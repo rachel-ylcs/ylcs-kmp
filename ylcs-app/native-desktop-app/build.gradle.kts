@@ -1,7 +1,5 @@
 import love.yinlin.gradle.BuildPlatform
 import love.yinlin.repository.C
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     install(
@@ -42,39 +40,24 @@ rachel {
             packageName = C.app.name
             displayName = C.app.displayName
             iconFile = C.root.app.config.icon.asFile
-            workingDirectory = C.root.work.desktop.asFile
         }
 
-        actions {
-            tasks.register("nativeDesktopRunDebug") {
-                description = "运行Debug原生桌面端"
-                dependsOn(tasks.named("composeRun"))
-            }
-
-            tasks.register("nativeDesktopRunRelease") {
-                description = "运行Release原生桌面端"
-                dependsOn(tasks.named("composeReleaseRun"))
-            }
-
+        artifacts {
             val (target, platform) = when (C.platform) {
-                BuildPlatform.Windows -> "Windows" to "WindowsNative"
-                BuildPlatform.Linux -> "Linux" to "LinuxNative"
-                BuildPlatform.Mac -> "Macos" to "macOSNative"
+                BuildPlatform.Windows -> "windows" to "WindowsNative"
+                BuildPlatform.Linux -> "linux" to "LinuxNative"
+                BuildPlatform.Mac -> "macos" to "macOSNative"
             }
-            val archive = tasks.named<Zip>("package${target}ReleaseExecutable")
+            val archive = nativeDesktopReleaseArchive
+            copy("nativeDesktopArtifact", archive, C.root.outputs, "ylcs-native-$target.zip", "打包当前平台的原生桌面端工件")
+            copy("nativeDesktopPublish", archive, C.root.outputs, "[$platform]${C.app.displayName}${C.versionName}.zip", "发布原生桌面端")
+        }
 
-            for ((taskName, filename) in mapOf(
-                "nativeDesktopArtifact" to "ylcs-native-${target.lowercase()}.zip",
-                "nativeDesktopPublish" to "[$platform]${C.app.displayName}${C.versionName}.zip",
-            )) {
-                tasks.register<Copy>(taskName) {
-                    description = if (taskName == "nativeDesktopArtifact") "打包当前平台的原生桌面端工件" else "发布原生桌面端"
-                    dependsOn(archive)
-
-                    from(archive.flatMap { it.archiveFile })
-                    into(C.root.outputs)
-                    rename { filename }
-                }
+        runs {
+            nativeDesktop {
+                debug("nativeDesktopRunDebug", "运行Debug原生桌面端")
+                release("nativeDesktopRunRelease", "运行Release原生桌面端")
+                workingDirectory = C.root.work.desktop.asFile
             }
         }
     }

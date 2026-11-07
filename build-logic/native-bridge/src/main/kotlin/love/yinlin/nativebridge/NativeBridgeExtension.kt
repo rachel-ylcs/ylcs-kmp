@@ -3,12 +3,18 @@ package love.yinlin.nativebridge
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.file.Directory
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderConvertible
 import javax.inject.Inject
 
 abstract class NativeBridgeExtension @Inject constructor(objects: ObjectFactory) {
+    internal val localSdlSource = objects.directoryProperty()
+
+    /** Prepared SDL source tree in the repository's active Native Compose generation. */
+    val sdlSourceDirectory: Provider<Directory> get() = localSdlSource
+
     val skikoTestRuntimeEnabled = objects.property(Boolean::class.java).convention(false)
 
     /** Stage Skiko's ICU locale data beside host Native tests, without adding application binaries. */

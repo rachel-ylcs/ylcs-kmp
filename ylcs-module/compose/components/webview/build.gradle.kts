@@ -1,5 +1,6 @@
 import love.yinlin.gradle.ExportLib
 import love.yinlin.gradle.task.BuildNativeCppTask
+import love.yinlin.gradle.task.PrepareNuGetPackageTask
 
 plugins {
     install(
@@ -59,8 +60,15 @@ rachel {
         }
 
         actions {
-            tasks.withType<BuildNativeCppTask>().configureEach {
-                cmakeOptions.add("RACHEL_WEBVIEW2_VERSION" to libs.versions.webview2.get())
+            val sdk = tasks.register<PrepareNuGetPackageTask>("prepareWebView2Sdk") {
+                packageId.set("Microsoft.Web.WebView2")
+                packageVersion.set(libs.versions.webview2)
+            }
+            val archive = sdk.flatMap { it.archive }
+            tasks.withType<BuildNativeCppTask>().matching { it.name == "buildWindowsNative" }.configureEach {
+                dependsOn(sdk)
+                inputs.file(archive)
+                cmakeOptions.add(archive.map { "RACHEL_WEBVIEW2_ARCHIVE" to it.asFile.invariantSeparatorsPath })
             }
         }
     }

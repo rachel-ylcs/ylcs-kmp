@@ -65,13 +65,52 @@ composeDesktopPackage {
     entryPoint = "main"
     packageName = "ModManager"
     displayName = "Rachel MOD Manager"
-    workingDirectory = C.root.work.modManager.asFile
+    versionedArchive = false
 }
 ```
 
-`C` 属于本仓库 `repository-conventions`。通用工程应传入自身的目录；`workingDirectory` 只影响 Gradle 运行任务启动的进程，不写入分发程序。`arguments` 为参数列表，包含空格的参数无需手工补引号。
+`versionedArchive = false` 省略桥插件生成的 Release ZIP 文件名中的 Gradle 版本段。MOD Manager 的工作目录在下文所述的 `runs {}` 中配置。
 
 Native `composeRun` 和 `composeReleaseRun` 分别运行宿主 Debug/Release；`composeDistribution` 生成宿主 Release 完整目录。输出位于 `build/nativeApplication/<target>/<binary>/`。`build/bin/` 的单个链接产物不包含全部运行资源。Release 符号位于独立的 `build/nativeSymbols/`，需要随构建另行归档，详细规则见 [Native Compose](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/native-compose/README.md)。
+
+## 发布应用产物
+
+在模板内用 `artifacts {}` 注册发布任务。模板提供带生产任务依赖的文件或目录，模块声明发布任务名、目的地和文件名。
+
+| 产物来源 | 模板提供的输出 |
+| --- | --- |
+| Android Release APK | `androidReleaseApk` |
+| JVM Desktop Release 应用目录 | `desktopReleaseDistribution` |
+| 当前宿主的 Native Desktop Release ZIP | `nativeDesktopReleaseArchive` |
+| 浏览器分发目录 | `browserDistribution(BrowserArtifactTarget.Js)` 或 `BrowserArtifactTarget.Wasm`，单 JS 模板提供 `jsDistribution` |
+| 指定平台的 Native Release 可执行文件 | `releaseExecutable(BuildPlatform.Linux)` 等 |
+
+`copy` 复制单个文件，可指定新文件名。`zip` 将目录归档，可声明归档内的顶层目录和排除规则。`sync` 将分发目录同步到指定位置。`aggregate` 将多个发布任务组合为一个入口。示例中的 `C` 属于本仓库的 `repository-conventions`，通用工程可以传入自己的目标目录。
+
+```kotlin
+artifacts {
+    copy("androidArtifact", androidReleaseApk, C.root.outputs, "ylcs-android.apk", "安卓端Release打包")
+}
+```
+
+## 配置开发运行
+
+`runs {}` 配置 Gradle 启动的进程，与应用打包配置分开。使用 `jvm`、`nativeDesktop` 或 `nativeExecutable` 设置工作目录、命令行参数、环境变量和动态库目录。JVM 还支持 `jvmArgs`，其动态库目录写入 `java.library.path`。Native 将动态库目录加入宿主平台的进程搜索路径。
+
+`debug(...)` 和 `release(...)` 选择构建模式并可注册运行别名。两个模式需要不同配置时，可以分别声明。浏览器使用 `browser(...)` 为 JS 或 Wasm 注册运行入口，开发服务器继续由 `webpack {}` 配置。
+
+```kotlin
+runs {
+    jvm {
+        debug("desktopRunDebug", "运行 Debug 桌面端")
+        release("desktopRunRelease", "运行 Release 桌面端")
+        workingDirectory = C.root.work.desktop.asFile
+        jvmArgs = listOf("-Dnative.library.resource.disabled=true")
+        libraryDirectories = listOf(C.root.artifacts.desktopNative.asFile)
+        buildDesktopNativeLibraries = true
+    }
+}
+```
 
 ## CInterop 与原生依赖
 

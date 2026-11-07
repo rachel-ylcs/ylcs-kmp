@@ -4,9 +4,13 @@ import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import javax.inject.Inject
 
 abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFactory) {
@@ -17,6 +21,13 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     abstract val workingDirectory: DirectoryProperty
     abstract val resources: ConfigurableFileCollection
     val desktop = NativeDesktopDistribution()
+    internal var releaseArchive: Provider<RegularFile>? = null
+    val hostReleaseArchive: Provider<RegularFile>
+        get() = checkNotNull(releaseArchive) { "No Release application archive was configured for this host" }
+    internal val hostRuns = mutableMapOf<NativeBuildType, MutableList<TaskProvider<RunNativeApplication>>>()
+
+    fun findHostRunTask(buildType: NativeBuildType): TaskProvider<RunNativeApplication>? =
+        hostRuns[buildType]?.singleOrNull()
     val skikoRuntimeEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val skikoWindowEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 

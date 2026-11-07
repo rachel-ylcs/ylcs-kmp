@@ -6,19 +6,20 @@
 
 共 26 个工件：Skiko Core/Skottie、UI 八工件、Foundation 两工件、Animation 三工件、Resources、Navigation3 UI、Material3 主族四工件、Material Ripple、Adaptive 四工件。Runtime 等已具备三个目标支持的依赖使用官方工件。
 
-基线由根 [libs.versions.toml](../libs.versions.toml) 和 [upstream](upstream) 锁定：CMP/Material3 `1.13.0-beta01`、Adaptive `1.4.0-alpha01`、Navigation3 `1.2.0`、Skiko `0.156.0`、SDL `3.4.18`、ICU 数据 `78.2`。桥插件使用 Rachel 发布版本，移植库使用对应的上游版本。
+在根 [libs.versions.toml](../libs.versions.toml) 选择上游版本。Material3 主族跟随 `cmp`，四个 Adaptive 工件跟随 `material3-adaptive`，完整 ICU 数据由 `icu` 选择。Skia SDK 版本从所选 Skiko 发布源码读取。同步器计算下载内容的摘要并生成来源记录，保存在 Git 忽略的 `vendor/` 下。移植库的 Maven 版本仍采用 Rachel 的发布格式。
 
 ## 目标与源码边界
 
 提供标准 Compose API、桌面 Native 窗口、资源读取与部署、Maven 发布/消费及应用目录分发。桥插件按 Native target 将官方请求重定向为 `love.yinlin.native.*` 工件；JVM、Android 等目标使用官方 Compose。KLIB 保留上游模块身份，以兼容官方 Runtime、AndroidX 等预编译依赖。
 
 - `adaptation/<上游 group>_<artifact>/`：维护的 Gradle buildFile、Kotlin/C++ 实现、cinterop 和单元测试。`src` 统一使用 `nativeMain`、`windowsMain`、`linuxMain`、`macosMain` 及对应 `Test`；cinterop 位于 `nativeMain/cinterop`。
-- `upstream/*.json`：源版本、仓库、提交、归档 SHA-256、工件及来源清单。`upstream/patches` 保存受版本、提交和哈希约束的上游差异，保留原始许可证和版权。
+- `upstream/*.json`：上游仓库、工件和构建配置。`upstream/patches` 保存上游差异；同步器检查补丁能否应用，计算摘要并保留原始许可证和版权。
+- `adaptation/provenance/`：记录维护中适配源码的原始出处。只有替换适配源码来源时才需要更新，随移植工件发布供追溯。
 - `gradle/templates`：Compose included build 模板。上游 `commonMain`、`skikoMain` 等编译片段由生成配置组织，保留元数据和 expect/actual 边界，不要求适配目录增加相同层次。
 - `vendor`：忽略的上游源码、归档、SDK 和构建输出，由 Kotlin 同步器管理。维护差异放入适配源码或补丁，不直接修改生成源码。
 - `verification`：独立 Maven 发布/消费工程，验证脱离源码复合构建后的使用方式。
 
-未修改的 macOS 实现直接从锁定的上游源码目录加入 `macosMain`，与适配源码一起编译成 Rachel 工件。例如 `ui-util` 使用上游 `macosMain`，`ui-text` 使用上游 `nativeMain`、`darwinMain` 和 `macosMain`。适配目录没有同名文件，不代表使用官方 macOS 二进制工件。
+未修改的 macOS 实现直接从当前版本的上游源码目录加入 `macosMain`，与适配源码一起编译成 Rachel 工件。例如 `ui-util` 使用上游 `macosMain`，`ui-text` 使用上游 `nativeMain`、`darwinMain` 和 `macosMain`。适配目录没有同名文件，不代表使用官方 macOS 二进制工件。
 
 源码同步位于 `build-logic/repository-conventions`，SDL 构建及验证工具位于 `build-logic/native-bridge`，Release 二进制与符号处理的共享实现位于 `build-logic/native-binaries`。后者由插件编译其源码，不是 `build-logic/settings.gradle.kts` 中单独 include 的项目。维护流程使用 Gradle/Kotlin，不依赖 Python。
 
@@ -30,42 +31,47 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。
 
+根版本目录指定 Gradle 和 Kotlin 版本。根 Wrapper 的 `distributionUrl` 必须与目录一致，生成的上游工程复用该 Wrapper。Kotlin 源码统一使用目录中的 KGP，语言及 API 级别取该 Kotlin 版本的主次版本，实验参数取根 `gradle.properties`。`.gradle.kts` 脚本自身由当前 Gradle 发行版内嵌的 Kotlin 编译，编写脚本时要使用它支持的语法。
+
 桥插件为本地源码消费单独生成项目结构元数据：保留发布坐标，并为实际选中的源码项目补充其 Gradle group/name 身份，兼容 Kotlin 在同一 build 和跨 included build 时使用的不同匹配方式。该文件仅替换 KGP 的 `kotlinProjectStructureMetadata` secondary variant；Maven publication 和 metadata JAR 继续使用原始发布元数据。通过 `ExportLib`／`api` 传递的依赖可沿模块链导入共享 Native 源码，不需要消费模块重复声明 Compose 子工件。
 
 ```text
 ./gradlew -p build-logic :repository-conventions:prepareNativeSources
 ./gradlew -p build-logic --offline :repository-conventions:prepareNativeSources
-./gradlew -p build-logic :repository-conventions:checkNativeUpstreamUpdates
 ./gradlew -p build-logic :repository-conventions:test :native-bridge:test :native-bridge:validatePlugins
 ./gradlew :native-compose:testHost :native-compose:publishHost
 ./gradlew :native-compose:verifyHost
 ```
 
-`prepareNativeSources` 获取锁定归档和稀疏 Git checkout、应用补丁并生成 included builds，不执行 CMake、库编译或应用运行。输入和受管理源码一致时直接复用，不重复解压 Maven 源码或还原、应用 Git 补丁，也不重写 Wrapper。离线模式要求所需归档、Git 对象及源码选择已存在。同步保留构建输出和未变化文件的时间戳，遇到本地修改、未知文件或上游漂移时保留现场并失败。
+`prepareNativeSources` 按版本目录解析 Git 标签和发布归档，计算 SHA-256，核对上游提供的摘要（如有），并校验本地缓存内容，再应用补丁、生成来源记录和 included builds。根 Gradle Sync 自动执行同一准备过程；准备源码本身不执行 CMake 或库编译。需要使用 Native 库的任务会按需编译。离线模式需要本地已有当前版本的完整、可校验的上游输入。
 
-同步仅为 `vendor` 上游 Kotlin 文件和脚本合并文件级 `kotlin.Suppress("warnings")`，保留原有抑制项、版权声明和编译错误。`adaptation` 源码继续输出警告，未设置模块级 `suppressWarnings`。没有源码归属的编译器、链接器及 Gradle 警告继续保留。该策略参与同步记录和缓存身份，已有 vendor 会在源码准备时自动迁移。
+归档和 Git 源码缓存按版本和 SHA-256 存放在 `vendor/archives/` 和 `vendor/git/`。版本、源码和 SDK 哈希、补丁、适配源码及配置共同决定 `vendor/g/<id>/`；其中包含 Skiko、Compose、ICU、SDL，以及此代的 CMake、SDK、Gradle 输出和 Maven 验证仓库。`vendor/current.json` 只在整套源码准备成功后更新，供独立验证和 CI 定位产物。回滚版本可复用仍完整的对应缓存。旧版目录会保留，且不会作为新版输入；同步器只清理自己创建的临时目录。
+
+升级时修改版本目录即可触发同步。若新发布改变了补丁上下文、源码布局或 SDK 结构，准备过程会在不兼容的位置报错，此时需要更新对应适配。Windows 构建 SDL 需要 x64 MSVC、Windows SDK 和 Ninja：脚本会检查 Gradle 进程实际可见的编译器，必要时通过 `VS_PATH`、`SKIKO_VSBT_PATH`、`VSINSTALLDIR` 或 `vswhere` 找到安装，再初始化 `vcvars64.bat`。
+
+Kotlin 警告沿用仓库模块的默认行为，源码保留原有的局部 `@Suppress` 注解。同步器保留上游的版权声明。
 
 Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实共享实现；缺失 actual 由适配源码提供。日期和数字本地化共用 Skia ICU，macOS 的 `CalendarLocale` 保留 `NSLocale` 类型身份。
 
-应用默认分发 JetBrains Skia SDK 自带的约 3.72 MiB 裁剪版 ICU 数据，包含中英文文本边界规则、中日文词典及 Unicode 规范化等基础数据。`upstream/icu.json` 锁定源 SDK 和数据哈希；三个桌面目标共用同一份小端数据，以 `icudtl-text@dat` 随 Skiko publication 发布，桥插件在分发目录中将其命名为 `icudtl.dat`。应用分发目录不额外复制 ICU 许可证，适配源码也不单独维护许可证副本；上游归档及 Maven 许可来源保持原有管理方式。
+应用默认分发 JetBrains Skia SDK 自带的约 3.72 MiB 裁剪版 ICU 数据，包含中英文文本边界规则、中日文词典及 Unicode 规范化等基础数据。同步生成的 `metadata/icu.json` 记录源 SDK 和两份数据的 SHA-256；三个桌面目标共用同一份小端数据，以 `icudtl-text@dat` 随 Skiko publication 发布，桥插件在分发目录中将其命名为 `icudtl.dat`。应用分发目录不额外复制 ICU 许可证，适配源码也不单独维护许可证副本；上游归档及 Maven 许可来源保持原有管理方式。
 
 裁剪版不包含完整的各语言日期、数字、货币等本地化资源。完整 ICU 数据仍以 `icudtl@dat` 发布，`nativeBridge { skikoTests() }` 和移植维护测试使用完整数据，以验证 Material3 日期及数字本地化能力；需要这些能力的应用必须自行选用完整数据。Linux/macOS 首次使用日期服务时注册只读内存映射，Windows 使用 Skia 的数据加载器。
 
-`testHost` 执行当前宿主库测试；`publishHost` 输出到 `native-compose/vendor/build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
+`testHost` 执行当前宿主库测试；`publishHost` 输出到当前代的 `build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
 
-日常 Build/Test 通过共享的 `setup-build`、`setup-native` 动作恢复上游归档、准备好的源码、Kotlin/Native 工具链和 Gradle 编译缓存，不运行移植库的维护测试或本地发布。桌面 Native 作业另外恢复宿主 SDL/Skia SDK；修改 `skikoMain`、`skikoTest` 也会触发三个桌面 Native 平台的框架测试。源码快照仅使用精确缓存键，命中后恢复并由 Settings 检查、复用；未命中时自动准备并创建快照。
+日常 Build/Test 通过共享的 `setup-build`、`setup-native` 动作恢复上游下载与 Kotlin/Native 工具链，再验证并准备当前代源码。桌面 Native 作业按当前代与宿主镜像恢复 SDL SDK。修改 `skikoMain`、`skikoTest` 也会触发三个桌面 Native 平台的框架测试。
 
-[native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游锁及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
+[native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游配置及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
 
 GitHub Actions 的 macOS Gradle 作业通过共享 `setup-native` 动作设置 `kotlin.incremental.native=false`、一个 Gradle worker、一个 Native 后端线程及 3 GiB Gradle 堆，Kotlin 编译在 Gradle 进程内执行。这些用户级属性覆盖仓库的本地开发配置，同时作用于框架 Build/Test、发布、included build 和独立 Maven 消费验证，避免冷构建重复建立按文件项目缓存及多个编译进程争用 runner 内存；Gradle build cache 和 Native 外部依赖缓存继续启用。框架 Apple Native 单元测试及移植验证程序使用链接器 `-S` 省去调试映射，测试断言和编译优化模式保持原有配置。本地构建保留原有增量编译及调试配置。维护工作流保存宿主库阶段的完整日志、Gradle 耗时报告及 Kotlin 编译报告。
 
-源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`，缓存身份由 `:repository-conventions:writeNativeCiInputs` 计算；快照排除 SDK、原始归档和编译输出。静态 SDK 缓存按宿主镜像、Kotlin 版本及 SDK 输入区分。
+`:repository-conventions:writeNativeCiInputs` 计算 CI 的版本目录输入。CI 可以恢复含有其他版本的下载缓存，但同步器按当前版本定位文件并校验 SHA-256；静态 SDL SDK 的缓存键使用完整的当前代哈希。
 
 升级维护流程：
 
-1. 确定 CMP、Skiko 及独立版本库的目标版本，核对官方 tag/commit、Maven source archive、Skia 资产、SDK 的 ICU 版本和社区参考变化，更新根版本目录及锁定项。
-2. 在临时目录取得对应原始源码，审核和重做 `upstream/patches`。先执行 `git apply --check`，保留真实功能、平台实现和许可证。更新补丁清单的 SHA-256、提交、版本及参考身份，不能只修改版本标签。
-3. 核查适配实现、源集、依赖导出、KLIB 身份、资源所有权及测试；Kotlin 位置解构等兼容性修改保留为受版本约束的补丁。
+1. 在根版本目录更新目标版本。同步器解析发布标签、Maven 源码和 Skia SDK，并生成对应的 SHA-256 记录。
+2. 若补丁不再适用，在临时目录用原始源码更新补丁，执行 `git apply --check`，保留平台实现和许可证。只有补丁文件增删或改名时才需要调整清单。
+3. 核查适配实现、源集、依赖导出、KLIB 身份、资源所有权及测试；Kotlin 位置解构等兼容性修改保留为适配补丁。
 4. 准备源码并验证对应宿主和独立 Maven 消费，刷新 IDEA Gradle 模型。
 
 ## 消费端使用
@@ -99,7 +105,7 @@ rachel {
 
 Windows、macOS 和 X11 支持禁用普通窗口焦点；Wayland 普通顶层窗口的 `focusable` 配置仅保存赋值，不调用 SDL 修改焦点能力，也不抛异常或回写配置值。鼠标穿透、用户缩放和标题栏拖动分别独立控制，Wayland 的鼠标穿透仍可正常使用。
 
-鼠标穿透通过受锁定补丁管理的 SDL 窗口扩展实现，要求无系统标题栏；恢复系统标题栏时自动关闭穿透。Windows 使用 layered／transparent 扩展样式，并在关闭穿透时恢复原有相关样式位；窗口宿主预先注册不带 `CS_OWNDC` 的窗口类，以兼容分层输入穿透，保留 D3D12／软件渲染。macOS 使用 NSWindow 的忽略鼠标事件属性；X11 使用 SHAPE 1.1 输入区域；Wayland 使用 wl_surface 的空输入区域。切换不会清空绘制内容，缺少所需后端能力时明确报错。补丁哈希参与源码和静态 SDK 缓存身份。
+鼠标穿透通过由适配补丁提供的 SDL 窗口扩展实现，要求无系统标题栏；恢复系统标题栏时自动关闭穿透。Windows 使用 layered／transparent 扩展样式，并在关闭穿透时恢复原有相关样式位；窗口宿主预先注册不带 `CS_OWNDC` 的窗口类，以兼容分层输入穿透，保留 D3D12／软件渲染。macOS 使用 NSWindow 的忽略鼠标事件属性；X11 使用 SHAPE 1.1 输入区域；Wayland 使用 wl_surface 的空输入区域。切换不会清空绘制内容，缺少所需后端能力时明确报错。补丁哈希参与源码和静态 SDK 缓存身份。
 
 Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏通过 `WindowScope.DragArea` 识别主鼠标键拖动，再调用底层窗口的 `startDrag()` 发起平台拖动；支持长按与双击回调。交互控件区域可用 `Modifier.windowDragArea(controller, draggable = false)` 禁止拖动，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
 
@@ -127,7 +133,7 @@ class DesktopApplication(override val commandArgs: Array<String>) : PlatformAppl
 fun main(args: Array<String>) = DesktopApplication(args).run()
 ```
 
-Native 托盘沿用 SDL 3.4.18 的图标接口，通过 `controller.tray.visible` 显示或隐藏，`painter` 默认为窗口图标，`tooltip` 默认为窗口标题。`isActive` 表示图标是否已创建，`isAvailable` 记录最近一次创建结果（尚未尝试时为 null）。桌面未提供托盘服务时跳过创建，Linux 需要可用的 GTK/AppIndicator 和桌面托盘服务。显隐与提示文字等状态由窗口生命周期内的 Main 协程观察，窗口隐藏或最小化时仍可更新；关闭窗口时取消观察并释放托盘。当前只开放图标、提示文字及显隐，点击、菜单和通知待后续接入，不添加图标点击的 SDL 扩展补丁。
+Native 托盘沿用 SDL 的图标接口，通过 `controller.tray.visible` 显示或隐藏，`painter` 默认为窗口图标，`tooltip` 默认为窗口标题。`isActive` 表示图标是否已创建，`isAvailable` 记录最近一次创建结果（尚未尝试时为 null）。桌面未提供托盘服务时跳过创建，Linux 需要可用的 GTK/AppIndicator 和桌面托盘服务。显隐与提示文字等状态由窗口生命周期内的 Main 协程观察，窗口隐藏或最小化时仍可更新；关闭窗口时取消观察并释放托盘。当前只开放图标、提示文字及显隐，点击、菜单和通知待后续接入，不添加图标点击的 SDL 扩展补丁。
 
 应用安装桥插件后，可在 `rachel.multiplatform` 配置打包信息：
 

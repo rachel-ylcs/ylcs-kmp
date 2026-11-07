@@ -1,4 +1,8 @@
 import love.yinlin.gradle.ExportLib
+import love.yinlin.gradle.BuildPlatform
+import love.yinlin.gradle.task.BuildDesktopNativeTask
+import love.yinlin.gradle.task.BuildNativeCppTask
+import love.yinlin.gradle.task.PrepareNuGetPackageTask
 
 plugins {
     install(
@@ -74,4 +78,22 @@ rachel {
             wasmJsMain(webMain)
         }
     }
+}
+
+val winrtSdk = tasks.register<PrepareNuGetPackageTask>("prepareWinRtSdk") {
+    packageId.set("Microsoft.Windows.SDK.CPP")
+    packageVersion.set(libs.versions.windowsSdkCpp)
+}
+val winrtArchive = winrtSdk.flatMap { it.archive }
+tasks.withType<BuildDesktopNativeTask>().configureEach {
+    if (nativePlatform.get() == BuildPlatform.Windows) {
+        dependsOn(winrtSdk)
+        inputs.file(winrtArchive)
+        cmakeOptions.add(winrtArchive.map { "RACHEL_WINRT_SDK_ARCHIVE" to it.asFile.invariantSeparatorsPath })
+    }
+}
+tasks.withType<BuildNativeCppTask>().matching { it.name == "buildWindowsNative" }.configureEach {
+    dependsOn(winrtSdk)
+    inputs.file(winrtArchive)
+    cmakeOptions.add(winrtArchive.map { "RACHEL_WINRT_SDK_ARCHIVE" to it.asFile.invariantSeparatorsPath })
 }

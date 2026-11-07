@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.result.UnresolvedDependencyResult
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -26,9 +27,20 @@ plugins {
 
 val native = providers.gradleProperty("framework.native").getOrElse("false").toBoolean()
 if (native) apply(plugin = "love.yinlin.native-bridge")
-layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/framework-consumer-${if (native) "native" else "jvm"}"))
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.verificationGeneration") as File
+tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+layout.buildDirectory.set(generation.resolve("build/framework-consumer-${if (native) "native" else "jvm"}"))
+
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
+val compilerProfile = gradle.extensions.extraProperties
 
 kotlin {
+    compilerOptions {
+        languageVersion.set(kotlinLanguage)
+        apiVersion.set(kotlinLanguage)
+        @Suppress("UNCHECKED_CAST")
+        freeCompilerArgs.addAll(compilerProfile["rachel.kotlin.compilerArgs"] as List<String>)
+    }
     jvmToolchain(25)
     if (native) {
         when (HostManager.host.name) {

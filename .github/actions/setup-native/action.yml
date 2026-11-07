@@ -6,6 +6,11 @@ inputs:
     description: Install Linux development packages needed to compile the desktop Native producers.
     default: 'false'
 
+outputs:
+  generation:
+    description: Repository-relative directory of the prepared Native sources and build outputs.
+    value: ${{ steps.prepare.outputs.generation }}
+
 runs:
   using: composite
   steps:
@@ -49,30 +54,15 @@ runs:
         key: native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-${{ inputs.tools }}
         restore-keys: |
           native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-
-    - name: Restore immutable upstream archives
+    - name: Restore upstream source and SDK downloads
       uses: actions/cache@v5
       with:
         path: |
-          native-compose/vendor/skiko/*.zip
-          native-compose/vendor/skiko/skia/*.zip
-          native-compose/vendor/maven/*-sources.jar
-          native-compose/vendor/sdl-source-*.zip
-          native-compose/vendor/icu/icu-data.zip
-        key: native-archives-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/compose.json', 'native-compose/upstream/sdl.json', 'native-compose/upstream/icu.json') }}
-    - name: Restore prepared source workspaces
-      id: sources
-      uses: actions/cache@v5
-      with:
-        path: native-compose/vendor/cache/prepared-sources.zip
-        key: native-sources-v6-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.native-inputs }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/main/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', '.gitattributes', 'gradlew', 'gradlew.bat') }}
-    - name: Restore the static SDL SDK and extracted Skia binaries
-      if: ${{ inputs.tools == 'true' }}
-      uses: actions/cache@v5
-      with:
-        path: |
-          native-compose/vendor/sdl-static
-          native-compose/vendor/skiko/workspace/skiko/dependencies/skia
-        key: native-sdk-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.image-version }}-${{ steps.inputs.outputs.kotlin-version }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'native-compose/upstream/patches/sdl.patch', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts') }}
+          native-compose/vendor/archives
+          native-compose/vendor/git
+        key: native-inputs-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.native-inputs }}-${{ hashFiles('native-compose/upstream/*.json') }}
+        restore-keys: |
+          native-inputs-v1-${{ runner.os }}-${{ runner.arch }}-
     - name: Linux desktop Native toolchain dependencies
       if: ${{ runner.os == 'Linux' && inputs.tools == 'true' }}
       shell: bash
@@ -81,6 +71,14 @@ runs:
         sudo apt-get install -y cmake ninja-build pkg-config libfontconfig1-dev libfreetype6-dev \
           libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev \
           libxinerama-dev libxi-dev libxss-dev libxtst-dev libwayland-dev wayland-protocols libxkbcommon-dev
+    - name: Provide Ninja independently of Visual Studio
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: |
+        if (-not (Get-Command ninja -ErrorAction SilentlyContinue)) {
+          choco install ninja --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
     - name: Configure the macOS Native toolchain
       if: ${{ runner.os == 'macOS' && inputs.tools == 'true' }}
       shell: bash
@@ -96,18 +94,18 @@ runs:
         sdk_root="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
         printf 'SDKROOT=%s\n' "$sdk_root" >> "$GITHUB_ENV"
         printf 'macOS SDK: %s\n' "$sdk_root"
-    - name: Restore the prepared source snapshot
-      if: ${{ steps.sources.outputs.cache-hit == 'true' }}
+    - name: Prepare the selected Native sources
+      id: prepare
       shell: bash
       run: |
         bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
           -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-          :repository-conventions:restoreNativeSourceCache
-    - name: Prepare a missing source snapshot
-      if: ${{ steps.sources.outputs.cache-hit != 'true' }}
-      shell: bash
-      run: |
-        bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
-          -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-          :repository-conventions:prepareNativeSources \
-          :repository-conventions:createNativeSourceCache
+          :repository-conventions:prepareNativeSources
+        printf 'generation=native-compose/%s\n' "$(jq -er '.directory' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
+        printf 'sha256=%s\n' "$(jq -er '.sha256' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
+    - name: Restore the static SDL SDK for this generation
+      if: ${{ inputs.tools == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ${{ steps.prepare.outputs.generation }}/sdl/sdk
+        key: native-sdl-sdk-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.image-version }}-${{ steps.prepare.outputs.sha256 }}

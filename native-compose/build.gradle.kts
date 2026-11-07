@@ -4,19 +4,15 @@ import org.jetbrains.kotlin.konan.target.HostManager
 plugins { idea }
 
 val nativeDirectory = layout.projectDirectory
-layout.buildDirectory.set(nativeDirectory.dir("vendor/build/native-compose"))
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.generation") as File
+layout.buildDirectory.set(generation.resolve("build/native-compose"))
+tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+val compose = JsonSlurper().parse(generation.resolve("metadata/compose.json")) as Map<*, *>
+val modules = compose["modules"] as Map<*, *>
 idea.module {
     // Included builds provide their own source roots inside vendor.
     excludeDirs.addAll(files("vendor", ".gradle", ".kotlin").files)
 }
-val lock = JsonSlurper().parse(file("upstream/lock.json")) as Map<*, *>
-val sdlLock = JsonSlurper().parse(file("upstream/sdl.json")) as Map<*, *>
-check(libs.versions.sdl.get() == sdlLock["version"]) {
-    "SDL version changed in ../libs.versions.toml; review upstream/sdl.json and run prepareNativeSources."
-}
-val portGroup = lock["group"] as String
-check(portGroup == "love.yinlin.native.skiko") { "Review Native Skiko's publication namespace in upstream/lock.json" }
-
 val sourceBuild = gradle.includedBuilds.find { it.name == "skiko" }
 val hostPublication = when (HostManager.host.name) {
     "mingw_x64" -> "MingwX64"
@@ -32,8 +28,6 @@ val hostTarget = when (HostManager.host.name) {
 }
 val composeSource = gradle.includedBuilds.find { it.name == "compose-ui" }
 if (sourceBuild != null && composeSource != null && hostTarget != null) {
-    val composeLock = JsonSlurper().parse(file("upstream/compose.json")) as Map<*, *>
-    val modules = composeLock["modules"] as Map<*, *>
     tasks.register("testHost") {
         group = "verification"
         description = "Run all maintained Native library regressions for this host"
@@ -76,26 +70,23 @@ tasks.register<Sync>("publishHost") {
     description = "Publish all owned host KLIBs to one local verification repository"
     dependsOn("publishSkikoToVerificationRepository", "publishComposeUiToVerificationRepository")
     from(layout.buildDirectory.dir("repository"))
-    from(nativeDirectory.dir("vendor/build/compose-ui/repository")) {
-        val composeLock = JsonSlurper().parse(file("upstream/compose.json")) as Map<*, *>
-        val modules = composeLock["modules"] as Map<*, *>
-        val groups = modules.values.map { (it as Map<*, *>)["group"] ?: composeLock["group"] }.toSet()
+    from(generation.resolve("build/compose-ui/repository")) {
+        val groups = modules.values.map { (it as Map<*, *>)["group"] ?: compose["group"] }.toSet()
         include(groups.map { "${it.toString().replace('.', '/')}/**" })
     }
-    into(nativeDirectory.dir("vendor/build/repository"))
+    into(generation.resolve("build/repository"))
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
 val repositoryBuildLogic = gradle.includedBuilds.single { it.projectDir.canonicalFile == nativeDirectory.dir("../build-logic").asFile.canonicalFile }
 for ((name, target) in mapOf(
     "prepareSources" to ":repository-conventions:prepareNativeSources",
-    "checkUpstreamUpdates" to ":repository-conventions:checkNativeUpstreamUpdates",
     "checkSources" to ":native-bridge:checkNativeSources",
     "verifyHost" to ":native-bridge:verifyNativeHost",
     "assembleVerificationRepository" to ":native-bridge:assembleNativeRepository",
 )) {
     tasks.register(name) {
-        group = if (name in setOf("prepareSources", "checkUpstreamUpdates")) "native setup" else "verification"
+        group = if (name == "prepareSources") "native setup" else "verification"
         dependsOn(repositoryBuildLogic.task(target))
     }
 }

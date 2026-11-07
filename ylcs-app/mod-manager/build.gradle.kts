@@ -1,7 +1,5 @@
 import love.yinlin.gradle.BuildPlatform
 import love.yinlin.repository.C
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     install(
@@ -47,37 +45,25 @@ rachel {
             entryPoint = "main"
             packageName = "ModManager"
             displayName = "Rachel MOD Manager"
-            workingDirectory = C.root.work.modManager.asFile
+            versionedArchive = false
         }
 
-        actions {
-            tasks.withType<Zip>().matching { it.name.startsWith("package") && it.name.endsWith("ReleaseExecutable") }.configureEach {
-                archiveVersion.set("")
-            }
-
+        artifacts {
             val (target, platform) = when (C.platform) {
-                BuildPlatform.Windows -> "Windows" to "WindowsNative"
-                BuildPlatform.Linux -> "Linux" to "LinuxNative"
-                BuildPlatform.Mac -> "Macos" to "macOSNative"
+                BuildPlatform.Windows -> "windows" to "WindowsNative"
+                BuildPlatform.Linux -> "linux" to "LinuxNative"
+                BuildPlatform.Mac -> "macos" to "macOSNative"
             }
-            val archive = tasks.named<Zip>("package${target}ReleaseExecutable")
-            for ((taskName, filename) in mapOf(
-                "modManagerArtifact" to "ylcs-mod-manager-${target.lowercase()}.zip",
-                "modManagerPublish" to "[$platform]ModManager${C.versionName}.zip",
-            )) {
-                tasks.register<Copy>(taskName) {
-                    description = if (taskName == "modManagerArtifact") "打包MOD编辑器工件" else "发布MOD编辑器"
-                    dependsOn(archive)
+            val archive = nativeDesktopReleaseArchive
+            copy("modManagerArtifact", archive, C.root.outputs, "ylcs-mod-manager-$target.zip", "打包MOD编辑器工件")
+            copy("modManagerPublish", archive, C.root.outputs, "[$platform]ModManager${C.versionName}.zip", "发布MOD编辑器")
+        }
 
-                    from(archive.flatMap { it.archiveFile })
-                    into(C.root.outputs)
-                    rename { filename }
-                }
-            }
-
-            tasks.register("modManagerRunDebug") {
-                description = "运行MOD编辑器Debug原生桌面版"
-                dependsOn(tasks.named("composeRun"))
+        runs {
+            nativeDesktop {
+                debug("modManagerRunDebug", "运行MOD编辑器Debug原生桌面版")
+                release()
+                workingDirectory = C.root.work.modManager.asFile
             }
         }
     }

@@ -1,4 +1,6 @@
 import love.yinlin.repository.tip.showtime
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     idea
@@ -20,6 +22,14 @@ plugins {
 
 idea.module {
     excludeDirs.add(file("native-compose/vendor"))
+}
+
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
+allprojects {
+    tasks.withType<KotlinCompilationTask<*>>().configureEach {
+        compilerOptions.languageVersion.set(kotlinLanguage)
+        compilerOptions.apiVersion.set(kotlinLanguage)
+    }
 }
 
 showtime()

@@ -3,13 +3,18 @@ import groovy.json.JsonSlurper
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import java.security.MessageDigest
+import java.nio.file.Files
 
-fun sdkDigest(file: File): String = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
+fun sdkDigest(file: File): String {
+    val digest = MessageDigest.getInstance("SHA-256")
+    file.inputStream().use { input -> java.security.DigestInputStream(input, digest).use { it.transferTo(java.io.OutputStream.nullOutputStream()) } }
+    return digest.digest().joinToString("") { "%02x".format(it) }
+}
 
 fun Project.sdkOutput(arguments: List<String>, variables: Map<String, String>): String {
     val result = providers.exec {
         commandLine(arguments)
-        environment(variables)
+        setEnvironment(variables)
         isIgnoreExitValue = true
     }
     val output = result.standardOutput.asText.get()
@@ -17,31 +22,63 @@ fun Project.sdkOutput(arguments: List<String>, variables: Map<String, String>): 
     return output
 }
 
+fun sdkTool(variables: Map<String, String>, name: String): File? =
+    variables["PATH"].orEmpty().split(File.pathSeparator).asSequence().map { it.trim().trim('"') }
+        .filter { it.isNotEmpty() }.map { File(it, name) }.firstOrNull { it.isFile }?.canonicalFile
+
 fun Project.sdkWindowsEnvironment(base: Map<String, String>, work: File): Map<String, String> {
-    if (!base["INCLUDE"].isNullOrBlank() && !base["LIB"].isNullOrBlank()) return base
-    val installation = base["VS_PATH"] ?: base["SKIKO_VSBT_PATH"] ?: error("Static SDL requires VS_PATH or an initialized MSVC environment")
-    val vcvars = File(installation, "VC/Auxiliary/Build/vcvars64.bat")
-    check(vcvars.isFile) { "Missing MSVC environment script: $vcvars" }
-    work.mkdirs()
-    val helper = work.resolve("msvc-environment.cmd")
-    helper.writeText("@echo off\r\ncall \"%RACHEL_SDL_VCVARS%\" >nul\r\nif errorlevel 1 exit /b %errorlevel%\r\nset\r\n")
-    // Environment output can contain credentials. Capture it internally; never log it.
-    val process = ProcessBuilder("cmd.exe", "/d", "/c", helper.absolutePath).apply {
-        environment().putAll(base)
-        environment()["RACHEL_SDL_VCVARS"] = vcvars.absolutePath
-        redirectError(ProcessBuilder.Redirect.DISCARD)
-    }.start()
-    val encoding = java.nio.charset.Charset.forName(System.getProperty("native.encoding", java.nio.charset.Charset.defaultCharset().name()))
-    val output = process.inputStream.bufferedReader(encoding).use { it.readText() }
-    check(process.waitFor() == 0) { "Cannot initialize MSVC for static SDL" }
-    val variables = base.toMutableMap()
-    for (line in output.lineSequence()) {
-        val separator = line.indexOf('=')
-        if (separator > 0) variables[line.substring(0, separator)] = line.substring(separator + 1)
+    val variables = base.mapKeys { it.key.uppercase(java.util.Locale.ROOT) }
+    fun ready(environment: Map<String, String>): Boolean {
+        val compiler = sdkTool(environment, "cl.exe") ?: return false
+        val linker = sdkTool(environment, "link.exe") ?: return false
+        return !environment["INCLUDE"].isNullOrBlank() && !environment["LIB"].isNullOrBlank() &&
+            environment["VSCMD_ARG_TGT_ARCH"].orEmpty().lowercase() in setOf("", "x64", "amd64") &&
+            compiler.parentFile.name.equals("x64", ignoreCase = true) && linker.parentFile == compiler.parentFile
     }
-    val ninja = File(installation, "Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja")
-    if (ninja.resolve("ninja.exe").isFile) variables["PATH"] = ninja.absolutePath + File.pathSeparator + variables["PATH"].orEmpty()
-    return variables
+    if (ready(variables) && sdkTool(variables, "ninja.exe") != null && sdkTool(variables, "cmake.exe") != null) return variables
+    val explicit = listOf("SKIKO_VSBT_PATH", "VS_PATH", "VSINSTALLDIR").firstNotNullOfOrNull { variables[it]?.takeIf(String::isNotBlank)?.let(::File) }
+    val vswhere = variables["PROGRAMFILES(X86)"]?.let { File(it, "Microsoft Visual Studio/Installer/vswhere.exe") }
+    val installation = explicit ?: vswhere?.takeIf(File::isFile)?.let {
+        val path = sdkOutput(listOf(it.path, "-latest", "-products", "*", "-requires",
+            "Microsoft.VisualStudio.Component.VC.Tools.x86.x64", "-property", "installationPath"), variables).trim()
+        path.takeIf(String::isNotEmpty)?.let(::File)
+    }
+    check(installation != null) { "Cannot locate x64 MSVC for SDL; install the Visual Studio C++ tools or set VS_PATH to the installation directory." }
+    val environment = variables.toMutableMap()
+    if (!ready(variables)) {
+        val vcvars = installation.resolve("VC/Auxiliary/Build/vcvars64.bat")
+        check(vcvars.isFile) { "Missing MSVC environment script: $vcvars" }
+        val helper = Files.createTempFile(work.toPath(), "vcvars-", ".cmd").toFile()
+        try {
+            helper.writeText("@echo off\r\ncall \"%RACHEL_SDL_VCVARS%\" >nul\r\nif errorlevel 1 exit /b %errorlevel%\r\nset\r\n")
+            // Capture the environment privately, preserving Windows' case-insensitive variable names.
+            val process = ProcessBuilder("cmd.exe", "/d", "/c", helper.name).directory(work).apply {
+                environment().clear()
+                environment().putAll(variables.filterKeys { name ->
+                    name !in setOf("INCLUDE", "LIB", "LIBPATH", "VCTOOLSINSTALLDIR", "VCTOOLSVERSION", "WINDOWSSDKDIR", "WINDOWSSDKVERSION") &&
+                        !name.startsWith("VSCMD_") && !name.startsWith("__VSCMD_")
+                })
+                variables["__VSCMD_PREINIT_PATH"]?.takeIf(String::isNotBlank)?.let { environment()["PATH"] = it }
+                environment()["RACHEL_SDL_VCVARS"] = vcvars.absolutePath
+                redirectError(ProcessBuilder.Redirect.DISCARD)
+            }.start()
+            val encoding = java.nio.charset.Charset.forName(System.getProperty("native.encoding", java.nio.charset.Charset.defaultCharset().name()))
+            val output = process.inputStream.bufferedReader(encoding).use { it.readText() }
+            check(process.waitFor() == 0) { "Cannot initialize x64 MSVC using $vcvars" }
+            environment.clear()
+            for (line in output.lineSequence()) {
+                val separator = line.indexOf('=')
+                if (separator > 0) environment[line.substring(0, separator).uppercase(java.util.Locale.ROOT)] = line.substring(separator + 1)
+            }
+            environment.remove("RACHEL_SDL_VCVARS")
+        }
+        finally { helper.delete() }
+    }
+    check(ready(environment)) { "MSVC initialization did not supply cl.exe, link.exe, INCLUDE and LIB for x64: $installation" }
+    val ninja = installation.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja")
+    val cmake = installation.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin")
+    environment["PATH"] = (listOf(ninja, cmake).filter(File::isDirectory).map { it.absolutePath } + environment["PATH"].orEmpty()).joinToString(File.pathSeparator)
+    return environment
 }
 
 fun Project.sdkLinuxOptions(nativeHome: File, variables: Map<String, String>, work: File): Pair<List<String>, Map<String, String>> {
@@ -91,28 +128,33 @@ fun sdkLinkOptions(text: String): List<String> {
     return result
 }
 
-val sdkNativeDirectory = rootProject.projectDir.resolve("../../../../..").canonicalFile.resolve("native-compose")
-val sdkLockFile = sdkNativeDirectory.resolve("upstream/sdl.json")
-val sdkLock = JsonSlurper().parse(sdkLockFile) as Map<*, *>
-val sdkBuildProfile = sdkLock["build"] as Map<*, *>
+val sdkGeneration = rootProject.projectDir.resolve("../../..").canonicalFile
+val sdkNativeDirectory = sdkGeneration.resolve("../../..").canonicalFile
+val sdkMetadataFile = sdkGeneration.resolve("metadata/sdl.json")
+val sdkMetadata = JsonSlurper().parse(sdkMetadataFile) as Map<*, *>
+val sdkBuildProfile = sdkMetadata["build"] as Map<*, *>
 val sdkCmakeProfile = sdkBuildProfile["cmake"] as Map<*, *>
 check(sdkBuildProfile["dynamicApi"] == false && sdkCmakeProfile.all { (name, value) -> name is String && Regex("SDL_[A-Z0-9_]+").matches(name) && value is Boolean }) { "Invalid SDL window SDK profile" }
-val sdkVersion = sdkLock["version"] as String
+val sdkVersion = sdkMetadata["version"] as String
 val sdkHost = HostManager.host.name
 check(sdkHost in setOf("mingw_x64", "linux_x64", "macos_arm64")) { "Unsupported static SDL host: $sdkHost" }
-val sdkSource = sdkNativeDirectory.resolve("vendor/sdl-source-$sdkVersion")
-val sdkPrefix = sdkNativeDirectory.resolve("vendor/sdl-static/$sdkHost")
+val sdkSource = sdkGeneration.resolve("sdl/source")
+val sdkPrefix = sdkGeneration.resolve("sdl/sdk/$sdkHost")
+extensions.extraProperties["rachel.sdl.sdk"] = sdkPrefix
 val sdkArchiveName = if (sdkHost == "mingw_x64") "SDL3-static.lib" else "libSDL3.a"
 val sdkScript = sdkNativeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts")
-val sdkDropPatch = sdkSource.resolve(".rachel-drop-patch.json")
+val sdkSourceRecord = sdkGeneration.resolve("sdl/files.json")
 val sdkNativeLocation = layout.buildDirectory.file("konan.txt")
 
 tasks.register("prepareSdlStatic") {
     group = "native setup"
-    description = "Build the pinned SDL source as a static SDK for the Kotlin/Native host"
-    inputs.files(sdkLockFile, sdkScript, sdkSource.resolve(".rachel-source-sha256"), sdkSource.resolve("src/dynapi/SDL_dynapi.h"), sdkDropPatch)
+    description = "Build the selected SDL source as a static SDK for the Kotlin/Native host"
+    inputs.files(sdkMetadataFile, sdkScript, sdkSourceRecord, sdkGeneration.resolve(".rachel-generation.json"))
     inputs.property("host", sdkHost)
-    outputs.files(sdkPrefix.resolve("rachel-sdl.json"), sdkPrefix.resolve("lib/$sdkArchiveName"))
+    outputs.dir(sdkPrefix)
+    // Always verify the installed archive and toolchain identity before reusing the SDK.
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("The static SDK is verified against the resolved host toolchain") { true }
     if (sdkHost == "linux_x64") {
         dependsOn("downloadKotlinNativeDistribution")
         inputs.file(sdkNativeLocation)
@@ -121,32 +163,53 @@ tasks.register("prepareSdlStatic") {
         check(sdkSource.resolve("include/SDL3/SDL.h").isFile) { "Run :repository-conventions:prepareNativeSources to prepare the SDL source" }
         val dynamicApiHeader = sdkSource.resolve("src/dynapi/SDL_dynapi.h")
         check(dynamicApiHeader.readText().contains("#define SDL_DYNAMIC_API 0 /* Rachel:")) { "Prepare the direct-call SDL source profile before building its SDK" }
-        val work = sdkNativeDirectory.resolve("vendor/build/sdl-static")
+        val work = sdkGeneration.resolve("sdl/cmake/$sdkHost").apply { mkdirs() }
         val environment = if (sdkHost == "mingw_x64") project.sdkWindowsEnvironment(System.getenv(), work) else System.getenv()
-        val source = sdkLock["source"] as Map<*, *>
-        val dropPatchSha256 = (JsonSlurper().parse(sdkDropPatch) as Map<*, *>)["patchSha256"] as String
+        val source = sdkMetadata["source"] as Map<*, *>
         val profile = mutableMapOf<String, Any>("version" to sdkVersion, "target" to sdkHost, "archive" to sdkArchiveName,
             "linkage" to "static", "buildType" to "Release", "sourceSha256" to source["sha256"]!!, "scriptSha256" to sdkDigest(sdkScript),
-            "dynamicApiHeaderSha256" to sdkDigest(dynamicApiHeader), "dropPatchSha256" to dropPatchSha256, "profile" to sdkBuildProfile)
-        val nativeOptions = if (sdkHost == "linux_x64") {
-            val (options, identities) = project.sdkLinuxOptions(File(sdkNativeLocation.get().asFile.readText().trim()), environment, work.resolve("bootstrap"))
-            profile["nativeToolchain"] = identities
-            options
-        } else emptyList()
+            "preparedSourceSha256" to sdkDigest(sdkSourceRecord), "profile" to sdkBuildProfile)
+        val cmake = if (sdkHost == "mingw_x64") {
+            checkNotNull(sdkTool(environment, "cmake.exe")) { "Cannot find cmake.exe in the SDL build environment." }.path
+        } else "cmake"
+        val nativeOptions = when (sdkHost) {
+            "linux_x64" -> {
+                val (options, identities) = project.sdkLinuxOptions(File(sdkNativeLocation.get().asFile.readText().trim()), environment, work.resolve("bootstrap"))
+                profile["nativeToolchain"] = identities
+                options
+            }
+            "mingw_x64" -> {
+                val compiler = checkNotNull(sdkTool(environment, "cl.exe"))
+                val linker = checkNotNull(sdkTool(environment, "link.exe"))
+                val ninja = checkNotNull(sdkTool(environment, "ninja.exe")) { "Cannot find ninja.exe in the SDL build environment." }
+                profile["nativeToolchain"] = mapOf("compiler" to compiler.path, "compilerSha256" to sdkDigest(compiler),
+                    "windowsSdk" to environment["WINDOWSSDKVERSION"].orEmpty(), "ninjaSha256" to sdkDigest(ninja), "cmakeSha256" to sdkDigest(File(cmake)))
+                listOf("-G", "Ninja", "-DCMAKE_C_COMPILER=${compiler.path}", "-DCMAKE_CXX_COMPILER=${compiler.path}",
+                    "-DCMAKE_LINKER=${linker.path}", "-DCMAKE_MAKE_PROGRAM=${ninja.path}", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded")
+            }
+            else -> listOf("-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0")
+        }
         val profileFile = sdkPrefix.resolve("rachel-sdl.json")
         val previous = if (profileFile.isFile) JsonSlurper().parse(profileFile) as Map<*, *> else emptyMap<String, Any>()
         val existingArchive = sdkPrefix.resolve("lib/$sdkArchiveName")
         if (profile.all { (key, value) -> previous[key] == value } && existingArchive.isFile && previous["archiveSha256"] == sdkDigest(existingArchive)) return@doLast
-        val build = work.resolve(if (sdkHost == "linux_x64") "linux_x64-konan" else sdkHost)
+        // A failed or changed compiler probe must never leave a CMakeCache for the next attempt.
+        val build = Files.createTempDirectory(work.toPath(), "configure-").toFile()
         val options = mutableListOf("-DCMAKE_INSTALL_PREFIX=$sdkPrefix", "-DCMAKE_INSTALL_LIBDIR=lib", "-DCMAKE_BUILD_TYPE=Release", "-DSDL_SHARED=OFF", "-DSDL_STATIC=ON",
             "-DCMAKE_POSITION_INDEPENDENT_CODE=ON", "-DSDL_TEST_LIBRARY=OFF", "-DSDL_TESTS=OFF", "-DSDL_EXAMPLES=OFF")
         options.addAll(sdkCmakeProfile.map { (name, value) -> "-D$name=${if (value == true) "ON" else "OFF"}" })
         options.addAll(nativeOptions)
-        if (sdkHost == "mingw_x64") options.addAll(listOf("-G", "Ninja", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded"))
-        else if (sdkHost == "macos_arm64") options.addAll(listOf("-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"))
-        for (command in listOf(listOf("cmake", "-S", sdkSource.path, "-B", build.path) + options,
-            listOf("cmake", "--build", build.path, "--config", "Release", "--parallel", "2"), listOf("cmake", "--install", build.path, "--config", "Release"))) {
-            logger.lifecycle(project.sdkOutput(command, environment))
+        try {
+            for (command in listOf(listOf(cmake, "-S", sdkSource.path, "-B", build.path) + options,
+                listOf(cmake, "--build", build.path, "--config", "Release", "--parallel", "2"), listOf(cmake, "--install", build.path, "--config", "Release"))) {
+                logger.lifecycle(project.sdkOutput(command, environment))
+            }
+        }
+        finally {
+            check(build.canonicalFile.parentFile == work.canonicalFile && !Files.isSymbolicLink(build.toPath()))
+            Files.walk(build.toPath()).use { paths ->
+                paths.sorted(Comparator.reverseOrder()).forEach { Files.delete(it) }
+            }
         }
         val archive = sdkPrefix.resolve("lib/$sdkArchiveName")
         check(archive.isFile && archive.inputStream().use { String(it.readNBytes(8), Charsets.US_ASCII) } == "!<arch>\n") { "CMake did not produce a static SDL archive: $archive" }

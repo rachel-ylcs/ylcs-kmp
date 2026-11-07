@@ -3,7 +3,6 @@
     "files": {
         "adaptation/org.jetbrains.androidx.navigation3_navigation3-ui/src/nativeMain/kotlin/androidx/navigation3/ui/NavDisplay.native.kt": {
             "artifact": "org.jetbrains.androidx.navigation3:navigation3-ui-macosarm64:1.2.0:sources",
-            "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c",
             "source": "macosMain/androidx/navigation3/ui/NavDisplay.macos.kt",
             "description": "Preserves the three desktop default transition actuals for all owned Native targets; the official macOS and JVM desktop defaults intentionally use no transition, while NavDisplay supports caller-provided animations."
         },
@@ -213,25 +212,21 @@
         },
         "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/CalendarLocaleNumbers.native.kt": {
             "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
-            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
             "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
             "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
         },
         "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.native.kt": {
             "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
-            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
             "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
             "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
         },
         "adaptation/org.jetbrains.compose.material3_material3/src/macosMain/kotlin/androidx/compose/material3/CalendarLocaleTag.macos.kt": {
             "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
-            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
             "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
             "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
         },
         "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/CalendarLocaleTag.kt": {
             "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
-            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
             "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
             "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
         },

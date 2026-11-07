@@ -10,6 +10,7 @@ class NativeDesktopDistribution {
     var packageName: String = "application"
     var displayName: String = "Application"
     var packageVersion: String = "1.0.0"
+    var versionedArchive: Boolean = true
     var description: String = ""
     var vendor: String = ""
     var author: String = ""

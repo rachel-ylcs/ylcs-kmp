@@ -15,7 +15,7 @@ internal class NativeCiInputs(private val repository: File) {
     }
 
     fun identity(catalog: NativeSourceCatalog): SourceObject {
-        val versions = catalog.versions.filterKeys { it in setOf("kotlin", "cmp", "skiko", "sdl", "agp", "dokka", "coroutines", "mavenPublish") || (!it.startsWith("rachel") && referenced(it, "versions.")) }.toSortedMap()
+        val versions = catalog.versions.filterKeys { it in setOf("kotlin", "cmp", "skiko", "sdl", "icu", "navigation3", "material3-adaptive", "agp", "dokka", "coroutines", "mavenPublish") || (!it.startsWith("rachel") && referenced(it, "versions.")) }.toSortedMap()
         val libraries = catalog.libraries.filter { (alias, value) ->
             referenced(alias) || alias.startsWith("native-") || value.first.startsWith("org.jetbrains.compose.") || value.first.startsWith("org.jetbrains.skiko:") ||
                 value.first in setOf("org.jetbrains:annotations", "org.jetbrains.kotlinx:kotlinx-coroutines-core", "org.jetbrains.kotlinx:atomicfu")

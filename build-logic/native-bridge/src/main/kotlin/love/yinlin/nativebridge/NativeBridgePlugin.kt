@@ -19,10 +19,17 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinSharedNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.util.Properties
+import java.io.File
 
 class NativeBridgePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val bridge = project.extensions.create("nativeBridge", NativeBridgeExtension::class.java)
+        val extras = project.gradle.extensions.extraProperties
+        if (extras.has("love.yinlin.nativeCompose.generation")) {
+            val generation = extras.get("love.yinlin.nativeCompose.generation") as File
+            bridge.localSdlSource.fileValue(generation.resolve("sdl/source"))
+        }
+        bridge.localSdlSource.disallowChanges()
         val compatibility = Properties().apply {
             checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
         }
@@ -302,7 +309,7 @@ class NativeBridgePlugin : Plugin<Project> {
                         if (symbolRecord != null) NativeReleaseSymbols.recordDistribution(staged, symbolRecord.get().asFile)
                     }
                 }
-                project.tasks.register("run$suffix", RunNativeApplication::class.java) {
+                val run = project.tasks.register("run$suffix", RunNativeApplication::class.java) {
                     group = "native application"
                     dependsOn(stage)
                     distribution.set(project.layout.dir(stage.map { task -> task.destinationDir }))
@@ -310,15 +317,22 @@ class NativeBridgePlugin : Plugin<Project> {
                     arguments.set(application.arguments)
                     workingDirectory.convention(application.workingDirectory.orElse(distribution))
                 }
-                project.tasks.register("package$suffix", Zip::class.java) {
+                if (target.konanTarget == HostManager.host && binary.compilation.name == "main") {
+                    application.hostRuns.getOrPut(binary.buildType) { mutableListOf() }.add(run)
+                }
+                val archive = project.tasks.register("package$suffix", Zip::class.java) {
                     group = "native application"
                     dependsOn(stage)
                     NativeDesktopPackaging.configureArchive(this, stage.map { task -> task.destinationDir }, executablePath)
                     archiveBaseName.set(application.baseName)
                     archiveClassifier.set("${target.konanTarget.name}-${binary.buildType.name.lowercase()}")
+                    if (!desktop.versionedArchive && binary.buildType == NativeBuildType.RELEASE) archiveVersion.set("")
                     destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
                     isPreserveFileTimestamps = false
                     isReproducibleFileOrder = true
+                }
+                if (target.konanTarget == HostManager.host && binary.name == "releaseExecutable") {
+                    application.releaseArchive = archive.flatMap { it.archiveFile }
                 }
             }
         }

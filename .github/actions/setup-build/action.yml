@@ -6,7 +6,7 @@ inputs:
     description: Install Android SDK packages.
     default: 'false'
   msvc:
-    description: Legacy input; every Windows job initializes MSVC for Native and JNI compatibility.
+    description: Initialize MSVC for jobs that build the Native Skia bridge or WebView2 loader.
     default: 'false'
   gtk:
     description: Install GTK development dependencies on Linux.
@@ -15,8 +15,13 @@ inputs:
     description: Install Xvfb and Xauthority tools on Linux.
     default: 'false'
   native-tools:
-    description: Install desktop Native development tools and restore compiled SDL and Skia SDKs.
+    description: Install desktop Native development tools and restore the compiled SDL SDK.
     default: 'false'
+
+outputs:
+  native-generation:
+    description: Repository-relative Native Compose generation.
+    value: ${{ steps.native-sources.outputs.generation }}
 
 runs:
   using: composite
@@ -57,13 +62,14 @@ runs:
         packages: 'platform-tools platforms;android-37.2'
 
     - name: Setup MSVC
-      if: ${{ runner.os == 'Windows' }}
+      if: ${{ runner.os == 'Windows' && inputs.msvc == 'true' }}
       uses: TheMrMilchmann/setup-msvc-dev@v4
       with:
         arch: x64
         export-path-to-vs: VS_PATH
 
     - name: Restore Native Compose Dependencies
+      id: native-sources
       uses: ./.github/actions/setup-native
       with:
         tools: ${{ inputs.native-tools }}

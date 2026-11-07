@@ -24,7 +24,7 @@ target_link_libraries(rachel_audio PUBLIC $<TARGET_PROPERTY:rachel_audio_objects
 if(WIN32)
     target_compile_features(rachel_audio_objects PRIVATE cxx_std_20)
     include(windows_winrt.cmake)
-    if(MINGW)
+    if(MINGW AND NOT RACHEL_DESKTOP_JNI)
         target_compile_definitions(rachel_audio_objects PRIVATE RACHEL_VIDEO_GPU)
     endif()
     target_compile_definitions(rachel_audio_objects PRIVATE WINVER=0x0A00 _WIN32_WINNT=0x0A00 UNICODE _UNICODE NOMINMAX MA_ENABLE_WASAPI)

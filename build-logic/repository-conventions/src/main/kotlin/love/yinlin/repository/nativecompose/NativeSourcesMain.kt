@@ -5,14 +5,7 @@ import java.io.File
 object NativeSourcesMain {
     @JvmStatic
     fun main(arguments: Array<String>) {
-        require(arguments.size in 2 .. 3) { "Expected command and native-compose directory" }
-        val directory = File(arguments[1]).canonicalFile
-        when (arguments[0]) {
-            "prepare" -> NativeUpstreamSync(directory).prepare(arguments.getOrNull(2) == "offline")
-            "updates" -> NativeUpstreamSync(directory).checkUpdates()
-            "cache-create" -> NativeSourceCache(directory).create()
-            "cache-restore" -> NativeSourceCache(directory).restore()
-            else -> error("Unknown Native source command: ${arguments[0]}")
-        }
+        require(arguments.size in 1 .. 2 && (arguments.size == 1 || arguments[1] == "offline")) { "Expected native-compose directory and optional offline flag" }
+        NativeUpstreamSync(File(arguments[0])).prepare(arguments.size == 2)
     }
 }

@@ -8,7 +8,7 @@ Rachel 使用仓库根目录的 Gradle Wrapper，以及 `build-logic` 中的统�
 | --- | --- | --- |
 | Gradle Wrapper | 9.8.2 | `gradle/wrapper/gradle-wrapper.properties` |
 | Kotlin | 2.5.0-Beta2 | `libs.versions.toml` |
-| Compose Multiplatform | 1.13.0-beta01 | `libs.versions.toml` |
+| Compose Multiplatform | 1.13.0-beta02 | `libs.versions.toml` |
 | Android Gradle Plugin | 9.3.3 | `libs.versions.toml` |
 | Ktor | 3.6.0 | `libs.versions.toml` |
 | Coroutines | 1.11.0 | `libs.versions.toml` |
@@ -101,6 +101,10 @@ Maven 发布坐标由模块路径和共享版本名生成，例如：
 坐标生成规则不证明某个版本已经发布。仓库内部开发优先使用项目依赖；仓库外使用前应确认目标仓库中的实际产物。
 
 推送 `maven*` 标签触发 `.github/workflows/publish.yml`。工作流先在 Windows 主机上构建 `media` 与 `webview` 的 Windows 静态库，因为它们分别需要 Windows C++/WinRT SDK 和 Visual C++ SDK；随后将两个归档恢复到 macOS 发布机各模块的 `build/nativeCpp/windows/lib` 目录。macOS 发布阶段仅排除这两个已完成的 CMake 构建任务，仍执行 Windows CInterop、Kotlin 编译、签名与 Maven 发布，并继续构建其他已启用平台的产物。发布前检查两个归档非空；Windows 构建或 artifact 传递失败时不继续发布。
+
+JVM 桌面端在 Windows 使用 Kotlin/Native 下载的 LLVM 和 MinGW 编译 JNI DLL。Gradle 仍通过 `buildDesktopNative` 生成各模块的动态库，运行和打包沿用这些库的原有文件名。请将 CMake 和 Ninja 加入 Gradle 进程的 `PATH`。媒体库的 C++/WinRT 头文件按需从微软的 NuGet 包获取并校验，JDK 提供 JNI 头文件。Windows Native Compose 的 Skia 桥和 WebView2 静态加载器仍需要 MSVC。
+
+WebView2 和 C++/WinRT SDK 的版本在根 `libs.versions.toml` 中选择。Gradle 从 NuGet 获取归档和发布摘要，校验记录保存在各模块的 `build/` 中。
 
 ## 常用命令
 

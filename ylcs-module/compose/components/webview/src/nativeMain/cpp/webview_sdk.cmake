@@ -1,26 +1,14 @@
-if(NOT RACHEL_WEBVIEW2_VERSION)
-    message(FATAL_ERROR "Set RACHEL_WEBVIEW2_VERSION from the version catalog")
+if(NOT EXISTS "${RACHEL_WEBVIEW2_ARCHIVE}")
+    message(FATAL_ERROR "The verified WebView2 package is missing. Run the Gradle Native build to prepare it.")
 endif()
 
-set(WEBVIEW2_ROOT "${CMAKE_CURRENT_BINARY_DIR}/webview2-${RACHEL_WEBVIEW2_VERSION}")
-set(WEBVIEW2_ARCHIVE "${WEBVIEW2_ROOT}/sdk.zip")
+file(SHA256 "${RACHEL_WEBVIEW2_ARCHIVE}" WEBVIEW2_HASH)
+string(SUBSTRING "${WEBVIEW2_HASH}" 0 16 WEBVIEW2_ID)
+set(WEBVIEW2_ROOT "${CMAKE_CURRENT_BINARY_DIR}/webview2-${WEBVIEW2_ID}")
 set(WEBVIEW2_SDK "${WEBVIEW2_ROOT}/sdk")
-set(WEBVIEW2_HASH "90778deb1b77e36292828b4b5833c9255c27533f40e0ddd55891ae718944edc4")
-file(MAKE_DIRECTORY "${WEBVIEW2_ROOT}")
-if(EXISTS "${WEBVIEW2_ARCHIVE}")
-    file(SHA256 "${WEBVIEW2_ARCHIVE}" ARCHIVE_HASH)
-endif()
-if(NOT ARCHIVE_HASH STREQUAL WEBVIEW2_HASH)
-    file(DOWNLOAD
-        "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/${RACHEL_WEBVIEW2_VERSION}/microsoft.web.webview2.${RACHEL_WEBVIEW2_VERSION}.nupkg"
-        "${WEBVIEW2_ARCHIVE}"
-        EXPECTED_HASH SHA256=${WEBVIEW2_HASH}
-        TLS_VERIFY ON
-        TIMEOUT 120
-    )
-endif()
-if(NOT EXISTS "${WEBVIEW2_SDK}/build/native/x64/WebView2LoaderStatic.lib")
-    file(ARCHIVE_EXTRACT INPUT "${WEBVIEW2_ARCHIVE}" DESTINATION "${WEBVIEW2_SDK}")
+if(NOT EXISTS "${WEBVIEW2_SDK}/build/native/x64/WebView2LoaderStatic.lib" OR NOT EXISTS "${WEBVIEW2_SDK}/build/native/include/WebView2.h")
+    file(MAKE_DIRECTORY "${WEBVIEW2_SDK}")
+    file(ARCHIVE_EXTRACT INPUT "${RACHEL_WEBVIEW2_ARCHIVE}" DESTINATION "${WEBVIEW2_SDK}")
 endif()
 
 set(VS_ROOT "$ENV{VS_PATH}")

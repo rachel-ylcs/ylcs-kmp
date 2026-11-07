@@ -160,7 +160,6 @@ jobs:
       runner: ${{ matrix.os }}
       task: ylcs-app:desktop-app:desktopJar
       submodules: recursive
-      msvc: true
       gtk: true
 
   build-nativeDesktop:

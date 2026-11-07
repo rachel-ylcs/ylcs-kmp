@@ -1,5 +1,5 @@
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm")
     `java-gradle-plugin`
 }
 
@@ -23,17 +23,13 @@ tasks.register<JavaExec>("writeNativeCiInputs") {
     args(rootProject.projectDir.parentFile.absolutePath, layout.buildDirectory.file("native-ci/inputs.properties").get().asFile.absolutePath, providers.gradleProperty("native.ci.baseCatalog").getOrElse(""))
 }
 
-for ((taskName, command) in mapOf("prepareNativeSources" to "prepare", "checkNativeUpstreamUpdates" to "updates", "restoreNativeSourceCache" to "cache-restore", "createNativeSourceCache" to "cache-create")) {
-    tasks.register<JavaExec>(taskName) {
-        group = "native setup"
-        description = "${command.replace('-', ' ')} the locked Native Compose sources"
-        classpath = sourceSets.main.get().runtimeClasspath
-        mainClass.set("love.yinlin.repository.nativecompose.NativeSourcesMain")
-        args(command, nativeSourcesDirectory.asFile.absolutePath)
-        if (command == "prepare" && gradle.startParameter.isOffline) args("offline")
-        if (command == "prepare") mustRunAfter("restoreNativeSourceCache")
-        if (command == "cache-create") mustRunAfter("prepareNativeSources")
-    }
+tasks.register<JavaExec>("prepareNativeSources") {
+    group = "native setup"
+    description = "Resolve the version catalog and prepare isolated Native Compose sources"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("love.yinlin.repository.nativecompose.NativeSourcesMain")
+    args(nativeSourcesDirectory.asFile.absolutePath)
+    if (gradle.startParameter.isOffline) args("offline")
 }
 
 kotlin {

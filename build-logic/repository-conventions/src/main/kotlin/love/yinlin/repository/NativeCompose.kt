@@ -6,72 +6,36 @@ import love.yinlin.repository.nativecompose.NativeUpstreamSync
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
-import java.security.MessageDigest
-
-private fun sha256(file: File): String = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
 
 private fun Settings.includeNativeComposeSources(directory: File) {
-    NativeUpstreamSync(directory).prepare(gradle.startParameter.isOffline)
-    val stateFile = directory.resolve("vendor/skiko/state.json")
-    check(stateFile.isFile) { "Source preparation did not produce vendor/skiko/state.json" }
-
-    val state = JsonSlurper().parse(stateFile) as Map<*, *>
-    val repository = settingsDir.canonicalFile.toPath()
-    val inputs = state["inputs"] as Map<*, *>
-    for ((name, expected) in inputs) {
-        val input = settingsDir.resolve(name as String).canonicalFile
-        require(input.toPath().startsWith(repository)) { "Invalid prepared input path: $name" }
-        check(input.isFile && sha256(input) == expected) { "Prepared input changed: $name; re-run prepareNativeSources" }
-    }
-    check(sha256(settingsDir.resolve("libs.versions.toml")) == state["catalogSha256"]) { "Prepared build does not use the root version catalog" }
-    val versions = state["versions"] as Map<*, *>
-    gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.root", directory)
+    val generation = NativeUpstreamSync(directory).prepare(gradle.startParameter.isOffline)
+    val extras = gradle.extensions.extraProperties
+    extras.set("love.yinlin.nativeCompose.generation", generation)
+    val skiko = JsonSlurper().parse(generation.resolve("metadata/skiko.json")) as Map<*, *>
     for (rule in listOf("skiko-core", "skiko-skottie")) {
-        gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", versions["skiko"] as String)
+        extras.set("love.yinlin.nativeBridge.version.$rule", skiko["version"] as String)
     }
-
-    val sourceDirectory = directory.resolve(state["build"] as String).canonicalFile
-    require(sourceDirectory == directory.resolve("vendor/skiko/workspace/skiko").canonicalFile) { "Invalid prepared source directory" }
-    check(sourceDirectory.isDirectory) { "Prepared Native Compose working tree is missing" }
-    val lock = JsonSlurper().parse(directory.resolve("upstream/lock.json")) as Map<*, *>
-    extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "skiko", mapOf(
-        "skiko-core" to ("${lock["group"]}:skiko" to ":"),
-        "skiko-skottie" to ("${lock["group"]}:skiko-skottie" to ":skiko-skottie"),
+    extensions.getByType<NativeBridgeSourcesExtension>().include(generation.resolve("skiko/workspace/skiko"), "skiko", mapOf(
+        "skiko-core" to ("${skiko["group"]}:skiko" to ":"),
+        "skiko-skottie" to ("${skiko["group"]}:skiko-skottie" to ":skiko-skottie"),
     ), mapOf(
         "skiko-core" to directory.resolve("adaptation/org.jetbrains.skiko_skiko"),
         "skiko-skottie" to directory.resolve("adaptation/org.jetbrains.skiko_skiko-skottie"),
     ))
-    includeComposeUiSources(directory)
-}
 
-private fun Settings.includeComposeUiSources(directory: File) {
-    val stateFile = directory.resolve("vendor/compose/state.json")
-    check(stateFile.isFile) { "Source preparation did not produce vendor/compose/state.json" }
-    val state = JsonSlurper().parse(stateFile) as Map<*, *>
-    val repository = settingsDir.canonicalFile.toPath()
-    for ((name, expected) in state["inputs"] as Map<*, *>) {
-        val input = settingsDir.resolve(name as String).canonicalFile
-        require(input.toPath().startsWith(repository)) { "Invalid prepared Compose input path: $name" }
-        check(input.isFile && sha256(input) == expected) { "Prepared Compose input changed: $name; re-run prepareNativeSources" }
-    }
-    check(sha256(settingsDir.resolve("libs.versions.toml")) == state["catalogSha256"]) { "Prepared Compose build does not use the root version catalog" }
-    val sourceDirectory = directory.resolve(state["build"] as String).canonicalFile
-    require(sourceDirectory == directory.resolve("vendor/compose/workspace/native-desktop").canonicalFile) { "Invalid prepared Compose source directory" }
-    check(sourceDirectory.isDirectory) { "Prepared Compose working tree is missing" }
-    val lock = JsonSlurper().parse(directory.resolve("upstream/compose.json")) as Map<*, *>
-    val modules = lock["modules"] as Map<*, *>
+    val compose = JsonSlurper().parse(generation.resolve("metadata/compose.json")) as Map<*, *>
+    val modules = compose["modules"] as Map<*, *>
     val projects = modules.entries.associate { (artifact, value) ->
         val module = value as Map<*, *>
         val rule = "compose-$artifact"
-        val moduleVersions = state["moduleVersions"] as? Map<*, *>
-        gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", (moduleVersions?.get(artifact) ?: state["version"]) as String)
-        rule to ("${module["group"] ?: lock["group"]}:$artifact" to ":$artifact")
+        gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", module["version"] as String)
+        rule to ("${module["group"] ?: compose["group"]}:$artifact" to ":$artifact")
     }
     val adaptations = modules.entries.associate { (artifact, value) ->
         val module = value as Map<*, *>
         "compose-$artifact" to directory.resolve("adaptation/${module["adaptation"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}_$artifact"}")
     }
-    extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "compose-ui", projects, adaptations)
+    extensions.getByType<NativeBridgeSourcesExtension>().include(generation.resolve("compose/workspace/native-desktop"), "compose-ui", projects, adaptations)
 }
 
 @Suppress("unused")

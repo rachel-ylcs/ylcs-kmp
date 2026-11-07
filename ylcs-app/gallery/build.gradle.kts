@@ -1,6 +1,5 @@
-import love.yinlin.gradle.wasmBinaryDir
+import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -74,23 +73,17 @@ rachel {
             }
         }
 
-        actions {
-            tasks.register("galleryRun") {
-                description = "运行Debug桌面版Gallery"
-                dependsOn(tasks.named("run"))
+        artifacts {
+            sync("galleryPublish", browserDistribution(BrowserArtifactTarget.Wasm), C.root.docs.gallery, "发布网页版Gallery")
+        }
+
+        runs {
+            jvm {
+                debug("galleryRun", "运行Debug桌面版Gallery")
             }
 
-            tasks.register("nativeGalleryRun") {
-                description = "运行Debug原生桌面版Gallery"
-                dependsOn(tasks.named("composeRun"))
-            }
-
-            tasks.register<Sync>("galleryPublish") {
-                description = "发布网页版Gallery"
-                dependsOn(tasks.named("wasmJsBrowserDistribution"))
-
-                from(wasmBinaryDir)
-                into(C.root.docs.gallery)
+            nativeDesktop {
+                debug("nativeGalleryRun", "运行Debug原生桌面版Gallery")
             }
         }
     }

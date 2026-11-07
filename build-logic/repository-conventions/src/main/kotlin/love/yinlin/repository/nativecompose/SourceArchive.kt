@@ -4,11 +4,8 @@ import java.io.File
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.file.Files
-import java.nio.file.attribute.PosixFilePermission
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 
 internal object SourceArchive {
     private fun short(bytes: ByteArray, offset: Int): Int = ByteBuffer.wrap(bytes, offset, 2).order(ByteOrder.LITTLE_ENDIAN).short.toInt() and 0xffff
@@ -87,41 +84,9 @@ internal object SourceArchive {
                         check(count == entry.size) { "ZIP entry size changed: ${entry.name}" }
                     }
                 }
-                if (entry.comment?.startsWith("rachel-mode:") == true && File.separatorChar != '\\') {
-                    val mode = entry.comment.removePrefix("rachel-mode:").toInt()
-                    check(mode in 0 .. 511)
-                    val permissions = PosixFilePermission.entries.filterIndexed { index, _ -> mode and (1 shl (8 - index)) != 0 }.toSet()
-                    Files.setPosixFilePermissions(target.toPath(), permissions)
-                }
                 hashes[relative] = target.sourceHash()
             }
             return hashes
         }
-    }
-
-    fun snapshot(files: Map<String, File>, destination: File) {
-        destination.parentFile.mkdirs()
-        val temporary = destination.resolveSibling("${destination.name}.tmp")
-        try {
-            ZipOutputStream(temporary.outputStream().buffered()).use { archive ->
-                var total = 0L
-                check(files.size <= 100_000)
-                for ((name, file) in files.toSortedMap()) {
-                    sourceRelativePath(name)
-                    check(file.isFile && !Files.isSymbolicLink(file.toPath())) { "Invalid source cache input: $file" }
-                    total += file.length()
-                    check(file.length() <= 256L * 1024 * 1024 && total <= 4L * 1024 * 1024 * 1024) { "Source cache exceeds its size limit" }
-                    val entry = ZipEntry(name)
-                    if (File.separatorChar != '\\') {
-                        val permissions = Files.getPosixFilePermissions(file.toPath())
-                        entry.comment = "rachel-mode:" + PosixFilePermission.entries.foldIndexed(0) { index, mode, permission -> if (permission in permissions) mode or (1 shl (8 - index)) else mode }
-                    }
-                    archive.putNextEntry(entry)
-                    file.inputStream().use { it.transferTo(archive) }
-                    archive.closeEntry()
-                }
-            }
-            Files.move(temporary.toPath(), destination.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-        } finally { temporary.delete() }
     }
 }

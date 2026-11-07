@@ -135,7 +135,6 @@ jobs:
     with:
       runner: windows-latest
       task: desktopTest
-      msvc: true
 
   test-js:
     name: Test Web JS

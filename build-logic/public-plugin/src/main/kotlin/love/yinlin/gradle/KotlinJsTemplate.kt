@@ -19,6 +19,8 @@ class KotlinJsSourceSetsScope(
 }
 
 open class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
+    val jsDistribution get() = owner.browserDistribution(BrowserArtifactTarget.Js)
+
     private var sourceBlock: KotlinJsSourceSetsScope.() -> Unit = {}
     fun sources(block: KotlinJsSourceSetsScope.() -> Unit) {
         val previous = sourceBlock

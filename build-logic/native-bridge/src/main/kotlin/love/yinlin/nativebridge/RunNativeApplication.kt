@@ -3,6 +3,7 @@ package love.yinlin.nativebridge
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -21,17 +22,23 @@ abstract class RunNativeApplication : DefaultTask() {
     abstract val distribution: DirectoryProperty
     @get:Input abstract val executableName: Property<String>
     @get:Input abstract val arguments: ListProperty<String>
+    @get:Input abstract val environmentVariables: MapProperty<String, String>
     @get:Internal abstract val workingDirectory: DirectoryProperty
     @get:Inject abstract val execOperations: ExecOperations
+
+    init {
+        environmentVariables.convention(emptyMap())
+    }
 
     @TaskAction
     fun runApplication() {
         val directory = distribution.get().asFile
         val workspace = workingDirectory.get().asFile
-        check(workspace.isDirectory || workspace.mkdirs()) { "Cannot create the Native application's working directory: $workspace" }
+        check(workspace.isDirectory || workspace.mkdirs() || workspace.isDirectory) { "Cannot create the Native application's working directory: $workspace" }
         execOperations.exec {
             workingDir = workspace
             commandLine(listOf(directory.resolve(executableName.get()).absolutePath) + arguments.get())
+            environment(environmentVariables.get())
         }
     }
 }

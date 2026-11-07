@@ -98,9 +98,26 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
 
     private var projectActionsBlock: (Project.() -> Unit)? = null
     fun actions(block: Project.() -> Unit) { projectActionsBlock = block }
+
+    private val artifactBlocks = mutableListOf<ArtifactExports.() -> Unit>()
+    fun artifacts(block: ArtifactExports.() -> Unit) { artifactBlocks += block }
+
+    private val runBlocks = mutableListOf<ApplicationRuns.() -> Unit>()
+    fun runs(block: ApplicationRuns.() -> Unit) { runBlocks += block }
+
     internal fun Project.configureActions() {
-        val block = projectActionsBlock ?: return
-        afterEvaluate { block(this) }
+        if (artifactBlocks.isEmpty() && runBlocks.isEmpty() && projectActionsBlock == null) return
+        afterEvaluate {
+            if (artifactBlocks.isNotEmpty()) {
+                val exports = ArtifactExports(this)
+                for (block in artifactBlocks) exports.block()
+            }
+            if (runBlocks.isNotEmpty()) {
+                val runs = ApplicationRuns(this)
+                for (block in runBlocks) runs.block()
+            }
+            projectActionsBlock?.invoke(this)
+        }
     }
 
     internal lateinit var owner: Project

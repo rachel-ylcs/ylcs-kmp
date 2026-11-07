@@ -1,5 +1,15 @@
 {
     "reference": "skiko-reference",
+    "patchOrigins": {
+        "skiko-reference": {
+            "repository": "brahmkshatriya/skiko-native",
+            "commit": "85a7cf78045555f885fa774ac6007c6258d2bfb7"
+        },
+        "skiko-merge-base": {
+            "repository": "JetBrains/skiko",
+            "commit": "c4b1940eaa73abfcbaa3f3f5d5972ab0ac7b9810"
+        }
+    },
     "files": {
         "adaptation/org.jetbrains.skiko_skiko/src/macosMain/kotlin/org/jetbrains/skiko/ResourceFilePosition.macos.kt": "skiko/src/darwinMain/kotlin/org/jetbrains/skiko/ResourceFilePosition.darwin.kt",
         "adaptation/org.jetbrains.skiko_skiko/src/linuxMain/kotlin/org/jetbrains/skiko/LinuxFrameLimiter.kt": "skiko/src/linuxMain/kotlin/org/jetbrains/skiko/LinuxFrameLimiter.kt",

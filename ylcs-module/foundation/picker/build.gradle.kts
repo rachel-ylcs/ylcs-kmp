@@ -17,16 +17,16 @@ rachel {
         nativeDesktopTarget = true
 
         interop {
-            val sdlSource = rootProject.file("native-compose/vendor/sdl-source-${libs.versions.sdl.get()}")
+            val sdlSource = nativeBridge.sdlSourceDirectory.get()
 
             desktop {
-                cpp(sdlSource.path)
+                cpp(sdlSource.asFile.path)
             }
 
             native {
                 cpp("sdl3") {
                     dependencyFiles = files()
-                    includeDirs(sdlSource.resolve("include").path)
+                    includeDirs(sdlSource.dir("include").asFile.path)
                 }
             }
         }

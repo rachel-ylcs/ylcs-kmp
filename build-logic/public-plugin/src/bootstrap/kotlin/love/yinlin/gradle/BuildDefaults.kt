@@ -98,6 +98,8 @@ class BuildDefaults : Serializable {
     }
 
     class Native : Serializable {
+        var cmakeExecutable: String = "cmake"
+        var ninjaExecutable: String? = null
         var outputDirectory: String? = null
         var jniHeadersDirectory: String? = null
         var buildType: String = "Release"

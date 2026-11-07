@@ -38,6 +38,7 @@ jobs:
           submodules: recursive
 
       - name: Setup Build Environment
+        id: setup
         uses: ./.github/actions/setup-build
         with:
           msvc: 'true'
@@ -53,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: native-compose-maven-${{ matrix.target }}
-          path: native-compose/vendor/build/repository/
+          path: ${{ steps.setup.outputs.native-generation }}/build/repository/
           if-no-files-found: error
 
       - name: Build Windows Native Libraries
@@ -107,9 +108,11 @@ jobs:
           path: host-publications
 
       - name: Assemble and verify the complete three-target Native repository
+        id: assemble
         run: |
           bash ./gradlew -p build-logic :native-bridge:assembleNativeRepository \
             --no-configuration-cache --build-cache --max-workers=1 --stacktrace
+          printf 'generation=native-compose/%s\n' "$(jq -er '.directory' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
 
       - name: Upload Native Compose and public Gradle plugins
         env:
@@ -124,7 +127,7 @@ jobs:
             :native-bridge:publishToMavenCentral \
             :public-plugin:publishToMavenCentral \
             :native-dokka:publishToMavenCentral \
-            -Pnative.publishing.repository=native-compose/vendor/build/assembled-repository \
+            -Pnative.publishing.repository=${{ steps.assemble.outputs.generation }}/build/assembled-repository \
             --no-configuration-cache --build-cache --max-workers=1 --stacktrace
 
       - name: Upload framework libraries

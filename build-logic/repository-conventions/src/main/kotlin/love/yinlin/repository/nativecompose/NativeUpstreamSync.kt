@@ -1,45 +1,40 @@
 package love.yinlin.repository.nativecompose
 
 import java.io.File
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.nio.file.Files
-import java.time.Duration
+import java.util.Properties
+import java.util.zip.ZipFile
 
 class NativeUpstreamSync(directory: File) {
     internal val nativeDirectory = directory.canonicalFile
     internal val repository = nativeDirectory.parentFile
     internal val vendor = nativeDirectory.resolve("vendor")
     internal val catalog = NativeSourceCatalog(repository)
-    internal val compose = nativeDirectory.resolve("upstream/compose.json").sourceJson()
-    internal val skiko = nativeDirectory.resolve("upstream/lock.json").sourceJson()
     internal val patches = SourcePatches(nativeDirectory)
     internal val workspace = SourceWorkspace(vendor)
+    private val skikoOrigins = nativeDirectory.resolve("adaptation/provenance/adaptation-origins.json")
+
+    internal fun kotlinProperties(): Map<String, String> {
+        val properties = Properties().apply { repository.resolve("gradle.properties").inputStream().use(::load) }
+        return properties.stringPropertyNames().filter {
+            it.startsWith("rachel.kotlin.") || it in setOf("kotlin.native.ignoreDisabledTargets", "kotlin.native.jvmArgs")
+        }.sorted().associateWith(properties::getProperty)
+    }
 
     init {
         check(nativeDirectory.name == "native-compose" && nativeDirectory.resolve("upstream").isDirectory) { "Not a Native Compose source directory: $directory" }
         vendor.mkdirs()
         check(vendor.canonicalFile.parentFile == nativeDirectory && !Files.isSymbolicLink(vendor.toPath())) { "Native vendor directory escapes its repository" }
-        check(compose["version"] == catalog.versions["cmp"] && skiko["versions"].sourceObject()["skiko"] == catalog.versions["skiko"]) { "Update the pinned upstream sources before changing CMP/Skiko versions" }
-        check(skiko["group"] == "love.yinlin.native.skiko") { "Native Skiko publication namespace mismatch" }
-        val spec = patches.manifest["skiko"].sourceObject()
-        check(spec["version"] == skiko["versions"].sourceObject()["skiko"] && spec["sources"] == skiko["sources"] && spec["skia"] == skiko["skia"] && spec["skiaAssets"] == skiko["skiaAssets"]) { "Skiko patch provenance does not match the source lock" }
-        check(patches.manifest["compose"].sourceObject()["commit"] == compose["commit"] && patches.manifest["resources"].sourceObject()["commit"] == compose["resourceSource"].sourceObject()["commit"] &&
-            patches.manifest["compose"].sourceObject()["version"] == compose["version"] && patches.manifest["resources"].sourceObject()["version"] == compose["version"]) { "Compose patches do not match the source commits/releases" }
     }
 
-    internal fun inputHashes(): Map<String, String> {
+    private fun inputHashes(): Map<String, String> {
         val files = mutableListOf<File>()
-        files.addAll(nativeDirectory.resolve("upstream").walkTopDown().filter { it.isFile })
-        files.addAll(nativeDirectory.resolve("gradle/templates").walkTopDown().filter { it.isFile })
-        files.addAll(repository.resolve("build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose").walkTopDown().filter { it.extension == "kt" })
-        files.add(repository.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
-        files.add(repository.resolve(".gitattributes"))
-        files.add(repository.resolve("settings.gradle.kts"))
-        files.add(repository.resolve("gradle.properties"))
-        files.addAll(listOf("gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map { repository.resolve(it) })
+        for (relative in listOf("native-compose/upstream", "native-compose/gradle", "native-compose/adaptation",
+            "build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose", "build-logic/native-bridge/gradle")) {
+            files.addAll(repository.resolve(relative).walkTopDown().filter { it.isFile })
+        }
+        files.addAll(listOf("native-compose/build.gradle.kts", ".gitattributes", "settings.gradle.kts", "gradle.properties", "gradle/wrapper/gradle-wrapper.properties",
+            "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map(repository::resolve))
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
 
@@ -49,137 +44,214 @@ class NativeUpstreamSync(directory: File) {
         finally {
             checkedSourcePath(vendor, directory)
             check(directory.parentFile.canonicalFile == vendor.canonicalFile && directory.name.startsWith(prefix))
-            if (directory.exists()) check(directory.deleteRecursively()) { "Cannot remove source staging directory: $directory" }
-        }
-    }
-
-    fun prepare(offline: Boolean = false) {
-        prepareSkiko(offline)
-        prepareSdl(offline)
-        prepareIcu(offline)
-        ComposeSourceSync(this).prepare(offline)
-    }
-
-    private fun prepareIcu(offline: Boolean) {
-        val lock = nativeDirectory.resolve("upstream/icu.json").sourceJson()
-        check(lock["skia"] == skiko["skia"]) { "Review the ICU data version when changing the Skia SDK" }
-        val source = lock["source"].sourceObject()
-        val data = lock["data"].sourceObject()
-        val runtime = lock["runtime"].sourceObject()
-        val owner = vendor.resolve("icu")
-        workspace.locked(owner) {
-            val archive = owner.resolve("icu-data.zip")
-            val build = owner.resolve("workspace")
-            val marker = build.resolve(".rachel-prepared.json")
-            val fingerprint = bytesHash(sourceBytes(mapOf("lock" to lock, "inputs" to inputHashes())))
-            val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
-            if (previous["fingerprint"] != fingerprint || !build.resolve("icudtl.dat").isFile || !build.resolve("text/icudtl.dat").isFile || !build.resolve("icu-LICENSE.txt").isFile) stage(".icu-data-") { staging ->
-                downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 64L * 1024 * 1024)
-                SourceArchive.extract(archive, staging, false)
-                val input = staging.resolve(sourceRelativePath(data["file"] as String))
-                check(input.sourceHash() == data["sha256"] && staging.resolve("LICENSE").sourceHash() == lock["licenseSha256"]) { "ICU data/license checksum mismatch" }
-                Files.move(input.toPath(), staging.resolve("icudtl.dat").toPath())
-                Files.move(staging.resolve("LICENSE").toPath(), staging.resolve("icu-LICENSE.txt").toPath())
-                // ICU data is platform-independent on the three little-endian desktop targets.
-                // The pinned Windows SDK carries the external data file; Apple/Linux embed it.
-                val key = runtime["archive"] as String
-                val sdkHash = skiko["skiaAssets"].sourceObject().getValue(key) as String
-                val sdk = vendor.resolve("skiko/skia/$sdkHash.zip")
-                downloadSource("https://github.com/JetBrains/skia/releases/download/${skiko["skia"]}/Skia-${skiko["skia"]}-$key.zip", sdk, sdkHash, offline, 1024L * 1024 * 1024)
-                val selected = SourceArchive.extract(sdk, staging, false) { relative ->
-                    if (relative == runtime["entry"]) "text/icudtl.dat" else null
+            if (File.separatorChar == '\\') {
+                // Git can mark loose objects and packs read-only on Windows.
+                Files.walk(directory.toPath()).use { paths ->
+                    paths.filter { Files.isRegularFile(it, java.nio.file.LinkOption.NOFOLLOW_LINKS) }.forEach {
+                        val attributes = Files.getFileAttributeView(it, java.nio.file.attribute.DosFileAttributeView::class.java, java.nio.file.LinkOption.NOFOLLOW_LINKS)
+                        if (attributes.readAttributes().isReadOnly) attributes.setReadOnly(false)
+                    }
                 }
-                check(selected["text/icudtl.dat"] == runtime["sha256"]) { "JetBrains text ICU data differs from its lock" }
-                workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "version" to lock["version"]))
             }
-            check(build.resolve("icudtl.dat").sourceHash() == data["sha256"]) { "Prepared ICU data differs from its lock" }
-            check(build.resolve("icu-LICENSE.txt").sourceHash() == lock["licenseSha256"]) { "Prepared ICU license differs from its lock" }
-            check(build.resolve("text/icudtl.dat").sourceHash() == runtime["sha256"]) { "Prepared text ICU data differs from its lock" }
-            println("Prepared ICU ${lock["version"]}: JetBrains text runtime and complete locale test data")
+            Files.walk(directory.toPath()).use { paths ->
+                paths.sorted(Comparator.reverseOrder()).forEach { Files.delete(it) }
+            }
         }
     }
 
-    private fun prepareSkiko(offline: Boolean) {
-        val owner = vendor.resolve("skiko")
-        workspace.locked(owner) {
-            val upstream = skiko["sources"].sourceObject().getValue("skiko-upstream").sourceObject()
-            val repositoryName = upstream["repository"] as String
-            val commit = upstream["commit"] as String
-            check(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+").matches(repositoryName) && Regex("[a-f0-9]{40}").matches(commit)) { "Invalid Skiko source identity" }
-            val archive = owner.resolve("skiko-upstream.zip")
-            val inputs = inputHashes()
-            val inventory = nativeDirectory.resolve("adaptation").listFiles().orEmpty().filter { it.name.startsWith("org.jetbrains.skiko_") }.flatMap { module -> module.resolve("src").walkTopDown().filter { it.isFile }.map { it.relativeTo(nativeDirectory).invariantSeparatorsPath }.toList() }.sorted()
-            val fingerprint = bytesHash(sourceBytes(mapOf("inputs" to inputs, "catalog" to NativeCiInputs(repository).identity(catalog), "inventory" to inventory,
-                "publicationVersion" to "${catalog.versions.getValue("rachel")}-cmp-${catalog.versions.getValue("cmp")}")))
-            val build = owner.resolve("workspace")
-            val marker = build.resolve(".rachel-prepared.json")
-            val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
-            if (previous["fingerprint"] != fingerprint || !workspace.reusable(build, marker, mapOf("fingerprint" to fingerprint))) stage(".skiko-source-") { staging ->
-                downloadSource("https://codeload.github.com/$repositoryName/zip/$commit", archive, upstream["sha256"] as String, offline, 128L * 1024 * 1024)
-                SourceArchive.extract(archive, staging, true)
-                patches.apply(staging, patches.manifest["skiko"].sourceObject())
-                catalog.alignUpstreamCatalog(staging.resolve("dependencies.toml"))
-                updateSkikoProfile(staging)
-                catalog.copyWrappers(staging)
-                prepareNotices(staging)
-                removeShadows(staging)
-                SourceWarnings.prepare(vendor, staging)
-                workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "sources" to skiko["sources"]), setOf("skiko/dependencies/skia"))
-            }
-            val key = skiaHostKey()
-            val filename = "Skia-${skiko["skia"]}-$key.zip"
-            val expected = skiko["skiaAssets"].sourceObject().getValue(key) as String
-            val cached = owner.resolve("skia/$expected.zip")
-            val target = build.resolve("skiko/dependencies/skia/${skiko["skia"]}/$filename")
-            if (!target.isFile || target.sourceHash() != expected) {
-                downloadSource("https://github.com/JetBrains/skia/releases/download/${skiko["skia"]}/$filename", cached, expected, offline, 1024L * 1024 * 1024)
-                cached.copyTo(checkedSourcePath(vendor, target).apply { parentFile.mkdirs() }, overwrite = true)
-            }
-            else if (!cached.isFile) target.copyTo(cached.apply { parentFile.mkdirs() })
-            writeSource(vendor, owner.resolve("state.json"), sourceBytes(mapOf("schema" to 3, "build" to "vendor/skiko/workspace/skiko", "fingerprint" to fingerprint,
-                "inputs" to inputs, "sourceInventory" to inventory, "catalogSha256" to catalog.file.sourceHash(), "java" to catalog.java,
-                "versions" to skiko["versions"].sourceObject().mapValues { (name, value) -> catalog.versions[name] ?: value })))
-            println("Prepared Skiko ${catalog.versions["skiko"]} sources")
-        }
+    private fun version(name: String): String = catalog.versions.getValue(name).also {
+        check(Regex("[0-9]+(?:[.][0-9]+)+(?:-[A-Za-z0-9.-]+)?").matches(it)) { "Invalid upstream version for $name: $it" }
     }
 
-    private fun updateSkikoProfile(directory: File) {
+    /** Returns the exact generation prepared for this Gradle invocation. */
+    fun prepare(offline: Boolean = false): File = workspace.locked(vendor) {
+        val inputs = inputHashes()
+        val catalogHash = catalog.sha256
+        check(catalog.file.sourceHash() == catalogHash) { "Version catalog changed during Native source preparation; retry synchronization." }
+        val resolver = NativeSourceInputs(this, offline)
+        val cmpVersion = version("cmp")
+        val skikoVersion = version("skiko")
+        val sdlVersion = version("sdl")
+        val icuVersion = version("icu")
+        val composeSpec = nativeDirectory.resolve("upstream/compose.json").sourceJson()
+        val skikoSpec = nativeDirectory.resolve("upstream/skiko.json").sourceJson()
+        check(skikoSpec["group"] == "love.yinlin.native.skiko") { "Invalid Native Skiko publication namespace" }
+        val sdlSpec = nativeDirectory.resolve("upstream/sdl.json").sourceJson()
+        val icuSpec = nativeDirectory.resolve("upstream/icu.json").sourceJson()
+        val maven = linkedMapOf<String, NativeSourceInputs.Archive>()
+        val modules = composeSpec["modules"].sourceObject().mapValues { (name, value) ->
+            val module = value.sourceObject()
+            val selectedVersion = version(module["versionRef"] as? String ?: "cmp")
+            if (module["sourceRepository"] != "maven") module + ("version" to selectedVersion)
+            else {
+                val group = (module["upstreamGroup"] as String).replace('.', '/')
+                val artifact = "$name-macosarm64"
+                val url = "https://repo.maven.apache.org/maven2/$group/$artifact/$selectedVersion/$artifact-$selectedVersion-sources.jar"
+                val archive = resolver.archive("maven-$name", selectedVersion, url, 32L * 1024 * 1024)
+                maven[name] = archive
+                module + mapOf("version" to selectedVersion, "sourceArchive" to (module["sourceArchive"].sourceObject() + archive.metadata))
+            }
+        }
+        val core = resolver.gitTree("compose", composeSpec["repository"] as String, cmpVersion, modules.filterValues { it["sourceRepository"] == null }.map { (name, module) -> ComposeSourceSync.sourcePath(name, module) })
+        val resources = resolver.gitTree("resources", composeSpec["resourceSource"].sourceObject()["repository"] as String, cmpVersion, listOf("components/resources/library"))
+        val compose = composeSpec + core.metadata + mapOf("resourceSource" to resources.metadata, "modules" to modules)
+        val skikoArchive = resolver.archive("skiko", skikoVersion, "https://codeload.github.com/JetBrains/skiko/zip/refs/tags/v$skikoVersion", 128L * 1024 * 1024)
+        val skia = skiaVersion(skikoArchive.file)
+        val runtime = icuSpec["runtime"].sourceObject()
+        val sdk = setOf(skiaHostKey(), runtime["archive"] as String).associateWith { key ->
+            resolver.archive("skia-$key", skia, "https://github.com/JetBrains/skia/releases/download/$skia/Skia-$skia-$key.zip", 1024L * 1024 * 1024)
+        }
+        val patchOrigins = skikoOrigins.sourceJson().getValue("patchOrigins")
+        val skiko = skikoSpec + mapOf("patchOrigins" to patchOrigins, "version" to skikoVersion, "source" to (skikoArchive.metadata + ("ref" to "refs/tags/v$skikoVersion")), "skia" to skia,
+            "skiaAssets" to sdk.mapValues { it.value.metadata })
+        val sdlArchive = resolver.archive("sdl", sdlVersion, "https://github.com/libsdl-org/SDL/releases/download/release-$sdlVersion/SDL3-$sdlVersion.zip", 128L * 1024 * 1024)
+        val sdl = sdlSpec + mapOf("version" to sdlVersion, "source" to sdlArchive.metadata)
+        val icuArchive = resolver.archive("icu", icuVersion, "https://github.com/unicode-org/icu/releases/download/release-$icuVersion/icu4c-$icuVersion-data-bin-l.zip", 64L * 1024 * 1024)
+        val identity = mapOf("schema" to 1, "host" to skiaHostKey(), "catalogSha256" to catalogHash, "inputs" to inputs, "patches" to patches.manifest,
+            "compose" to compose, "skiko" to skiko, "sdl" to sdl, "icu" to icuArchive.metadata)
+        val hash = bytesHash(sourceBytes(sourceIdentity(identity)))
+        // Keep paths short for MSVC/CMake; the marker always verifies all 256 bits.
+        val generation = checkedSourcePath(vendor, vendor.resolve("g/${hash.take(24)}"))
+        val owner = checkedSourcePath(vendor, generation.resolve(".rachel-generation.json"))
+        if (generation.exists()) {
+            check(owner.isFile && owner.sourceJson()["sha256"] == hash) { "Unrecognized Native generation preserved: $generation" }
+        }
+        else writeSource(vendor, owner, sourceBytes(mapOf("sha256" to hash, "identity" to identity)))
+        writeMetadata(generation, "skiko", skiko)
+        writeMetadata(generation, "compose", compose)
+        writeMetadata(generation, "sdl", sdl)
+        prepareSdl(generation, sdlArchive.file, sdl)
+        prepareIcu(generation, icuVersion, icuArchive, sdk.getValue(runtime.getValue("archive") as String), runtime, skia)
+        prepareSkiko(generation, skikoArchive.file, skiko, sdl, sdk)
+        ComposeSourceSync(this, generation, compose).prepare(core, resources, maven)
+        check(catalog.file.sourceHash() == catalogHash && inputHashes() == inputs) { "Native synchronization inputs changed during preparation; retry synchronization." }
+        val current = mapOf("directory" to generation.relativeTo(nativeDirectory).invariantSeparatorsPath, "sha256" to hash, "catalogSha256" to catalogHash)
+        writeSource(vendor, generation.resolve("ready.json"), sourceBytes(current))
+        writeSource(vendor, vendor.resolve("current.json"), sourceBytes(current))
+        println("Prepared Native Compose $cmpVersion / Skiko $skikoVersion / SDL $sdlVersion: $generation")
+        generation
+    }
+
+    private fun sourceIdentity(value: Any?): Any? = when (value) {
+        is Map<*, *> -> value.filterKeys { it != "publishedSha256" }.mapValues { (_, item) -> sourceIdentity(item) }
+        is List<*> -> value.map(::sourceIdentity)
+        else -> value
+    }
+
+    private fun writeMetadata(generation: File, name: String, metadata: SourceObject) {
+        writeSource(vendor, generation.resolve("metadata/$name.json"), sourceBytes(metadata))
+    }
+
+    private fun skiaVersion(archive: File): String = ZipFile(archive).use { zip ->
+        val entry = zip.entries().asSequence().single { it.name.substringAfter('/') == "skiko/gradle.properties" }
+        check(entry.size in 1 .. 64L * 1024) { "Invalid Skiko Gradle properties" }
+        val content = zip.getInputStream(entry).bufferedReader().use { it.readText() }
+        Regex("(?m)^dependencies[.]skia=(m[0-9]+-[a-f0-9]+)[ \t]*\r?$").find(content)?.groupValues?.get(1)
+            ?: error("Cannot resolve the Skia SDK from Skiko's release")
+    }
+
+    private fun prepareIcu(generation: File, version: String, archive: NativeSourceInputs.Archive, sdk: NativeSourceInputs.Archive, runtime: SourceObject, skia: String) {
+        val destination = generation.resolve("icu/workspace")
+        val record = generation.resolve("icu/files.json")
+        val identity = mapOf("archiveSha256" to archive.metadata["sha256"], "sdkSha256" to sdk.metadata["sha256"])
+        if (!workspace.reusable(destination, record, identity)) stage(".icu-") { staging ->
+            val dataFile = "icudt${version.substringBefore('.')}l.dat"
+            val extracted = SourceArchive.extract(archive.file, staging, false) { relative ->
+                when (relative) {
+                    dataFile -> "icudtl.dat"
+                    "LICENSE" -> "icu-LICENSE.txt"
+                    else -> null
+                }
+            }
+            check(extracted.size == 2) { "Missing complete ICU data or license in ${archive.file}" }
+            val text = SourceArchive.extract(sdk.file, staging, false) { relative -> if (relative == runtime["entry"]) "text/icudtl.dat" else null }
+            check(text.size == 1) { "The Skia SDK is missing its external text ICU data" }
+            workspace.synchronize(staging, destination, record, identity)
+        }
+        writeMetadata(generation, "icu", mapOf("version" to version, "skia" to skia, "source" to archive.metadata,
+            "data" to mapOf("sha256" to destination.resolve("icudtl.dat").sourceHash()),
+            "runtime" to (runtime + ("sha256" to destination.resolve("text/icudtl.dat").sourceHash())),
+            "licenseSha256" to destination.resolve("icu-LICENSE.txt").sourceHash()))
+    }
+
+    private fun prepareSkiko(generation: File, archive: File, skiko: SourceObject, sdl: SourceObject, sdk: Map<String, NativeSourceInputs.Archive>) {
+        val destination = generation.resolve("skiko/workspace")
+        val record = generation.resolve("skiko/files.json")
+        val identity = mapOf("sourceSha256" to skiko["source"].sourceObject()["sha256"])
+        if (!workspace.reusable(destination, record, identity)) stage(".skiko-") { staging ->
+            SourceArchive.extract(archive, staging, true)
+            patches.apply(staging, patches.manifest["skiko"].sourceObject())
+            for (module in listOf("skiko", "skiko/skiko-skottie")) {
+                val directory = staging.resolve(module)
+                Files.move(directory.resolve("build.gradle.kts").toPath(), directory.resolve("rachel-upstream.gradle.kts").toPath())
+            }
+            catalog.alignUpstreamCatalog(staging.resolve("dependencies.toml"))
+            updateSkikoProfile(staging, skiko, sdk)
+            for (path in listOf("skiko/settings.gradle.kts", "skiko/buildSrc/settings.gradle.kts")) {
+                val settings = staging.resolve(path)
+                val build = destination.resolve(path).parentFile
+                val repositoryPath = build.toPath().relativize(repository.toPath()).toString().replace(File.separatorChar, '/')
+                settings.writeText(settings.readText().replace("__REPOSITORY__", repositoryPath))
+            }
+            catalog.copyWrappers(staging)
+            prepareNotices(staging, skiko, sdl)
+            removeShadows(staging)
+            workspace.synchronize(staging, destination, record, identity, setOf("skiko/dependencies/skia"))
+        }
+        val key = skiaHostKey()
+        val verified = sdk.getValue(key)
+        val skia = skiko["skia"]
+        val target = checkedSourcePath(vendor, destination.resolve("skiko/dependencies/skia/$skia/Skia-$skia-$key.zip"))
+        if (!target.isFile) {
+            target.parentFile.mkdirs()
+            val temporary = Files.createTempFile(target.parentFile.toPath(), ".skia-", ".zip").toFile()
+            try {
+                verified.file.copyTo(temporary, overwrite = true)
+                check(temporary.sourceHash() == verified.metadata["sha256"]) { "Skia SDK copy failed integrity verification" }
+                Files.move(temporary.toPath(), target.toPath())
+            }
+            finally { temporary.delete() }
+        }
+        else check(target.sourceHash() == verified.metadata["sha256"]) { "Skia SDK SHA-256 mismatch: $target" }
+    }
+
+    private fun updateSkikoProfile(directory: File, skiko: SourceObject, sdk: Map<String, NativeSourceInputs.Archive>) {
         val properties = directory.resolve("skiko/gradle.properties")
+        val language = catalog.versions.getValue("kotlin").split('.').take(2).joinToString(".")
         val values = linkedMapOf("deploy.version" to "${catalog.versions.getValue("rachel")}-cmp-${catalog.versions.getValue("cmp")}", "deploy.group" to skiko["group"].toString(), "dependencies.skia" to skiko["skia"].toString(),
-            "skiko.kotlin.language.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."), "skiko.kotlin.api.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."))
-        val rootProperties = repository.resolve("gradle.properties").readText()
-        Regex("(?m)^(kotlin\\.native\\.(?:ignoreDisabledTargets|jvmArgs))[ \\t]*=[ \\t]*([^\r\n]*)").findAll(rootProperties).forEach { values[it.groupValues[1]] = it.groupValues[2].trim() }
+            "skiko.kotlin.language.version" to language, "skiko.kotlin.api.version" to language,
+            "skiko.kotlin.native.language.version" to language, "skiko.kotlin.native.api.version" to language)
+        for ((target, archive) in sdk) values["rachel.skia.sha256.$target"] = archive.metadata.getValue("sha256").toString()
+        values.putAll(kotlinProperties())
         var text = properties.readText()
         for ((name, value) in values) {
-            val pattern = Regex("(?m)^${Regex.escape(name)}[^\r\n]*")
+            val pattern = Regex("(?m)^${Regex.escape(name)}[ \\t]*=[^\r\n]*")
             text = if (pattern.containsMatchIn(text)) pattern.replace(text) { "$name=$value" } else "$text\n$name=$value\n"
         }
         properties.writeText(text)
         val buildSrc = directory.resolve("skiko/buildSrc/build.gradle.kts")
-        buildSrc.writeText(Regex("jvmToolchain\\(\\d+\\)").replace(buildSrc.readText(), "jvmToolchain(${catalog.java})"))
+        val buildScript = Regex("jvmToolchain\\(\\d+\\)").replace(buildSrc.readText(), "jvmToolchain(${catalog.java})")
+        buildSrc.writeText(buildScript + """
+            |tasks.configureEach {
+            |    inputs.property("rachel.native.generation", projectDir.resolve("../../../..").canonicalFile.name)
+            |}
+        """.trimMargin() + "\n")
     }
 
-    private fun prepareNotices(directory: File) {
+    private fun prepareNotices(directory: File, skiko: SourceObject, sdl: SourceObject) {
         val notices = directory.resolve("skiko/rachel-notices").apply { mkdirs() }
         directory.resolve("LICENSE").copyTo(notices.resolve("Apache-2.0.txt"), overwrite = true)
         directory.resolve("NOTICE").copyTo(notices.resolve("NOTICE"), overwrite = true)
-        nativeDirectory.resolve("upstream/adaptation-origins.json").copyTo(notices.resolve("adaptation-origins.json"), overwrite = true)
-        notices.resolve("upstream-lock.json").writeBytes(sourceBytes(skiko))
-        val sdl = nativeDirectory.resolve("upstream/sdl.json").sourceJson()
-        val text = buildString {
-            append("# Native desktop source provenance\n\nRachel's modified Native desktop builds of the locked Skiko sources.\n\n")
-            for ((name, source) in skiko["sources"].sourceObject()) {
-                val entry = source.sourceObject()
-                append("- $name: https://github.com/${entry["repository"]} at ${entry["commit"]}.\n")
-            }
-            append("- Skia: ${skiko["skia"]}; archive hashes are in upstream-lock.json.\n- SDL ${sdl["version"]}: ${sdl["source"].sourceObject()["url"]}; SHA-256 ${sdl["source"].sourceObject()["sha256"]}.\n\n")
-            append("Original licenses and copyright notices remain in the sources. adaptation-origins.json records reference-derived files; the unified patch includes the reviewed community delta.\n")
-        }
-        notices.resolve("THIRD_PARTY_NOTICES.md").writeText(text)
+        skikoOrigins.copyTo(notices.resolve("adaptation-origins.json"), overwrite = true)
+        notices.resolve("upstream-sources.json").writeBytes(sourceBytes(mapOf("skiko" to skiko, "sdl" to sdl, "patches" to patches.manifest)))
+        notices.resolve("THIRD_PARTY_NOTICES.md").writeText(
+            "# Native desktop source provenance\n\nRachel modifies Skiko and SDL for Native desktop. See upstream-sources.json for the resolved releases and SHA-256 values. " +
+                "Original licenses remain in the sources. adaptation-origins.json records reference-derived files.\n"
+        )
     }
 
     private fun removeShadows(directory: File) {
-        val origins = nativeDirectory.resolve("upstream/adaptation-origins.json").sourceJson()["files"].sourceObject()
+        val origins = skikoOrigins.sourceJson()["files"].sourceObject()
         for ((relative, origin) in origins) {
             val maintained = nativeDirectory.resolve(sourceRelativePath(relative))
             check(maintained.isFile) { "Missing maintained Skiko source: $relative" }
@@ -187,62 +259,29 @@ class NativeUpstreamSync(directory: File) {
         }
     }
 
-    private fun prepareSdl(offline: Boolean) {
-        val lock = nativeDirectory.resolve("upstream/sdl.json").sourceJson()
-        val version = lock["version"] as String
-        check(version == catalog.versions["sdl"]) { "SDL catalog/source lock mismatch" }
-        val source = lock["source"].sourceObject()
-        val archive = vendor.resolve("sdl-source-$version.zip")
-        val destination = vendor.resolve("sdl-source-$version")
-        val marker = destination.resolve(".rachel-source-sha256")
-        if (!marker.isFile || marker.readText() != source["sha256"]) stage(".sdl-source-") { staging ->
-            downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 128L * 1024 * 1024)
+    private fun prepareSdl(generation: File, archive: File, metadata: SourceObject) {
+        val destination = generation.resolve("sdl/source")
+        val record = generation.resolve("sdl/files.json")
+        val identity = mapOf("sourceSha256" to metadata["source"].sourceObject()["sha256"])
+        if (workspace.reusable(destination, record, identity)) return
+        stage(".sdl-") { staging ->
             SourceArchive.extract(archive, staging, true)
-            staging.resolve(".rachel-source-sha256").writeText(source["sha256"] as String)
-            check(!destination.exists()) { "Unrecognized SDL source directory preserved: $destination" }
-            Files.move(staging.toPath(), destination.toPath())
+            check(staging.resolve("include/SDL3/SDL.h").isFile && staging.resolve("LICENSE.txt").isFile) { "SDL headers/license are missing" }
+            check(metadata["build"].sourceObject()["dynamicApi"] == false) { "The static Compose SDL profile requires direct API calls" }
+            NativeSdlSource.disableDynamicApi(staging)
+            patches.apply(staging, patches.manifest["sdl"].sourceObject())
+            workspace.synchronize(staging, destination, record, identity)
         }
-        check(destination.resolve("include/SDL3/SDL.h").isFile && destination.resolve("LICENSE.txt").isFile) { "SDL headers/license are missing" }
-        check(lock["build"].sourceObject()["dynamicApi"] == false) { "The static Compose SDL profile requires direct API calls" }
-        NativeSdlSource.disableDynamicApi(destination)
-        NativeSdlSource.prepareDropNegotiation(nativeDirectory, destination, archive, source["sha256"] as String)
-        println("Prepared SDL $version sources")
     }
 
-    private fun nativeHostTarget(): String {
+    private fun skiaHostKey(): String {
         val os = System.getProperty("os.name").lowercase()
         val arch = System.getProperty("os.arch").lowercase()
         return when {
-            os.startsWith("windows") && arch in setOf("amd64", "x86_64") -> "mingw_x64"
-            os.startsWith("linux") && arch in setOf("amd64", "x86_64") -> "linux_x64"
-            os.startsWith("mac") && arch in setOf("arm64", "aarch64") -> "macos_arm64"
+            os.startsWith("windows") && arch in setOf("amd64", "x86_64") -> "windows-Release-x64"
+            os.startsWith("linux") && arch in setOf("amd64", "x86_64") -> "linux-Release-x64"
+            os.startsWith("mac") && arch in setOf("arm64", "aarch64") -> "macos-Release-arm64"
             else -> error("Unsupported desktop Native host: $os/$arch")
-        }
-    }
-
-    private fun skiaHostKey(): String = when (nativeHostTarget()) {
-        "mingw_x64" -> "windows-Release-x64"
-        "linux_x64" -> "linux-Release-x64"
-        else -> "macos-Release-arm64"
-    }
-
-    fun checkUpdates() {
-        val identities = skiko["sources"].sourceObject().mapValues { it.value.sourceObject() } + mapOf("Compose" to compose, "Resources" to compose["resourceSource"].sourceObject())
-        for ((name, identity) in identities) {
-            val ref = identity["ref"] as String
-            val remote = sourceCommand(repository, listOf("git", "ls-remote", "https://github.com/${identity["repository"]}.git", ref, "$ref^{}"))
-            println("$name: locked=${identity["commit"]} remote=${remote.trim().ifEmpty { "immutable commit" }}")
-        }
-        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build()
-        for ((name, value) in compose["modules"].sourceObject()) {
-            val module = value.sourceObject()
-            if (module["sourceRepository"] != "maven") continue
-            val url = "https://repo.maven.apache.org/maven2/${(module["upstreamGroup"] as String).replace('.', '/')}/$name/maven-metadata.xml"
-            val response = client.send(HttpRequest.newBuilder(URI(url)).timeout(Duration.ofSeconds(30)).GET().build(), HttpResponse.BodyHandlers.ofInputStream())
-            val xml = response.body().use { it.readNBytes(1024 * 1024 + 1) }
-            check(response.statusCode() == 200 && xml.size <= 1024 * 1024) { "Cannot read Maven release metadata: $name" }
-            val latest = Regex("<latest>([^<]+)</latest>").find(xml.toString(Charsets.UTF_8))?.groupValues?.get(1)
-            println("${module["upstreamGroup"]}:$name: locked=${module["version"] ?: compose["version"]} latest=$latest")
         }
     }
 }

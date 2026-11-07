@@ -9,4 +9,4 @@
 *.css linguist-language=JavaScript
 *.html linguist-language=JavaScript
 
-native-compose/upstream/patches/*.patch text eol=lf
+native-compose/upstream/patches/*.patch text eol=lf whitespace=-blank-at-eol

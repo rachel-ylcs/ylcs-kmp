@@ -6,7 +6,7 @@ import java.io.File
 internal object SkikoApplicationDependencies {
     fun configure(project: Project, application: NativeApplicationExtension, bridge: NativeBridgeExtension) {
         val extras = project.gradle.extensions.extraProperties
-        val nativeRoot = if (extras.has("love.yinlin.nativeCompose.root")) extras.get("love.yinlin.nativeCompose.root") as File else null
+        val nativeRoot = if (extras.has("love.yinlin.nativeCompose.generation")) extras.get("love.yinlin.nativeCompose.generation") as File else null
         if (application.skikoRuntimeEnabled.get()) configureSkiko(project, application, bridge, nativeRoot)
         if (!application.skikoWindowEnabled.get()) return
         val renderer = project.providers.gradleProperty("native.renderer").getOrElse("gpu")
@@ -17,7 +17,7 @@ internal object SkikoApplicationDependencies {
     private fun configureSkiko(project: Project, application: NativeApplicationExtension, bridge: NativeBridgeExtension, nativeRoot: File?) {
         if (nativeRoot != null) {
             for (target in NativeRuntimeAttributes.artifactSuffixes.keys) application.runtime(target) {
-                files.from(nativeRoot.resolve("vendor/icu/workspace/text/icudtl.dat"))
+                files.from(nativeRoot.resolve("icu/workspace/text/icudtl.dat"))
             }
         }
         else {

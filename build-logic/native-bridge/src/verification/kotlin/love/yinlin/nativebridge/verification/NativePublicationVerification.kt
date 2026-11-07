@@ -6,9 +6,9 @@ import java.util.Properties
 import java.util.zip.ZipFile
 
 /** Audits actual Maven files, KLIB manifests, embedded native archives and test reports. */
-internal class NativePublicationVerification(private val nativeDirectory: File) {
+internal class NativePublicationVerification(private val nativeDirectory: File, private val generation: File? = null) {
     private val compose = nativeDirectory.resolve("upstream/compose.json").readJson()
-    private val skiko = nativeDirectory.resolve("upstream/lock.json").readJson()
+    private val skiko = nativeDirectory.resolve("upstream/skiko.json").readJson()
     private val modules = compose["modules"].jsonObject()
     private val compiler = catalogVersions().getValue("kotlin")
 
@@ -18,15 +18,11 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
     }
 
     fun checkSources() {
-        val versions = catalogVersions()
-        check(compose["version"] == versions["cmp"] && skiko["versions"].jsonObject()["skiko"] == versions["skiko"]) { "Review the source locks for the selected CMP/Skiko release" }
-        check(nativeDirectory.resolve("upstream/sdl.json").readJson()["version"] == versions["sdl"]) { "SDL catalog/lock mismatch" }
-        check(nativeDirectory.resolve("upstream/icu.json").readJson()["skia"] == skiko["skia"]) { "Review the ICU locale data for the selected Skia SDK" }
         for ((artifact, value) in modules) {
             val module = value.jsonObject()
             check((module["redirectTargets"] as List<*>).toSet() == targetSuffixes.keys && (module["metadataTargets"] as List<*>).toSet() == targetSuffixes.keys) { "Missing owned Native target: $artifact" }
             val reference = module["versionRef"] as? String ?: "cmp"
-            check((module["version"] ?: compose["version"]) == versions[reference]) { "Source/catalog version mismatch: $artifact" }
+            check(reference in catalogVersions()) { "Unknown version alias for $artifact: $reference" }
         }
         val allowed = setOf("nativeMain", "windowsMain", "linuxMain", "macosMain", "nativeTest", "windowsTest", "linuxTest", "macosTest")
         for (module in nativeDirectory.resolve("adaptation").listFiles().orEmpty().filter { it.isDirectory }) {
@@ -38,11 +34,11 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
             }
         }
         for (manifest in listOf("adaptation-origins.json", "compose-origins.json")) {
-            for (relative in nativeDirectory.resolve("upstream/$manifest").readJson()["files"].jsonObject().keys) {
+            for (relative in nativeDirectory.resolve("adaptation/provenance/$manifest").readJson()["files"].jsonObject().keys) {
                 check(relative.startsWith("adaptation/") && nativeDirectory.contained(relative).isFile) { "Missing maintained source: $relative" }
             }
         }
-        println("PASS: ${modules.size + 2} owned libraries; uniform Native roots and pinned sources")
+        println("PASS: ${modules.size + 2} owned libraries; uniform Native roots and catalog references")
     }
 
     internal fun verifyFiles(metadata: JsonObject, directory: File) {
@@ -137,13 +133,13 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
             if (artifact == "skiko") {
                 check(sdl) { "Core KLIB must embed static SDL" }
                 val icu = native.resolve("$artifact-$suffix-$version-icudtl.dat")
-                val expectedIcu = nativeDirectory.resolve("upstream/icu.json").readJson()["data"].jsonObject()["sha256"]
+                val expectedIcu = checkNotNull(generation).resolve("metadata/icu.json").readJson()["data"].jsonObject()["sha256"]
                 check(icu.isFile && icu.digest("SHA-256") == expectedIcu) { "Complete ICU locale data is missing or has the wrong version: $icu" }
                 val textIcu = native.resolve("$artifact-$suffix-$version-icudtl-text.dat")
-                val expectedTextIcu = nativeDirectory.resolve("upstream/icu.json").readJson()["runtime"].jsonObject()["sha256"]
+                val expectedTextIcu = checkNotNull(generation).resolve("metadata/icu.json").readJson()["runtime"].jsonObject()["sha256"]
                 check(textIcu.isFile && textIcu.digest("SHA-256") == expectedTextIcu) { "JetBrains text ICU data is missing or has the wrong version: $textIcu" }
                 val license = native.resolve("$artifact-$suffix-$version-icu-license.txt")
-                check(license.isFile && license.digest("SHA-256") == nativeDirectory.resolve("upstream/icu.json").readJson()["licenseSha256"]) { "ICU data license is missing: $license" }
+                check(license.isFile && license.digest("SHA-256") == checkNotNull(generation).resolve("metadata/icu.json").readJson()["licenseSha256"]) { "ICU data license is missing: $license" }
                 if (target == "linux_x64") for (system in listOf("fontconfig", "GL", "dl")) check(exportedOptions.any { "-l$system" in it }) { "Linux $system link dependency is missing" }
             }
             if (artifact == "skiko-skottie") {
@@ -204,8 +200,8 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
     fun verifyHost(repository: File, target: String) {
         checkSources()
         verify(repository, target)
-        verifyReports(listOf(nativeDirectory.resolve("vendor/build/compose-ui")), expectedTests(target, false))
-        val skikoBuild = nativeDirectory.resolve("vendor/skiko/workspace/skiko")
+        verifyReports(listOf(checkNotNull(generation).resolve("build/compose-ui")), expectedTests(target, false))
+        val skikoBuild = checkNotNull(generation).resolve("skiko/workspace/skiko")
         verifyReports(listOf(skikoBuild.resolve("build"), skikoBuild.resolve("skiko-skottie/build")), expectedTests(target, true))
     }
 

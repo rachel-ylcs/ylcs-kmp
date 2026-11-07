@@ -1,9 +1,6 @@
 {
     "schema": 1,
     "repository": "JetBrains/compose-multiplatform-core",
-    "ref": "v1.13.0-beta01",
-    "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
-    "version": "1.13.0-beta01",
     "group": "love.yinlin.native.compose.ui",
     "ownedTargets": [
         "mingw_x64",
@@ -11,23 +8,18 @@
         "macos_arm64"
     ],
     "resourceSource": {
-        "repository": "JetBrains/compose-multiplatform",
-        "ref": "v1.13.0-beta01",
-        "commit": "926b833de872721337612d7ac4629636e9db4d1e"
+        "repository": "JetBrains/compose-multiplatform"
     },
     "modules": {
         "navigation3-ui": {
             "family": "navigation3",
             "group": "love.yinlin.native.androidx.navigation3",
             "upstreamGroup": "org.jetbrains.androidx.navigation3",
-            "version": "1.2.0",
             "versionRef": "navigation3",
             "adaptation": "org.jetbrains.androidx.navigation3_navigation3-ui",
             "sourceRepository": "maven",
             "sourcePath": "navigation3-ui",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/androidx/navigation3/navigation3-ui-macosarm64/1.2.0/navigation3-ui-macosarm64-1.2.0-sources.jar",
-                "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c",
                 "licensePath": "META-INF/org/jetbrains/androidx/navigation3/navigation3-ui/LICENSE.txt"
             },
             "requiresSkiko": true,
@@ -402,8 +394,6 @@
             "sourceRepository": "maven",
             "sourcePath": "material3",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-macosarm64/1.13.0-beta01/material3-macosarm64-1.13.0-beta01-sources.jar",
-                "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/material3/LICENSE.txt"
             },
             "redirectTargets": [
@@ -449,8 +439,6 @@
             "sourceRepository": "maven",
             "sourcePath": "material3-ripple",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-ripple-macosarm64/1.13.0-beta01/material3-ripple-macosarm64-1.13.0-beta01-sources.jar",
-                "sha256": "c067bdeb43271642e864b6f2ae35ed5f27c350ad2df03cf7e06f89ee6cfd9cdb",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/material3-ripple/LICENSE.txt"
             },
             "redirectTargets": [
@@ -481,8 +469,6 @@
             "sourceRepository": "maven",
             "sourcePath": "material3-window-size-class",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-window-size-class-macosarm64/1.13.0-beta01/material3-window-size-class-macosarm64-1.13.0-beta01-sources.jar",
-                "sha256": "2df762d6098cd097e0d5c1d91de2ce81149b1867cd6d6c173eb16239f763daa7",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/material3-window-size-class/LICENSE.txt"
             },
             "redirectTargets": [
@@ -516,8 +502,6 @@
             "sourceRepository": "maven",
             "sourcePath": "material3-adaptive-navigation-suite",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-adaptive-navigation-suite-macosarm64/1.13.0-beta01/material3-adaptive-navigation-suite-macosarm64-1.13.0-beta01-sources.jar",
-                "sha256": "647f494eb054966e13200640fca3c446a2dcf519641199a1f88b30ff8cf50844",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/material3-adaptive-navigation-suite/LICENSE.txt"
             },
             "redirectTargets": [
@@ -545,8 +529,6 @@
             "sourceRepository": "maven",
             "sourcePath": "material-ripple",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material/material-ripple-macosarm64/1.13.0-beta01/material-ripple-macosarm64-1.13.0-beta01-sources.jar",
-                "sha256": "3e00d5744e39008081ca5ff415d29ce94b02fe11de1539164ce21adf8871c42c",
                 "licensePath": "META-INF/org/jetbrains/compose/material/material-ripple/LICENSE.txt"
             },
             "redirectTargets": [
@@ -577,8 +559,6 @@
             "sourceRepository": "maven",
             "sourcePath": "adaptive",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-macosarm64/1.4.0-alpha01/adaptive-macosarm64-1.4.0-alpha01-sources.jar",
-                "sha256": "cf1e496e1070fe22fabe6d86b305f6468689cd67f8dcd3c774ed45c66c50aeba",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive/LICENSE.txt"
             },
             "redirectTargets": [
@@ -600,8 +580,7 @@
                     "src/nonAndroidMain/kotlin"
                 ]
             },
-            "version": "1.4.0-alpha01",
-            "versionRef": "material3"
+            "versionRef": "material3-adaptive"
         },
         "adaptive-layout": {
             "family": "adaptive",
@@ -611,8 +590,6 @@
             "sourceRepository": "maven",
             "sourcePath": "adaptive-layout",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-layout-macosarm64/1.4.0-alpha01/adaptive-layout-macosarm64-1.4.0-alpha01-sources.jar",
-                "sha256": "f6747aa077e5f9b73f3c480692bc81d22a13968da2d8ab2a7410bdb7ef0089a7",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-layout/LICENSE.txt"
             },
             "redirectTargets": [
@@ -637,8 +614,7 @@
                     "src/skikoMain/kotlin"
                 ]
             },
-            "version": "1.4.0-alpha01",
-            "versionRef": "material3"
+            "versionRef": "material3-adaptive"
         },
         "adaptive-navigation": {
             "family": "adaptive",
@@ -648,8 +624,6 @@
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-navigation-macosarm64/1.4.0-alpha01/adaptive-navigation-macosarm64-1.4.0-alpha01-sources.jar",
-                "sha256": "699eeeed8e6c9125064096d18748dcd78b6761efe5d11bd9c47c7cf3339c1829",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-navigation/LICENSE.txt"
             },
             "redirectTargets": [
@@ -668,8 +642,7 @@
                     "src/commonMain/kotlin"
                 ]
             },
-            "version": "1.4.0-alpha01",
-            "versionRef": "material3"
+            "versionRef": "material3-adaptive"
         },
         "adaptive-navigation3": {
             "family": "adaptive",
@@ -679,8 +652,6 @@
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation3",
             "sourceArchive": {
-                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-navigation3-macosarm64/1.4.0-alpha01/adaptive-navigation3-macosarm64-1.4.0-alpha01-sources.jar",
-                "sha256": "12392143160bde37748ceedc6f0702b6d8047b878835a690102df73c31dcacc2",
                 "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-navigation3/LICENSE.txt"
             },
             "redirectTargets": [
@@ -699,8 +670,7 @@
                     "src/commonMain/kotlin"
                 ]
             },
-            "version": "1.4.0-alpha01",
-            "versionRef": "material3"
+            "versionRef": "material3-adaptive"
         }
     }
 }

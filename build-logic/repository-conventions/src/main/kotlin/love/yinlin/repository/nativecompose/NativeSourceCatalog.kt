@@ -3,7 +3,9 @@ package love.yinlin.repository.nativecompose
 import java.io.File
 
 internal class NativeSourceCatalog(private val repository: File, val file: File = repository.resolve("libs.versions.toml")) {
-    private val text = file.readText()
+    private val bytes = file.readBytes()
+    val sha256 = bytesHash(bytes)
+    private val text = bytes.toString(Charsets.UTF_8)
     private val sections = Regex("(?m)^\\[([^]]+)]\\s*$").findAll(text).toList()
     private fun section(name: String, required: Boolean = true): String {
         val index = sections.indexOfFirst { it.groupValues[1] == name }

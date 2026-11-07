@@ -7,26 +7,11 @@ endif()
 
 project(player)
 
-if(MSVC)
-    set(LINK_STATIC_MSVC_LIBS ON CACHE BOOL "")
-    if(LINK_STATIC_MSVC_LIBS)
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    endif()
-    add_compile_options("/utf-8")
-endif()
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${NATIVE_OUTPUT_DIR}") # .exe and .dll
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${NATIVE_OUTPUT_DIR}") # .so and .dylib
 # set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${NATIVE_OUTPUT_DIR}") # .lib and .a
-
-find_package(Java COMPONENTS Runtime Development)
-if(NOT Java_FOUND)
-    message(FATAL_ERROR "ylcs native lib requires Java to build!")
-    return()
-endif()
-find_package(JNI REQUIRED)
 
 find_path(AUDIO_SHARED_CPP_DIR rachel_audio.h PATHS ${RACHEL_CPP_SOURCE_DIRS} NO_DEFAULT_PATH REQUIRED)
 add_subdirectory("${AUDIO_SHARED_CPP_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/shared-audio")
@@ -40,12 +25,11 @@ add_library(player SHARED
 
 target_include_directories(player PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${JNI_INCLUDE_DIRS}
-    ${NATIVE_JNI_DIR}
+    ${RACHEL_JNI_INCLUDE_DIRS}
+    ${RACHEL_CPP_INCLUDE_DIR}
 )
 
 target_link_libraries(player PRIVATE
-    ${JNI_LIBRARIES}
     rachel_audio
 )
 
@@ -62,6 +46,7 @@ endif()
 
 if(WIN32)
     target_compile_definitions(player PRIVATE UNICODE _UNICODE)
+    set_target_properties(player PROPERTIES PREFIX "")
 endif()
 
 set_target_properties(player PROPERTIES

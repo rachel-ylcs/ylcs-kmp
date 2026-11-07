@@ -1,7 +1,5 @@
-import love.yinlin.gradle.jsBinaryDir
+import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import love.yinlin.gradle.wasmBinaryDir
-import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -44,49 +42,20 @@ rachel {
             }
         }
 
-        actions {
-            tasks.register("webJsRun") {
-                description = "运行Web/Js网页版"
-                dependsOn(tasks.named("jsBrowserDevelopmentRun"))
-            }
+        artifacts {
+            val js = browserDistribution(BrowserArtifactTarget.Js)
+            val wasm = browserDistribution(BrowserArtifactTarget.Wasm)
+            val excludes = listOf("*.map", "*.txt")
+            val jsArtifact = zip("webJsArtifact", js, C.root.outputs, "ylcs-js.zip", "打包Web/Js网页版", "webJs", excludes, replaceUnpackedOutput = true)
+            val wasmArtifact = zip("webWasmArtifact", wasm, C.root.outputs, "ylcs-wasm.zip", "打包Web/Wasm网页版", "webWasm", excludes, replaceUnpackedOutput = true)
+            zip("webJsPublish", js, C.root.outputs, "[WebJs]${C.app.displayName}${C.versionName}.zip", "发布Web/Js网页版", "webJs", excludes, replaceUnpackedOutput = true)
+            zip("webPublish", wasm, C.root.outputs, "[WebWasm]${C.app.displayName}${C.versionName}.zip", "发布网页版", "webWasm", excludes, replaceUnpackedOutput = true)
+            aggregate("webArtifact", "打包网页版", jsArtifact, wasmArtifact)
+        }
 
-            tasks.register("webRun") {
-                description = "运行Web/Wasm网页版"
-                dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
-            }
-
-            for ((taskName, filename) in mapOf(
-                "webJsArtifact" to "ylcs-js.zip",
-                "webWasmArtifact" to "ylcs-wasm.zip",
-                "webJsPublish" to "[WebJs]${C.app.displayName}${C.versionName}.zip",
-                "webPublish" to "[WebWasm]${C.app.displayName}${C.versionName}.zip",
-            )) {
-                val isJs = taskName == "webJsArtifact" || taskName == "webJsPublish"
-                val binaryDirectory = if (isJs) jsBinaryDir else wasmBinaryDir
-                val outputDirectory = if (isJs) "webJs" else "webWasm"
-                tasks.register<Zip>(taskName) {
-                    description = when (taskName) {
-                        "webJsArtifact" -> "打包Web/Js网页版"
-                        "webWasmArtifact" -> "打包Web/Wasm网页版"
-                        "webJsPublish" -> "发布Web/Js网页版"
-                        else -> "发布网页版"
-                    }
-                    dependsOn(tasks.named(if (isJs) "jsBrowserDistribution" else "wasmJsBrowserDistribution"))
-
-                    from(binaryDirectory) {
-                        into(outputDirectory)
-                        exclude("*.map", "*.txt")
-                    }
-                    destinationDirectory.set(C.root.outputs)
-                    archiveFileName.set(filename)
-                    doFirst { delete(C.root.outputs.dir(outputDirectory)) }
-                }
-            }
-
-            tasks.register("webArtifact") {
-                description = "打包网页版"
-                dependsOn(tasks.named("webJsArtifact"), tasks.named("webWasmArtifact"))
-            }
+        runs {
+            browser("webJsRun", BrowserArtifactTarget.Js, "运行Web/Js网页版")
+            browser("webRun", BrowserArtifactTarget.Wasm, "运行Web/Wasm网页版")
         }
     }
 }

@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 
 class SourcePatchesTest {
     @Test
-    fun windowsCheckoutPreservesTheBytesUsedByTheLockedPatchHash() {
+    fun windowsCheckoutPreservesTheBytesUsedByThePatchHash() {
         val work = Files.createTempDirectory("native-patch-checkout").toFile()
         try {
             val repository = File(checkNotNull(System.getProperty("native.sources.repositoryRoot")))

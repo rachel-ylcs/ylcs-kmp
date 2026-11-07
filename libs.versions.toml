@@ -10,19 +10,22 @@ rachelMinimumCode = "370"
 # ----- [Plugin] -----
 
 kotlin = "2.5.0-Beta2"
+gradle = "9.8.2"
 agp = "9.3.3"
-cmp = "1.13.0-beta01"
+cmp = "1.13.0-beta02"
 mavenPublish = "0.37.0"
-dokka = "2.3.0-Beta"
+dokka = "2.3.0"
 
 # ----- [Common] -----
 
-skiko = "0.156.0"
-sdl = "3.4.18"
+skiko = "0.156.1"
+sdl = "3.4.20"
+icu = "78.2"
 webview2 = "1.0.4314.35"
+windowsSdkCpp = "10.0.26100.4204"
 lifecycle = "2.11.0"
 savedstate = "1.5.0"
-material3 = "1.4.0-alpha01"
+material3-adaptive = "1.4.0-alpha01"
 navigation3 = "1.2.0"
 coroutines = "1.11.0"
 ktor = "3.6.1"
@@ -48,6 +51,8 @@ nativeBridge = { id = "love.yinlin.native-bridge", version.ref = "rachel" }
 nativeBridgeSettings = { id = "love.yinlin.native-bridge.settings", version.ref = "rachel" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinSamWithReceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
+kotlinAssignment = { id = "org.jetbrains.kotlin.plugin.assignment", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }
@@ -117,10 +122,10 @@ compose-material3 = { module = "org.jetbrains.compose.material3:material3", vers
 compose-material3-ripple = { module = "org.jetbrains.compose.material3:material3-ripple", version.ref = "cmp" }
 compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "cmp" }
 compose-material3-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "cmp" }
-compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3" }
-compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "material3" }
-compose-material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "material3" }
-compose-material3-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "material3" }
+compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive" }
+compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "material3-adaptive" }
+compose-material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
+compose-material3-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "material3-adaptive" }
 
 # kotlinx
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.33.0" }

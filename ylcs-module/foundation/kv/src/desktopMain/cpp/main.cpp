@@ -1,4 +1,4 @@
-#include <native_jni.h>
+#include <jni.h>
 #define FORCE_POSIX
 #include <MMBuffer.h>
 #include <rachel_kv.h>

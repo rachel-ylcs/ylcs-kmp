@@ -15,10 +15,10 @@ internal object SkikoTestRuntime {
         val targets = kotlin.targets.withType(KotlinNativeTarget::class.java).filter { it.konanTarget == HostManager.host }
         if (targets.isEmpty()) return
         val extras = project.gradle.extensions.extraProperties
-        val nativeDirectory = if (extras.has("love.yinlin.nativeCompose.root")) extras.get("love.yinlin.nativeCompose.root") as File else null
+        val nativeDirectory = if (extras.has("love.yinlin.nativeCompose.generation")) extras.get("love.yinlin.nativeCompose.generation") as File else null
         val data = project.objects.fileCollection()
         if (nativeDirectory != null) {
-            data.from(nativeDirectory.resolve("vendor/icu/workspace/icudtl.dat"))
+            data.from(nativeDirectory.resolve("icu/workspace/icudtl.dat"))
         }
         else {
             val module = bridge.redirects.getByName("skiko-core").module.get().split(':')

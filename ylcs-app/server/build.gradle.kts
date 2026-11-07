@@ -1,6 +1,5 @@
-import love.yinlin.gradle.nativeBinaryDir
+import love.yinlin.gradle.BuildPlatform
 import love.yinlin.repository.C
-import org.gradle.api.tasks.Copy
 
 plugins {
     install(
@@ -13,8 +12,6 @@ plugins {
 rachel {
     nativeExecutable {
         nativeDesktopTarget = true
-
-        commandArgs = listOf("--cd=${C.root.work.server.asFile}")
 
         sources {
             nativeMain(commonMain) {
@@ -34,15 +31,15 @@ rachel {
             macosMain(nativeMain)
         }
 
-        actions {
-            for (taskName in listOf("serverArtifact", "serverPublish")) {
-                tasks.register<Copy>(taskName) {
-                    description = if (taskName == "serverArtifact") "打包服务端工件" else "发布服务端"
-                    dependsOn(tasks.named("linkReleaseExecutableLinux"))
+        artifacts {
+            val binary = releaseExecutable(BuildPlatform.Linux)
+            copy("serverArtifact", binary, C.root.outputs, description = "打包服务端工件")
+            copy("serverPublish", binary, C.root.outputs, description = "发布服务端")
+        }
 
-                    from(nativeBinaryDir("linux", "server.kexe"))
-                    into(C.root.outputs)
-                }
+        runs {
+            nativeExecutable {
+                arguments = listOf("--cd=${C.root.work.server.asFile}")
             }
         }
     }

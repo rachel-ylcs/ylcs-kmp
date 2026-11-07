@@ -1,6 +1,5 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -31,24 +30,18 @@ rachel {
             }
         }
 
-        actions {
-            tasks.register("landpageRun") {
-                description = "运行落地页"
-                dependsOn(tasks.named("jsBrowserDevelopmentRun"))
-            }
+        artifacts {
+            zip(
+                "landpagePublish", jsDistribution, C.root.outputs, "landpage.zip",
+                description = "发布落地页",
+                archiveRoot = "landpage",
+                excludes = listOf("*.map", "*.txt"),
+                replaceUnpackedOutput = true,
+            )
+        }
 
-            tasks.register<Zip>("landpagePublish") {
-                description = "发布落地页"
-                dependsOn(tasks.named("jsBrowserDistribution"))
-
-                from(jsBinaryDir) {
-                    into("landpage")
-                    exclude("*.map", "*.txt")
-                }
-                destinationDirectory.set(C.root.outputs)
-                archiveFileName.set("landpage.zip")
-                doFirst { delete(C.root.outputs.dir("landpage")) }
-            }
+        runs {
+            browser("landpageRun", BrowserArtifactTarget.Js, "运行落地页")
         }
     }
 }

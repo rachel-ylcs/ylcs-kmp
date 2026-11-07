@@ -172,7 +172,8 @@ jobs:
         with:
           arch: x64
           export-path-to-vs: VS_PATH
-      - name: Restore and prepare pinned Native sources and SDKs
+      - name: Restore and prepare Native sources and SDKs
+        id: native-sources
         uses: ./.github/actions/setup-native
         with:
           tools: 'true'
@@ -225,7 +226,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: native-compose-maven-${{ matrix.target }}
-          path: native-compose/vendor/build/repository/
+          path: ${{ steps.native-sources.outputs.generation }}/build/repository/
           if-no-files-found: error
       - name: Diagnose a macOS toolchain failure
         if: failure() && runner.os == 'macOS'
@@ -244,25 +245,25 @@ jobs:
         with:
           name: native-compose-evidence-${{ matrix.target }}
           path: |
-            native-compose/vendor/build/compose-ui/*/test-results/
-            native-compose/vendor/build/compose-ui/*/reports/tests/
-            native-compose/vendor/build/framework-consumer-*/test-results/
-            native-compose/vendor/build/framework-consumer-*/reports/tests/
-            native-compose/vendor/build/repository/**/*.module
-            native-compose/vendor/build/repository/**/*.pom
-            native-compose/vendor/skiko/workspace/skiko/build/test-results/
-            native-compose/vendor/skiko/workspace/skiko/skiko-skottie/build/test-results/
+            ${{ steps.native-sources.outputs.generation }}/build/compose-ui/*/test-results/
+            ${{ steps.native-sources.outputs.generation }}/build/compose-ui/*/reports/tests/
+            ${{ steps.native-sources.outputs.generation }}/build/framework-consumer-*/test-results/
+            ${{ steps.native-sources.outputs.generation }}/build/framework-consumer-*/reports/tests/
+            ${{ steps.native-sources.outputs.generation }}/build/repository/**/*.module
+            ${{ steps.native-sources.outputs.generation }}/build/repository/**/*.pom
+            ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/build/test-results/
+            ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/skiko-skottie/build/test-results/
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
             build-logic/public-plugin/build/test-results/
             build-logic/repository-conventions/build/test-results/
             build/native-ci/
             build/reports/profile/
-            native-compose/vendor/build/compose-ui/*/reports/kotlin-build/
-            native-compose/vendor/build/compose-ui/root/reports/profile/
-            native-compose/vendor/skiko/workspace/skiko/build/reports/kotlin-build/
-            native-compose/vendor/skiko/workspace/skiko/skiko-skottie/build/reports/kotlin-build/
-            native-compose/vendor/skiko/workspace/skiko/build/reports/profile/
+            ${{ steps.native-sources.outputs.generation }}/build/compose-ui/*/reports/kotlin-build/
+            ${{ steps.native-sources.outputs.generation }}/build/compose-ui/root/reports/profile/
+            ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/build/reports/kotlin-build/
+            ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/skiko-skottie/build/reports/kotlin-build/
+            ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/build/reports/profile/
           if-no-files-found: warn
 
   assemble:
@@ -284,11 +285,13 @@ jobs:
           pattern: native-compose-maven-*
           path: host-publications
       - name: Require all host artifacts and one canonical KMP root
+        id: assemble
         run: |
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             :native-bridge:assembleNativeRepository
+          printf 'generation=native-compose/%s\n' "$(jq -er '.directory' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v7
         with:
           name: native-compose-maven
-          path: native-compose/vendor/build/assembled-repository/
+          path: ${{ steps.assemble.outputs.generation }}/build/assembled-repository/
           if-no-files-found: error

@@ -1,9 +1,7 @@
 import love.yinlin.gradle.BuildPlatform
-import love.yinlin.gradle.desktopBinaryDir
+import love.yinlin.gradle.desktopNativeLibraries
 import love.yinlin.repository.C
 import love.yinlin.gradle.task.CopyDesktopNativeTask
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     install(
@@ -52,27 +50,20 @@ rachel {
             }
         }
 
+        runs {
+            jvm {
+                debug("desktopRunDebug", "运行Debug桌面端")
+                release("desktopRunRelease", "运行Release桌面端")
+                workingDirectory = C.root.work.desktop.asFile
+                jvmArgs = listOf("-Dnative.library.resource.disabled=true")
+                libraryDirectories = listOf(C.root.artifacts.desktopNative.asFile)
+                buildDesktopNativeLibraries = true
+            }
+        }
+
         actions {
-            val desktopWorkspace = C.root.work.desktop.asFile
-            val desktopNativeDirectory = C.root.artifacts.desktopNative.asFile
-            tasks.withType<JavaExec>().matching { it.name == "run" || it.name == "runRelease" }.configureEach {
-                jvmArgs(
-                    "-Duser.dir=$desktopWorkspace",
-                    "-Dnative.library.resource.disabled=true",
-                    "-Djava.library.path=$desktopNativeDirectory",
-                )
-                doFirst { desktopWorkspace.mkdirs() }
-            }
-
-            tasks.register("desktopRunDebug") {
-                description = "运行Debug桌面端"
-                dependsOn(tasks.named("run"))
-            }
-
-            tasks.register("desktopRunRelease") {
-                description = "运行Release桌面端"
-                dependsOn(tasks.named("runRelease"))
-            }
+            val runtimeNativeLibraries = providers.provider { desktopNativeLibraries() }
+            tasks.named("desktopJar") { dependsOn(runtimeNativeLibraries) }
 
             tasks.register("desktopCheckModules") {
                 description = "检查桌面端模块完整性"
@@ -87,33 +78,27 @@ rachel {
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)
             }
+        }
 
-            val (platform, applicationDirectory) = when (C.platform) {
-                BuildPlatform.Windows -> "Windows" to targetName
-                BuildPlatform.Linux -> "Linux" to targetName
-                BuildPlatform.Mac -> "macOS" to "$targetName.app"
+        artifacts {
+            val platform = when (C.platform) {
+                BuildPlatform.Windows -> "Windows"
+                BuildPlatform.Linux -> "Linux"
+                BuildPlatform.Mac -> "macOS"
             }
-            val executablePath = when (C.platform) {
-                BuildPlatform.Windows -> "$applicationDirectory/$targetName.exe"
-                BuildPlatform.Linux -> "$applicationDirectory/bin/$targetName"
-                BuildPlatform.Mac -> "$applicationDirectory/Contents/MacOS/$targetName"
-            }
-            val executable = desktopBinaryDir.file(executablePath)
+            val distribution = desktopReleaseDistribution
+            val executable = desktopReleaseExecutable
             for ((taskName, filename) in mapOf(
                 "desktopArtifact" to "ylcs-${platform.lowercase()}.zip",
                 "desktopPublish" to "[$platform]${C.app.displayName}${C.versionName}.zip",
             )) {
-                tasks.register<Zip>(taskName) {
-                    description = if (taskName == "desktopArtifact") "打包当前平台的桌面端工件" else "发布桌面端"
-                    dependsOn(tasks.named("createReleaseDistributable"))
-
-                    from(desktopBinaryDir) { include("$applicationDirectory/**") }
-                    destinationDirectory.set(C.root.outputs)
-                    archiveFileName.set(filename)
-                    useFileSystemPermissions()
-                    inputs.file(executable).withPropertyName("desktopExecutable")
-                    doFirst { delete(C.root.outputs.dir(applicationDirectory)) }
-                }
+                zip(
+                    taskName, distribution, C.root.outputs, filename,
+                    description = if (taskName == "desktopArtifact") "打包当前平台的桌面端工件" else "发布桌面端",
+                    archiveRoot = desktopReleaseDirectoryName,
+                    executable = executable,
+                    replaceUnpackedOutput = true,
+                )
             }
         }
     }

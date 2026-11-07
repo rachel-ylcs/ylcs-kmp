@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.Family
@@ -8,10 +9,20 @@ plugins {
 }
 
 val explicit = providers.gradleProperty("native.explicit").getOrElse("false").toBoolean()
-layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/maven-consumer"))
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.verificationGeneration") as File
+tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+layout.buildDirectory.set(generation.resolve("build/maven-consumer"))
+
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
+val compilerProfile = gradle.extensions.extraProperties
 
 kotlin {
-    compilerOptions { freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals") }
+    compilerOptions {
+        languageVersion.set(kotlinLanguage)
+        apiVersion.set(kotlinLanguage)
+        @Suppress("UNCHECKED_CAST")
+        freeCompilerArgs.addAll(compilerProfile["rachel.kotlin.compilerArgs"] as List<String>)
+    }
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")

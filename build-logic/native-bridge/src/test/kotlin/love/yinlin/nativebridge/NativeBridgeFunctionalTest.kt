@@ -53,12 +53,14 @@ class NativeBridgeFunctionalTest {
         val repository = project()
         repository.resolve("libs.versions.toml").writeText(File(System.getProperty("native.tests.versionCatalog")).readText())
         val native = repository.resolve("native-compose")
-        native.resolve("upstream").mkdirs()
-        native.resolve("upstream/compose.json").writeText("""
+        native.resolve("adaptation/provenance").mkdirs()
+        val generation = native.resolve("vendor/g/fixture")
+        generation.resolve("metadata").mkdirs()
+        generation.resolve("metadata/compose.json").writeText("""
             {"group":"test.native.ui","modules":{"ui-util":{"sourceSets":{"commonMain":["src/commonMain/kotlin"]}}}}
         """.trimIndent())
-        native.resolve("upstream/compose-origins.json").writeText("""{"files":{}}""")
-        val build = native.resolve("vendor/compose/workspace/native-desktop").apply { mkdirs() }
+        native.resolve("adaptation/provenance/compose-origins.json").writeText("""{"files":{}}""")
+        val build = generation.resolve("compose/workspace/native-desktop").apply { mkdirs() }
         build.parentFile.resolve("LICENSE.txt").writeText("fixture source license\n")
         build.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
         build.resolve("settings.gradle.kts").writeText("""
@@ -69,7 +71,7 @@ class NativeBridgeFunctionalTest {
                 }
             }
             dependencyResolutionManagement {
-                versionCatalogs { create("libs") { from(files("../../../../../libs.versions.toml")) } }
+                versionCatalogs { create("libs") { from(files("../../../../../../../libs.versions.toml")) } }
             }
             rootProject.name = "native-ui-publication-fixture"
             include(":ui-util")
@@ -139,7 +141,6 @@ class NativeBridgeFunctionalTest {
         val root = project()
         val native = root.resolve("native-compose")
         native.resolve("upstream").mkdirs()
-        native.resolve("upstream/lock.json").writeText("""{"skia":"fixture"}""")
         val library = native.resolve("adaptation/test.library").apply { mkdirs() }
         library.resolve("settings.gradle.kts").writeText("rootProject.name = \"library-test-configuration\"\n")
         library.resolve("gradle.properties").writeText("kotlin.native.ignoreDisabledTargets=true\n")
@@ -395,8 +396,8 @@ class NativeBridgeFunctionalTest {
         for (sourceBuild in listOf(false, true)) {
             val directory = project()
             if (sourceBuild) {
-                directory.resolve("settings.gradle.kts").appendText("gradle.extensions.extraProperties.set(\"love.yinlin.nativeCompose.root\", file(\"native-compose\"))\n")
-                val data = directory.resolve("native-compose/vendor/icu/workspace").apply { mkdirs() }
+                directory.resolve("settings.gradle.kts").appendText("gradle.extensions.extraProperties.set(\"love.yinlin.nativeCompose.generation\", file(\"native-compose/vendor/g/fixture\"))\n")
+                val data = directory.resolve("native-compose/vendor/g/fixture/icu/workspace").apply { mkdirs() }
                 data.resolve("icudtl.dat").writeText("complete locale data")
                 data.resolve("icu-LICENSE.txt").writeText("source license")
                 data.resolve("text/icudtl.dat").apply {

@@ -2,11 +2,17 @@ package love.yinlin.gradle
 
 import com.android.build.api.dsl.ApkSigningConfig
 import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import java.io.File
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 
 class KotlinAndroidSourceSetsScope(private val handler: DependencyHandler) {
@@ -52,18 +58,18 @@ open class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
     }
     internal fun ApplicationExtension.android() { androidBlock(this) }
 
-    val Project.originOutput: File get() {
-        val outputDir = layout.buildDirectory.get().dir("outputs").dir("apk").dir("release").asFile
-        val outputList = outputDir.listFiles { file ->
-            file.isFile && file.extension.equals("apk", true)
-        }?.sortedBy { it.name }.orEmpty()
-        return when {
-            outputList.size == 1 -> outputList.first()
-            else -> outputList.firstOrNull { it.name == "${project.name}-release.apk" }
-                ?: outputList.firstOrNull()
-                ?: outputDir.resolve("${project.name}-release.apk")
+    private val releaseApkDirectories = mutableMapOf<String, Provider<Directory>>()
+
+    val androidReleaseApk: Provider<RegularFile>
+        get() {
+            val directory = releaseApkDirectories["release"] ?: releaseApkDirectories.values.singleOrNull()
+                ?: error("Expected one Release APK variant for ${owner.path}, found ${releaseApkDirectories.keys}")
+            val projectName = owner.name
+            return directory.map { it.file(selectReleaseApk(it.asFile, projectName).name) }
         }
-    }
+
+    val Project.originOutput: File get() =
+        selectReleaseApk(layout.buildDirectory.get().dir("outputs/apk/release").asFile, name)
 
     final override fun Project.build(extension: KotlinAndroidExtension) {
         with(extension) {
@@ -76,6 +82,12 @@ open class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
         }
 
         KotlinAndroidSourceSetsScope(dependencies).source()
+
+        extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
+            onVariants(selector().withBuildType("release")) { variant ->
+                releaseApkDirectories[variant.name] = variant.artifacts.get(SingleArtifact.APK)
+            }
+        }
 
         extensions.configure<ApplicationExtension> {
             namespace = packageName.ifEmpty { uniqueSafeModuleName }
@@ -145,5 +157,17 @@ open class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
         }
 
         configureActions()
+    }
+}
+
+private fun selectReleaseApk(outputDir: File, projectName: String): File {
+    val outputList = outputDir.listFiles { file ->
+        file.isFile && file.extension.equals("apk", true)
+    }?.sortedBy { it.name }.orEmpty()
+    return when {
+        outputList.size == 1 -> outputList.first()
+        else -> outputList.firstOrNull { it.name == "$projectName-release.apk" }
+            ?: outputList.firstOrNull()
+            ?: outputDir.resolve("$projectName-release.apk")
     }
 }

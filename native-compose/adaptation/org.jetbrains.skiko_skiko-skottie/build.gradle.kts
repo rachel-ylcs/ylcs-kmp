@@ -1,8 +1,12 @@
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import tasks.configuration.configureNativeTarget
-import tasks.configuration.nativeSymbolSourcesFor
+import org.jetbrains.skiko.build.configuration.configureNativeTarget
+import org.jetbrains.skiko.build.configuration.nativeSymbolSourcesFor
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.supportNativeWindows
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
 
 plugins {
     kotlin("multiplatform")
@@ -14,7 +18,7 @@ plugins {
 
 val adaptationDirectory = buildFile.parentFile.canonicalFile
 val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
-if (dokkaBuild) layout.buildDirectory.set(adaptationDirectory.parentFile.parentFile.resolve("vendor/build/dokka/skottie"))
+if (dokkaBuild) layout.buildDirectory.set(rootDir.resolve("../../../build/dokka/skottie").canonicalFile)
 
 // Official Skottie supplies the shared bindings; register Windows before publication setup.
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->

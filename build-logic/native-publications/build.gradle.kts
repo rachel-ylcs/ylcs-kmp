@@ -14,7 +14,7 @@ val nativeDirectory = repositoryDirectory.resolve("native-compose")
 val repositoryPath = providers.gradleProperty("native.publishing.repository")
 val inputRepository = repositoryPath.orNull?.let { repositoryDirectory.resolve(it).canonicalFile }
 val compose = JsonSlurper().parse(nativeDirectory.resolve("upstream/compose.json")) as Map<*, *>
-val skiko = JsonSlurper().parse(nativeDirectory.resolve("upstream/lock.json")) as Map<*, *>
+val skiko = JsonSlurper().parse(nativeDirectory.resolve("upstream/skiko.json")) as Map<*, *>
 val modules = compose["modules"] as Map<*, *>
 val coordinates = listOf("skiko", "skiko-skottie").map { skiko["group"].toString() to it } + modules.map { (name, value) ->
     ((value as Map<*, *>)["group"] ?: compose["group"]).toString() to name.toString()

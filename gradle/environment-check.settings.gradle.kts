@@ -10,28 +10,56 @@ val win = os.startsWith("windows")
 val linux = os.startsWith("linux")
 val mac = os.startsWith("mac")
 val exe = if (win) ".exe" else ""
+val reports = mutableListOf<String>()
 
 fun report(name: String, value: String?, hint: String = "", required: Boolean = true) {
-    if (value != null) println("[PASS] $name — $value")
-    else if (!required) println("[WARN] $name — $hint")
-    else {
-        val message = "[ERROR] $name — $hint"
-        println(message)
-        throw GradleException(message)
-    }
+    if (value != null) reports.add("[PASS] $name — $value")
+    else if (!required) reports.add("[WARN] $name — $hint")
+    else throw GradleException("[ERROR] $name — $hint")
 }
 
-fun quick(vararg args: String): String? {
+fun quickOutput(vararg args: String): String? {
     val process = try { ProcessBuilder(*args).redirectErrorStream(true).start() } catch (_: Exception) { return null }
     if (!process.waitFor(3, TimeUnit.SECONDS)) { process.destroyForcibly(); return null }
     if (process.exitValue() != 0) return null
-    return process.inputStream.bufferedReader().use { it.readLine()?.trim().orEmpty() }
+    return process.inputStream.bufferedReader().use { it.readText().trim() }
 }
+
+fun quick(vararg args: String): String? = quickOutput(*args)?.lineSequence()?.firstOrNull()?.trim()
+
+fun pathDirectories(): List<File> = System.getenv("PATH").orEmpty().split(File.pathSeparator)
+    .map { it.trim().trim('"') }.filter(String::isNotEmpty).map(::File)
 
 fun locate(name: String, extra: List<File> = emptyList()): File? {
     val names = if (win) listOf("$name.exe", "$name.cmd", "$name.bat") else listOf(name)
-    val fromPath = env["PATH"].orEmpty().split(File.pathSeparator).filter { it.isNotEmpty() }.flatMap { dir -> names.map { File(dir, it) } }
+    val fromPath = pathDirectories().flatMap { dir -> names.map(dir::resolve) }
     return (fromPath + extra).firstOrNull { it.isFile && (win || it.canExecute()) }
+}
+
+fun windowsCmakeRoots(): List<File> {
+    if (!win) return emptyList()
+    val hints = listOf("VS_PATH", "VSINSTALLDIR", "SKIKO_VSBT_PATH").mapNotNull { name ->
+        System.getenv(name)?.trim()?.trim('"')?.takeIf(String::isNotEmpty)?.let(::File)
+    }
+    val programDirectories = listOfNotNull(System.getenv("ProgramFiles(x86)"), System.getenv("ProgramFiles"), System.getenv("ProgramW6432")).distinct()
+    val vswhere = programDirectories.asSequence().map { File(it, "Microsoft Visual Studio/Installer/vswhere.exe") }.firstOrNull(File::isFile)
+    val registered = vswhere?.let { quickOutput(it.absolutePath, "-all", "-products", "*", "-property", "installationPath", "-utf8") }
+        .orEmpty().lineSequence().map(String::trim).filter(String::isNotEmpty).map(::File).toList()
+    val standard = programDirectories.flatMap { File(it, "Microsoft Visual Studio").listFiles().orEmpty().filter(File::isDirectory) }
+        .flatMap { it.listFiles().orEmpty().filter(File::isDirectory) }
+    return (hints + registered + standard).map { it.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake") }.distinct()
+}
+
+fun nativeTool(name: String, hints: List<File>): Pair<File, String> {
+    val candidates = (pathDirectories().map { it.resolve("$name$exe") } + hints).filter(File::isFile).distinct()
+    for (candidate in candidates) {
+        val executable = candidate.canonicalFile
+        val version = quick(executable.path, "--version")?.takeIf(String::isNotBlank) ?: continue
+        report(name, "$version — ${executable.path}")
+        return executable to version
+    }
+    val hint = if (candidates.isEmpty()) "未在 PATH 或已安装的工具目录中找到 $name" else "无法执行 ${candidates.joinToString { it.absolutePath }}"
+    throw GradleException("[ERROR] $name — $hint")
 }
 
 fun command(name: String, hints: List<File> = emptyList()): String {
@@ -67,31 +95,6 @@ val sdk = listOfNotNull(
 report("Android SDK", sdk?.let { "${it.absolutePath} (sdk.dir=${props.getProperty("sdk.dir") ?: "未设置"}, ANDROID_HOME=${env["ANDROID_HOME"] ?: "未设置"})" }, "未找到有效 SDK；检查 local.properties 的 sdk.dir 或 ANDROID_HOME")
 val android = sdk!!
 
-val vs = if (win) {
-    val candidates = listOfNotNull(
-        env["VS_PATH"]?.let(::File),
-        env["SKIKO_VSBT_PATH"]?.let(::File)
-    ) + listOf("18", "2022", "2026").flatMap { year ->
-        listOf("Community", "Professional", "Enterprise", "BuildTools").map {
-            File(env["ProgramFiles"].orEmpty(), "Microsoft Visual Studio/$year/$it")
-        }
-    }
-    val found = candidates.firstOrNull { File(it, "VC/Auxiliary/Build/vcvars64.bat").isFile }
-    // # 4-1-1 : Visual Studio / msvc
-    report("Visual Studio C++", found?.absolutePath, "缺少 x64 MSVC C++ Build Tools")
-    val vcvars = env["VS_PATH"]?.let { File(it, "VC/Auxiliary/Build/vcvars64.bat") }
-    // # 4-1-2 : VS_PATH
-    report("VS_PATH", vcvars?.takeIf { it.isFile }?.let { "${env["VS_PATH"]} -> ${it.absolutePath}" }, "当前 JNI 构建要求 VS_PATH 指向 ${found?.absolutePath ?: "Visual Studio 安装根目录"}")
-    val kits = listOfNotNull(
-        env["WindowsSdkDir"]?.let(::File),
-        env["ProgramFiles(x86)"]?.let { File(it, "Windows Kits/10") }
-    )
-    val kit = kits.firstOrNull { File(it, "Include").listFiles()?.any { ver -> File(ver, "ucrt").isDirectory && File(ver, "um").isDirectory } == true }
-    // # 4-1-3 : Windows SDK
-    report("Windows SDK", kit?.absolutePath, "缺少 Windows SDK 的 UCRT/UM 头文件")
-    found
-} else null
-
 // # 4-2 : g++ / clang ++
 if (linux) report("Linux C++ 编译器", (locate("g++") ?: locate("clang++"))?.absolutePath, "未找到 g++/clang++；安装 Ubuntu C++ 工具链")
 
@@ -104,22 +107,20 @@ val xcode = if (mac) {
 } else null
 
 // # 5 : cmake
+val windowsCmake = windowsCmakeRoots()
+val androidCmake = File(android, "cmake").listFiles().orEmpty().filter(File::isDirectory).sortedByDescending { it.name }
 val cmakeHints = listOfNotNull(
-    if (win) vs?.let { File(it, "Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe") } else null,
     if (mac) File("/opt/homebrew/bin/cmake") else null,
     if (mac) File("/Applications/CMake.app/Contents/bin/cmake") else null
-) + File(android, "cmake").listFiles().orEmpty().map { File(it, "bin/cmake$exe") }
-val cmakeVersion = command("cmake", cmakeHints)
+) + windowsCmake.map { it.resolve("CMake/bin/cmake.exe") } + androidCmake.map { it.resolve("bin/cmake$exe") }
+val (cmake, cmakeVersion) = nativeTool("cmake", cmakeHints)
 val version = Regex("cmake version (\\d+)\\.(\\d+)").find(cmakeVersion)?.groupValues
 
 // # 6 : cmake version
 report("CMake >= 3.24", if (version != null && (version[1].toInt() > 3 || version[1].toInt() == 3 && version[2].toInt() >= 24)) cmakeVersion else null, "检测到 $cmakeVersion；本仓库的 CMake 脚本需要 >= 3.24")
 
 // # 7 : ninja
-val ninjaHint = if (win) vs?.let { File(it, "Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe") } else null
-val ninja = locate("ninja", listOfNotNull(ninjaHint))
-val ninjaVersion = quick("ninja", "--version")
-report("Ninja", ninjaVersion?.let { "$it — ${ninja?.absolutePath ?: "当前 Gradle PATH"}" } ?: if (win) ninja?.absolutePath else null, "找不到 CMake 可用的 Ninja 构建器")
+val ninja = nativeTool("ninja", windowsCmake.map { it.resolve("Ninja/ninja.exe") } + androidCmake.map { it.resolve("bin/ninja$exe") }).first
 
 // # 8 : Submodules
 for ((name, relative) in listOf(
@@ -155,3 +156,7 @@ if (mac) {
     val simulator = File(xcode!!, "Platforms/iPhoneSimulator.platform/Developer/SDKs")
     report("iOS Simulator SDK", simulator.takeIf { it.isDirectory }?.absolutePath, "缺少 ${simulator.absolutePath}；模拟器运行可能受限", false)
 }
+
+gradle.extensions.extraProperties.set("rachel.native.cmakeExecutable", cmake.path)
+gradle.extensions.extraProperties.set("rachel.native.ninjaExecutable", ninja.path)
+println(reports.joinToString("\n"))

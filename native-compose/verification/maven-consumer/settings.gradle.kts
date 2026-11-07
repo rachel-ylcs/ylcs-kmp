@@ -6,10 +6,13 @@ pluginManagement {
     }
 }
 
+apply(from = "../../gradle/verification.settings.gradle.kts")
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.verificationGeneration") as File
+
 dependencyResolutionManagement {
     repositories {
         maven {
-            url = uri(providers.gradleProperty("native.repository").getOrElse("../../vendor/build/native-compose/repository"))
+            url = uri(providers.gradleProperty("native.repository").getOrElse(generation.resolve("build/native-compose/repository").path))
         }
         mavenCentral()
     }

@@ -1,7 +1,7 @@
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm")
     `java-gradle-plugin`
     `maven-publish`
 }
@@ -20,6 +20,7 @@ sourceSets.test {
 }
 
 dependencies {
+    compileOnly(localGroovy())
     add(bootstrap.compileOnlyConfigurationName, gradleApi())
     add(bootstrap.compileOnlyConfigurationName, gradleKotlinDsl())
     implementation(libs.gradle.plugin.kotlin)

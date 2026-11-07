@@ -1,9 +1,23 @@
-file(GLOB WINDOWS_SDK_CPPWINRT
-    "$ENV{WindowsSdkDir}/Include/*/cppwinrt"
-    "C:/Program Files (x86)/Windows Kits/10/Include/*/cppwinrt"
-)
-list(SORT WINDOWS_SDK_CPPWINRT COMPARE NATURAL ORDER DESCENDING)
-find_path(WINDOWS_CPPWINRT_INCLUDE winrt/base.h PATHS ${WINDOWS_SDK_CPPWINRT} NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+# WinRT projections are headers only. MinGW supplies all link libraries.
+if(NOT EXISTS "${RACHEL_WINRT_SDK_ARCHIVE}")
+    message(FATAL_ERROR "The verified C++/WinRT SDK package is missing. Run the Gradle build to prepare it.")
+endif()
+file(SHA256 "${RACHEL_WINRT_SDK_ARCHIVE}" SDK_SHA256)
+string(SUBSTRING "${SDK_SHA256}" 0 12 SDK_ID)
+set(SDK_DIR "${CMAKE_CURRENT_BINARY_DIR}/winrt-sdk-${SDK_ID}")
+if(NOT EXISTS "${SDK_DIR}/ready")
+    file(MAKE_DIRECTORY "${SDK_DIR}")
+    file(ARCHIVE_EXTRACT INPUT "${RACHEL_WINRT_SDK_ARCHIVE}" DESTINATION "${SDK_DIR}"
+        PATTERNS "c/Include/*/cppwinrt/*" "c/Include/*/shared/*" "c/Include/*/um/*")
+endif()
+file(GLOB WINDOWS_SDK_CPPWINRT "${SDK_DIR}/c/Include/*/cppwinrt")
+unset(WINDOWS_CPPWINRT_INCLUDE CACHE)
+find_path(WINDOWS_CPPWINRT_INCLUDE winrt/base.h PATHS ${WINDOWS_SDK_CPPWINRT} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+get_filename_component(SDK_INCLUDE "${WINDOWS_CPPWINRT_INCLUDE}" DIRECTORY)
+if(NOT EXISTS "${SDK_INCLUDE}/shared/winerror.h" OR NOT EXISTS "${SDK_INCLUDE}/um/Windows.h")
+    message(FATAL_ERROR "The downloaded C++/WinRT SDK is incomplete: ${SDK_INCLUDE}")
+endif()
+file(WRITE "${SDK_DIR}/ready" "${SDK_SHA256}\n")
 target_include_directories(rachel_audio_objects SYSTEM PRIVATE "${WINDOWS_CPPWINRT_INCLUDE}")
 
 if(MINGW)

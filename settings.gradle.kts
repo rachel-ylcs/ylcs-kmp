@@ -22,10 +22,7 @@ repository {
     rachel {
         stripFirstPathSegment = true
 
-        languageFeatures = listOf(
-            "-Xexpect-actual-classes",
-            "-Xcollection-literals",
-        )
+        languageFeatures = providers.gradleProperty("rachel.kotlin.compilerArgs").get().split(',')
 
         resourceExcludes = listOf(
             "/META-INF/{AL2.0,LGPL2.1}",
@@ -66,6 +63,8 @@ repository {
         }
 
         native {
+            cmakeExecutable = gradle.extensions.extraProperties.get("rachel.native.cmakeExecutable") as String
+            ninjaExecutable = gradle.extensions.extraProperties.get("rachel.native.ninjaExecutable") as String
             outputDirectory = "artifacts/desktopNative"
             jniHeadersDirectory = "artifacts/include"
             buildType = "Release"

@@ -1,6 +1,5 @@
-import love.yinlin.gradle.wasmBinaryDir
+import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -59,23 +58,17 @@ rachel {
             }
         }
 
-        actions {
-            tasks.register("modernScreenRun") {
-                description = "运行Debug桌面版ModernScreen"
-                dependsOn(tasks.named("run"))
+        artifacts {
+            sync("modernScreenPublish", browserDistribution(BrowserArtifactTarget.Wasm), C.root.docs.modernScreen, "发布网页版ModernScreen")
+        }
+
+        runs {
+            jvm {
+                debug("modernScreenRun", "运行Debug桌面版ModernScreen")
             }
 
-            tasks.register("nativeModernScreenRun") {
-                description = "运行Debug原生桌面版ModernScreen"
-                dependsOn(tasks.named("composeRun"))
-            }
-
-            tasks.register<Sync>("modernScreenPublish") {
-                description = "发布网页版ModernScreen"
-                dependsOn(tasks.named("wasmJsBrowserDistribution"))
-
-                from(wasmBinaryDir)
-                into(C.root.docs.modernScreen)
+            nativeDesktop {
+                debug("nativeModernScreenRun", "运行Debug原生桌面版ModernScreen")
             }
         }
     }

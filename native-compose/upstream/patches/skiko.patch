@@ -1,27 +1,5 @@
-diff --git a/dependencies.toml b/dependencies.toml
-index f5ee31a..fa4bf60 100644
---- a/dependencies.toml
-+++ b/dependencies.toml
-@@ -1,13 +1,11 @@
- [versions]
--kotlin = "2.4.20"
-+kotlin = "2.5.0-Beta2"
- kotlinxBrowser = "0.5.0"
--
--coroutines = "1.8.0"
-+coroutines = "1.11.0"
- jetbrainsRuntime-api = "1.5.0"
- 
--androidGradlePlugin = "9.0.0"
--dokka = "2.2.0"
--
-+androidGradlePlugin = "9.3.3"
-+dokka = "2.3.0-Beta"
- buildHelpers-publishing = "0.1.28"
- githubApi = "1.329"
- gradleDownloadTask = "5.5.0"
 diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
-index a098724..495b1b6 100644
+index 5d248a7..a7d9651 100644
 --- a/skiko/build.gradle.kts
 +++ b/skiko/build.gradle.kts
 @@ -1,6 +1,8 @@
@@ -33,28 +11,56 @@ index a098724..495b1b6 100644
 +import org.gradle.api.publish.tasks.GenerateModuleMetadata
  import org.gradle.api.tasks.compile.JavaCompile
  import org.gradle.api.tasks.testing.logging.TestExceptionFormat
- import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-@@ -16,17 +18,13 @@ import dsl.SkikoDependencyScope
+ import org.gradle.kotlin.dsl.withType
+@@ -8,6 +10,8 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
++import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
++import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+ import org.jetbrains.skiko.build.configuration.WasmImportsGeneratorCompilerPluginSupportPlugin
+ import org.jetbrains.skiko.build.configuration.WasmImportsGeneratorForTestCompilerPluginSupportPlugin
+ import org.jetbrains.skiko.build.configuration.configureGenerateSymbolsList
+@@ -41,6 +45,8 @@ import org.jetbrains.skiko.build.context.supportNativeIosArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosX64
+ import org.jetbrains.skiko.build.context.supportNativeLinux
++import org.jetbrains.skiko.build.context.supportNativeLinuxArm64
++import org.jetbrains.skiko.build.context.supportNativeLinuxX64
+ import org.jetbrains.skiko.build.context.supportNativeMac
+ import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+ import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+@@ -60,23 +66,17 @@ import org.jetbrains.skiko.build.utils.Arch
+ import org.jetbrains.skiko.build.utils.OS
+ import org.jetbrains.skiko.build.utils.SkikoArtifacts
+ import org.jetbrains.skiko.build.utils.SkikoProperties
++import org.jetbrains.skiko.build.utils.hostArch
+ import org.jetbrains.skiko.build.utils.hostOs
+ import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
+ import org.jetbrains.skiko.build.utils.wasmImports
  
- plugins {
-     kotlin("multiplatform")
+-plugins {
+-    kotlin("multiplatform")
 -    id("com.android.kotlin.multiplatform.library") apply false
 -    org.jetbrains.dokka
-     `maven-publish`
-     signing
-     org.gradle.crypto.checksum
+-    `maven-publish`
+-    signing
+-    org.gradle.crypto.checksum
 -    org.jetbrains.kotlinx.benchmark
- }
+-}
++val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
++fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
++val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
++fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
++val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
  
 -if (supportAndroid) {
 -    apply(plugin = "com.android.kotlin.multiplatform.library")
 -}
-+// Rachel core build excludes Android configuration.
-+
  
  apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
  apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
-@@ -35,7 +33,7 @@ val skiko = SkikoProperties(rootProject)
+@@ -85,7 +85,7 @@ val skiko = SkikoProperties(rootProject)
  val buildType = skiko.buildType
  val targetOs = hostOs
  val targetArch = skiko.targetArch
@@ -63,7 +69,7 @@ index a098724..495b1b6 100644
  
  val coreDependencies: SkikoDependencyScope.() -> Unit = {
      targets {
-@@ -107,12 +105,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+@@ -157,12 +157,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
          }
          native {
@@ -77,7 +83,7 @@ index a098724..495b1b6 100644
                  // Hack to fix problem with linker not always finding certain declarations.
                  directStaticSkiaLibs(
                      "skshaper",
-@@ -121,13 +115,37 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+@@ -171,13 +167,37 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                      "skia",
                      "skia_ganesh_ext"
                  )
@@ -116,7 +122,7 @@ index a098724..495b1b6 100644
                      "CoreGraphics",
                      "CoreText",
                      "CoreServices",
-@@ -135,6 +153,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+@@ -185,6 +205,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              ios {
@@ -124,7 +130,7 @@ index a098724..495b1b6 100644
                  frameworks(
                      "Metal",
                      "CoreGraphics",
-@@ -144,6 +163,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+@@ -194,6 +215,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              tvos {
@@ -132,7 +138,7 @@ index a098724..495b1b6 100644
                  frameworks(
                      "Metal",
                      "CoreGraphics",
-@@ -193,13 +213,13 @@ val skikoProjectContext = SkikoProjectContext(
+@@ -243,13 +265,13 @@ val skikoProjectContext = SkikoProjectContext(
  )
  
  allprojects {
@@ -148,23 +154,16 @@ index a098724..495b1b6 100644
      }
      google()
  }
-@@ -216,30 +236,14 @@ kotlin {
+@@ -258,21 +280,8 @@ kotlin {
      applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
      skikoProjectContext.declareSkiaTasks()
  
 -    if (supportAwt) {
 -        jvm("awt") {
--            compilations.all {
--                compileTaskProvider.configure {
--                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
--                }
--            }
 -            generateVersion(targetOs, targetArch, skiko)
 -        }
 -    }
-+    @Suppress("UNCHECKED_CAST")
-+    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoProjectContext)
- 
+-
 -    if (supportAndroid) {
 -        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
 -            namespace = "org.jetbrains.skiko"
@@ -172,20 +171,14 @@ index a098724..495b1b6 100644
 -            minSdk = 24
 -            withJava()
 -            withHostTest {}
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
- 
--            compilerOptions {
--                jvmTarget.set(JvmTarget.JVM_11)
--            }
 -        }
 -    }
++    @Suppress("UNCHECKED_CAST")
++    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoProjectContext)
  
  
      if (supportWeb) {
-@@ -298,31 +302,28 @@ kotlin {
+@@ -331,35 +340,18 @@ kotlin {
      }
  
      if (supportNativeMac) {
@@ -205,10 +198,10 @@ index a098724..495b1b6 100644
 -    }
 -    if (supportNativeIosX64) {
 -        skikoProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64())
-     }
+-    }
 -    if (supportNativeTvosArm64) {
 -        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosArm64())
--    }
+     }
 -    if (supportNativeTvosSimulatorArm64) {
 -        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosSimulatorArm64())
 -    }
@@ -217,24 +210,53 @@ index a098724..495b1b6 100644
 +    if (supportNativeLinuxArm64) {
 +        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
      }
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
  
      sourceSets.commonMain.dependencies {
          implementation(kotlin("stdlib"))
-@@ -391,44 +392,15 @@ kotlin {
+-        implementation(libs.coroutines.core)
++        implementation(rachelCatalog.findLibrary("coroutines-core").get())
+     }
+ 
+     sourceSets.commonTest.dependencies {
+@@ -370,23 +362,23 @@ kotlin {
+ 
+     skikoProjectContext.jvmMainSourceSet?.dependencies {
+         implementation(kotlin("stdlib"))
+-        implementation(libs.coroutines.core.jvm)
++        implementation(rachelCatalog.findLibrary("coroutines-core-jvm").get())
+     }
+ 
+     skikoProjectContext.webMainSourceSet?.dependencies {
+-        implementation(libs.kotlinx.browser)
++        implementation(rachelCatalog.findLibrary("kotlinx-browser").get())
+     }
+ 
+     skikoProjectContext.awtMainSourceSet?.dependencies {
+-        implementation(libs.jetbrainsRuntime.api)
++        implementation(rachelCatalog.findLibrary("jetbrainsRuntime-api").get())
+     }
+ 
+     skikoProjectContext.awtTestSourceSet?.dependencies {
+-        implementation(libs.kotlinx.benchmark.runtime)
++        implementation(rachelCatalog.findLibrary("kotlinx-benchmark-runtime").get())
+     }
+ 
+     skikoProjectContext.androidMainSourceSet?.dependencies {
+-        implementation(libs.coroutines.android)
++        implementation(rachelCatalog.findLibrary("coroutines-android").get())
+     }
+ 
+     if (supportAndroid && supportAwt) {
+@@ -396,7 +388,7 @@ kotlin {
+     }
+ 
+     skikoProjectContext.jvmTestSourceSet?.dependencies {
+-        implementation(libs.coroutines.test)
++        implementation(rachelCatalog.findLibrary("coroutines-test").get())
+         implementation(kotlin("test-junit"))
+         implementation(kotlin("test"))
+     }
+@@ -419,44 +411,6 @@ kotlin {
  /**
   * Setup JVM benchmarks
   */
@@ -242,15 +264,14 @@ index a098724..495b1b6 100644
 -    benchmark {
 -        targets.register("awtTest")
 -    }
-+// Rachel core build excludes Android configuration.
- 
+-
 -    /* Ensure that the benchmark task has the same classpath as the regular test task */
 -    tasks.withType<JavaExec>().named { it == "awtTestBenchmark" }.configureEach {
 -        classpath = project.files({ tasks.withType<Test>().named("awtTest").get().classpath })
 -    }
 -}
- 
- 
+-
+-
 -if (supportAndroid) {
 -    val os = OS.Android
 -    kotlin.targets.getByName("android").generateVersion(os, Arch.Arm64, skiko)
@@ -261,8 +282,7 @@ index a098724..495b1b6 100644
 -    for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
 -        skikoProjectContext.createSkikoJvmJarTask(os, arch, skikoAndroidArtifact)
 -    }
-+// Rachel core build excludes Android configuration.
- 
+-
 -    tasks.withType<JavaCompile>().configureEach {
 -        if (name.startsWith("compileAndroid") && name.endsWith("JavaWithJavac")) {
 -            sourceCompatibility = JavaVersion.VERSION_11.toString()
@@ -270,7 +290,7 @@ index a098724..495b1b6 100644
 -        }
 -    }
 -}
- 
+-
 -if (supportAwt) {
 -    val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
 -        archiveBaseName.set("skiko-awt-test")
@@ -278,26 +298,23 @@ index a098724..495b1b6 100644
 -    }
 -    skikoProjectContext.setupJvmTestTask(skikoAwtJarForTests, targetOs, targetArch)
 -}
-+// Rachel core build excludes Android configuration.
-+
  
  afterEvaluate {
      tasks.named("clean").configure {
-@@ -460,23 +432,11 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
+@@ -488,23 +442,6 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
      }
  }
  
 -if (supportAwt) {
 -    afterEvaluate {
 -        configureSymbolsFor(targetOs, targetArch)
-+// Rachel core build excludes Android configuration.
- 
+-
 -        if (targetOs == OS.MacOS && targetArch == Arch.Arm64) {
 -            configureSymbolsFor(OS.MacOS, Arch.X64)
 -        }
 -    }
 -}
- 
+-
 -if (supportAndroid) {
 -    afterEvaluate {
 -        for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
@@ -305,12 +322,10 @@ index a098724..495b1b6 100644
 -        }
 -    }
 -}
-+// Rachel core build excludes Android configuration.
-+
  
  if (supportWeb) {
      skikoProjectContext.provideWasmTestResources()
-@@ -495,11 +455,55 @@ if (supportWeb) {
+@@ -523,11 +460,55 @@ if (supportWeb) {
  
  skikoProjectContext.declarePublications()
  
@@ -368,17 +383,18 @@ index a098724..495b1b6 100644
      }
      configureSignAndPublishDependencies()
  }
-@@ -559,3 +563,46 @@ tasks.withType<KotlinNativeCompile>().configureEach {
- tasks.withType<KotlinCompilationTask<*>>().configureEach {
-     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+@@ -581,3 +562,47 @@ tasks.register("printSkiaVersion") {
  }
-+
+ 
+ configureKotlinCompilerOptions()
 +// Rachel: all maintained/source-build compilations use the same language features.
++val kotlinLanguage = KotlinVersion.fromVersion(providers.gradleProperty("skiko.kotlin.language.version").get())
++val kotlinFlags = providers.gradleProperty("rachel.kotlin.compilerArgs").map { it.split(',') }
 +allprojects {
-+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
-+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-+            compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
-+        }
++    tasks.withType<KotlinCompilationTask<*>>().configureEach {
++        compilerOptions.languageVersion.set(kotlinLanguage)
++        compilerOptions.apiVersion.set(kotlinLanguage)
++        compilerOptions.freeCompilerArgs.addAll(kotlinFlags)
 +    }
 +}
 +
@@ -416,12 +432,30 @@ index a098724..495b1b6 100644
 +    }
 +}
 diff --git a/skiko/buildSrc/build.gradle.kts b/skiko/buildSrc/build.gradle.kts
-index 32fd2b3..1da424e 100644
+index 32fd2b3..9358c16 100644
 --- a/skiko/buildSrc/build.gradle.kts
 +++ b/skiko/buildSrc/build.gradle.kts
-@@ -6,12 +6,15 @@ dependencies {
+@@ -1,17 +1,37 @@
++import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
++import java.util.Properties
++
+ plugins {
+-    `kotlin-dsl`
++    alias(rachelLibs.plugins.kotlinJvm)
++    alias(rachelLibs.plugins.kotlinSamWithReceiver)
++    alias(rachelLibs.plugins.kotlinAssignment)
+ }
+ 
++samWithReceiver { annotation("org.gradle.api.HasImplicitReceiver") }
++assignment { annotation("org.gradle.api.SupportsKotlinAssignmentOverloading") }
++
++val kotlinProfile = Properties().apply { rootDir.resolve("../gradle.properties").inputStream().use(::load) }
++val kotlinLanguage = KotlinVersion.fromVersion(rachelLibs.versions.kotlin.get().split('.').take(2).joinToString("."))
++
+ dependencies {
      implementation(kotlin("stdlib"))
      compileOnly(gradleApi())
++    compileOnly(gradleKotlinDsl())
      implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
 -    implementation(libs.android.gradlePlugin)
 -    implementation(libs.dokka.gradlePlugin)
@@ -436,10 +470,15 @@ index 32fd2b3..1da424e 100644
 +// Rachel: share the main build toolchain and compiler features.
 +kotlin {
 +    jvmToolchain(25)
-+    compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
++    compilerOptions {
++        languageVersion.set(kotlinLanguage)
++        apiVersion.set(kotlinLanguage)
++        freeCompilerArgs.addAll(kotlinProfile.getProperty("rachel.kotlin.compilerArgs").split(','))
++        freeCompilerArgs.addAll("-Xabi-stability=stable", "-java-parameters", "-jvm-default=enable", "-Xsam-conversions=class")
++    }
  }
 diff --git a/skiko/buildSrc/settings.gradle.kts b/skiko/buildSrc/settings.gradle.kts
-index 517dffe..240abd5 100644
+index 517dffe..345f129 100644
 --- a/skiko/buildSrc/settings.gradle.kts
 +++ b/skiko/buildSrc/settings.gradle.kts
 @@ -1,7 +1,7 @@
@@ -451,7 +490,7 @@ index 517dffe..240abd5 100644
          }
          gradlePluginPortal()
      }
-@@ -32,7 +32,7 @@ dependencyResolutionManagement {
+@@ -32,11 +32,14 @@ dependencyResolutionManagement {
          }
  
          mavenCentral {
@@ -460,24 +499,523 @@ index 517dffe..240abd5 100644
          }
      }
  
-diff --git a/skiko/buildSrc/src/main/kotlin/MergeStaticArchivesTask.kt b/skiko/buildSrc/src/main/kotlin/MergeStaticArchivesTask.kt
-index 7ac7cef..813a75b 100644
---- a/skiko/buildSrc/src/main/kotlin/MergeStaticArchivesTask.kt
-+++ b/skiko/buildSrc/src/main/kotlin/MergeStaticArchivesTask.kt
-@@ -91,7 +91,7 @@ abstract class MergeStaticArchivesTask : DefaultTask() {
+     versionCatalogs {
++        register("rachelLibs") {
++            from(files("__REPOSITORY__/libs.versions.toml"))
++        }
+         register("libs") {
+             from(files("../../dependencies.toml"))
+         }
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
+index ba0b45a..2d94901 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
+@@ -33,6 +33,9 @@ import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
+ import org.jetbrains.skiko.build.utils.skikoKotlinNativeApiVersion
+ import org.jetbrains.skiko.build.utils.skikoKotlinNativeLanguageVersion
+ import org.jetbrains.skiko.build.utils.toTitleCase
++import org.jetbrains.skiko.build.context.supportNativeLinuxArm64
++import org.jetbrains.skiko.build.context.supportNativeLinuxX64
++import org.jetbrains.skiko.build.context.supportNativeWindows
  
-     private fun run(vararg args: String, cwd: File? = null) = execOperations.exec {
-         commandLine(*args)
--        workingDir = cwd
-+        if (cwd != null) workingDir = cwd
+ private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
+     runCatching {
+@@ -200,18 +203,26 @@ fun Project.configureSignAndPublishDependencies() {
+         tasks.configureEach {
+             when {
+                 name.startsWith(publishLinuxX64) -> {
+-                    dependsOn(signLinuxArm64Publication)
++                    if (supportNativeLinuxArm64) dependsOn(signLinuxArm64Publication)
+                     dependsOn(signLinuxX64Publication)
+                 }
+ 
+                 name.startsWith(publishLinuxArm64) -> {
+                     dependsOn(signLinuxArm64Publication)
+-                    dependsOn(signLinuxX64Publication)
++                    if (supportNativeLinuxX64) dependsOn(signLinuxX64Publication)
+                 }
+             }
+         }
      }
-     private fun capture(vararg args: String): String {
-         val out = ByteArrayOutputStream()
-diff --git a/skiko/buildSrc/src/main/kotlin/SkiaTarget.kt b/skiko/buildSrc/src/main/kotlin/SkiaTarget.kt
-index 28e0470..635c36e 100644
---- a/skiko/buildSrc/src/main/kotlin/SkiaTarget.kt
-+++ b/skiko/buildSrc/src/main/kotlin/SkiaTarget.kt
-@@ -5,7 +5,10 @@ enum class SkiaTarget(
+ 
++    if (supportNativeWindows) {
++        tasks.configureEach {
++            if (name.startsWith("publishMingwX64PublicationTo")) {
++                dependsOn("signMingwX64Publication")
++            }
++        }
++    }
++
+     if (supportNativeMac) {
+         val publishMacosArm64 = "publishMacosArm64PublicationTo"
+         val publishMacosX64 = "publishMacosX64PublicationTo"
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
+index fa8a118..17de602 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
+@@ -43,6 +43,7 @@ import org.jetbrains.skiko.build.utils.linkerForTarget
+ import org.jetbrains.skiko.build.utils.projectDirs
+ import org.jetbrains.skiko.build.utils.registerSkikoTask
+ import org.jetbrains.skiko.build.utils.targetId
++import org.jetbrains.skiko.build.cpp.requireDumpbin
+ 
+ private val jvmTargetOsAttribute =
+     Attribute.of("org.jetbrains.skiko.jvm.target-os", String::class.java)
+@@ -169,7 +170,7 @@ private fun SkikoProjectContext.createGenerateRequiredSymbolsTask(
+     this.symbolExtractorCommand.set(
+         when (targetOs) {
+             OS.Android -> project.androidLlvmNm().map { listOf(it) }
+-            OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
++            OS.Windows -> project.provider { listOf(windowsSdkPaths.requireDumpbin().absolutePath) }
+             else -> project.provider { listOf("nm") }
+         }
+     )
+@@ -436,7 +437,7 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
+         this.symbolExtractorCommand.set(
+             when (targetOs) {
+                 OS.Android -> project.androidLlvmNm().map { listOf(it) }
+-                OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
++                OS.Windows -> project.provider { listOf(windowsSdkPaths.requireDumpbin().absolutePath) }
+                 else -> project.provider { listOf("nm") }
+             }
+         )
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
+index 5853665..4683bc1 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
+@@ -7,9 +7,15 @@ import org.gradle.api.Project
+ import org.gradle.api.artifacts.Configuration
+ import org.gradle.api.attributes.Attribute
+ import org.gradle.api.attributes.Usage
++import org.gradle.api.publish.PublishingExtension
++import org.gradle.api.publish.maven.MavenPublication
+ import org.gradle.api.tasks.Exec
++import org.gradle.api.tasks.Sync
+ import org.gradle.api.tasks.TaskProvider
++import org.gradle.kotlin.dsl.configure
+ import org.gradle.kotlin.dsl.getByName
++import org.gradle.kotlin.dsl.register
++import org.gradle.kotlin.dsl.withType
+ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+@@ -18,11 +24,14 @@ import org.jetbrains.skiko.build.context.SkikoModuleKind
+ import org.jetbrains.skiko.build.context.SkikoProjectContext
+ import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
+ import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
++import org.jetbrains.skiko.build.cpp.MergeStaticArchivesTask
++import org.jetbrains.skiko.build.cpp.StripCoffDirectivesTask
+ import org.jetbrains.skiko.build.cpp.PatchSkiaSymbolsTask
+ import org.jetbrains.skiko.build.cpp.WriteCInteropDefFile
+ import org.jetbrains.skiko.build.symbols.HideSkiaSymbolsTask
+ import org.jetbrains.skiko.build.dependencies.TargetEnv
+ import org.jetbrains.skiko.build.utils.Arch
++import org.jetbrains.skiko.build.utils.SkiaBuildType
+ import org.jetbrains.skiko.build.utils.OS
+ import org.jetbrains.skiko.build.utils.compilerForTarget
+ import org.jetbrains.skiko.build.utils.hostArch
+@@ -43,6 +52,9 @@ private val nativeSymbolSourcesUikitSimAttribute =
+ 
+ private const val NATIVE_SYMBOL_SOURCES_USAGE = "skiko-native-symbol-sources"
+ 
++private val arm64ToolchainRoot: String
++    get() = System.getenv("SKIKO_ARM64_TOOLCHAIN") ?: "/opt/arm-gnu-toolchain"
++
+ fun String.withSuffix(isUikitSim: Boolean = false) =
+     this + if (isUikitSim) "Sim" else ""
+ 
+@@ -186,6 +198,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
+                 compiler.set(project.appleToolchainExecutableOrDefault("clang++", compiler.get()))
+                 flags.set(listOf(
+                     *project.appleMacOsSdkFlags().toTypedArray(),
++                    "-mmacosx-version-min=12.0",
+                     *buildType.clangFlags,
+                     *skiaPreprocessorFlags(OS.MacOS, buildType),
+                     when(arch) {
+@@ -212,22 +225,53 @@ fun SkikoProjectContext.compileNativeBridgesTask(
+                 )
+                 // Add sysroot for ARM64 cross-compilation
+                 if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+-                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
++                    linuxFlags.add(0, "--sysroot=$arm64ToolchainRoot/aarch64-none-linux-gnu/libc")
++                    // Fontconfig, FreeType, GLX, and X11 development headers are architecture-neutral.
++                    // Search the host's header tree only after the ARM64 sysroot so libc headers still
++                    // come from the cross toolchain.
++                    linuxFlags.addAll(listOf("-idirafter", "/usr/include", "-idirafter", "/usr/include/freetype2"))
+                 }
+                 flags.set(linuxFlags)
+             }
++            OS.Windows -> {
++                compiler.set(windowsSdkPaths.compiler.absolutePath)
++                includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
++                val crossTargetFlags = if (windowsSdkPaths.isCrossCompiling) {
++                    val targetTriple = when (arch) {
++                        Arch.X64 -> "x86_64-pc-windows-msvc"
++                        Arch.Arm64 -> "aarch64-pc-windows-msvc"
++                        Arch.Wasm -> error("Unexpected Windows architecture: $arch")
++                    }
++                    arrayOf(
++                        "/clang:--target=$targetTriple",
++                        "/clang:-Wno-unused-command-line-argument",
++                    )
++                } else {
++                    emptyArray()
++                }
++                flags.set(listOf(
++                    "/nologo",
++                    *buildType.winCompilerFlags,
++                    "/utf-8",
++                    "/GR-",
++                    "/FS",
++                    *crossTargetFlags,
++                    *skiaPreprocessorFlags(OS.Windows, buildType),
++                ))
++            }
+             else -> throw GradleException("$os not yet supported")
+         }
+ 
+-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
+-                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
++        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeMain/cpp") +
++                (if (os == OS.Windows) projectDirs("src/windowsMain/cpp") else emptyList()) +
++                (if (skiko.includeTestHelpers) projectDirs("src/nativeTest/cpp") else emptyList())
+         sourceRoots.set(srcDirs)
+ 
+-        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
++        includeHeadersNonRecursive(projectDir.resolve("src/nativeMain/cpp"))
+         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+         if (kind == SkikoModuleKind.EXTENSION) {
+             val coreProjectDir = project.rootProject.projectDir
+-            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeJsMain/cpp"))
++            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeMain/cpp"))
+             includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
+         }
+         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
+@@ -265,12 +309,22 @@ fun SkikoProjectContext.configureNativeTarget(
+     arch: Arch,
+     target: KotlinNativeTarget,
+     coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
+-) = with(this.project) {
+-    if (!os.isCompatibleWithHost) return
+-
++): Unit = with(this.project) {
+     if (kind != SkikoModuleKind.EXTENSION) {
+         target.generateVersion(os, arch, skiko)
+     }
++
++    // Kotlin sources can be cross-compiled on another host, but the native C++
++    // bridge and final linkage require the target platform toolchain.
++    if (providers.gradleProperty("rachel.dokka").orNull == "true") {
++        val targetString = "${os.idWithSuffix(isUikitSim = target.isUikitSimulator())}-${arch.id}"
++        val interopName = if (os == OS.IOS || os == OS.TVOS) "uikit" else cinteropName
++        configureCinterop(interopName, os, arch, target, targetString, emptyList())
++        return
++    }
++
++    if (!os.isCompatibleWithHost) return
++
+     val isUikitSim = target.isUikitSimulator()
+ 
+     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
+@@ -279,7 +333,10 @@ fun SkikoProjectContext.configureNativeTarget(
+     val unpackedSkia = unzipper.get()
+     val skiaDir = unpackedSkia.absolutePath
+ 
+-    val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString.a")
++    val bridgesLibraryExtension = if (os == OS.Windows) ".lib" else ".a"
++    val bridgesLibrary = layout.buildDirectory.file(
++        "nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
++    )
+     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
+ 
+     // For iOS/tvOS we patch every library so that public Skia symbols are
+@@ -289,17 +346,78 @@ fun SkikoProjectContext.configureNativeTarget(
+     // unsupported shapes fall back to a "_skiko" suffix.
+     val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
+     val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
++    val strippedCoffLibsDir =
++        layout.buildDirectory.dir("nativeBridges/strippedCoff/$targetString").get().asFile
+ 
+     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
+     val resolvedBinaryInputs = resolveBinaryInputs(os, arch, TargetEnv.NATIVE, skiaBinDir)
+-    val nativeArchives = resolvedBinaryInputs.staticArchivePaths.distinct()
+-    val allLibraries = if (requiresSymbolPatching) {
+-        nativeArchives.map { lib ->
+-            "${patchedLibsDir.absolutePath}/${File(lib).name}"
+-        } + "${patchedLibsDir.absolutePath}/$nativeBridgesLibPrefix-$targetString.a"
++    val mergedArchive = layout.buildDirectory.file("mergedSkiaArchives/$targetString/libskia_static.a")
++    val mergeArchivesTask = if (os == OS.Windows) null else
++        project.tasks.register<MergeStaticArchivesTask>("mergeSkiaArchives$targetString") {
++            dependsOn(unzipper)
++            targetOs.set(os)
++            archives.set(resolvedBinaryInputs.staticArchivePaths.distinct().map(::File))
++            output.set(mergedArchive)
++        }
++    val nativeArchives = if (os == OS.Windows) resolvedBinaryInputs.staticArchivePaths.distinct()
++        else listOf(mergedArchive.get().asFile.absolutePath)
++    val windowsRuntimeAliasesTask: TaskProvider<Sync>?
++    val windowsRuntimeArchives: List<String>
++    val windowsStaticMsvcRuntimes: List<String>
++    if (os == OS.Windows) {
++        val msvcRuntimeLibraryDir =
++            windowsSdkPaths.libDirs.firstOrNull { it.resolve("libcmt.lib").isFile }
++                ?: error("MSVC static runtime libraries were not found in ${windowsSdkPaths.libDirs}")
++        val ucrtLibraryDir =
++            windowsSdkPaths.libDirs.firstOrNull { it.resolve("ucrt.lib").isFile }
++                ?: error("Windows UCRT import libraries were not found in ${windowsSdkPaths.libDirs}")
++        val windowsSystemLibraryDir =
++            windowsSdkPaths.libDirs.firstOrNull { it.resolve("d3d12.lib").isFile }
++                ?: error("Windows SDK import libraries were not found in ${windowsSdkPaths.libDirs}")
++        val runtimeAliases = if (kind != SkikoModuleKind.CORE) emptyMap<File, String>() else
++            mapOf(
++                msvcRuntimeLibraryDir.resolve("oldnames.lib") to "liboldnames.a",
++                ucrtLibraryDir.resolve("ucrt.lib") to "libucrt.a",
++                windowsSystemLibraryDir.resolve("d3d12.lib") to "libd3d12.a",
++            )
++        val aliasesDir =
++            layout.buildDirectory.dir("nativeBridges/msvcRuntimeAliases/$targetString").get().asFile
++        windowsRuntimeAliasesTask =
++            tasks.register<Sync>("prepareMsvcRuntimeAliases${joinToTitleCamelCase(targetString)}") {
++                runtimeAliases.forEach { (source, aliasName) ->
++                    from(source) {
++                        rename { aliasName }
++                    }
++                }
++                into(aliasesDir)
++        }
++        windowsRuntimeArchives = runtimeAliases.values.map { aliasesDir.resolve(it).absolutePath }
++        windowsStaticMsvcRuntimes =
++            (if (kind == SkikoModuleKind.CORE) listOf("libcmt.lib", "libcpmt.lib", "libvcruntime.lib") else emptyList()).map {
++                msvcRuntimeLibraryDir.resolve(it).absolutePath
++            }
+     } else {
+-        nativeArchives + bridgesLibraryPath
++        windowsRuntimeAliasesTask = null
++        windowsRuntimeArchives = emptyList()
++        windowsStaticMsvcRuntimes = emptyList()
+     }
++    val platformLibraries =
++        when {
++            requiresSymbolPatching ->
++                nativeArchives.map { lib ->
++                    "${patchedLibsDir.absolutePath}/${File(lib).name}"
++                } + "${patchedLibsDir.absolutePath}/$nativeBridgesLibPrefix-$targetString.a"
++            os == OS.Windows ->
++                nativeArchives.map { lib ->
++                    strippedCoffLibsDir.resolve(File(lib).name).absolutePath
++                } +
++                    strippedCoffLibsDir.resolve(File(bridgesLibraryPath).name).absolutePath +
++                    windowsStaticMsvcRuntimes.map { runtime ->
++                        strippedCoffLibsDir.resolve(File(runtime).name).absolutePath
++                    }
++            else -> nativeArchives + bridgesLibraryPath
++        }
++    val allLibraries = platformLibraries + windowsRuntimeArchives
+ 
+     val hiddenSymbolsFile = layout.buildDirectory.file(
+         "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
+@@ -311,24 +429,26 @@ fun SkikoProjectContext.configureNativeTarget(
+     } else {
+         nativeArchives
+     }
+-    val hideSkiaSymbols = project.registerSkikoTask<HideSkiaSymbolsTask>(
+-        "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
+-        os,
+-        arch
+-    ) {
+-        targetOs.set(os)
+-        symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
+-        symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
+-        outputFile.set(hiddenSymbolsFile)
++    val hideSkiaSymbols = if (os == OS.Windows) {
++        null
++    } else {
++        project.registerSkikoTask<HideSkiaSymbolsTask>(
++            "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
++            os,
++            arch
++        ) {
++            targetOs.set(os)
++            symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
++            symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
++            outputFile.set(hiddenSymbolsFile)
++        }
+     }
+ 
+     val linkerFlags = when (os) {
+         OS.MacOS -> {
+             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
+-            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags + listOf(
+-                "-unexported_symbols_list",
+-                hiddenSymbolsFile.get().asFile.absolutePath
+-            ))
++            // KLIBs must remain linkable after leaving the producer's machine.
++            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
+         }
+         OS.IOS -> {
+             // list of linker options to be included into klib, which are needed for skiko consumers
+@@ -353,16 +473,34 @@ fun SkikoProjectContext.configureNativeTarget(
+                 "-L/usr/lib64",
+                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
+             )
+-            options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
+             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+             options.addAll(resolvedBinaryInputs.linkFlags)
+             // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
+             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
+                 // ARM GNU toolchain sysroot paths
+-                options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
+-                options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
++                options.add(0, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/lib64")
++                options.add(1, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/usr/lib64")
+             }
+-            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
++            configureCinterop(cinteropName, os, arch, target, targetString, options)
++            mutableListOfLinkerOptions(options)
++        }
++        OS.Windows -> {
++            val options = mutableListOf(
++                // The published Skia archives carry /MT directives, while Kotlin/Native uses the
++                // MinGW CRT. Suppress their default-library directives and explicitly provide the
++                // matching filtered MSVC runtime archives embedded above.
++                "-Wl,--allow-multiple-definition",
++                "-Wl,--wrap=atexit",
++                "-Wl,/nodefaultlib:libcmt",
++                "-Wl,/nodefaultlib:oldnames",
++                "-Wl,/nodefaultlib:libcpmt",
++                "-Wl,/nodefaultlib:libucrt",
++                "-Wl,/nodefaultlib:libvcruntime",
++                "-Wl,/nodefaultlib:vcruntime",
++            )
++            options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
++            options.addAll(resolvedBinaryInputs.linkFlags)
++            configureCinterop(cinteropName, os, arch, target, targetString, options)
+             mutableListOfLinkerOptions(options)
+         }
+         else -> mutableListOf()
+@@ -379,7 +517,9 @@ fun SkikoProjectContext.configureNativeTarget(
+ 
+     // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
+     target.binaries.all {
+-        freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
++        linkTaskProvider.configure {
++            toolOptions.freeCompilerArgs.addAll(allLibraries.flatMap { listOf("-include-binary", it) } + linkerFlags)
++        }
+     }
+ 
+     target.compilations.all {
+@@ -402,13 +542,17 @@ fun SkikoProjectContext.configureNativeTarget(
+         }
+         inputs.files(objectFiles)
+         val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
+-        val staticLib = "$nativeBridgesLibPrefix-$targetString.a"
++        val staticLib = "$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
+         workingDir = outDir
+         when (os) {
+             OS.Linux -> {
+                 executable = if (arch == Arch.Arm64 && hostArch != Arch.Arm64) "aarch64-linux-gnu-ar" else "ar"
+                 argumentProviders.add { listOf("-crs", staticLib) }
+             }
++            OS.Windows -> {
++                executable = windowsSdkPaths.librarian.absolutePath
++                argumentProviders.add { listOf("/NOLOGO", "/OUT:$staticLib") }
++            }
+             OS.MacOS, OS.IOS, OS.TVOS -> {
+                 executable = "libtool"
+                 argumentProviders.add { listOf("-static", "-o", staticLib) }
+@@ -420,6 +564,24 @@ fun SkikoProjectContext.configureNativeTarget(
+         outputs.dir(outDir)
+     }
+ 
++    val stripCoffDirectivesTask =
++        if (os == OS.Windows) {
++            project.registerSkikoTask<StripCoffDirectivesTask>(
++                "stripCoffDirectives",
++                os,
++                arch,
++            ) {
++                dependsOn(unzipper)
++                dependsOn(linkTask)
++                inputLibraries.set(
++                    (nativeArchives + bridgesLibraryPath + windowsStaticMsvcRuntimes).map(::File)
++                )
++                outputDir.set(strippedCoffLibsDir)
++            }
++        } else {
++            null
++        }
++
+     // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
+     val compilationDependency = if (requiresSymbolPatching) {
+         val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
+@@ -432,6 +594,7 @@ fun SkikoProjectContext.configureNativeTarget(
+         }
+         project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
+             dependsOn(unzipper)
++            mergeArchivesTask?.let { dependsOn(it) }
+             dependsOn(linkTask)
+             if (coreSymbolSources != null) {
+                 dependsOn(coreSymbolSources)
+@@ -445,18 +608,24 @@ fun SkikoProjectContext.configureNativeTarget(
+                 configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
+             }
+         }
+-    } else {
+-        linkTask
+-    }
++    } else stripCoffDirectivesTask ?: linkTask
+ 
+-    hideSkiaSymbols.configure {
++    hideSkiaSymbols?.configure {
+         dependsOn(unzipper)
++        mergeArchivesTask?.let { dependsOn(it) }
+         dependsOn(compilationDependency)
+     }
+ 
+     target.compilations.all {
+         compileTaskProvider.configure {
+-            dependsOn(hideSkiaSymbols)
++            // Free compiler argument paths alone do not track embedded archive contents.
++            inputs.files(allLibraries).withPropertyName("embeddedNativeArchives")
++            windowsRuntimeAliasesTask?.let { dependsOn(it) }
++            if (hideSkiaSymbols != null) {
++                dependsOn(hideSkiaSymbols)
++            } else {
++                dependsOn(compilationDependency)
++            }
+         }
+     }
+ }
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
+index 0a8c728..1654b53 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
+@@ -90,16 +90,16 @@ fun SkikoProjectContext.declareWasmTasks() {
+         buildTargetArch.set(Arch.Wasm)
+         buildVariant.set(buildType)
+ 
+-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/webMain/cpp", "src/nativeJsMain/cpp") +
+-                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
++        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/webMain/cpp", "src/nativeMain/cpp") +
++                if (skiko.includeTestHelpers) projectDirs("src/nativeTest/cpp") else emptyList()
+         sourceRoots.set(srcDirs)
+ 
+-        includeHeadersNonRecursive(project.projectDir.resolve("src/nativeJsMain/cpp"))
++        includeHeadersNonRecursive(project.projectDir.resolve("src/nativeMain/cpp"))
+         includeHeadersNonRecursive(project.projectDir.resolve("src/webMain/cpp"))
+         includeHeadersNonRecursive(project.projectDir.resolve("src/commonMain/cpp/common/include"))
+         if (isSideModule) {
+             val coreProjectDir = project.rootProject.projectDir
+-            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeJsMain/cpp"))
++            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeMain/cpp"))
+             includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
+         }
+         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
+index 5ef6d38..5e5c1f2 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
+@@ -10,7 +10,10 @@ enum class SkiaTarget(
      IOS("ios", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
      IOS_SIM("iosSim", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=false")),
      MACOS("macos", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
@@ -489,42 +1027,100 @@ index 28e0470..635c36e 100644
      LINUX("linux", listOf("-P${SkikoGradleProperties.AWT_ENABLED}=true")),
      WASM("wasm", listOf("-P${SkikoGradleProperties.WASM_ENABLED}=true", "-P${SkikoGradleProperties.AWT_ENABLED}=false"));
  
-diff --git a/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt b/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
-index 2c24690..708016f 100644
---- a/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
-+++ b/skiko/buildSrc/src/main/kotlin/SkikoProjectContext.kt
-@@ -115,7 +115,7 @@ fun SkikoProjectContext.declareSkiaTasks() {
-                 val skiaUrl = "$skiaBaseUrl/$artifactId.zip"
-                 description = "downloads $skiaUrl"
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkikoProjectContext.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkikoProjectContext.kt
+index c765b68..374385f 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkikoProjectContext.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkikoProjectContext.kt
+@@ -1,8 +1,6 @@
+ package org.jetbrains.skiko.build.context
  
+-import de.undercouch.gradle.tasks.download.Download
+ import java.io.File
+-import org.gradle.api.DefaultTask
+ import org.gradle.api.Project
+ import org.gradle.api.provider.Provider
+ import org.gradle.api.tasks.Copy
+@@ -24,7 +22,6 @@ import org.jetbrains.skiko.build.utils.SkikoArtifacts
+ import org.jetbrains.skiko.build.utils.SkikoGradleProperties
+ import org.jetbrains.skiko.build.utils.SkikoProperties
+ import org.jetbrains.skiko.build.utils.joinToTitleCamelCase
+-import org.jetbrains.skiko.build.utils.registerOrGetTask
+ 
+ enum class SkikoModuleKind { CORE, EXTENSION }
+ 
+@@ -116,26 +113,11 @@ fun SkikoProjectContext.declareSkiaTasks() {
+     ).forEach { (config, architectures) ->
+         architectures.forEach { arch ->
+             val taskNameSuffix = joinToTitleCamelCase(config, arch)
+-            val target = "$config-$arch"
+ 
+-            val skiaReleaseTag = project.skiaVersion(target)
+-
+-            val skiaBaseUrl = "https://github.com/JetBrains/skia/releases/download/$skiaReleaseTag"
++            val skiaReleaseTag = project.property("dependencies.skia").toString()
+ 
+             val artifactId = "Skia-${skiaReleaseTag}-${config}-$buildType-${arch}"
+-
+-            val downloadSkiaTask = project.tasks.register<Download>("downloadSkia$buildType$taskNameSuffix") {
+-                group = "Skia Binaries"
+-
+-                val skiaUrl = "$skiaBaseUrl/$artifactId.zip"
+-                description = "downloads $skiaUrl"
+-
 -                onlyIfModified(true)
-+                overwrite(false)
-                 src(skiaUrl)
-                 dest(skiko.dependenciesDir.resolve(
-                     "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-$buildType-${arch}.zip")
-@@ -129,6 +129,21 @@ fun SkikoProjectContext.declareSkiaTasks() {
+-                src(skiaUrl)
+-                dest(skiko.dependenciesDir.resolve(
+-                    "skia/$skiaReleaseTag/Skia-$skiaReleaseTag-$config-$buildType-${arch}.zip")
+-                )
+-            }
++            val archive = skiko.dependenciesDir.resolve("skia/$skiaReleaseTag/$artifactId.zip")
+ 
+             project.tasks.register<Copy>("unzipSkia$buildType$taskNameSuffix") {
+                 group = "Skia Binaries"
+@@ -143,8 +125,18 @@ fun SkikoProjectContext.declareSkiaTasks() {
+                 val outputDir = skiko.dependenciesDir.resolve("skia/$skiaReleaseTag/$artifactId")
                  description = "unzips to $outputDir"
  
-                 dependsOn(downloadSkiaTask)
+-                dependsOn(downloadSkiaTask)
+-                from(project.zipTree(downloadSkiaTask.get().dest)) {
++                inputs.file(archive)
 +                doFirst {
-+                    val lockedChecksums = mapOf(
-+                        "windows-Release-x64" to "a51a1d52c706129b7c695a3e9ade630758d392a053faac9ae88420ecaea40dbf",
-+                        "linux-Release-x64" to "39c68325dd756c9ecd56d6a9c1fdec0fa03ab9d8dc72e9fa4f23bd1e8a29f551",
-+                        "macos-Release-arm64" to "e1caf783f4d1412759632c6727d7ac3b91670bb5cfb66e45f81de968d27e65ed"
-+                    )
-+                    val expected = lockedChecksums["$config-$buildType-$arch"]
-+                        ?: error("No audited Skia archive for $config-$buildType-$arch")
++                    val expected = project.providers.gradleProperty("rachel.skia.sha256.$config-$buildType-$arch").orNull
++                        ?: error("Skia SDK is not prepared for $config-$buildType-$arch")
 +                    val sha256 = java.security.MessageDigest.getInstance("SHA-256")
-+                    java.security.DigestInputStream(downloadSkiaTask.get().dest.inputStream(), sha256).use {
++                    java.security.DigestInputStream(archive.inputStream(), sha256).use {
 +                        it.transferTo(java.io.OutputStream.nullOutputStream())
 +                    }
 +                    val actual = sha256.digest().joinToString("") { "%02x".format(it) }
 +                    check(actual == expected) { "Skia archive SHA-256 mismatch: $artifactId" }
 +                }
-                 from(project.zipTree(downloadSkiaTask.get().dest)) {
++                from(project.zipTree(archive)) {
                      // On Windows, some of the skia libraries have lib prefix and some do not
                      // Let's standardize it
-@@ -180,55 +195,70 @@ internal val Project.isInIdea: Boolean
+                     if (config == "windows") {
+@@ -172,20 +164,7 @@ fun SkikoProjectContext.registerOrGetSkiaDirProvider(
+ ): Provider<File> {
+     val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
+ 
+-    val skiaDir = skiko.skiaDir
+-    return if (skiaDir != null) {
+-        project.tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
+-            // dummy task to simplify usage of the resulting provider (see `else` branch)
+-            // if a file provider is not created from a task provider,
+-            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+-            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+-            enabled = false
+-        }.map {
+-            skiaDir.absoluteFile
+-        }
+-    } else {
+-        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+-    }
++    return project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
+ }
+ 
+ internal val Project.isInIdea: Boolean
+@@ -194,55 +173,70 @@ internal val Project.isInIdea: Boolean
      }
  
  val Project.supportAndroid: Boolean
@@ -610,12 +1206,67 @@ index 2c24690..708016f 100644
  
  fun Project.skiaVersion(target: String): String {
      val platformSpecificVersion = "dependencies.skia.$target"
-diff --git a/skiko/buildSrc/src/main/kotlin/StripCoffDirectivesTask.kt b/skiko/buildSrc/src/main/kotlin/StripCoffDirectivesTask.kt
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
+index d839b03..1a8b2b9 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
+@@ -38,27 +38,16 @@ val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
+                 withLinux()
+             }
+ 
+-            group("darwin") {
+-                group("uikit") {
+-                    group("tvos")
+-                    group("ios") {
+-                        withIos()
+-                    }
+-                }
+-
+-                group("macos") {
+-                    withMacos()
+-                }
+-
+-                group("tvos") {
+-                    withTvos()
+-                }
++            group("windows") {
++                withMingw()
+             }
+-        }
+ 
+-        group("nativeJs") {
+-            group("web")
+-            group("native")
++            group("macos") {
++                withMacos()
++            }
+         }
++
++        // Rachel core build excludes Android configuration.
++
+     }
+ }
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
+index 5bb0cca..440eed7 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
+@@ -94,7 +94,7 @@ abstract class MergeStaticArchivesTask : DefaultTask() {
+ 
+     private fun run(vararg args: String, cwd: File? = null) = execOperations.exec {
+         commandLine(*args)
+-        workingDir = cwd
++        if (cwd != null) workingDir = cwd
+     }
+     private fun capture(vararg args: String): String {
+         val out = ByteArrayOutputStream()
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt
 new file mode 100644
-index 0000000..edd3a19
+index 0000000..3e8825e
 --- /dev/null
-+++ b/skiko/buildSrc/src/main/kotlin/StripCoffDirectivesTask.kt
-@@ -0,0 +1,81 @@
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt
+@@ -0,0 +1,83 @@
++package org.jetbrains.skiko.build.cpp
++
 +import java.io.File
 +import org.gradle.api.DefaultTask
 +import org.gradle.api.file.DirectoryProperty
@@ -697,736 +1348,11 @@ index 0000000..edd3a19
 +        val QUOTE = '"'.code.toByte()
 +    }
 +}
-diff --git a/skiko/buildSrc/src/main/kotlin/dsl/SkikoDependency.kt b/skiko/buildSrc/src/main/kotlin/dsl/SkikoDependency.kt
-index 760bdb0..e050753 100644
---- a/skiko/buildSrc/src/main/kotlin/dsl/SkikoDependency.kt
-+++ b/skiko/buildSrc/src/main/kotlin/dsl/SkikoDependency.kt
-@@ -22,8 +22,8 @@ annotation class SkikoBinaryDsl
- 
- val OS.validEnvs: List<TargetEnv>
-     get() = when (this) {
--        OS.MacOS, OS.Linux -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
--        OS.Windows, OS.Android -> listOf(TargetEnv.JVM)
-+        OS.MacOS, OS.Linux, OS.Windows -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
-+        OS.Android -> listOf(TargetEnv.JVM)
-         OS.IOS, OS.TVOS -> listOf(TargetEnv.NATIVE)
-         OS.Wasm -> listOf(TargetEnv.WASM)
-     }
-diff --git a/skiko/buildSrc/src/main/kotlin/internal/utils/ArgBuilder.kt b/skiko/buildSrc/src/main/kotlin/internal/utils/ArgBuilder.kt
-index d1358cb..ee3ee9e 100644
---- a/skiko/buildSrc/src/main/kotlin/internal/utils/ArgBuilder.kt
-+++ b/skiko/buildSrc/src/main/kotlin/internal/utils/ArgBuilder.kt
-@@ -78,6 +78,10 @@ internal abstract class AbstractArgBuilder : ArgBuilder {
- 
- internal abstract class BaseVisualStudioBuildToolsArgBuilder : AbstractArgBuilder() {
-     override fun escapePathIfNeeded(file: File): String {
-+        if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-+            val path = super.escapePathIfNeeded(file)
-+            return if (" " in path) "\"$path\"" else path
-+        }
-         val path = file.absolutePath
-             .replace("/", "\\")
-             .replace("\\", "\\\\")
-@@ -143,4 +147,4 @@ internal class VisualCppLinkerArgBuilder : BaseVisualStudioBuildToolsArgBuilder(
-             super.addTransformedArgs(argName, value)
-         }
-     }
--}
-\ No newline at end of file
-+}
-diff --git a/skiko/buildSrc/src/main/kotlin/properties.kt b/skiko/buildSrc/src/main/kotlin/properties.kt
-index e35db1a..89b8bcd 100644
---- a/skiko/buildSrc/src/main/kotlin/properties.kt
-+++ b/skiko/buildSrc/src/main/kotlin/properties.kt
-@@ -34,7 +34,7 @@ enum class OS(
- val OS.isCompatibleWithHost: Boolean
-     get() = when (this) {
-         OS.Linux -> hostOs == OS.Linux
--        OS.Windows -> hostOs == OS.Windows
-+        OS.Windows -> hostOs == OS.Windows || isLinuxToWindowsMsvcCrossCompilationEnabled
-         OS.MacOS, OS.IOS, OS.TVOS -> hostOs == OS.MacOS
-         OS.Wasm -> true
-         OS.Android -> true
-@@ -135,6 +135,9 @@ class SkikoProperties(private val myProject: Project) {
- 
-     val baseDeployVersion: String = myProject.property("deploy.version") as String
- 
-+    val deployGroup: String = myProject.findProperty("deploy.group")?.toString()
-+        ?: SkikoArtifacts.DEFAULT_GROUP_ID
-+
-     val deployVersion: String
-         get() {
-             val main = if (isRelease) baseDeployVersion else "$baseDeployVersion-SNAPSHOT"
-@@ -168,7 +171,7 @@ class SkikoProperties(private val myProject: Project) {
-         get() = myProject.findProperty("release.github.prerelease") == "true"
- 
-     val visualStudioBuildToolsDir: File?
--        get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
-+        get() = (System.getenv("SKIKO_VSBT_PATH")?.takeIf(String::isNotBlank) ?: System.getenv("VS_PATH"))?.let { File(it) }?.takeIf { it.isDirectory }
- 
-     /**
-      * Skia repository root directory for building Skia from source.
-@@ -283,9 +286,13 @@ object SkikoGradleProperties {
-     const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
-     const val NATIVE_MAC = "skiko.native.mac.enabled"
-     const val NATIVE_LINUX = "skiko.native.linux.enabled"
-+    const val NATIVE_LINUX_X64 = "skiko.native.linux.x64.enabled"
-+    const val NATIVE_LINUX_ARM64 = "skiko.native.linux.arm64.enabled"
-+    const val NATIVE_WINDOWS = "skiko.native.windows.enabled"
- }
- 
- class SkikoArtifacts(
-+    val groupId: String = DEFAULT_GROUP_ID,
-     val artifactIdPrefix: String = DEFAULT_ARTIFACT_ID_PREFIX,
-     val displayName: String = "Skiko",
-     val pomDescription: String = "Kotlin Skia bindings",
-@@ -310,8 +317,12 @@ class SkikoArtifacts(
-     // does not seem possible (at least without adding a dash to a target's tasks),
-     // so we're using the default naming pattern instead.
-     // See https://youtrack.jetbrains.com/issue/KT-50001.
--    fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false) =
--        "$artifactIdPrefix-${os.id + if (isUikitSim) "simulator" else ""}${arch.id}"
-+    fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false): String {
-+        // Kotlin/Native calls its Windows target mingwX64, so KGP publishes
-+        // `*-mingwx64` rather than using Skiko's internal `windows` OS id.
-+        val targetOsId = if (os == OS.Windows) "mingw" else os.id
-+        return "$artifactIdPrefix-${targetOsId + if (isUikitSim) "simulator" else ""}${arch.id}"
-+    }
- 
-     companion object {
-         const val DEFAULT_ARTIFACT_ID_PREFIX = "skiko"
-diff --git a/skiko/buildSrc/src/main/kotlin/publishing.kt b/skiko/buildSrc/src/main/kotlin/publishing.kt
-index b9cb8ae..38db6a8 100644
---- a/skiko/buildSrc/src/main/kotlin/publishing.kt
-+++ b/skiko/buildSrc/src/main/kotlin/publishing.kt
-@@ -108,8 +108,9 @@ private val SkikoPublishingContext.emptySourcesJar
-         archiveClassifier.set("sources")
-     }
- 
--private val SkikoPublishingContext.emptyJavadocJar
--    get() = project.tasks.registerOrGetTask<Jar>("emptyJavadocJar") {
-+private fun SkikoPublishingContext.emptyJavadocJar(publicationName: String) =
-+    project.tasks.registerOrGetTask<Jar>("empty${toTitleCase(publicationName)}JavadocJar") {
-+        archiveBaseName.set("${skikoArtifacts.artifactIdPrefix}-$publicationName")
-         archiveClassifier.set("javadoc")
-     }
- 
-@@ -127,14 +128,6 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
-                 name = "BuildRepo"
-                 url = project.rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
-             }
--            maven {
--                name = "ComposeRepo"
--                url = project.uri(skiko.composeRepoUrl)
--                credentials {
--                    username = skiko.composeRepoUserName
--                    password = skiko.composeRepoKey
--                }
--            }
-         }
-     }
- }
-@@ -160,10 +153,10 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
-     publishing {
-         publications.configureEach {
-             this as MavenPublication
--            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-+            groupId = skikoArtifacts.groupId
- 
-             // Necessary for publishing to Maven Central
--            artifact(emptyJavadocJar)
-+            artifact(emptyJavadocJar(name))
- 
-             pom {
-                 description.set(skikoArtifacts.pomDescription)
-@@ -187,7 +180,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
-             pom.withXml {
-                 asNode().appendNode("dependencies")
-                     .appendNode("dependency").apply {
--                        appendNode("groupId", SkikoArtifacts.DEFAULT_GROUP_ID)
-+                        appendNode("groupId", skikoArtifacts.groupId)
-                         appendNode("artifactId", skikoArtifacts.jvmArtifactId)
-                         appendNode("version", "[${skiko.deployVersion}]")
-                         appendNode("scope", "compile")
-@@ -337,7 +330,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
-              */
-             dependencies.add(
-                 project.dependencies.create(
--                    SkikoArtifacts.DEFAULT_GROUP_ID,
-+                    skikoArtifacts.groupId,
-                     skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch),
-                     skiko.deployVersion
-                 )
-@@ -358,7 +351,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
-         create("awtRuntimeElements", MavenPublication::class.java) {
-             from(component)
-             pomNameForPublication[name] = "${skikoArtifacts.displayName} JVM Runtime"
--            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-+            groupId = skikoArtifacts.groupId
-             artifactId = skikoArtifacts.jvmRuntimeArtifactId
-             version = skiko.deployVersion
- 
-@@ -408,7 +401,7 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
-         awtRuntimeTargets.forEach { (os, arch) ->
-             config.dependencyConstraints.add(
-                 project.dependencies.constraints.create(
--                    "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
-+                    "${skikoArtifacts.groupId}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
-                 )
-             )
-         }
-diff --git a/skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt b/skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt
-index 19e138b..3e8884b 100644
---- a/skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt
-+++ b/skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt
-@@ -36,27 +36,16 @@ val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
-                 withLinux()
-             }
- 
--            group("darwin") {
--                group("uikit") {
--                    group("tvos")
--                    group("ios") {
--                        withIos()
--                    }
--                }
--
--                group("macos") {
--                    withMacos()
--                }
--
--                group("tvos") {
--                    withTvos()
--                }
-+            group("windows") {
-+                withMingw()
-             }
--        }
- 
--        group("nativeJs") {
--            group("web")
--            group("native")
-+            group("macos") {
-+                withMacos()
-+            }
-         }
-+
-+        // Rachel core build excludes Android configuration.
-+
-     }
- }
-diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/CommonTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/CommonTasksConfiguration.kt
-index e1ccd14..a54c03a 100644
---- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/CommonTasksConfiguration.kt
-+++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/CommonTasksConfiguration.kt
-@@ -16,7 +16,10 @@ import supportNativeIosArm64
- import supportNativeIosSimulatorArm64
- import supportNativeIosX64
- import supportNativeLinux
-+import supportNativeLinuxArm64
-+import supportNativeLinuxX64
- import supportNativeMac
-+import supportNativeWindows
- import supportNativeTvosArm64
- import supportNativeTvosSimulatorArm64
- import supportNativeTvosX64
-@@ -190,18 +193,26 @@ fun Project.configureSignAndPublishDependencies() {
-         tasks.configureEach {
-             when {
-                 name.startsWith(publishLinuxX64) -> {
--                    dependsOn(signLinuxArm64Publication)
-+                    if (supportNativeLinuxArm64) dependsOn(signLinuxArm64Publication)
-                     dependsOn(signLinuxX64Publication)
-                 }
- 
-                 name.startsWith(publishLinuxArm64) -> {
-                     dependsOn(signLinuxArm64Publication)
--                    dependsOn(signLinuxX64Publication)
-+                    if (supportNativeLinuxX64) dependsOn(signLinuxX64Publication)
-                 }
-             }
-         }
-     }
- 
-+    if (supportNativeWindows) {
-+        tasks.configureEach {
-+            if (name.startsWith("publishMingwX64PublicationTo")) {
-+                dependsOn("signMingwX64Publication")
-+            }
-+        }
-+    }
-+
-     if (supportNativeMac) {
-         val publishMacosArm64 = "publishMacosArm64PublicationTo"
-         val publishMacosX64 = "publishMacosX64PublicationTo"
-diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/JvmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/JvmTasksConfiguration.kt
-index 4c02102..f8c9ee4 100644
---- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/JvmTasksConfiguration.kt
-+++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/JvmTasksConfiguration.kt
-@@ -37,6 +37,7 @@ import org.gradle.kotlin.dsl.register
- import projectDirs
- import registerOrGetSkiaDirProvider
- import registerSkikoTask
-+import requireDumpbin
- import runPkgConfig
- import symbols.GenerateRequiredSymbolsTask
- import symbols.GenerateSymbolsListTask
-@@ -169,7 +170,7 @@ private fun SkikoProjectContext.createGenerateRequiredSymbolsTask(
-     this.symbolExtractorCommand.set(
-         when (targetOs) {
-             OS.Android -> project.androidLlvmNm().map { listOf(it) }
--            OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
-+            OS.Windows -> project.provider { listOf(windowsSdkPaths.requireDumpbin().absolutePath) }
-             else -> project.provider { listOf("nm") }
-         }
-     )
-@@ -437,7 +438,7 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
-         this.symbolExtractorCommand.set(
-             when (targetOs) {
-                 OS.Android -> project.androidLlvmNm().map { listOf(it) }
--                OS.Windows -> project.provider { listOf(windowsSdkPaths.dumpbin.absolutePath) }
-+                OS.Windows -> project.provider { listOf(windowsSdkPaths.requireDumpbin().absolutePath) }
-                 else -> project.provider { listOf("nm") }
-             }
-         )
-diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
---- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
-+++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
-@@ -8,6 +8,7 @@
- import SkiaBuildType
- import SkikoModuleKind
- import SkikoProjectContext
-+import StripCoffDirectivesTask
- import WriteCInteropDefFile
- import compilerForTarget
- import dsl.TargetEnv
-@@ -20,10 +21,15 @@
- import org.gradle.api.artifacts.Configuration
- import org.gradle.api.attributes.Attribute
- import org.gradle.api.attributes.Usage
-+import org.gradle.api.publish.PublishingExtension
-+import org.gradle.api.publish.maven.MavenPublication
- import org.gradle.api.tasks.Exec
-+import org.gradle.api.tasks.Sync
- import org.gradle.api.tasks.TaskProvider
-+import org.gradle.kotlin.dsl.configure
- import org.gradle.kotlin.dsl.getByName
- import org.gradle.kotlin.dsl.register
-+import org.gradle.kotlin.dsl.withType
- import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
- import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
- import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-@@ -45,6 +51,9 @@
-     Attribute.of("org.jetbrains.skiko.nativeSymbolSources.uikitSim", String::class.java)
- 
- private const val NATIVE_SYMBOL_SOURCES_USAGE = "skiko-native-symbol-sources"
-+
-+private val arm64ToolchainRoot: String
-+    get() = System.getenv("SKIKO_ARM64_TOOLCHAIN") ?: "/opt/arm-gnu-toolchain"
-
- fun String.withSuffix(isUikitSim: Boolean = false) =
-     this + if (isUikitSim) "Sim" else ""
-@@ -189,6 +198,7 @@
-                 compiler.set(project.appleToolchainExecutableOrDefault("clang++", compiler.get()))
-                 flags.set(listOf(
-                     *project.appleMacOsSdkFlags().toTypedArray(),
-+                    "-mmacosx-version-min=12.0",
-                     *buildType.clangFlags,
-                     *skiaPreprocessorFlags(OS.MacOS, buildType),
-                     when(arch) {
-@@ -215,22 +225,53 @@
-                 )
-                 // Add sysroot for ARM64 cross-compilation
-                 if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
--                    linuxFlags.add(0, "--sysroot=/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc")
-+                    linuxFlags.add(0, "--sysroot=$arm64ToolchainRoot/aarch64-none-linux-gnu/libc")
-+                    // Fontconfig, FreeType, GLX, and X11 development headers are architecture-neutral.
-+                    // Search the host's header tree only after the ARM64 sysroot so libc headers still
-+                    // come from the cross toolchain.
-+                    linuxFlags.addAll(listOf("-idirafter", "/usr/include", "-idirafter", "/usr/include/freetype2"))
-                 }
-                 flags.set(linuxFlags)
-             }
-+            OS.Windows -> {
-+                compiler.set(windowsSdkPaths.compiler.absolutePath)
-+                includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
-+                val crossTargetFlags = if (windowsSdkPaths.isCrossCompiling) {
-+                    val targetTriple = when (arch) {
-+                        Arch.X64 -> "x86_64-pc-windows-msvc"
-+                        Arch.Arm64 -> "aarch64-pc-windows-msvc"
-+                        Arch.Wasm -> error("Unexpected Windows architecture: $arch")
-+                    }
-+                    arrayOf(
-+                        "/clang:--target=$targetTriple",
-+                        "/clang:-Wno-unused-command-line-argument",
-+                    )
-+                } else {
-+                    emptyArray()
-+                }
-+                flags.set(listOf(
-+                    "/nologo",
-+                    *buildType.winCompilerFlags,
-+                    "/utf-8",
-+                    "/GR-",
-+                    "/FS",
-+                    *crossTargetFlags,
-+                    *skiaPreprocessorFlags(OS.Windows, buildType),
-+                ))
-+            }
-             else -> throw GradleException("$os not yet supported")
-         }
- 
--        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
--                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
-+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeMain/cpp") +
-+                (if (os == OS.Windows) projectDirs("src/windowsMain/cpp") else emptyList()) +
-+                (if (skiko.includeTestHelpers) projectDirs("src/nativeTest/cpp") else emptyList())
-         sourceRoots.set(srcDirs)
- 
--        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
-+        includeHeadersNonRecursive(projectDir.resolve("src/nativeMain/cpp"))
-         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
-         if (kind == SkikoModuleKind.EXTENSION) {
-             val coreProjectDir = project.rootProject.projectDir
--            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeJsMain/cpp"))
-+            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeMain/cpp"))
-             includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
-         }
-         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
-@@ -270,11 +311,21 @@
-     target: KotlinNativeTarget,
-     coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
- ) = with(this.project) {
--    if (!os.isCompatibleWithHost) return
--
-     if (kind != SkikoModuleKind.EXTENSION) {
-         target.generateVersion(os, arch, skiko)
-     }
-+
-+    // Kotlin sources can be cross-compiled on another host, but the native C++
-+    // bridge and final linkage require the target platform toolchain.
-+    if (providers.gradleProperty("rachel.dokka").orNull == "true") {
-+        val targetString = "${os.idWithSuffix(isUikitSim = target.isUikitSimulator())}-${arch.id}"
-+        val interopName = if (os == OS.IOS || os == OS.TVOS) "uikit" else cinteropName
-+        configureCinterop(interopName, os, arch, target, targetString, emptyList())
-+        return
-+    }
-+
-+    if (!os.isCompatibleWithHost) return
-+
-     val isUikitSim = target.isUikitSimulator()
- 
-     val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
-@@ -283,7 +334,10 @@
-     val unpackedSkia = unzipper.get()
-     val skiaDir = unpackedSkia.absolutePath
- 
--    val bridgesLibrary = layout.buildDirectory.file("nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString.a")
-+    val bridgesLibraryExtension = if (os == OS.Windows) ".lib" else ".a"
-+    val bridgesLibrary = layout.buildDirectory.file(
-+        "nativeBridges/static/$targetString/$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
-+    )
-     val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
- 
-     // For iOS/tvOS we patch every library so that public Skia symbols are
-@@ -293,24 +347,78 @@
-     // unsupported shapes fall back to a "_skiko" suffix.
-     val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
-     val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
-+    val strippedCoffLibsDir =
-+        layout.buildDirectory.dir("nativeBridges/strippedCoff/$targetString").get().asFile
- 
-     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
-     val resolvedBinaryInputs = resolveBinaryInputs(os, arch, TargetEnv.NATIVE, skiaBinDir)
-     val mergedArchive = layout.buildDirectory.file("mergedSkiaArchives/$targetString/libskia_static.a")
--    val mergeArchivesTask = project.tasks.register<MergeStaticArchivesTask>("mergeSkiaArchives$targetString") {
--        dependsOn(unzipper)
--        targetOs.set(os)
--        archives.set(resolvedBinaryInputs.staticArchivePaths.distinct().map(::File))
--        output.set(mergedArchive)
--    }
--    val nativeArchives = listOf(mergedArchive.get().asFile.absolutePath)
--    val allLibraries = if (requiresSymbolPatching) {
--        nativeArchives.map { lib ->
--            "${patchedLibsDir.absolutePath}/${File(lib).name}"
--        } + "${patchedLibsDir.absolutePath}/$nativeBridgesLibPrefix-$targetString.a"
-+    val mergeArchivesTask = if (os == OS.Windows) null else
-+        project.tasks.register<MergeStaticArchivesTask>("mergeSkiaArchives$targetString") {
-+            dependsOn(unzipper)
-+            targetOs.set(os)
-+            archives.set(resolvedBinaryInputs.staticArchivePaths.distinct().map(::File))
-+            output.set(mergedArchive)
-+        }
-+    val nativeArchives = if (os == OS.Windows) resolvedBinaryInputs.staticArchivePaths.distinct()
-+        else listOf(mergedArchive.get().asFile.absolutePath)
-+    val windowsRuntimeAliasesTask: TaskProvider<Sync>?
-+    val windowsRuntimeArchives: List<String>
-+    val windowsStaticMsvcRuntimes: List<String>
-+    if (os == OS.Windows) {
-+        val msvcRuntimeLibraryDir =
-+            windowsSdkPaths.libDirs.firstOrNull { it.resolve("libcmt.lib").isFile }
-+                ?: error("MSVC static runtime libraries were not found in ${windowsSdkPaths.libDirs}")
-+        val ucrtLibraryDir =
-+            windowsSdkPaths.libDirs.firstOrNull { it.resolve("ucrt.lib").isFile }
-+                ?: error("Windows UCRT import libraries were not found in ${windowsSdkPaths.libDirs}")
-+        val windowsSystemLibraryDir =
-+            windowsSdkPaths.libDirs.firstOrNull { it.resolve("d3d12.lib").isFile }
-+                ?: error("Windows SDK import libraries were not found in ${windowsSdkPaths.libDirs}")
-+        val runtimeAliases = if (kind != SkikoModuleKind.CORE) emptyMap<File, String>() else
-+            mapOf(
-+                msvcRuntimeLibraryDir.resolve("oldnames.lib") to "liboldnames.a",
-+                ucrtLibraryDir.resolve("ucrt.lib") to "libucrt.a",
-+                windowsSystemLibraryDir.resolve("d3d12.lib") to "libd3d12.a",
-+            )
-+        val aliasesDir =
-+            layout.buildDirectory.dir("nativeBridges/msvcRuntimeAliases/$targetString").get().asFile
-+        windowsRuntimeAliasesTask =
-+            tasks.register<Sync>("prepareMsvcRuntimeAliases${joinToTitleCamelCase(targetString)}") {
-+                runtimeAliases.forEach { (source, aliasName) ->
-+                    from(source) {
-+                        rename { aliasName }
-+                    }
-+                }
-+                into(aliasesDir)
-+        }
-+        windowsRuntimeArchives = runtimeAliases.values.map { aliasesDir.resolve(it).absolutePath }
-+        windowsStaticMsvcRuntimes =
-+            (if (kind == SkikoModuleKind.CORE) listOf("libcmt.lib", "libcpmt.lib", "libvcruntime.lib") else emptyList()).map {
-+                msvcRuntimeLibraryDir.resolve(it).absolutePath
-+            }
-     } else {
--        nativeArchives + bridgesLibraryPath
--    }
-+        windowsRuntimeAliasesTask = null
-+        windowsRuntimeArchives = emptyList()
-+        windowsStaticMsvcRuntimes = emptyList()
-+    }
-+    val platformLibraries =
-+        when {
-+            requiresSymbolPatching ->
-+                nativeArchives.map { lib ->
-+                    "${patchedLibsDir.absolutePath}/${File(lib).name}"
-+                } + "${patchedLibsDir.absolutePath}/$nativeBridgesLibPrefix-$targetString.a"
-+            os == OS.Windows ->
-+                nativeArchives.map { lib ->
-+                    strippedCoffLibsDir.resolve(File(lib).name).absolutePath
-+                } +
-+                    strippedCoffLibsDir.resolve(File(bridgesLibraryPath).name).absolutePath +
-+                    windowsStaticMsvcRuntimes.map { runtime ->
-+                        strippedCoffLibsDir.resolve(File(runtime).name).absolutePath
-+                    }
-+            else -> nativeArchives + bridgesLibraryPath
-+        }
-+    val allLibraries = platformLibraries + windowsRuntimeArchives
- 
-     val hiddenSymbolsFile = layout.buildDirectory.file(
-         "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
-@@ -322,24 +430,26 @@
-     } else {
-         nativeArchives
-     }
--    val hideSkiaSymbols = project.registerSkikoTask<HideSkiaSymbolsTask>(
--        "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
--        os,
--        arch
--    ) {
--        targetOs.set(os)
--        symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
--        symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
--        outputFile.set(hiddenSymbolsFile)
-+    val hideSkiaSymbols = if (os == OS.Windows) {
-+        null
-+    } else {
-+        project.registerSkikoTask<HideSkiaSymbolsTask>(
-+            "hideSkiaSymbols".withSuffix(isUikitSim = isUikitSim),
-+            os,
-+            arch
-+        ) {
-+            targetOs.set(os)
-+            symbolExtractorCommand.set(if (os == OS.IOS || os == OS.TVOS) listOf("xcrun", "nm") else listOf("nm"))
-+            symbolSourceLibraries.from(hiddenSymbolSources.map { File(it) })
-+            outputFile.set(hiddenSymbolsFile)
-+        }
-     }
- 
-     val linkerFlags = when (os) {
-         OS.MacOS -> {
-             configureCinterop(cinteropName, os, arch, target, targetString, resolvedBinaryInputs.frameworks)
--            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags + listOf(
--                "-unexported_symbols_list",
--                hiddenSymbolsFile.get().asFile.absolutePath
--            ))
-+            // KLIBs must remain linkable after leaving the producer's machine.
-+            mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
-         }
-         OS.IOS -> {
-             // list of linker options to be included into klib, which are needed for skiko consumers
-@@ -364,16 +474,34 @@
-                 "-L/usr/lib64",
-                 "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
-             )
--            options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
-             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
-             options.addAll(resolvedBinaryInputs.linkFlags)
-             // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
-             if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
-                 // ARM GNU toolchain sysroot paths
--                options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
--                options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
--            }
--            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
-+                options.add(0, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/lib64")
-+                options.add(1, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/usr/lib64")
-+            }
-+            configureCinterop(cinteropName, os, arch, target, targetString, options)
-+            mutableListOfLinkerOptions(options)
-+        }
-+        OS.Windows -> {
-+            val options = mutableListOf(
-+                // The published Skia archives carry /MT directives, while Kotlin/Native uses the
-+                // MinGW CRT. Suppress their default-library directives and explicitly provide the
-+                // matching filtered MSVC runtime archives embedded above.
-+                "-Wl,--allow-multiple-definition",
-+                "-Wl,--wrap=atexit",
-+                "-Wl,/nodefaultlib:libcmt",
-+                "-Wl,/nodefaultlib:oldnames",
-+                "-Wl,/nodefaultlib:libcpmt",
-+                "-Wl,/nodefaultlib:libucrt",
-+                "-Wl,/nodefaultlib:libvcruntime",
-+                "-Wl,/nodefaultlib:vcruntime",
-+            )
-+            options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
-+            options.addAll(resolvedBinaryInputs.linkFlags)
-+            configureCinterop(cinteropName, os, arch, target, targetString, options)
-             mutableListOfLinkerOptions(options)
-         }
-         else -> mutableListOf()
-@@ -390,7 +518,9 @@
- 
-     // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
-     target.binaries.all {
--        freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
-+        linkTaskProvider.configure {
-+            toolOptions.freeCompilerArgs.addAll(allLibraries.flatMap { listOf("-include-binary", it) } + linkerFlags)
-+        }
-     }
- 
- 
-@@ -414,13 +544,17 @@
-         }
-         inputs.files(objectFiles)
-         val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
--        val staticLib = "$nativeBridgesLibPrefix-$targetString.a"
-+        val staticLib = "$nativeBridgesLibPrefix-$targetString$bridgesLibraryExtension"
-         workingDir = outDir
-         when (os) {
-             OS.Linux -> {
-                 executable = if (arch == Arch.Arm64 && hostArch != Arch.Arm64) "aarch64-linux-gnu-ar" else "ar"
-                 argumentProviders.add { listOf("-crs", staticLib) }
-             }
-+            OS.Windows -> {
-+                executable = windowsSdkPaths.librarian.absolutePath
-+                argumentProviders.add { listOf("/NOLOGO", "/OUT:$staticLib") }
-+            }
-             OS.MacOS, OS.IOS, OS.TVOS -> {
-                 executable = "libtool"
-                 argumentProviders.add { listOf("-static", "-o", staticLib) }
-@@ -431,6 +565,24 @@
-         file(outDir).mkdirs()
-         outputs.dir(outDir)
-     }
-+
-+    val stripCoffDirectivesTask =
-+        if (os == OS.Windows) {
-+            project.registerSkikoTask<StripCoffDirectivesTask>(
-+                "stripCoffDirectives",
-+                os,
-+                arch,
-+            ) {
-+                dependsOn(unzipper)
-+                dependsOn(linkTask)
-+                inputLibraries.set(
-+                    (nativeArchives + bridgesLibraryPath + windowsStaticMsvcRuntimes).map(::File)
-+                )
-+                outputDir.set(strippedCoffLibsDir)
-+            }
-+        } else {
-+            null
-+        }
-
-     // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
-     val compilationDependency = if (requiresSymbolPatching) {
-@@ -444,7 +596,7 @@
-         }
-         project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
-             dependsOn(unzipper)
--            dependsOn(mergeArchivesTask)
-+            mergeArchivesTask?.let { dependsOn(it) }
-             dependsOn(linkTask)
-             if (coreSymbolSources != null) {
-                 dependsOn(coreSymbolSources)
-@@ -458,19 +610,24 @@
-                 configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
-             }
-         }
--    } else {
--        linkTask
--    }
--
--    hideSkiaSymbols.configure {
-+    } else stripCoffDirectivesTask ?: linkTask
-+
-+    hideSkiaSymbols?.configure {
-         dependsOn(unzipper)
--        dependsOn(mergeArchivesTask)
-+        mergeArchivesTask?.let { dependsOn(it) }
-         dependsOn(compilationDependency)
-     }
- 
-     target.compilations.all {
-         compileTaskProvider.configure {
--            dependsOn(hideSkiaSymbols)
-+            // Free compiler argument paths alone do not track embedded archive contents.
-+            inputs.files(allLibraries).withPropertyName("embeddedNativeArchives")
-+            windowsRuntimeAliasesTask?.let { dependsOn(it) }
-+            if (hideSkiaSymbols != null) {
-+                dependsOn(hideSkiaSymbols)
-+            } else {
-+                dependsOn(compilationDependency)
-+            }
-         }
-     }
- }
-diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/WasmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/WasmTasksConfiguration.kt
-index e517cef..56586e9 100644
---- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/WasmTasksConfiguration.kt
-+++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/WasmTasksConfiguration.kt
-@@ -89,16 +89,16 @@ fun SkikoProjectContext.declareWasmTasks() {
-         buildTargetArch.set(Arch.Wasm)
-         buildVariant.set(buildType)
- 
--        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/webMain/cpp", "src/nativeJsMain/cpp") +
--                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
-+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/webMain/cpp", "src/nativeMain/cpp") +
-+                if (skiko.includeTestHelpers) projectDirs("src/nativeTest/cpp") else emptyList()
-         sourceRoots.set(srcDirs)
- 
--        includeHeadersNonRecursive(project.projectDir.resolve("src/nativeJsMain/cpp"))
-+        includeHeadersNonRecursive(project.projectDir.resolve("src/nativeMain/cpp"))
-         includeHeadersNonRecursive(project.projectDir.resolve("src/webMain/cpp"))
-         includeHeadersNonRecursive(project.projectDir.resolve("src/commonMain/cpp/common/include"))
-         if (isSideModule) {
-             val coreProjectDir = project.rootProject.projectDir
--            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeJsMain/cpp"))
-+            includeHeadersNonRecursive(coreProjectDir.resolve("src/nativeMain/cpp"))
-             includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
-         }
-         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
-diff --git a/skiko/buildSrc/src/main/kotlin/windowsSdkPaths.kt b/skiko/buildSrc/src/main/kotlin/windowsSdkPaths.kt
-index 344d9e2..ccba8fc 100644
---- a/skiko/buildSrc/src/main/kotlin/windowsSdkPaths.kt
-+++ b/skiko/buildSrc/src/main/kotlin/windowsSdkPaths.kt
-@@ -12,18 +12,36 @@ import kotlin.math.abs
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
+index 08f2491..77c39fa 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
+@@ -16,18 +16,36 @@ import org.jetbrains.skiko.build.utils.hostOs
  data class WindowsSdkPaths(
      val compiler: File,
      val linker: File,
@@ -1465,7 +1391,7 @@ index 344d9e2..ccba8fc 100644
  
      val hostPlatform = host()
      val finder = GradleWindowsComponentFinderWrapper(gradle, hostPlatform, arch)
-@@ -37,6 +55,7 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
+@@ -41,6 +59,7 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
      return WindowsSdkPaths(
          compiler = compiler,
          linker = linker,
@@ -1473,7 +1399,7 @@ index 344d9e2..ccba8fc 100644
          dumpbin = linker.parentFile.resolve("dumpbin.exe"),
          includeDirs = systemLibraries.flatMap { it.includeDirs }.map { it.fixPathFor(arch) },
          libDirs = systemLibraries.flatMap { it.libDirs }.map { it.fixPathFor(arch) },
-@@ -44,6 +63,88 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
+@@ -48,6 +67,88 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
      )
  }
  
@@ -1562,7 +1488,7 @@ index 344d9e2..ccba8fc 100644
  // workaround until https://github.com/gradle/gradle/pull/21780 is merged
  private fun File.fixPathFor(arch: Arch) = File(absolutePath.replace("x64", arch.id))
  
-@@ -53,7 +154,8 @@ private class GradleWindowsComponentFinderWrapper(
+@@ -57,7 +158,8 @@ private class GradleWindowsComponentFinderWrapper(
      private val arch: Arch,
  ) {
      fun findVisualCpp(): VisualCpp {
@@ -1572,26 +1498,190 @@ index 344d9e2..ccba8fc 100644
  
          val vsLocator = gradle.serviceOf<VisualStudioLocator>()
          val vsComponent = if (skikoVsbtPath != null) {
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
+index 6769256..18641b2 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
+@@ -22,8 +22,8 @@ annotation class SkikoBinaryDsl
+ 
+ val OS.validEnvs: List<TargetEnv>
+     get() = when (this) {
+-        OS.MacOS, OS.Linux -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
+-        OS.Windows, OS.Android -> listOf(TargetEnv.JVM)
++        OS.MacOS, OS.Linux, OS.Windows -> listOf(TargetEnv.JVM, TargetEnv.NATIVE)
++        OS.Android -> listOf(TargetEnv.JVM)
+         OS.IOS, OS.TVOS -> listOf(TargetEnv.NATIVE)
+         OS.Wasm -> listOf(TargetEnv.WASM)
+     }
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
+index ea4b478..2ed547e 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
+@@ -118,8 +118,9 @@ private val SkikoPublishingContext.emptySourcesJar
+         archiveClassifier.set("sources")
+     }
+ 
+-private val SkikoPublishingContext.emptyJavadocJar
+-    get() = project.tasks.registerOrGetTask<Jar>("emptyJavadocJar") {
++private fun SkikoPublishingContext.emptyJavadocJar(publicationName: String) =
++    project.tasks.registerOrGetTask<Jar>("empty${toTitleCase(publicationName)}JavadocJar") {
++        archiveBaseName.set("${skikoArtifacts.artifactIdPrefix}-$publicationName")
+         archiveClassifier.set("javadoc")
+     }
+ 
+@@ -137,14 +138,6 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
+                 name = "BuildRepo"
+                 url = project.rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
+             }
+-            maven {
+-                name = "ComposeRepo"
+-                url = project.uri(skiko.composeRepoUrl)
+-                credentials {
+-                    username = skiko.composeRepoUserName
+-                    password = skiko.composeRepoKey
+-                }
+-            }
+         }
+     }
+ }
+@@ -170,10 +163,10 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
+     publishing {
+         publications.configureEach {
+             this as MavenPublication
+-            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
++            groupId = skikoArtifacts.groupId
+ 
+             // Necessary for publishing to Maven Central
+-            artifact(emptyJavadocJar)
++            artifact(emptyJavadocJar(name))
+ 
+             pom {
+                 description.set(skikoArtifacts.pomDescription)
+@@ -197,7 +190,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
+             pom.withXml {
+                 asNode().appendNode("dependencies")
+                     .appendNode("dependency").apply {
+-                        appendNode("groupId", SkikoArtifacts.DEFAULT_GROUP_ID)
++                        appendNode("groupId", skikoArtifacts.groupId)
+                         appendNode("artifactId", skikoArtifacts.jvmArtifactId)
+                         appendNode("version", "[${skiko.deployVersion}]")
+                         appendNode("scope", "compile")
+@@ -347,7 +340,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
+              */
+             dependencies.add(
+                 project.dependencies.create(
+-                    SkikoArtifacts.DEFAULT_GROUP_ID,
++                    skikoArtifacts.groupId,
+                     skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch),
+                     skiko.deployVersion
+                 )
+@@ -368,7 +361,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
+         create("awtRuntimeElements", MavenPublication::class.java) {
+             from(component)
+             pomNameForPublication[name] = "${skikoArtifacts.displayName} JVM Runtime"
+-            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
++            groupId = skikoArtifacts.groupId
+             artifactId = skikoArtifacts.jvmRuntimeArtifactId
+             version = skiko.deployVersion
+ 
+@@ -418,7 +411,7 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
+         awtRuntimeTargets.forEach { (os, arch) ->
+             config.dependencyConstraints.add(
+                 project.dependencies.constraints.create(
+-                    "${SkikoArtifacts.DEFAULT_GROUP_ID}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
++                    "${skikoArtifacts.groupId}:${skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)}:${skiko.deployVersion}!!"
+                 )
+             )
+         }
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
+index 22b9121..7ad33f2 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
+@@ -78,6 +78,10 @@ internal abstract class AbstractArgBuilder : ArgBuilder {
+ 
+ internal abstract class BaseVisualStudioBuildToolsArgBuilder : AbstractArgBuilder() {
+     override fun escapePathIfNeeded(file: File): String {
++        if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
++            val path = super.escapePathIfNeeded(file)
++            return if (" " in path) "\"$path\"" else path
++        }
+         val path = file.absolutePath
+             .replace("/", "\\")
+             .replace("\\", "\\\\")
+diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
+index b08a021..0dabf4a 100644
+--- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
++++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
+@@ -6,6 +6,7 @@ import org.gradle.api.GradleException
+ import org.gradle.api.Project
+ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+ import org.jetbrains.skiko.build.context.SkiaTarget
++import org.jetbrains.skiko.build.cpp.isLinuxToWindowsMsvcCrossCompilationEnabled
+ 
+ enum class OS(
+     val id: String,
+@@ -37,7 +38,7 @@ enum class OS(
+ val OS.isCompatibleWithHost: Boolean
+     get() = when (this) {
+         OS.Linux -> hostOs == OS.Linux
+-        OS.Windows -> hostOs == OS.Windows
++        OS.Windows -> hostOs == OS.Windows || isLinuxToWindowsMsvcCrossCompilationEnabled
+         OS.MacOS, OS.IOS, OS.TVOS -> hostOs == OS.MacOS
+         OS.Wasm -> true
+         OS.Android -> true
+@@ -143,6 +144,9 @@ class SkikoProperties(private val myProject: Project) {
+ 
+     val baseDeployVersion: String = myProject.property("deploy.version") as String
+ 
++    val deployGroup: String = myProject.findProperty("deploy.group")?.toString()
++        ?: SkikoArtifacts.DEFAULT_GROUP_ID
++
+     val deployVersion: String
+         get() {
+             val main = if (isRelease) baseDeployVersion else "$baseDeployVersion-SNAPSHOT"
+@@ -176,7 +180,7 @@ class SkikoProperties(private val myProject: Project) {
+         get() = myProject.findProperty("release.github.prerelease") == "true"
+ 
+     val visualStudioBuildToolsDir: File?
+-        get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
++        get() = (System.getenv("SKIKO_VSBT_PATH")?.takeIf(String::isNotBlank) ?: System.getenv("VS_PATH"))?.let { File(it) }?.takeIf { it.isDirectory }
+ 
+     /**
+      * Skia repository root directory for building Skia from source.
+@@ -293,9 +297,13 @@ object SkikoGradleProperties {
+     const val NATIVE_TVOS_X64 = "skiko.native.tvos.x64.enabled"
+     const val NATIVE_MAC = "skiko.native.mac.enabled"
+     const val NATIVE_LINUX = "skiko.native.linux.enabled"
++    const val NATIVE_LINUX_X64 = "skiko.native.linux.x64.enabled"
++    const val NATIVE_LINUX_ARM64 = "skiko.native.linux.arm64.enabled"
++    const val NATIVE_WINDOWS = "skiko.native.windows.enabled"
+ }
+ 
+ class SkikoArtifacts(
++    val groupId: String = DEFAULT_GROUP_ID,
+     val artifactIdPrefix: String = DEFAULT_ARTIFACT_ID_PREFIX,
+     val displayName: String = "Skiko",
+     val pomDescription: String = "Kotlin Skia bindings",
+@@ -320,8 +328,12 @@ class SkikoArtifacts(
+     // does not seem possible (at least without adding a dash to a target's tasks),
+     // so we're using the default naming pattern instead.
+     // See https://youtrack.jetbrains.com/issue/KT-50001.
+-    fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false) =
+-        "$artifactIdPrefix-${os.id + if (isUikitSim) "simulator" else ""}${arch.id}"
++    fun nativeArtifactIdFor(os: OS, arch: Arch, isUikitSim: Boolean = false): String {
++        // Kotlin/Native calls its Windows target mingwX64, so KGP publishes
++        // `*-mingwx64` rather than using Skiko's internal `windows` OS id.
++        val targetOsId = if (os == OS.Windows) "mingw" else os.id
++        return "$artifactIdPrefix-${targetOsId + if (isUikitSim) "simulator" else ""}${arch.id}"
++    }
+ 
+     companion object {
+         const val DEFAULT_ARTIFACT_ID_PREFIX = "skiko"
 diff --git a/skiko/gradle.properties b/skiko/gradle.properties
-index b071eae..f37bd59 100644
+index c60a153..b93a6fb 100644
 --- a/skiko/gradle.properties
 +++ b/skiko/gradle.properties
-@@ -4,11 +4,11 @@ kotlin.code.style=official
- kotlin.mpp.applyDefaultHierarchyTemplate=false
- kotlin.mpp.enableCInteropCommonization=true
- kotlin.js.yarn.lock.file=false
--skiko.kotlin.language.version=2.2
--skiko.kotlin.api.version=2.2
-+skiko.kotlin.language.version=2.5
-+skiko.kotlin.api.version=2.5
- skiko.emsdk.version=4.0.7
- 
--deploy.version=0.0.0
-+deploy.version=0.156.0
- 
- # a tag from https://github.com/JetBrains/skia/releases
- dependencies.skia=m156-24300fbbcb
-@@ -34,14 +34,28 @@ dependencies.angle=ec4d8f8e4d
+@@ -38,14 +38,28 @@ dependencies.angle=ec4d8f8e4d
  # dependencies.skia.windows-arm64
  # dependencies.skia.windows-x64
  
@@ -1622,629 +1712,22 @@ index b071eae..f37bd59 100644
 +skiko.native.linux.arm64.enabled=false
 +
 +kotlin.native.ignoreDisabledTargets=true
-diff --git a/skiko/rachel-upstream.gradle.kts b/skiko/rachel-upstream.gradle.kts
-new file mode 100644
-index 0000000..5a55e5a
---- /dev/null
-+++ b/skiko/rachel-upstream.gradle.kts
-@@ -0,0 +1,610 @@
-+@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
-+
-+import groovy.json.JsonOutput
-+import groovy.json.JsonSlurper
-+import org.gradle.api.publish.tasks.GenerateModuleMetadata
-+import org.gradle.api.tasks.compile.JavaCompile
-+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-+import org.gradle.kotlin.dsl.withType
-+import tasks.configuration.*
-+import dsl.SkikoDependencyScope
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
-+apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
-+
-+val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
-+fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
-+val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
-+fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
-+val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
-+
-+val skiko = SkikoProperties(rootProject)
-+val buildType = skiko.buildType
-+val targetOs = hostOs
-+val targetArch = skiko.targetArch
-+val skikoArtifacts = SkikoArtifacts(groupId = skiko.deployGroup)
-+
-+val coreDependencies: SkikoDependencyScope.() -> Unit = {
-+    targets {
-+        all {
-+            staticSkiaLibs(
-+                "skia",
-+                "skia_ganesh_ext",
-+                "svg",
-+                "skparagraph",
-+                "skshaper",
-+                "skunicode_core",
-+                "skunicode_icu",
-+                "icu",
-+                "harfbuzz",
-+                "skresources",
-+                "png",
-+                "jpeg",
-+                "webp",
-+                "webp_sse41",
-+                "zlib",
-+                "expat",
-+            )
-+        }
-+        jvm {
-+            macos {
-+                staticSkiaLibs("piex", "dng_sdk")
-+                linkFlags("-lobjc")
-+                frameworks(
-+                    "AppKit",
-+                    "CoreFoundation",
-+                    "CoreGraphics",
-+                    "CoreServices",
-+                    "CoreText",
-+                    "Foundation",
-+                    "IOKit",
-+                    "Metal",
-+                    "OpenGL",
-+                    "QuartzCore",  // for CoreAnimation
-+                )
-+            }
-+
-+            windows {
-+                    staticSkiaLibs("d3d12allocator")
-+                    // m151 SkSL adopted Chromium's raw_ptr<T> (BackupRefPtr/MiraclePtr), which is
-+                    // active on Windows (no-op elsewhere). skia.lib now references partition_alloc
-+                    // and raw_ptr symbols that live in these split-out static libs, so link them.
-+                    // allocator_shim is intentionally omitted: it overrides global malloc and is not
-+                    // referenced by skia.
-+                    staticSkiaLibs("raw_ptr", "allocator_core", "allocator_base")
-+            }
-+
-+            linux {
-+                // Hack to fix problem with linker not always finding certain declarations.
-+                directStaticSkiaLibs(
-+                    "skia",
-+                    "skia_ganesh_ext",
-+                    "skunicode_core",
-+                    "skunicode_icu",
-+                    "skshaper",
-+                )
-+                dynamicSystemLibs("GL", "X11", "fontconfig")
-+                arm64 { dynamicSystemLibs("EGL") }
-+            }
-+
-+            android {
-+                // Hack to fix problem with linker not always finding certain declarations.
-+                directStaticSkiaLibs("skia", "skia_ganesh_ext")
-+                dynamicSystemLibs("GLESv3", "EGL")
-+            }
-+        }
-+        native {
-+            linux {
-+                staticSkiaLibs("piex", "dng_sdk")
-+                // Hack to fix problem with linker not always finding certain declarations.
-+                directStaticSkiaLibs(
-+                    "skshaper",
-+                    "skunicode_core",
-+                    "skunicode_icu",
-+                    "skia",
-+                    "skia_ganesh_ext"
-+                )
-+                dynamicSystemLibs("fontconfig", "GL", "dl")
-+                arm64 { dynamicSystemLibs("EGL") }
-+            }
-+
-+            windows {
-+                staticSkiaLibs(
-+                    "d3d12allocator",
-+                    "raw_ptr",
-+                    "allocator_core",
-+                    "allocator_base",
-+                )
-+                dynamicSystemLibs(
-+                    "advapi32",
-+                    "gdi32",
-+                    "dwmapi",
-+                    "ole32",
-+                    "shlwapi",
-+                    "user32",
-+                    "winmm",
-+                    "dxgi",
-+                    "d3dcompiler",
-+                    "opengl32",
-+                )
-+            }
-+
-+            macos {
-+                staticSkiaLibs("piex", "dng_sdk")
-+                frameworks(
-+                    "Metal",
-+                    "OpenGL",
-+                    "QuartzCore",
-+                    "CoreGraphics",
-+                    "CoreText",
-+                    "CoreServices",
-+                )
-+            }
-+
-+            ios {
-+                staticSkiaLibs("piex", "dng_sdk")
-+                frameworks(
-+                    "Metal",
-+                    "CoreGraphics",
-+                    "CoreText",
-+                    "UIKit",
-+                )
-+            }
-+
-+            tvos {
-+                staticSkiaLibs("piex", "dng_sdk")
-+                frameworks(
-+                    "Metal",
-+                    "CoreGraphics",
-+                    "CoreText",
-+                    "UIKit",
-+                )
-+            }
-+        }
-+        wasm {
-+            staticSkiaLibs(
-+                "bentleyottmann",
-+                "freetype2",
-+                "jpeg12",
-+                "jpeg16",
-+                "wuffs",
-+                "skcms",
-+                "brotli",
-+            )
-+            linkFlags(
-+                "-s", "MAIN_MODULE=2",
-+                "-s", "AUTOLOAD_DYLIBS=0",
-+                "-l", "GL",
-+                "-s", "MAX_WEBGL_VERSION=2",
-+                "-s", "MIN_WEBGL_VERSION=2",
-+                "-s", "MODULARIZE=1",
-+                "-s", "EXPORT_ES6=1",
-+                "-s", "EXPORT_NAME=loadSkikoWASM",
-+                "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports, loadDynamicLibrary, LDSO, HEAPU8]\"",
-+                "-s", "STACK_SIZE=1048576", // 1 MB
-+                "--bind",
-+            )
-+        }
-+    }
-+}
-+
-+val skikoProjectContext = SkikoProjectContext(
-+    project = project,
-+    skiko = skiko,
-+    kotlin = kotlin,
-+    kind = SkikoModuleKind.CORE,
-+    artifacts = skikoArtifacts,
-+    windowsSdkPathProvider = {
-+        findWindowsSdkPaths(gradle, targetArch)
-+    },
-+    additionalRuntimeLibraries = project.registerAdditionalLibraries(targetOs, targetArch, skiko, skikoArtifacts),
-+    configureDependencies = coreDependencies
-+)
-+
-+allprojects {
-+    group = skikoArtifacts.groupId
-+    version = skiko.deployVersion
-+}
-+
-+repositories {
-+    mavenCentral {
-+        url = uri("https://repo.maven.apache.org/maven2")
-+    }
-+    google()
-+}
-+
-+kotlin {
-+    compilerOptions {
-+        languageVersion.set(skikoKotlinLanguageVersion)
-+        apiVersion.set(skikoKotlinApiVersion)
-+        freeCompilerArgs.add(
-+            "-opt-in=org.jetbrains.skiko.InternalSkikoApi"
-+        )
-+    }
-+
-+    applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
-+    skikoProjectContext.declareSkiaTasks()
-+
-+    @Suppress("UNCHECKED_CAST")
-+    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoProjectContext)
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+
-+    if (supportWeb) {
-+        skikoProjectContext.declareWasmTasks()
-+
-+        js {
-+            outputModuleName.set("skiko-kjs") // override the name to avoid name collision with a different skiko.js file
-+            browser {
-+                testTask {
-+                    useKarma {
-+                        useChromeHeadless()
-+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
-+                    }
-+                }
-+            }
-+            binaries.executable()
-+            generateVersion(OS.Wasm, Arch.Wasm, skiko)
-+
-+            val test by compilations.getting
-+
-+            project.tasks.named<Copy>(test.processResourcesTaskName) {
-+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinWasmJs"])
-+            }
-+
-+            setupImportsGeneratorPlugin(
-+                skikoArtifacts.artifactIdPrefix,
-+                isSideModule = skikoProjectContext.kind == SkikoModuleKind.EXTENSION
-+            )
-+        }
-+
-+
-+        @OptIn(ExperimentalWasmDsl::class)
-+        wasmJs {
-+            outputModuleName.set("skiko-kjs-wasm") // override the name to avoid name collision with a different skiko.js file
-+            browser {
-+                testTask {
-+                    useKarma {
-+                        useChromeHeadless()
-+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
-+                    }
-+                }
-+            }
-+            generateVersion(OS.Wasm, Arch.Wasm, skiko)
-+
-+            val test by compilations.getting
-+
-+            project.tasks.named<Copy>(test.processResourcesTaskName) {
-+                dependsOn(test.compileTaskProvider, tasks["compileTestKotlinJs"])
-+            }
-+
-+            setupImportsGeneratorPlugin(
-+                skikoArtifacts.artifactIdPrefix,
-+                isSideModule = false
-+            )
-+        }
-+    }
-+
-+    if (supportNativeMac) {
-+        skikoProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
-+    }
-+    if (supportNativeLinuxX64) {
-+        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-+    }
-+    if (supportNativeLinuxArm64) {
-+        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
-+    }
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    sourceSets.commonMain.dependencies {
-+        implementation(kotlin("stdlib"))
-+        implementation(rachelCatalog.findLibrary("coroutines-core").get())
-+    }
-+
-+    sourceSets.commonTest.dependencies {
-+        implementation(kotlin("test"))
-+        implementation(kotlin("test-annotations-common"))
-+        implementation(project(":test-utils"))
-+    }
-+
-+    skikoProjectContext.jvmMainSourceSet?.dependencies {
-+        implementation(kotlin("stdlib"))
-+        implementation(rachelCatalog.findLibrary("coroutines-core-jvm").get())
-+    }
-+
-+    skikoProjectContext.webMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("kotlinx-browser").get())
-+    }
-+
-+    skikoProjectContext.awtMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("jetbrainsRuntime-api").get())
-+    }
-+
-+    skikoProjectContext.awtTestSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("kotlinx-benchmark-runtime").get())
-+    }
-+
-+    skikoProjectContext.androidMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("coroutines-android").get())
-+    }
-+
-+    if (supportAndroid && supportAwt) {
-+        sourceSets.named("androidMain") {
-+            dependsOn(sourceSets.getByName("jvmMain"))
-+        }
-+    }
-+
-+    skikoProjectContext.jvmTestSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("coroutines-test").get())
-+        implementation(kotlin("test-junit"))
-+        implementation(kotlin("test"))
-+    }
-+
-+    skikoProjectContext.webTestSourceSet?.apply {
-+        resources.srcDirs(
-+            tasks.named("optimizeWasm"), wasmImports
-+        )
-+    }
-+
-+    skikoProjectContext.wasmJsTest?.dependencies {
-+        implementation(kotlin("test-wasm-js"))
-+    }
-+
-+    if (supportAnyNative) {
-+        sourceSets.all {
-+            // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
-+            // note that setting it per source set still keeps it unset in commonized source sets.
-+            languageSettings.optIn("kotlin.native.SymbolNameIsInternal")
-+        }
-+        configureIOSTestsWithMetal(project)
-+    }
-+}
-+
-+/**
-+ * Setup JVM benchmarks
-+ */
-+// Rachel core build excludes Android configuration.
-+
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+afterEvaluate {
-+    tasks.named("clean").configure {
-+        doLast {
-+            delete(skiko.dependenciesDir)
-+            delete(project.file("src/jvmMain/java"))
-+        }
-+    }
-+}
-+
-+fun configureSymbolsFor(os: OS, arch: Arch) {
-+    val suffix = joinToTitleCamelCase(os.id, arch.id)
-+    val skiaBindingsDir = skikoProjectContext.registerOrGetSkiaDirProvider(os, arch)
-+    val coreCompile = tasks.named<CompileSkikoCppTask>("compileJvmBindings$suffix")
-+    val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
-+    val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
-+    dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
-+    if (os != OS.Android && supportAwt) {
-+        dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
-+    }
-+    val requiredSymbolFiles = files(requiredSymbols)
-+
-+    skikoProjectContext.configureGenerateSymbolsList(
-+        os, arch, skiaBindingsDir, coreCompile, coreObjcCompile, requiredSymbolFiles
-+    )
-+
-+    tasks.named("linkJvmBindings$suffix") {
-+        dependsOn("generateSymbolsList$suffix")
-+    }
-+}
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+if (supportWeb) {
-+    skikoProjectContext.provideWasmTestResources()
-+
-+    val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
-+        dependencies.add(it.name, project(":skiko-skottie"))
-+    }
-+    val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
-+        dependencies.add(it.name, project(":skiko-skottie"))
-+    }
-+    skikoProjectContext.configureWasmMainModuleSideModuleInputs(
-+        linkWasmSideModules,
-+        linkWasmD8SideModules,
-+    )
-+}
-+
-+skikoProjectContext.declarePublications()
-+
-+// A JVM target is enabled when producing the native-only KMP root so common metadata is
-+// compiled with the metadata/JVM compiler. Do not advertise that unpublished forked AWT
-+// target: non-native consumers continue to use the upstream Skiko coordinates.
-+if (providers.gradleProperty("skiko.native.root.only").map(String::toBoolean).getOrElse(false)) {
-+    val publishedNativeTargets =
-+        setOf(
-+            "linux_x64",
-+            "linux_arm64",
-+            "mingw_x64",
-+            "macos_x64",
-+            "macos_arm64",
-+        )
-+    tasks.named<GenerateModuleMetadata>("generateMetadataFileForKotlinMultiplatformPublication") {
-+        doLast {
-+            val metadataFile = outputFile.get().asFile
-+            @Suppress("UNCHECKED_CAST")
-+            val metadata = JsonSlurper().parseText(
-+                metadataFile.readText(Charsets.UTF_8)
-+            ) as MutableMap<String, Any?>
-+            @Suppress("UNCHECKED_CAST")
-+            val variants = metadata["variants"] as List<Map<String, Any?>>
-+            metadata["variants"] = variants.filter { variant ->
-+                @Suppress("UNCHECKED_CAST")
-+                val attributes = variant["attributes"] as? Map<String, Any?>
-+                val nativeTarget = attributes?.get("org.jetbrains.kotlin.native.target") as? String
-+                nativeTarget in publishedNativeTargets || variant["name"] in setOf(
-+                    "metadataApiElements",
-+                    "metadataSourcesElements",
-+                )
-+            }
-+            metadataFile.writeText(
-+                JsonOutput.prettyPrint(JsonOutput.toJson(metadata)) + "\n",
-+                Charsets.UTF_8,
-+            )
-+        }
-+    }
-+}
-+
-+val mavenCentral = MavenCentralProperties(project)
-+val hasLegacySigningKey = providers.gradleProperty("signing.secretKeyRingFile").isPresent
-+if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts || hasLegacySigningKey) {
-+    signing {
-+        sign(publishing.publications)
-+        if (mavenCentral.signArtifacts) {
-+            useInMemoryPgpKeys(
-+                mavenCentral.signArtifactsKey.get(),
-+                mavenCentral.signArtifactsPassword.get(),
-+            )
-+        }
-+    }
-+    configureSignAndPublishDependencies()
-+}
-+
-+tasks.withType<AbstractTestTask> {
-+    testLogging {
-+        events("FAILED", "SKIPPED")
-+        exceptionFormat = TestExceptionFormat.FULL
-+        showStandardStreams = true
-+        showStackTraces = true
-+    }
-+}
-+
-+project.tasks.withType<KotlinJsCompile>().configureEach {
-+    compilerOptions.freeCompilerArgs.addAll(listOf(
-+        "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
-+    ))
-+}
-+
-+skikoProjectContext.additionalRuntimeLibraries.forEach {
-+    it.registerRuntimePublishTaskDependency(listOf("MavenLocal", "ComposeRepoRepository"))
-+}
-+
-+// Local Skia build tasks
-+tasks.register<BuildLocalSkiaTask>("prepareLocalSkiaBuild") {
-+    group = "skia"
-+    description = "Build Skia binaries locally (without publishing Skiko)"
-+
-+    skiaVersion.set(provider { skiko.skiaVersionFromEnvOrProperties })
-+    skiaTarget.set(provider { skiko.skiaTarget })
-+    buildType.set(skiko.buildType)
-+
-+    val skiaRepoDir = skiko.skiaRepoDir
-+    if (skiaRepoDir != null) {
-+        this.skiaRepoDir.set(skiaRepoDir)
-+    } else {
-+        this.skiaRepoDir.set(project.file("skia"))
-+    }
-+
-+    skikoTargetFlags.set(provider {
-+        skiko.skiaTarget.getGradleFlags(skiko.targetArch)
-+    })
-+}
-+
-+tasks.register("printSkiaVersion") {
-+    group = "skia"
-+    description = "Print resolved Skia version"
-+    doLast {
-+        println(skiko.skiaVersionFromEnvOrProperties)
-+    }
-+}
-+
-+tasks.withType<KotlinNativeCompile>().configureEach {
-+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-+}
-+
-+tasks.withType<KotlinCompilationTask<*>>().configureEach {
-+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-+}
-+
-+// Rachel: all maintained/source-build compilations use the same language features.
-+allprojects {
-+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
-+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-+            compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
-+        }
-+    }
-+}
-+
-+// Rachel: sources artifacts include compiled native bridge sources and provenance.
-+tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
-+    if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
-+        from(rootProject.file("rachel-notices")) { into("META-INF/licenses") }
-+        listOf("commonMain/cpp", "nativeMain/cpp", "windowsMain/cpp", "linuxMain/cpp").forEach { path ->
-+            from("src/$path") { into("native-sources/$path") }
-+        }
-+    }
-+}
-+
-+// Rachel: expose only complete target publications produced on the matching host.
-+tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository>().configureEach {
-+    doFirst {
-+        check(repository.url.scheme == "file") {
-+            "Native Skiko remote Maven publishing is disabled; use the local verification repository."
-+        }
-+    }
-+}
-+
-+tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().configureEach {
-+    doFirst {
-+        val publicationName = publication.name
-+        check(publicationName != "mingwX64" || hostOs == OS.Windows) {
-+            "Build and publish mingwX64 on Windows with the C++ toolchain installed."
-+        }
-+        check(publicationName != "linuxX64" || hostOs == OS.Linux) {
-+            "Build and publish linuxX64 on Linux with the C++ toolchain installed."
-+        }
-+        check(publicationName != "macosArm64" || (hostOs == OS.MacOS && hostArch == Arch.Arm64)) {
-+            "Build and publish macosArm64 on Apple Silicon macOS with Xcode installed."
-+        }
-+    }
-+}
 diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
-index 31ceaa5..36edb07 100644
+index 31ceaa5..856f268 100644
 --- a/skiko/settings.gradle.kts
 +++ b/skiko/settings.gradle.kts
-@@ -9,16 +9,21 @@ dependencyResolutionManagement {
+@@ -1,3 +1,6 @@
++import groovy.json.JsonSlurper
++import java.security.MessageDigest
++
+ dependencyResolutionManagement {
+     versionCatalogs {
+         register("libs") {
+@@ -7,18 +10,29 @@ dependencyResolutionManagement {
+ }
+ 
  pluginManagement {
-+    includeBuild("../../../../../build-logic")
++    includeBuild("__REPOSITORY__/build-logic")
      repositories {
          mavenCentral {
 -            url = uri("https://cache-redirector.jetbrains.com/maven-central")
@@ -2266,11 +1749,17 @@ index 31ceaa5..36edb07 100644
 -include("skiko-graphite")
 +// Rachel: skiko-graphite is outside the core Native build.
 +
-+rootProject.buildFileName = "../../../../adaptation/org.jetbrains.skiko_skiko/build.gradle.kts"
++rootProject.buildFileName = "__REPOSITORY__/native-compose/adaptation/org.jetbrains.skiko_skiko/build.gradle.kts"
 +
-+project(":skiko-skottie").buildFileName = "../../../../../adaptation/org.jetbrains.skiko_skiko-skottie/build.gradle.kts"
++project(":skiko-skottie").buildFileName = "../__REPOSITORY__/native-compose/adaptation/org.jetbrains.skiko_skiko-skottie/build.gradle.kts"
++
++val generation = settingsDir.resolve("../../..").canonicalFile
++val ready = JsonSlurper().parse(generation.resolve("ready.json")) as Map<*, *>
++val catalog = settingsDir.resolve("__REPOSITORY__/libs.versions.toml")
++val catalogHash = MessageDigest.getInstance("SHA-256").digest(catalog.readBytes()).joinToString("") { "%02x".format(it) }
++check(ready["catalogSha256"] == catalogHash) { "Prepared Skiko sources are stale; use the root build to synchronize sources" }
 diff --git a/skiko/skiko-skottie/build.gradle.kts b/skiko/skiko-skottie/build.gradle.kts
-index aa4a813..3fdb5eb 100644
+index 4aaa050..1aa78c4 100644
 --- a/skiko/skiko-skottie/build.gradle.kts
 +++ b/skiko/skiko-skottie/build.gradle.kts
 @@ -1,6 +1,5 @@
@@ -2278,25 +1767,42 @@ index aa4a813..3fdb5eb 100644
  
 -import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
  import org.gradle.api.tasks.compile.JavaCompile
- import org.jetbrains.compose.internal.publishing.MavenCentralProperties
- import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-@@ -16,22 +15,19 @@ import dsl.SkikoDependencyScope
+ import org.gradle.kotlin.dsl.named
+ import org.gradle.kotlin.dsl.withType
+@@ -37,6 +36,7 @@ import org.jetbrains.skiko.build.context.supportNativeIosArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosX64
+ import org.jetbrains.skiko.build.context.supportNativeLinux
++import org.jetbrains.skiko.build.context.supportNativeLinuxX64
+ import org.jetbrains.skiko.build.context.supportNativeMac
+ import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+ import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+@@ -52,27 +52,22 @@ import org.jetbrains.skiko.build.utils.Arch
+ import org.jetbrains.skiko.build.utils.OS
+ import org.jetbrains.skiko.build.utils.SkikoArtifacts
+ import org.jetbrains.skiko.build.utils.SkikoProperties
++import org.jetbrains.skiko.build.utils.hostArch
+ import org.jetbrains.skiko.build.utils.hostOs
+ import org.jetbrains.skiko.build.utils.wasmImports
  
- plugins {
-     kotlin("multiplatform")
+-plugins {
+-    kotlin("multiplatform")
 -    id("com.android.kotlin.multiplatform.library") apply false
 -    org.jetbrains.dokka
-     `maven-publish`
-     signing
-     org.gradle.crypto.checksum
+-    `maven-publish`
+-    signing
+-    org.gradle.crypto.checksum
 -    org.jetbrains.kotlinx.benchmark
- }
+-}
++val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
++fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
++val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
++fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
++val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
  
 -if (supportAndroid) {
 -    apply(plugin = "com.android.kotlin.multiplatform.library")
 -}
-+// Rachel core build excludes Android configuration.
-+
  
  apply<SideWasmImportsGeneratorPlugin>()
  
@@ -2306,7 +1812,7 @@ index aa4a813..3fdb5eb 100644
      artifactIdPrefix = "skiko-skottie",
      displayName = "Skiko Skottie",
      pomDescription = "Kotlin Skia Skottie bindings",
-@@ -73,7 +69,7 @@ val skikoSkottieProjectContext = SkikoProjectContext(
+@@ -114,7 +109,7 @@ val skikoSkottieProjectContext = SkikoProjectContext(
  
  repositories {
      mavenCentral {
@@ -2315,22 +1821,14 @@ index aa4a813..3fdb5eb 100644
      }
      google()
  }
-@@ -89,79 +85,17 @@ kotlin {
- 
+@@ -122,69 +117,9 @@ repositories {
+ kotlin {
      applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
  
 -    if (supportAwt) {
--        jvm("awt") {
--            compilations.all {
--                compileTaskProvider.configure {
--                    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
--                }
--            }
--        }
+-        jvm("awt")
 -    }
-+    @Suppress("UNCHECKED_CAST")
-+    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoSkottieProjectContext)
- 
+-
 -    if (supportAndroid) {
 -        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
 -            namespace = "org.jetbrains.skiko"
@@ -2338,14 +1836,9 @@ index aa4a813..3fdb5eb 100644
 -            minSdk = 24
 -            withJava()
 -            withHostTest {}
--
--            compilerOptions {
--                jvmTarget.set(JvmTarget.JVM_11)
--            }
 -        }
 -    }
-+    // Rachel core build excludes Android configuration.
- 
+-
 -    if (supportWeb) {
 -        skikoSkottieProjectContext.declareWasmTasks()
 -
@@ -2371,6 +1864,8 @@ index aa4a813..3fdb5eb 100644
 -
 -            setupImportsGeneratorPlugin(skikoSkottieArtifacts.artifactIdPrefix, isSideModule = skikoSkottieProjectContext.kind == SkikoModuleKind.EXTENSION)
 -        }
++    @Suppress("UNCHECKED_CAST")
++    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoSkottieProjectContext)
  
 -        @OptIn(ExperimentalWasmDsl::class)
 -        wasmJs {
@@ -2395,15 +1890,10 @@ index aa4a813..3fdb5eb 100644
 -            setupImportsGeneratorPlugin(skikoSkottieArtifacts.artifactIdPrefix, isSideModule = true)
 -        }
 -    }
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
  
      fun coreNativeSymbolSources(os: OS, arch: Arch, isUikitSim: Boolean) =
          skikoSkottieProjectContext.nativeSymbolSourcesFor(os, arch, isUikitSim).also {
-@@ -169,51 +103,34 @@ kotlin {
+@@ -192,51 +127,17 @@ kotlin {
          }
  
      if (supportNativeMac) {
@@ -2415,40 +1905,28 @@ index aa4a813..3fdb5eb 100644
 +    if (supportNativeLinuxX64) {
          skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), ::coreNativeSymbolSources)
 -        skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), ::coreNativeSymbolSources)
-     }
- 
+-    }
+-
 -    if (supportNativeIosArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64(), ::coreNativeSymbolSources)
 -    }
-+    // Rachel core build excludes Android configuration.
- 
+-
 -    if (supportNativeIosSimulatorArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosSimulatorArm64(), ::coreNativeSymbolSources)
--    }
+     }
  
 -    if (supportNativeIosX64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64(), ::coreNativeSymbolSources)
 -    }
-+    // Rachel core build excludes Android configuration.
- 
+-
 -    if (supportNativeTvosArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosArm64(), ::coreNativeSymbolSources)
 -    }
- 
+-
 -    if (supportNativeTvosSimulatorArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosSimulatorArm64(), ::coreNativeSymbolSources)
 -    }
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
- 
+-
 -    if (supportNativeTvosX64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.TVOS, Arch.X64, tvosX64(), ::coreNativeSymbolSources)
 -    }
@@ -2469,15 +1947,53 @@ index aa4a813..3fdb5eb 100644
      }
  
      sourceSets.commonTest.dependencies {
-@@ -282,69 +199,14 @@ kotlin {
+@@ -251,24 +152,24 @@ kotlin {
+     }
+ 
+     skikoSkottieProjectContext.jvmTestSourceSet?.dependencies {
+-        implementation(libs.coroutines.test)
++        implementation(rachelCatalog.findLibrary("coroutines-test").get())
+         implementation(kotlin("test-junit"))
+         implementation(kotlin("test"))
+     }
+ 
+     skikoSkottieProjectContext.awtTestSourceSet?.dependencies {
+-        implementation(libs.kotlinx.benchmark.runtime)
++        implementation(rachelCatalog.findLibrary("kotlinx-benchmark-runtime").get())
+     }
+     skikoSkottieProjectContext.webMainSourceSet?.dependencies {
+-        implementation(libs.kotlinx.browser)
++        implementation(rachelCatalog.findLibrary("kotlinx-browser").get())
+     }
+ 
+     skikoSkottieProjectContext.awtMainSourceSet?.dependencies {
+-        implementation(libs.jetbrainsRuntime.api)
++        implementation(rachelCatalog.findLibrary("jetbrainsRuntime-api").get())
+     }
+ 
+     skikoSkottieProjectContext.androidMainSourceSet?.dependencies {
+-        implementation(libs.coroutines.android)
++        implementation(rachelCatalog.findLibrary("coroutines-android").get())
+     }
+ 
+     if (supportAndroid && supportAwt) {
+@@ -281,7 +182,7 @@ kotlin {
+         implementation(kotlin("test-wasm-js"))
+     }
+     skikoSkottieProjectContext.webTestSourceSet?.dependencies {
+-        implementation(libs.coroutines.core)
++        implementation(rachelCatalog.findLibrary("coroutines-core").get())
+     }
+ 
+     skikoSkottieProjectContext.webTestSourceSet?.apply {
+@@ -300,69 +201,6 @@ kotlin {
      }
  }
  
 -if (supportWeb) {
 -    skikoSkottieProjectContext.provideWasmSideModules()
 -}
-+// Rachel core build excludes Android configuration.
- 
+-
 -if (supportAndroid) {
 -    val os = OS.Android
 -    val skikoAndroidArtifact by project.tasks.registering(Jar::class) {
@@ -2496,7 +2012,7 @@ index aa4a813..3fdb5eb 100644
 -        )
 -        skikoSkottieProjectContext.provideJvmRequiredSymbols(os, arch)
 -    }
- 
+-
 -    tasks.withType<JavaCompile>().configureEach {
 -        if (name.startsWith("compileAndroid") && name.endsWith("JavaWithJavac")) {
 -            sourceCompatibility = JavaVersion.VERSION_11.toString()
@@ -2504,8 +2020,7 @@ index aa4a813..3fdb5eb 100644
 -        }
 -    }
 -}
-+// Rachel core build excludes Android configuration.
- 
+-
 -if (supportAwt) {
 -    val skikoSkottieAwtJarForTests by project.tasks.registering(Jar::class) {
 -        archiveBaseName.set("skiko-skottie-awt-test")
@@ -2524,7 +2039,7 @@ index aa4a813..3fdb5eb 100644
 -    val coreJvmRuntimeJar = skikoSkottieProjectContext.jvmRuntimeJarFor(targetOs, targetArch).also {
 -        dependencies.add(it.name, coreProject)
 -    }
- 
+-
 -    skikoSkottieProjectContext.setupJvmTestTask(
 -        skikoSkottieAwtJarForTests,
 -        targetOs,
@@ -2538,284 +2053,13 @@ index aa4a813..3fdb5eb 100644
 -        skikoSkottieProjectContext.provideJvmRequiredSymbols(OS.MacOS, Arch.X64)
 -    }
 -}
-+// Rachel core build excludes Android configuration.
-+
  
  skikoSkottieProjectContext.declarePublications()
  
-@@ -364,3 +226,36 @@ tasks.withType<KotlinNativeCompile>().configureEach {
- tasks.withType<KotlinCompilationTask<*>>().configureEach {
-     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+@@ -376,3 +214,36 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
  }
-+// Rachel: sources artifacts include compiled native bridge sources and provenance.
-+tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
-+    if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
-+        from(rootProject.file("rachel-notices")) { into("META-INF/licenses") }
-+        listOf("commonMain/cpp", "nativeMain/cpp", "windowsMain/cpp", "linuxMain/cpp").forEach { path ->
-+            from("src/$path") { into("native-sources/$path") }
-+        }
-+    }
-+}
-+
-+// Rachel: expose only complete target publications produced on the matching host.
-+tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository>().configureEach {
-+    doFirst {
-+        check(repository.url.scheme == "file") {
-+            "Native Skiko remote Maven publishing is disabled; use the local verification repository."
-+        }
-+    }
-+}
-+
-+tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().configureEach {
-+    doFirst {
-+        val publicationName = publication.name
-+        check(publicationName != "mingwX64" || hostOs == OS.Windows) {
-+            "Build and publish mingwX64 on Windows with the C++ toolchain installed."
-+        }
-+        check(publicationName != "linuxX64" || hostOs == OS.Linux) {
-+            "Build and publish linuxX64 on Linux with the C++ toolchain installed."
-+        }
-+        check(publicationName != "macosArm64" || (hostOs == OS.MacOS && hostArch == Arch.Arm64)) {
-+            "Build and publish macosArm64 on Apple Silicon macOS with Xcode installed."
-+        }
-+    }
-+}
-diff --git a/skiko/skiko-skottie/rachel-upstream.gradle.kts b/skiko/skiko-skottie/rachel-upstream.gradle.kts
-new file mode 100644
-index 0000000..21f9dcd
---- /dev/null
-+++ b/skiko/skiko-skottie/rachel-upstream.gradle.kts
-@@ -0,0 +1,263 @@
-+@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
-+
-+import org.gradle.api.tasks.compile.JavaCompile
-+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-+import org.gradle.kotlin.dsl.withType
-+import org.gradle.kotlin.dsl.named
-+import tasks.configuration.*
-+import dsl.SkikoDependencyScope
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+apply<SideWasmImportsGeneratorPlugin>()
-+
-+val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
-+fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
-+val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
-+fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
-+val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
-+
-+val skiko = SkikoProperties(rootProject)
-+val skikoSkottieArtifacts = SkikoArtifacts(
-+    groupId = skiko.deployGroup,
-+    artifactIdPrefix = "skiko-skottie",
-+    displayName = "Skiko Skottie",
-+    pomDescription = "Kotlin Skia Skottie bindings",
-+)
-+val buildType = skiko.buildType
-+val targetOs = hostOs
-+val targetArch = skiko.targetArch
-+val coreProject = project(":")
-+
-+val skottieDependencies: SkikoDependencyScope.() -> Unit = {
-+    dependsOnCore()
-+    targets {
-+        all {
-+            staticSkiaLibs(
-+                "skottie",
-+                "sksg",
-+                "jsonreader"
-+            )
-+        }
-+        wasm {
-+            linkFlags(
-+                "-s", "SIDE_MODULE=2",
-+            )
-+        }
-+    }
-+}
-+val skikoSkottieProjectContext = SkikoProjectContext(
-+    project = project,
-+    skiko = skiko,
-+    kotlin = kotlin,
-+    kind = SkikoModuleKind.EXTENSION,
-+    artifacts = skikoSkottieArtifacts,
-+    windowsSdkPathProvider = {
-+        findWindowsSdkPaths(gradle, targetArch)
-+    },
-+    additionalRuntimeLibraries = emptyList(),
-+    configureDependencies = skottieDependencies
-+)
-+
-+repositories {
-+    mavenCentral {
-+        url = uri("https://repo.maven.apache.org/maven2")
-+    }
-+    google()
-+}
-+
-+kotlin {
-+    compilerOptions {
-+        languageVersion.set(skikoKotlinLanguageVersion)
-+        apiVersion.set(skikoKotlinApiVersion)
-+        freeCompilerArgs.add(
-+            "-opt-in=org.jetbrains.skiko.InternalSkikoApi"
-+        )
-+    }
-+
-+    applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
-+
-+    @Suppress("UNCHECKED_CAST")
-+    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoSkottieProjectContext)
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    fun coreNativeSymbolSources(os: OS, arch: Arch, isUikitSim: Boolean) =
-+        skikoSkottieProjectContext.nativeSymbolSourcesFor(os, arch, isUikitSim).also {
-+            dependencies.add(it.name, coreProject)
-+        }
-+
-+    if (supportNativeMac) {
-+        skikoSkottieProjectContext.configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64(), ::coreNativeSymbolSources)
-+    }
-+
-+    if (supportNativeLinuxX64) {
-+        skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), ::coreNativeSymbolSources)
-+    }
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    // Rachel core build excludes Android configuration.
-+
-+
-+    sourceSets.commonMain.dependencies {
-+        implementation(kotlin("stdlib"))
-+
-+    }
-+
-+    sourceSets.commonTest.dependencies {
-+        implementation(kotlin("test"))
-+        implementation(kotlin("test-annotations-common"))
-+        implementation(project(":"))
-+        implementation(project(":test-utils"))
-+    }
-+
-+    skikoSkottieProjectContext.jvmMainSourceSet?.dependencies {
-+        implementation(kotlin("stdlib"))
-+    }
-+
-+    skikoSkottieProjectContext.jvmTestSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("coroutines-test").get())
-+        implementation(kotlin("test-junit"))
-+        implementation(kotlin("test"))
-+    }
-+
-+    skikoSkottieProjectContext.awtTestSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("kotlinx-benchmark-runtime").get())
-+    }
-+    skikoSkottieProjectContext.webMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("kotlinx-browser").get())
-+    }
-+
-+    skikoSkottieProjectContext.awtMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("jetbrainsRuntime-api").get())
-+    }
-+
-+    skikoSkottieProjectContext.androidMainSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("coroutines-android").get())
-+    }
-+
-+    if (supportAndroid && supportAwt) {
-+        sourceSets.named("androidMain") {
-+            dependsOn(sourceSets.getByName("jvmMain"))
-+        }
-+    }
-+
-+    skikoSkottieProjectContext.wasmJsTest?.dependencies {
-+        implementation(kotlin("test-wasm-js"))
-+    }
-+    skikoSkottieProjectContext.webTestSourceSet?.dependencies {
-+        implementation(rachelCatalog.findLibrary("coroutines-core").get())
-+    }
-+
-+    skikoSkottieProjectContext.webTestSourceSet?.apply {
-+        val coreWasmTestResources = skikoSkottieProjectContext.wasmTestResourcesFor().also {
-+            dependencies.add(it.name, coreProject)
-+        }
-+        resources.srcDirs(
-+            tasks.named("optimizeWasm"),
-+            wasmImports,
-+            coreWasmTestResources,
-+        )
-+    }
-+
-+    if (supportAnyNative) {
-+        sourceSets.all {
-+            // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
-+            // note that setting it per source set still keeps it unset in commonized source sets.
-+            languageSettings.optIn("kotlin.native.SymbolNameIsInternal")
-+        }
-+        configureIOSTestsWithMetal(project)
-+    }
-+}
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+// Rachel core build excludes Android configuration.
-+
-+
-+skikoSkottieProjectContext.declarePublications()
-+
-+val mavenCentral = MavenCentralProperties(project)
-+if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
-+    signing {
-+        sign(publishing.publications)
-+        useInMemoryPgpKeys(mavenCentral.signArtifactsKey.get(), mavenCentral.signArtifactsPassword.get())
-+    }
-+    configureSignAndPublishDependencies()
-+}
-+
-+tasks.withType<KotlinNativeCompile>().configureEach {
-+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-+}
-+
-+tasks.withType<KotlinCompilationTask<*>>().configureEach {
-+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-+}
+ 
+ configureKotlinCompilerOptions()
 +// Rachel: sources artifacts include compiled native bridge sources and provenance.
 +tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
 +    if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
@@ -3174,7 +2418,7 @@ index 0000000..b6f05bb
 +    }
 +}
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
-index 9523db6..f87c90b 100644
+index 4154190..fce528e 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
 @@ -6,6 +6,8 @@ import kotlin.math.min
@@ -3277,7 +2521,7 @@ index 9523db6..f87c90b 100644
       * Creates an empty Bitmap without pixels, with [ColorType.UNKNOWN],
       * [ColorAlphaType.UNKNOWN], and with a width and height of zero.
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
-index 7a75074..1a457ed 100644
+index f37859a..44315f4 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 @@ -601,15 +601,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
@@ -3411,7 +2655,7 @@ index 0000000..08417db
 +    assembledInterface: GLAssembledInterface,
 +): DirectContext
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
-index 3316e62..864835c 100644
+index c0b86bd..49af027 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 @@ -3,7 +3,10 @@ package org.jetbrains.skia
@@ -3493,7 +2737,7 @@ index 3316e62..864835c 100644
      fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean {
          return try {
              _nScalePixels(
-@@ -542,3 +583,12 @@ private external fun _nAdoptTextureFromAlphaType(
+@@ -590,3 +631,12 @@ private external fun _nAdoptTextureFromAlphaType(
      colorType: Int,
      alphaType: Int
  ): NativePointer
@@ -3519,7 +2763,7 @@ index d68cbed..8409e18 100644
  
  /**
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
-index a724c61..b7e50ab 100644
+index f0982a2..5d04e47 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
 @@ -53,7 +53,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
@@ -3532,10 +2776,10 @@ index a724c61..b7e50ab 100644
  
      private fun nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
-index 6bb835c..2a482a4 100644
+index 00ef144..d01b790 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
-@@ -43,6 +43,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
+@@ -44,6 +44,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
  
      override operator fun next(): FontRun {
          return try {
@@ -3543,7 +2787,7 @@ index 6bb835c..2a482a4 100644
              _nConsume(_ptr)
              FontRun(_getEndOfCurrentRun(), Font(_nGetCurrentFont(_ptr)))
          } finally {
-@@ -51,7 +52,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
+@@ -52,7 +53,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
      }
  
      override fun remove() {
@@ -3553,7 +2797,7 @@ index 6bb835c..2a482a4 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
-index 2d5991b..905cb5f 100644
+index 9d8f764..0d0cc24 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
 @@ -21,6 +21,7 @@ class HbIcuScriptRunIterator(text: ManagedString, manageText: Boolean) : Managed
@@ -3574,10 +2818,10 @@ index 2d5991b..905cb5f 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
-index 00a1b34..b551b34 100644
+index 9bbced8..b6a9419 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
-@@ -31,6 +31,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
+@@ -32,6 +32,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
  
      override operator fun next(): BidiRun {
          return try {
@@ -3585,7 +2829,7 @@ index 00a1b34..b551b34 100644
              _nConsume(_ptr)
              BidiRun(_getEndOfCurrentRun(), _nGetCurrentLevel(_ptr))
          } finally {
-@@ -39,7 +40,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
+@@ -40,7 +41,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
      }
  
      override fun remove() {
@@ -3595,10 +2839,10 @@ index 00a1b34..b551b34 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
-index 0cbe32b..cf13b04 100644
+index 292e392..c9980bf 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
-@@ -19,10 +19,11 @@ abstract class ManagedRunIterator<T> internal constructor(
+@@ -20,10 +20,11 @@ abstract class ManagedRunIterator<T> internal constructor(
          }
      }
  
@@ -3611,7 +2855,7 @@ index 0cbe32b..cf13b04 100644
      }
  
      internal fun _getEndOfCurrentRun(): Int {
-@@ -47,7 +48,7 @@ abstract class ManagedRunIterator<T> internal constructor(
+@@ -48,7 +49,7 @@ abstract class ManagedRunIterator<T> internal constructor(
      }
  
      init {
@@ -3621,10 +2865,10 @@ index 0cbe32b..cf13b04 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
-index 38f26dd..8f68fd3 100644
+index 3d02e0f..43c1078 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
-@@ -23,6 +23,7 @@ class TextBlobBuilderRunHandler internal constructor(
+@@ -24,6 +24,7 @@ class TextBlobBuilderRunHandler internal constructor(
          }
      }
  
@@ -3632,7 +2876,7 @@ index 38f26dd..8f68fd3 100644
      internal val _text: ManagedString?
  
      constructor(text: String?) : this(ManagedString(text), true, 0f, 0f)
-@@ -30,7 +31,7 @@ class TextBlobBuilderRunHandler internal constructor(
+@@ -31,7 +32,7 @@ class TextBlobBuilderRunHandler internal constructor(
  
      override fun close() {
          super.close()
@@ -3641,7 +2885,7 @@ index 38f26dd..8f68fd3 100644
      }
  
      override fun beginLine() {
-@@ -72,8 +73,7 @@ class TextBlobBuilderRunHandler internal constructor(
+@@ -73,8 +74,7 @@ class TextBlobBuilderRunHandler internal constructor(
      }
  
      init {
@@ -14547,11 +13791,11 @@ index 0000000..606574b
 +#endif /* SKIKO_TYPES_H */
 +
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
-index b23d0d1..59a5124 100644
+index d105f9e..e7a812d 100644
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
-@@ -8,7 +8,7 @@ import org.jetbrains.skia.impl.withResult
- import org.jetbrains.skiko.ExperimentalSkikoApi
+@@ -9,7 +9,7 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
+ import org.jetbrains.skiko.InternalSkikoApi
  
  internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
 -    block()
@@ -14635,305 +13879,6 @@ index 0000000..90f618e
 +        throw Error(error)
 +    }
 +}
-diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.native.kt
-deleted file mode 100644
-index 250532a..0000000
---- a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.native.kt
-+++ /dev/null
-@@ -1,293 +0,0 @@
--package org.jetbrains.skia.impl
--
--import kotlinx.cinterop.*
--import org.jetbrains.skia.ExternalSymbolName
--import org.jetbrains.skiko.InternalSkikoApi
--import org.jetbrains.skiko.internal.fastForEach
--import kotlin.native.internal.NativePtr
--
--actual abstract class Native actual constructor(ptr: NativePointer) {
--    internal actual var _ptr: NativePointer
--
--    @InternalSkikoApi
--    actual val nativePtr: NativePointer
--        get() = _ptr
--
--    override fun equals(other: Any?): Boolean {
--        if (this === other) return true
--        if (null == other) return false
--        if (other !is Native) return false
--        return if (_ptr == other._ptr) true else nativeEquals(other)
--    }
--
--    override fun hashCode(): Int {
--        return _ptr.toLong().hashCode()
--    }
--
--    internal actual open fun nativeEquals(other: Native?): Boolean {
--        return false
--    }
--
--    actual companion object {
--        init {
--            initCallbacks(
--                staticCFunction(::callBooleanCallback),
--                staticCFunction(::callIntCallback),
--                staticCFunction(::callNativePtrCallback),
--                staticCFunction(::callVoidCallback),
--                staticCFunction(::disposeCallback),
--            )
--        }
--
--        actual val NullPointer: NativePointer
--            get() = NativePtr.NULL
--    }
--
--    actual override fun toString(): String {
--        return this::class.simpleName + "(_ptr=0x" + _ptr.toString() + ")"
--    }
--
--    init {
--        if (ptr == NativePtr.NULL) throw RuntimeException("Can't wrap nullptr")
--        _ptr = ptr
--    }
--}
--
--actual typealias NativePointer = NativePtr
--
--@InternalSkikoApi
--actual typealias InteropPointer = NativePtr
--
--@InternalSkikoApi
--actual fun reachabilityBarrier(obj: Any?) {
--    // TODO: implement native barrier
--}
--
--@InternalSkikoApi
--actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
--    val scope = InteropScope()
--    try {
--        return scope.block()
--    } finally {
--        scope.release()
--    }
--}
--
--@InternalSkikoApi
--actual class InteropScope actual constructor() {
--    actual fun toInterop(string: String?): InteropPointer {
--        return if (string != null) {
--            val pinned = convertToZeroTerminatedString(string).pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInterop(array: ByteArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: ByteArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: ByteArray) {}
--
--    actual fun toInterop(array: ShortArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: ShortArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: ShortArray) {}
--
--    actual fun toInterop(array: IntArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: IntArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: IntArray) {}
--
--    actual fun toInterop(array: LongArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun InteropPointer.fromInterop(result: LongArray) {}
--
--    actual fun toInterop(array: FloatArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: FloatArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: FloatArray) {}
--
--    actual fun toInterop(array: DoubleArray?): InteropPointer {
--        return if (array != null && array.isNotEmpty()) {
--            val pinned = array.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: DoubleArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: DoubleArray) {}
--
--    actual fun toInterop(array: NativePointerArray?): InteropPointer {
--        return if (array != null && array.size > 0) {
--            // We pass it as LongArray via boundary.
--            val pinned = array.backing.pin()
--            elements.add(pinned)
--            val result = pinned.addressOf(0).rawValue
--            result
--        } else {
--            NativePtr.NULL
--        }
--    }
--
--    actual fun toInteropForResult(array: NativePointerArray?): InteropPointer = toInterop(array)
--
--    actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
--
--    actual fun toInterop(stringArray: Array<String>?): InteropPointer {
--        if (stringArray.isNullOrEmpty()) return NativePtr.NULL
--
--        val nativePointerArray = NativePointerArray(stringArray.size)
--        stringArray.forEachIndexed { index, str ->
--            val pin = convertToZeroTerminatedString(str).pin()
--            elements.add(pin)
--            nativePointerArray[index] = pin.addressOf(0).rawValue
--        }
--        return toInterop(nativePointerArray)
--    }
--
--    actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
--        val size = decoder.getArraySize(this)
--        val result = Array<T>(size) {
--            decoder.getArrayElement(this, it)
--        }
--        decoder.disposeArray(this)
--        return result
--    }
--
--    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
--        TODO("implement native fromInteropNativePointerArray")
--    }
--
--    actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
--        if (interopPointers.isEmpty()) return NativePtr.NULL
--        return toInterop(LongArray(interopPointers.size) { interopPointers[it].toLong() })
--    }
--
--    actual fun callback(callback: (() -> Unit)?) = callbackImpl(callback)
--    actual fun intCallback(callback: (() -> Int)?) = callbackImpl(callback)
--    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callbackImpl(callback)
--    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callbackImpl(callback)
--    actual fun booleanCallback(callback: (() -> Boolean)?) = callbackImpl(callback)
--
--    actual fun virtual(method: () -> Unit) = callbackImpl(method)
--    actual fun virtualInt(method: () -> Int) = callbackImpl(method)
--    actual fun virtualNativePointer(method: () -> NativePointer) = callbackImpl(method)
--    actual fun virtualInteropPointer(method: () -> InteropPointer) = callbackImpl(method)
--    actual fun virtualBoolean(method: () -> Boolean) = callbackImpl(method)
--
--    actual fun release() {
--        elements.fastForEach {
--            it.unpin()
--        }
--    }
--
--    private fun <T> callbackImpl(callback: (() -> T)?): InteropPointer = callback?.let {
--        val ptr = StableRef.create(it).asCPointer()
--        NativePtr.NULL.plus(ptr.toLong())
--    } ?: NativePtr.NULL
--
--    private val elements = mutableListOf<Pinned<*>>()
--}
--
--// Ugly! NativePtrArray in stdlib is unfortunately internal, don't have ctor and cannot be used.
--actual class NativePointerArray actual constructor(size: Int) {
--    internal val backing = LongArray(size)
--    actual operator fun get(index: Int): NativePointer {
--        return NativePtr.NULL + backing[index]
--    }
--
--    actual operator fun set(index: Int, value: NativePointer) {
--        backing[index] = value.toLong()
--    }
--
--    actual val size: Int
--        get() = backing.size
--}
--
--// Callbacks support
--
--private fun callVoidCallback(ptr: COpaquePointer) {
--    ptr.asStableRef<() -> Unit>().get().invoke()
--}
--
--private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
--    return ptr.asStableRef<() -> Boolean>().get().invoke()
--}
--
--private fun callIntCallback(ptr: COpaquePointer): Int {
--    return ptr.asStableRef<() -> Int>().get().invoke()
--}
--
--private fun callNativePtrCallback(ptr: COpaquePointer): Long {
--    return ptr.asStableRef<() -> NativePointer>().get().invoke().toLong()
--}
--
--private fun disposeCallback(ptr: COpaquePointer) {
--    ptr.asStableRef<Any>().dispose()
--}
--
--@ExternalSymbolName("skiko_initCallbacks")
--private external fun initCallbacks(
--    callBoolean: COpaquePointer,
--    callInt: COpaquePointer,
--    callNativePointer: COpaquePointer,
--    callVoid: COpaquePointer,
--    dispose: COpaquePointer
--)
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.shared.kt
 new file mode 100644
 index 0000000..0972275
@@ -15246,6 +14191,26 @@ index a44ff88..0000000
 -internal actual fun loadAngleLibrary() {
 -    // Nothing to do here
 -}
+diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
+deleted file mode 100644
+index 7f37323..0000000
+--- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
++++ /dev/null
+@@ -1,13 +0,0 @@
+-package org.jetbrains.skiko
+-
+-internal actual fun loadOpenGLLibrary() {
+-    when (hostOs) {
+-        // It is deprecated. See https://developer.apple.com/documentation/opengles
+-        OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")
+-        // Do nothing as we don't know for sure which OS supports OpenGL.
+-        // If there is support, we assume that it is already linked.
+-        // If there is no support, there will be a native crash
+-        // (to throw a RenderException we need to investigate case by case)
+-        else -> Unit
+-    }
+-}
+\ No newline at end of file
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt
 deleted file mode 100644
 index 2b587ac..0000000
@@ -16154,17 +15119,28 @@ index 0000000..76b9f4f
 +    }
 +}
 diff --git a/skiko/test-utils/build.gradle.kts b/skiko/test-utils/build.gradle.kts
-index 90d2a71..97bbb4f 100644
+index 0726aa0..f6b5ad5 100644
 --- a/skiko/test-utils/build.gradle.kts
 +++ b/skiko/test-utils/build.gradle.kts
-@@ -1,6 +1,5 @@
+@@ -1,7 +1,5 @@
  @file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
  
 -import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+-import org.gradle.kotlin.dsl.withType
  import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
  import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
  import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-@@ -9,12 +8,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+@@ -14,6 +12,9 @@ import org.jetbrains.skiko.build.context.supportNativeIosArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
+ import org.jetbrains.skiko.build.context.supportNativeIosX64
+ import org.jetbrains.skiko.build.context.supportNativeLinux
++import org.jetbrains.skiko.build.context.supportNativeLinuxArm64
++import org.jetbrains.skiko.build.context.supportNativeLinuxX64
++import org.jetbrains.skiko.build.context.supportNativeWindows
+ import org.jetbrains.skiko.build.context.supportNativeMac
+ import org.jetbrains.skiko.build.context.supportNativeTvosArm64
+ import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
+@@ -24,12 +25,10 @@ import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
  
  plugins {
      kotlin("multiplatform")
@@ -16179,7 +15155,7 @@ index 90d2a71..97bbb4f 100644
  
  repositories {
      mavenCentral()
-@@ -29,27 +26,11 @@ kotlin {
+@@ -44,27 +43,11 @@ kotlin {
  
      applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
  
@@ -16210,7 +15186,7 @@ index 90d2a71..97bbb4f 100644
  
      if (supportWeb) {
          js {
-@@ -61,31 +42,29 @@ kotlin {
+@@ -76,31 +59,29 @@ kotlin {
      }
  
      if (supportNativeMac) {
@@ -16259,7 +15235,7 @@ index 90d2a71..97bbb4f 100644
  
      sourceSets.commonMain.dependencies {
          implementation(kotlin("stdlib"))
-@@ -95,11 +74,8 @@ kotlin {
+@@ -110,11 +91,8 @@ kotlin {
          implementation(libs.coroutines.core)
      }
  
@@ -16304,23 +15280,3 @@ index 0000000..92a6ea3
 +private const val RESOURCES_PATH = "src/commonTest/resources"
 +
 +actual fun resourcePath(resourceId: String): String = "$RESOURCES_PATH/$resourceId"
-diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
-deleted file mode 100644
-index 7f37323..0000000
---- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
-+++ /dev/null
-@@ -1,13 +0,0 @@
--package org.jetbrains.skiko
--
--internal actual fun loadOpenGLLibrary() {
--    when (hostOs) {
--        // It is deprecated. See https://developer.apple.com/documentation/opengles
--        OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")
--        // Do nothing as we don't know for sure which OS supports OpenGL.
--        // If there is support, we assume that it is already linked.
--        // If there is no support, there will be a native crash
--        // (to throw a RenderException we need to investigate case by case)
--        else -> Unit
--    }
--}
-\ No newline at end of file

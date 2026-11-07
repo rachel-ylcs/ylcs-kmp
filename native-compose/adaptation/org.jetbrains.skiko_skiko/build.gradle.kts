@@ -3,7 +3,13 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.HostManager
-import tasks.configuration.configureNativeTarget
+import org.jetbrains.skiko.build.configuration.configureNativeTarget
+import org.jetbrains.skiko.build.context.SkikoProjectContext
+import org.jetbrains.skiko.build.context.supportNativeWindows
+import org.jetbrains.skiko.build.cpp.CompileSkikoCppTask
+import org.jetbrains.skiko.build.cpp.StripCoffDirectivesTask
+import org.jetbrains.skiko.build.utils.Arch
+import org.jetbrains.skiko.build.utils.OS
 
 plugins {
     kotlin("multiplatform")
@@ -15,8 +21,12 @@ plugins {
 
 val adaptationDirectory = buildFile.parentFile.canonicalFile
 val nativeComposeDirectory = adaptationDirectory.parentFile.parentFile
+val generation = rootDir.resolve("../../..").canonicalFile
 val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
-if (dokkaBuild) layout.buildDirectory.set(nativeComposeDirectory.resolve("vendor/build/dokka/skiko"))
+if (dokkaBuild) layout.buildDirectory.set(generation.resolve("build/dokka/skiko"))
+allprojects {
+    tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+}
 
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->
     project.group = "org.jetbrains.skiko"
@@ -76,13 +86,11 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 // SDL belongs to the Native producer. Consumers receive its bindings, static
 // archive and portable system dependencies through this module's publication.
 apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/skiko-library-tests.gradle.kts"))
-val sdlLock = JsonSlurper().parse(nativeComposeDirectory.resolve("upstream/sdl.json")) as Map<*, *>
-val sdlVersion = sdlLock["version"] as String
 val sdlHost = HostManager.host.name
-val sdlSdk = nativeComposeDirectory.resolve("vendor/sdl-static/$sdlHost")
 val sdlArchive = if (sdlHost == "mingw_x64") "SDL3-static.lib" else "libSDL3.a"
 apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
 val prepareSdl = tasks.named("prepareSdlStatic")
+val sdlSdk = extensions.extraProperties["rachel.sdl.sdk"] as File
 
 if (sdlHost == "mingw_x64" && !dokkaBuild) {
     tasks.named<StripCoffDirectivesTask>("stripCoffDirectivesWindowsX64") {
@@ -101,15 +109,15 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         val targetPublication = name
         publishing.publications.withType<MavenPublication>().configureEach {
             if (name == targetPublication) {
-                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/text/icudtl.dat")) {
+                artifact(generation.resolve("icu/workspace/text/icudtl.dat")) {
                     classifier = "icudtl-text"
                     extension = "dat"
                 }
-                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/icudtl.dat")) {
+                artifact(generation.resolve("icu/workspace/icudtl.dat")) {
                     classifier = "icudtl"
                     extension = "dat"
                 }
-                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/icu-LICENSE.txt")) {
+                artifact(generation.resolve("icu/workspace/icu-LICENSE.txt")) {
                     classifier = "icu-license"
                     extension = "txt"
                 }
@@ -142,24 +150,27 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     }
     val interop = compilations.getByName("main").cinterops.create("sdl") {
         definitionFile.set(output)
-        includeDirs(nativeComposeDirectory.resolve("vendor/sdl-source-$sdlVersion/include"))
+        includeDirs(generation.resolve("sdl/source/include"))
         if (isHost && !dokkaBuild) extraOpts("-libraryPath", sdlLibraryDirectory.invariantSeparatorsPath)
     }
-    tasks.named(interop.interopProcessingTaskName).configure { dependsOn(writeDefinition) }
+    tasks.named(interop.interopProcessingTaskName).configure {
+        dependsOn(writeDefinition)
+        if (isHost && !dokkaBuild) inputs.file(sdlSdk.resolve("lib/$sdlArchive"))
+    }
 }
 
 tasks.withType<AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
         dependsOn(prepareSdl)
         from(adaptationDirectory.resolve("src/nativeMain/cinterop")) { into("nativeInterop/cinterop") }
-        from(nativeComposeDirectory.resolve("vendor/sdl-source-$sdlVersion/LICENSE.txt")) {
+        from(generation.resolve("sdl/source/LICENSE.txt")) {
             into("META-INF/licenses")
             rename { "SDL.txt" }
         }
-        from(nativeComposeDirectory.resolve("vendor/icu/workspace/icu-LICENSE.txt")) {
+        from(generation.resolve("icu/workspace/icu-LICENSE.txt")) {
             into("META-INF/licenses")
             rename { "ICU.txt" }
         }
-        from(nativeComposeDirectory.resolve("upstream/icu.json")) { into("META-INF/provenance") }
+        from(generation.resolve("metadata/icu.json")) { into("META-INF/provenance") }
     }
 }

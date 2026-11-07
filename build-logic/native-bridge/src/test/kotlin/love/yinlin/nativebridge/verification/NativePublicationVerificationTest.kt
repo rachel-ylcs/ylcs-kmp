@@ -14,7 +14,7 @@ class NativePublicationVerificationTest {
         work.resolve("libs.versions.toml").writeText("[versions]\nkotlin = \"2.5.0-Beta2\"\ncmp = \"1.13.0-beta01\"\nskiko = \"0.156.0\"\nsdl = \"3.4.18\"\n[libraries]\n")
         native.resolve("upstream").mkdirs()
         native.resolve("upstream/compose.json").writeText("""{"version":"1.13.0-beta01","modules":{}}""")
-        native.resolve("upstream/lock.json").writeText("""{"versions":{"skiko":"0.156.0"}}""")
+        native.resolve("upstream/skiko.json").writeText("""{"group":"love.yinlin.native.skiko"}""")
         return NativePublicationVerification(native)
     }
 

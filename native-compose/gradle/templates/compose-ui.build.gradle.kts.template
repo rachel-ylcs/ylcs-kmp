@@ -6,6 +6,7 @@ import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.Family
@@ -18,13 +19,14 @@ plugins {
     id("love.yinlin.native-dokka") apply false
 }
 
-val repositoryDirectory = rootDir.resolve("../../../../..").canonicalFile
-val nativeDirectory = repositoryDirectory.resolve("native-compose")
-val sourceLock = JsonSlurper().parse(nativeDirectory.resolve("upstream/compose.json")) as Map<*, *>
-val modules = sourceLock["modules"] as Map<*, *>
+val generation = rootDir.resolve("../../..").canonicalFile
+val nativeDirectory = generation.resolve("../../..").canonicalFile
+val sourceMetadata = JsonSlurper().parse(generation.resolve("metadata/compose.json")) as Map<*, *>
+val modules = sourceMetadata["modules"] as Map<*, *>
 val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
-val buildDirectory = nativeDirectory.resolve(if (dokkaBuild) "vendor/build/dokka/compose-ui" else "vendor/build/compose-ui")
+val buildDirectory = generation.resolve(if (dokkaBuild) "build/dokka/compose-ui" else "build/compose-ui")
 val composeVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("cmp").get().requiredVersion
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
 val portVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("rachel").get().requiredVersion + "-cmp-" + composeVersion
 val hostTarget = when (HostManager.host.name) {
     "mingw_x64" -> "windows"
@@ -33,6 +35,9 @@ val hostTarget = when (HostManager.host.name) {
     else -> error("Unsupported Native UI build host: ${HostManager.host}")
 }
 layout.buildDirectory.set(buildDirectory.resolve("root"))
+allprojects {
+    tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+}
 
 subprojects {
     // KLIB module identities follow upstream; Maven publication coordinates remain independent.
@@ -54,7 +59,9 @@ subprojects {
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(__JAVA_VERSION__)
             compilerOptions {
-                freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
+                languageVersion.set(kotlinLanguage)
+                apiVersion.set(kotlinLanguage)
+                freeCompilerArgs.addAll(providers.gradleProperty("rachel.kotlin.compilerArgs").get().split(','))
                 optIn.add("androidx.compose.ui.ExperimentalComposeUiApi")
             }
             mingwX64("windows")
@@ -105,11 +112,11 @@ subprojects {
             repositories {
                 maven {
                     name = "NativeVerification"
-                    url = uri(nativeDirectory.resolve("vendor/build/compose-ui/repository"))
+                    url = uri(generation.resolve("build/compose-ui/repository"))
                 }
             }
             publications.withType<MavenPublication>().configureEach {
-                groupId = (module["group"] ?: sourceLock["group"]) as String
+                groupId = (module["group"] ?: sourceMetadata["group"]) as String
                 pom {
                     name.set("Rachel Native ${project.name}")
                     description.set("Native desktop adaptation of Compose ${project.name}; modified by Rachel")
@@ -139,10 +146,10 @@ subprojects {
         }
         tasks.withType<Jar>().matching { it.name.endsWith("SourcesJar") || it.name == "sourcesJar" }.configureEach {
             val sourceLicense = if (module["sourceRepository"] == "maven") project.file("LICENSE.txt")
-            else if (module["sourceRepository"] == "resources") nativeDirectory.resolve("vendor/resources/workspace/LICENSE.txt")
+            else if (module["sourceRepository"] == "resources") generation.resolve("resources/workspace/LICENSE.txt")
             else rootDir.resolve("../LICENSE.txt")
             from(sourceLicense) { into("META-INF/licenses") }
-            from(listOf(nativeDirectory.resolve("upstream/compose.json"), nativeDirectory.resolve("upstream/compose-origins.json"))) {
+            from(listOf(generation.resolve("metadata/compose.json"), nativeDirectory.resolve("adaptation/provenance/compose-origins.json"))) {
                 into("META-INF/provenance")
             }
         }

@@ -6,12 +6,16 @@ import love.yinlin.nativebridge.NativeDesktopDistribution
 import org.gradle.api.NamedDomainObjectContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractCreateDistributableTask
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -138,7 +142,31 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
         desktopPackage = DesktopPackage().apply(block)
     }
 
+    private val desktopApplicationName get() = desktopPackage?.packageName ?: uniqueSafeName
+
+    val desktopReleaseDirectoryName: String
+        get() = if (defaults.platform == BuildPlatform.Mac) "$desktopApplicationName.app" else desktopApplicationName
+
+    val desktopReleaseDistribution: Provider<Directory>
+        get() {
+            val directoryName = desktopReleaseDirectoryName
+            return owner.tasks.named("createReleaseDistributable", AbstractCreateDistributableTask::class.java)
+                .flatMap { it.destinationDir.dir(directoryName) }
+        }
+
+    val desktopReleaseExecutable: Provider<RegularFile>
+        get() {
+            val path = when (defaults.platform) {
+                BuildPlatform.Windows -> "$desktopApplicationName.exe"
+                BuildPlatform.Linux -> "bin/$desktopApplicationName"
+                BuildPlatform.Mac -> "Contents/MacOS/$desktopApplicationName"
+            }
+            return desktopReleaseDistribution.map { it.file(path) }
+        }
+
     // Web
+    fun browserDistribution(target: BrowserArtifactTarget): Provider<Directory> = owner.browserDistribution(target)
+
     var webTarget: Boolean = true
     var webTestHeadless: Boolean = true
     private var wasmJsBlock: KotlinWasmJsTargetDsl.() -> Unit = {}
@@ -171,6 +199,12 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
     // DesktopNative
     private var composeDesktopPackageBlock: (NativeDesktopDistribution.() -> Unit)? = null
+
+    val nativeDesktopReleaseArchive: Provider<RegularFile>
+        get() {
+            val application = owner.extensions.getByType<NativeApplicationExtension>()
+            return owner.providers.provider { application.hostReleaseArchive }.flatMap { it }
+        }
 
     fun composeDesktopPackage(block: NativeDesktopDistribution.() -> Unit) {
         val previous = composeDesktopPackageBlock

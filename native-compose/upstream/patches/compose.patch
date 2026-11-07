@@ -705,7 +705,7 @@ index ef19734ea58..eec10361417 100644
  ) : ParagraphIntrinsics {
 +    internal val boundaryLocale: String? get() = (style.localeList ?: defaultLocaleList).firstOrNull()?.toLanguageTag()
 +
-     private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null
+     private val resolvedTypefaces = TypefaceDirtyTracker()
  
      val textDirection =
 diff --git a/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt b/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt

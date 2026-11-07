@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import groovy.json.JsonSlurper
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -15,11 +16,21 @@ plugins {
     alias(libs.plugins.nativeBridge)
 }
 
-layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/compose-ui/maven-consumer"))
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.verificationGeneration") as File
+tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+layout.buildDirectory.set(generation.resolve("build/compose-ui/maven-consumer"))
 val explicit = providers.gradleProperty("native.explicit").getOrElse("false").toBoolean()
 
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
+val compilerProfile = gradle.extensions.extraProperties
+
 kotlin {
-    compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
+    compilerOptions {
+        languageVersion.set(kotlinLanguage)
+        apiVersion.set(kotlinLanguage)
+        @Suppress("UNCHECKED_CAST")
+        freeCompilerArgs.addAll(compilerProfile["rachel.kotlin.compilerArgs"] as List<String>)
+    }
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")
@@ -85,8 +96,8 @@ compose.resources {
 // Explicit Native coordinates must form a complete Maven graph without upstream port requests.
 tasks.register("verifyNativeMavenClosure") {
     doLast {
-        val lock = JsonSlurper().parse(file("../../upstream/compose.json")) as Map<*, *>
-        val owned = (lock["modules"] as Map<*, *>).map { (name, value) ->
+        val metadata = JsonSlurper().parse(generation.resolve("metadata/compose.json")) as Map<*, *>
+        val owned = (metadata["modules"] as Map<*, *>).map { (name, value) ->
             val module = value as Map<*, *>
             (module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}").toString() to name.toString()
         } + listOf("org.jetbrains.skiko" to "skiko", "org.jetbrains.skiko" to "skiko-skottie")

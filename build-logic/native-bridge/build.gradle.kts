@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm")
     `java-gradle-plugin`
     `maven-publish`
 }
@@ -57,6 +57,7 @@ for ((taskName, command) in mapOf("checkNativeSources" to "sources", "verifyNati
         classpath = verificationSource.runtimeClasspath
         mainClass.set("love.yinlin.nativebridge.verification.NativeVerification")
         args(command, rootProject.file("../native-compose").absolutePath)
+        if (command != "sources") dependsOn(":repository-conventions:prepareNativeSources")
     }
 }
 
@@ -67,9 +68,9 @@ val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     property("skiko.port.module", "love.yinlin.native.skiko:skiko:$portVersion")
     property("skiko.skottie.module", "love.yinlin.native.skiko:skiko-skottie:$portVersion")
     property("sdl.version", libs.versions.sdl.get())
-    val composeLock = rootProject.file("../native-compose/upstream/compose.json")
-    inputs.file(composeLock)
-    val compose = JsonSlurper().parse(composeLock) as Map<*, *>
+    val composeSpec = rootProject.file("../native-compose/upstream/compose.json")
+    inputs.file(composeSpec)
+    val compose = JsonSlurper().parse(composeSpec) as Map<*, *>
     val composeModules = compose["modules"] as Map<*, *>
     val catalog = project.extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
     property("compose.upstream.version", catalog.findVersion("cmp").get().requiredVersion)

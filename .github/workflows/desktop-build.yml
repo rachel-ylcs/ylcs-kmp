@@ -71,7 +71,7 @@ jobs:
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          msvc: ${{ runner.os == 'Windows' }}
+          msvc: ${{ inputs.native && runner.os == 'Windows' }}
           native-tools: ${{ inputs.native }}
           gtk: ${{ !inputs.native && runner.os == 'Linux' }}
           virtual-display: ${{ !inputs.native && runner.os == 'Linux' }}

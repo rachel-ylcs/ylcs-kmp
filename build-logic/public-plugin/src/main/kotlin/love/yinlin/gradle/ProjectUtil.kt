@@ -2,6 +2,7 @@ package love.yinlin.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 
 val Project.buildDefaults: BuildDefaults get() = extensions.getByType<BuildDefaults>()
@@ -36,6 +37,14 @@ val Project.desktopNativeJVMSourceDir: Directory get() = layout.projectDirectory
 // Web 二进制输出目录
 val Project.jsBinaryDir: Directory get() = layout.buildDirectory.get().dir("dist").dir("js").dir("productionExecutable")
 val Project.wasmBinaryDir: Directory get() = layout.buildDirectory.get().dir("dist").dir("wasmJs").dir("productionExecutable")
+
+enum class BrowserArtifactTarget(internal val taskPrefix: String) {
+    Js("jsBrowser"),
+    Wasm("wasmJsBrowser"),
+}
+
+internal fun Project.browserDistribution(target: BrowserArtifactTarget): Provider<Directory> =
+    layout.dir(tasks.named("${target.taskPrefix}Distribution").map { it.outputs.files.singleFile })
 
 // Native 二进制输出目录
 fun Project.nativeBinaryDir(platform: String, filename: String) = layout.buildDirectory.get().dir("bin").dir(platform).dir("releaseExecutable").file(filename)

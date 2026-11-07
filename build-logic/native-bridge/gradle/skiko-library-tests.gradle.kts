@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.konan.target.HostManager
 
 // Maintained library regressions remain separate from upstream's larger test suites.
 val adaptationDirectory = project.buildFile.parentFile
-val nativeDirectory = adaptationDirectory.parentFile.parentFile
+val generation = rootDir.resolve("../../..").canonicalFile
 val kotlinExtension = extensions.getByType<KotlinMultiplatformExtension>()
 val regressionRoot = kotlinExtension.sourceSets.maybeCreate("commonRegression")
 val sharedTests = kotlinExtension.sourceSets.create("nativeRegressionTest") {
@@ -30,7 +30,7 @@ kotlinExtension.targets.withType<KotlinNativeTargetWithHostTests>().configureEac
         setExecutionSourceFrom(binary)
         if (HostManager.host == target.konanTarget) {
             val stageRuntime = tasks.register<Copy>("stage${target.name.replaceFirstChar(Char::uppercase)}RegressionTestRuntime") {
-                from(nativeDirectory.resolve("vendor/icu/workspace/icudtl.dat"))
+                from(generation.resolve("icu/workspace/icudtl.dat"))
                 into(project.provider { binary.outputFile.parentFile })
             }
             tasks.withType<KotlinNativeTest>().matching { it.name == "${target.name}RegressionTest" }.configureEach {

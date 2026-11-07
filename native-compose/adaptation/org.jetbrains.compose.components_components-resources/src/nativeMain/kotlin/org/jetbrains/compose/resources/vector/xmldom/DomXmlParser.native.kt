@@ -1,6 +1,6 @@
 /*
  * Derived from brahmkshatriya/compose-native, under the Apache License, Version 2.0.
- * The pinned source and local changes are recorded in upstream/compose-origins.json.
+ * The original source and local changes are recorded in adaptation/provenance/compose-origins.json.
  * Changes: bounded parsing, DTD rejection, Unicode references and namespace handling.
  */
 package org.jetbrains.compose.resources.vector.xmldom

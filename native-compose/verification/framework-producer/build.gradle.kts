@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
@@ -10,9 +11,20 @@ plugins {
 
 group = "love.yinlin.verification"
 version = "1.0"
-layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/framework-producer"))
+val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompose.verificationGeneration") as File
+tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+layout.buildDirectory.set(generation.resolve("build/framework-producer"))
+
+val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
+val compilerProfile = gradle.extensions.extraProperties
 
 kotlin {
+    compilerOptions {
+        languageVersion.set(kotlinLanguage)
+        apiVersion.set(kotlinLanguage)
+        @Suppress("UNCHECKED_CAST")
+        freeCompilerArgs.addAll(compilerProfile["rachel.kotlin.compilerArgs"] as List<String>)
+    }
     jvmToolchain(25)
     jvm("desktop")
     // Every CI host verifies its own native publication alongside the JVM variant.
@@ -34,7 +46,7 @@ compose.resources {
 
 publishing.repositories.maven {
     name = "Verification"
-    url = uri(providers.gradleProperty("framework.repository").getOrElse("../../vendor/build/framework-repository"))
+    url = uri(providers.gradleProperty("framework.repository").getOrElse(generation.resolve("build/framework-repository").path))
 }
 
 val host = when (HostManager.host.name) {
