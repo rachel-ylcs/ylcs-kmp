@@ -51,7 +51,12 @@ class NativeBridgeFunctionalTest {
     @Test
     fun nativeUiTemplateKeepsKonanCoordinatesAfterKgpCreatesPublications() {
         val repository = project()
-        repository.resolve("libs.versions.toml").writeText(File(System.getProperty("native.tests.versionCatalog")).readText())
+        val catalog = File(System.getProperty("native.tests.versionCatalog"))
+        catalog.copyTo(repository.resolve(catalog.name))
+        val compilerProfile = Properties().apply {
+            catalog.resolveSibling("gradle.properties").inputStream().use(::load)
+        }
+        val compilerArgs = checkNotNull(compilerProfile.getProperty("rachel.kotlin.compilerArgs"))
         val native = repository.resolve("native-compose")
         native.resolve("adaptation/provenance").mkdirs()
         val generation = native.resolve("vendor/g/fixture")
@@ -62,7 +67,12 @@ class NativeBridgeFunctionalTest {
         native.resolve("adaptation/provenance/compose-origins.json").writeText("""{"files":{}}""")
         val build = generation.resolve("compose/workspace/native-desktop").apply { mkdirs() }
         build.parentFile.resolve("LICENSE.txt").writeText("fixture source license\n")
-        build.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
+        build.resolve("gradle.properties").writeText("""
+            kotlin.stdlib.default.dependency=false
+            kotlin.native.ignoreDisabledTargets=true
+            kotlin.mpp.applyDefaultHierarchyTemplate=false
+            rachel.kotlin.compilerArgs=$compilerArgs
+        """.trimIndent() + "\n")
         build.resolve("settings.gradle.kts").writeText("""
             pluginManagement {
                 repositories {
@@ -114,7 +124,9 @@ class NativeBridgeFunctionalTest {
                         println("NATIVE_UI_PUBLICATION=" + artifact)
                     }
                     library.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().forEach { target ->
-                        check(target.compilations.getByName("main").compileTaskProvider.get().compilerOptions.moduleName.get() == "org.jetbrains.compose.ui:ui-util")
+                        val options = target.compilations.getByName("main").compileTaskProvider.get().compilerOptions
+                        check(options.moduleName.get() == "org.jetbrains.compose.ui:ui-util")
+                        check(options.freeCompilerArgs.get().containsAll(providers.gradleProperty("rachel.kotlin.compilerArgs").get().split(',')))
                     }
                     val sources = library.tasks.getByName(hostTarget + "SourcesJar") as Jar
                     java.util.zip.ZipFile(sources.archiveFile.get().asFile).use { archive ->

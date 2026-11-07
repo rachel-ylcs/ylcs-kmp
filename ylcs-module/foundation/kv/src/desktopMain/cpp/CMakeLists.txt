@@ -25,7 +25,6 @@ target_include_directories(kv PRIVATE
     ${RACHEL_JNI_INCLUDE_DIRS}
     ${RACHEL_CPP_INCLUDE_DIR}
     ${KV_SHARED_CPP_DIR}
-    ${KV_SHARED_CPP_DIR}/mmkv/Core/include/MMKV
 )
 
 target_link_libraries(kv

@@ -172,6 +172,8 @@ tasks.withType<Test>().configureEach {
     systemProperty("native.tests.skikoLibraryScript", layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts").asFile.absolutePath)
     inputs.file(layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts"))
     inputs.file(rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template"))
+    inputs.file(rootProject.file("../gradle.properties"))
+    inputs.file(rootProject.file("../libs.versions.toml"))
     systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
     systemProperty("native.tests.composeVersion", libs.versions.cmp.get())
     systemProperty("native.tests.portVersion", "${libs.versions.rachel.get()}-cmp-${libs.versions.cmp.get()}")
