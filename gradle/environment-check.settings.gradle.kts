@@ -50,11 +50,13 @@ fun windowsCmakeRoots(): List<File> {
     return (hints + registered + standard).map { it.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake") }.distinct()
 }
 
-fun nativeTool(name: String, hints: List<File>): Pair<File, String> {
+fun nativeTool(name: String, hints: List<File>, versionPrefix: String = ""): Pair<File, String> {
     val candidates = (pathDirectories().map { it.resolve("$name$exe") } + hints).filter(File::isFile).distinct()
     for (candidate in candidates) {
         val executable = candidate.canonicalFile
-        val version = quick(executable.path, "--version")?.takeIf(String::isNotBlank) ?: continue
+        val output = quickOutput(executable.path, "--version") ?: continue
+        val version = output.lineSequence().map(String::trim)
+            .firstOrNull { it.isNotEmpty() && it.startsWith(versionPrefix) } ?: continue
         report(name, "$version — ${executable.path}")
         return executable to version
     }
@@ -113,7 +115,7 @@ val cmakeHints = listOfNotNull(
     if (mac) File("/opt/homebrew/bin/cmake") else null,
     if (mac) File("/Applications/CMake.app/Contents/bin/cmake") else null
 ) + windowsCmake.map { it.resolve("CMake/bin/cmake.exe") } + androidCmake.map { it.resolve("bin/cmake$exe") }
-val (cmake, cmakeVersion) = nativeTool("cmake", cmakeHints)
+val (cmake, cmakeVersion) = nativeTool("cmake", cmakeHints, versionPrefix = "cmake version ")
 val version = Regex("cmake version (\\d+)\\.(\\d+)").find(cmakeVersion)?.groupValues
 
 // # 6 : cmake version
