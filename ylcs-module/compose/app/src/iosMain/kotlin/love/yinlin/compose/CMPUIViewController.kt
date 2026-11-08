@@ -2,18 +2,15 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ComposeUIViewController
-import platform.UIKit.NSLayoutConstraint
-import platform.UIKit.UIStatusBarAnimation
-import platform.UIKit.UIStatusBarStyle
-import platform.UIKit.UIViewController
-import platform.UIKit.addChildViewController
-import platform.UIKit.didMoveToParentViewController
+import platform.UIKit.*
 
 internal class CMPUIViewController(
     private val onViewLoad: () -> Unit,
     composeUI: @Composable () -> Unit
 ) : UIViewController(nibName = null, bundle = null) {
-    private val composeUIController = ComposeUIViewController(composeUI)
+    private val composeUIController = ComposeUIViewController {
+        IOSKeyboardDismissal(onDismiss = { view.window?.endEditing(true) }, content = composeUI)
+    }
 
     override fun viewDidLoad() {
         super.viewDidLoad()

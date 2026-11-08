@@ -12,6 +12,36 @@ import kotlin.test.assertTrue
 
 class KotlinNativeCppTest {
     @Test
+    fun iosInteropsAndDelegatedSourceSetsUseTheirDeclaredNames() {
+        val project = ProjectBuilder.builder().build()
+        project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+        val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+        val ios = kotlin.iosArm64()
+        val windows = kotlin.mingwX64("windows")
+        val scope = KotlinMultiplatformSourceSetsScope(project, kotlin, kotlin.sourceSets)
+        with(scope) {
+            val audioMain by create(commonMain)
+            val nativeAudioMain by create(audioMain)
+            assertSame(audioMain, kotlin.sourceSets.getByName("audioMain"))
+            assertEquals(setOf(audioMain), nativeAudioMain.dependsOn)
+        }
+
+        with(KotlinMultiplatformTemplate()) {
+            interop {
+                ios { cpp("audio", "src/nativeMain/cpp") { compilerOpts("-DFIRST") } }
+                ios { cpp("audio", "src/nativeMain/cpp", "shared/cpp") { compilerOpts("-DSECOND") } }
+            }
+            interopSettings.iosSettings.configureCpp(ios)
+            interopSettings.configureNative(kotlin)
+            val interops = ios.compilations.getByName("main").cinterops
+            assertEquals(setOf("audio"), interops.names)
+            assertEquals(listOf("-DFIRST", "-DSECOND"), interops.getByName("audio").compilerOpts)
+            assertEquals(listOf("src/nativeMain/cpp", "shared/cpp"), interopSettings.iosSettings.sources.toList())
+            assertTrue(windows.compilations.getByName("main").cinterops.isEmpty())
+        }
+    }
+
+    @Test
     fun multiplatformMergesSharedAndPlatformInterops() {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")

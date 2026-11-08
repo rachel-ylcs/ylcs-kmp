@@ -33,7 +33,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
 
     private val lifetime = IOSPlayerLifetime()
     private val scope = lifetime.scope
-    private var player: IOSAVPlayer? = null
+    private var player: IOSMiniaudioPlayer? = null
     private var progressJob: Job? = null
     private val commandBindings: MutableList<CommandBinding> = []
     private var receivingRemoteEvents = false
@@ -237,11 +237,11 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
     }
 
     override suspend fun init(context: PlatformContext) = Coroutines.main {
-        if (lifetime.isClosed || isInit) return@main
+        if (lifetime.isClosed || player != null) return@main
         catchingError {
             check(remoteOwner == null || remoteOwner === this@IOSMusicPlayer) { "只能有一个 MusicPlayer 管理系统媒体遥控" }
             remoteOwner = this@IOSMusicPlayer
-            player = IOSAVPlayer(
+            player = IOSMiniaudioPlayer(
                 lifetime = lifetime,
                 mixWithOthers = !fetcher.audioFocus,
                 backgroundMusic = true,
@@ -249,6 +249,8 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
                 onChanged = ::onPlaybackChanged,
                 onEnded = ::onTrackEnded,
             )
+            player?.init()
+            if (lifetime.isClosed) return@main
             installRemoteCommands()
             UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
             receivingRemoteEvents = true

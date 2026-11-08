@@ -348,6 +348,8 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                     }
                 }.forEach { target ->
                     target.ios()
+                    interopSettings.iosSettings.configureCpp(target)
+                    registerIosCpp(target, interopSettings.iosSettings.sources)
 
                     // https://youtrack.jetbrains.com/issue/KT-80715
                     if (buildDefaults.platform == BuildPlatform.Mac) {

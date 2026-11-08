@@ -122,7 +122,13 @@ extern "C" {
             }
             auto notifications = std::make_shared<AudioNotifications>(owner->callbacks, revision, owner->music);
             std::shared_ptr<RachelAudioBackend> next;
-            if (owner->video) next = rachel_video_open(path, notifications);
+            if (owner->video) {
+#ifdef RACHEL_IOS_AUDIO
+                throw RachelAudioError(-1, "Video uses AVPlayer on iOS");
+#else
+                next = rachel_video_open(path, notifications);
+#endif
+            }
             else next = rachel_audio_open(path, previous.get(), notifications);
             previous.reset();
             {

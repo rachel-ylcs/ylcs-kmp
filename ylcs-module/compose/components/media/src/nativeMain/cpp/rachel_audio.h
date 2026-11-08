@@ -42,6 +42,7 @@ bool rachel_audio_pause(void *handle, int64_t revision);
 bool rachel_audio_seek(void *handle, int64_t position, int64_t revision);
 void rachel_audio_stop(void *handle, int64_t revision);
 void rachel_audio_query(void *handle, int64_t revision, RachelAudioSnapshot *snapshot);
+void rachel_audio_reset_device(void);
 void *rachel_video_create(RachelAudioCallback callback, RachelAudioCallbackRelease release, void *context);
 bool rachel_video_info(void *handle, int64_t revision, RachelVideoFrameInfo *info);
 bool rachel_video_copy_frame(void *handle, int64_t revision, void *pixels, int64_t capacity, int width, int height);
@@ -53,6 +54,8 @@ void rachel_sound_release(void *handle);
 bool rachel_sound_add_file(void *handle, const char *path);
 bool rachel_sound_add_memory(void *handle, const void *data, int64_t size);
 bool rachel_sound_play(void *handle, int index);
+bool rachel_sound_is_playing(void *handle);
+void rachel_sound_stop(void *handle);
 
 #ifdef __cplusplus
 }

@@ -76,6 +76,7 @@ jobs:
               - *client
               - 'ylcs-module/**/appleMain/**'
               - 'ylcs-module/**/iosMain/**'
+              - 'ylcs-module/compose/components/media/src/{audioMain,nativeAudioMain,nativeInterop,nativeMain/cpp}/**'
               - 'ylcs-app/app/**/nativeInterop/**'
               - 'ylcs-app/app/**/appleMain/**'
               - 'ylcs-app/app/**/iosMain/**'
@@ -84,11 +85,13 @@ jobs:
               - *client
               - 'ylcs-module/**/jvmMain/**'
               - 'ylcs-module/**/desktopMain/**'
+              - 'ylcs-module/compose/components/media/src/{audioMain,pcMain,nativeMain/cpp}/**'
               - 'ylcs-app/app/**/jvmMain/**'
               - 'ylcs-app/app/**/desktopMain/**'
               - 'ylcs-app/desktop-app/**'
             nativeDesktop:
               - *client
+              - 'ylcs-module/compose/components/media/src/{audioMain,nativeAudioMain}/**'
               - 'ylcs-module/**/src/{nativeMain,nativeInterop,pcMain,skikoMain,posixMain,appleMain,windowsMain,linuxMain,macosMain}/**'
               - 'ylcs-app/app/**/src/{nativeMain,nativeInterop,pcMain,skikoMain,posixMain,appleMain,windowsMain,linuxMain,macosMain}/**'
               - 'native-compose/adaptation/**'

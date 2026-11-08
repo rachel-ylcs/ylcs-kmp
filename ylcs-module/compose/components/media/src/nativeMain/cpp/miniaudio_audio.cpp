@@ -17,22 +17,95 @@ namespace {
 
     struct AudioEngine {
         ma_engine value {};
+#ifdef RACHEL_IOS_AUDIO
+        ma_device device {};
+        std::mutex outputMutex;
+        size_t outputs = 0;
+#endif
 
         AudioEngine() {
             auto config = ma_engine_config_init();
             config.periodSizeInMilliseconds = 5;
+#ifdef RACHEL_IOS_AUDIO
+            // AVAudioSession is shared with the UIKit video player and managed on the iOS side.
+            auto context = ma_context_config_init();
+            context.coreaudio.sessionCategory = ma_ios_session_category_none;
+            context.coreaudio.noAudioSessionActivate = MA_TRUE;
+            context.coreaudio.noAudioSessionDeactivate = MA_TRUE;
+            auto playback = ma_device_config_init(ma_device_type_playback);
+            playback.playback.format = ma_format_f32;
+            playback.periodSizeInMilliseconds = config.periodSizeInMilliseconds;
+            playback.pUserData = &value;
+            playback.dataCallback = [](ma_device *device, void *output, const void *, ma_uint32 frames) {
+                ma_engine_read_pcm_frames(static_cast<ma_engine *>(device->pUserData), output, frames, nullptr);
+            };
+            check(ma_device_init_ex(nullptr, 0, &context, &playback, &device));
+            config.noAutoStart = MA_TRUE;
+            config.pDevice = &device;
+            try {
+                check(ma_engine_init(&config, &value));
+            }
+            catch (...) {
+                ma_device_uninit(&device);
+                throw;
+            }
+#else
             check(ma_engine_init(&config, &value));
+#endif
         }
 
-        ~AudioEngine() { ma_engine_uninit(&value); }
+        ~AudioEngine() {
+#ifdef RACHEL_IOS_AUDIO
+            ma_device_stop(&device);
+#endif
+            ma_engine_uninit(&value);
+#ifdef RACHEL_IOS_AUDIO
+            ma_device_uninit(&device);
+#endif
+        }
+
+        void acquireOutput() {
+#ifdef RACHEL_IOS_AUDIO
+            std::lock_guard<std::mutex> guard(outputMutex);
+            if (outputs == 0) check(ma_engine_start(&value));
+            ++outputs;
+#endif
+        }
+
+        void releaseOutput() {
+#ifdef RACHEL_IOS_AUDIO
+            std::lock_guard<std::mutex> guard(outputMutex);
+            if (--outputs == 0) ma_engine_stop(&value);
+#endif
+        }
     };
 
+    struct AudioOutput {
+        AudioEngine &engine;
+        bool active = false;
+
+        void start() {
+            if (active) return;
+            engine.acquireOutput();
+            active = true;
+        }
+
+        void stop() {
+            if (!active) return;
+            active = false;
+            engine.releaseOutput();
+        }
+
+        ~AudioOutput() { stop(); }
+    };
+
+    std::mutex engineMutex;
+    std::weak_ptr<AudioEngine> sharedEngine;
+
     std::shared_ptr<AudioEngine> audioEngine() {
-        static std::mutex mutex;
-        static std::weak_ptr<AudioEngine> shared;
-        std::lock_guard<std::mutex> guard(mutex);
-        auto engine = shared.lock();
-        if (!engine) shared = engine = std::make_shared<AudioEngine>();
+        std::lock_guard<std::mutex> guard(engineMutex);
+        auto engine = sharedEngine.lock();
+        if (!engine) sharedEngine = engine = std::make_shared<AudioEngine>();
         return engine;
     }
 
@@ -57,6 +130,7 @@ namespace {
 
     class MiniaudioBackend final : public RachelAudioBackend {
         std::shared_ptr<AudioEngine> engine;
+        AudioOutput output { *engine };
         std::shared_ptr<AudioNotifications> notifications;
         ma_sound sound {};
         ma_uint32 rate = 0;
@@ -89,7 +163,10 @@ namespace {
                         ma_event_wait(&completion);
                         if (closed.load()) break;
                         std::lock_guard<std::mutex> guard(mutex);
-                        if (ended.load()) notifications->emit(RACHEL_AUDIO_EVENT_ENDED);
+                        if (ended.load()) {
+                            output.stop();
+                            notifications->emit(RACHEL_AUDIO_EVENT_ENDED);
+                        }
                     }
                 });
                 check(ma_sound_set_end_callback(&sound, [](void *context, ma_sound *) {
@@ -130,13 +207,17 @@ namespace {
             std::lock_guard<std::mutex> guard(mutex);
             if (ended.load() || ma_sound_at_end(&sound)) check(ma_sound_seek_to_pcm_frame(&sound, 0));
             ended.store(false);
-            check(ma_sound_start(&sound));
+            output.start();
+            const auto result = ma_sound_start(&sound);
+            if (result != MA_SUCCESS) output.stop();
+            check(result);
             notifications->emit(RACHEL_AUDIO_EVENT_STATE, 1);
         }
 
         void pause() override {
             std::lock_guard<std::mutex> guard(mutex);
             check(ma_sound_stop(&sound));
+            output.stop();
             notifications->emit(RACHEL_AUDIO_EVENT_STATE, 0);
         }
 
@@ -169,6 +250,7 @@ namespace {
 
     struct SoundBank {
         std::shared_ptr<AudioEngine> engine = audioEngine();
+        AudioOutput output { *engine };
         std::vector<std::unique_ptr<SoundEffect>> effects;
     };
 }
@@ -178,6 +260,13 @@ std::shared_ptr<RachelAudioBackend> rachel_audio_open(const char *path, RachelAu
 }
 
 extern "C" {
+    void rachel_audio_reset_device(void) {
+#ifdef RACHEL_IOS_AUDIO
+        std::lock_guard<std::mutex> guard(engineMutex);
+        sharedEngine.reset();
+#endif
+    }
+
     void *rachel_sound_create(void) {
         try { return new SoundBank(); }
         catch (...) { return nullptr; }
@@ -223,6 +312,25 @@ extern "C" {
         auto *bank = static_cast<SoundBank *>(handle);
         if (static_cast<size_t>(index) >= bank->effects.size()) return false;
         auto *sound = &bank->effects[index]->sound;
-        return ma_sound_stop(sound) == MA_SUCCESS && ma_sound_seek_to_pcm_frame(sound, 0) == MA_SUCCESS && ma_sound_start(sound) == MA_SUCCESS;
+        try {
+            bank->output.start();
+            return ma_sound_stop(sound) == MA_SUCCESS && ma_sound_seek_to_pcm_frame(sound, 0) == MA_SUCCESS && ma_sound_start(sound) == MA_SUCCESS;
+        }
+        catch (...) { return false; }
+    }
+
+    bool rachel_sound_is_playing(void *handle) {
+        if (!handle) return false;
+        const auto *bank = static_cast<SoundBank *>(handle);
+        return std::any_of(bank->effects.begin(), bank->effects.end(), [](const auto &effect) {
+            return ma_sound_is_playing(&effect->sound) && !ma_sound_at_end(&effect->sound);
+        });
+    }
+
+    void rachel_sound_stop(void *handle) {
+        if (!handle) return;
+        auto *bank = static_cast<SoundBank *>(handle);
+        for (auto &effect : bank->effects) ma_sound_stop(&effect->sound);
+        bank->output.stop();
     }
 }

@@ -20,7 +20,7 @@ import org.jetbrains.skia.*
 
 @Stable
 internal class PcVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
-    private val backend = AudioBackend(video = true)
+    private val backend = AudioBackend(create = VideoNative::create)
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
     private val playback = MutableStateFlow(false)
     private val frameRequests = Channel<Unit>(Channel.CONFLATED)

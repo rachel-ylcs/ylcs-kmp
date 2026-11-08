@@ -1,72 +1,38 @@
-@file:OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.media
 
-import kotlinx.cinterop.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.toNSData
 import love.yinlin.fs.File
 import platform.AVFAudio.*
 import platform.Foundation.*
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
-import platform.darwin.*
+import platform.darwin.NSObjectProtocol
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalForeignApi::class)
 actual class SoundPlayer {
-    private class Delegate(private val finished: (AVAudioPlayer) -> Unit) : NSObject(), AVAudioPlayerDelegateProtocol {
-        override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) = finished(player)
-        override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) = finished(player)
-    }
-
-    private sealed interface Source {
-        class Bytes(val data: NSData) : Source
-        class Path(val url: NSURL) : Source
-    }
-
     private val lifetime = IOSPlayerLifetime()
-    private val scope = lifetime.scope
+    private val bank = MiniaudioSoundBank()
     private val token = IOSAudioSessionPolicy.Token(IOSAudioSessionPolicy.Kind.Effect)
-    private var sources: List<Source> = []
-    private var players: List<AVAudioPlayer> = []
-    private var delegate: Delegate? = null
-    private val playing: MutableSet<AVAudioPlayer> = []
     private val notifications: MutableList<NSObjectProtocol> = []
-
-    private fun createPlayer(source: Source): AVAudioPlayer = memScoped {
-        val error = alloc<ObjCObjectVar<NSError?>>()
-        error.value = null
-        val player = when (source) {
-            is Source.Bytes -> AVAudioPlayer(source.data, error.ptr)
-            is Source.Path -> AVAudioPlayer(source.url, error.ptr)
-        }
-        error.value?.let { throw iosError("加载音效失败", it) }
-        player
-    }
-
-    private fun finish(player: AVAudioPlayer) {
-        playing.remove(player)
-        if (playing.isEmpty()) IOSAudioSessionPolicy.release(token)
-    }
+    private var playbackJob: Job? = null
+    private var restore: (suspend () -> Boolean)? = null
+    private var sourceVersion = 0L
 
     private fun stopEffects() {
-        players.forEach { it.stop() }
-        playing.clear()
+        playbackJob?.cancel()
+        playbackJob = null
+        bank.withHandle(Unit, SoundNative::stop)
         IOSAudioSessionPolicy.release(token)
     }
 
-    private fun disposePlayers() {
-        stopEffects()
-        players.forEach { it.delegate = null }
-        players = emptyList()
-        delegate = null
-    }
-
     private fun post(block: () -> Unit) {
-        scope.launch(mainImmediateContext) {
+        lifetime.scope.launch(mainImmediateContext) {
             if (!lifetime.isClosed) block()
         }
     }
@@ -90,79 +56,54 @@ actual class SoundPlayer {
                 if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) stopEffects()
             }
         }
-        notifications += center.addObserverForName(AVAudioSessionMediaServicesWereResetNotification, session, NSOperationQueue.mainQueue) {
+        notifications += center.addObserverForName(AVAudioSessionMediaServicesWereResetNotification, session, NSOperationQueue.mainQueue) { notification ->
             post {
-                IOSAudioSessionPolicy.markUnavailable()
-                val previous = sources
-                disposePlayers()
-                // reset 后重建原生对象，但不重放刚才的音效。
-                catching { replaceSources(previous) }
-            }
-        }
-        notifications += center.addObserverForName(UIApplicationDidEnterBackgroundNotification, null, NSOperationQueue.mainQueue) {
-            post { stopEffects() }
-        }
-    }
-
-    private fun replaceSources(newSources: List<Source>) {
-        // 新数据全部可解码后才替换旧缓存；加载失败保留原有音效。
-        val candidates: MutableList<AVAudioPlayer> = []
-        catchingError {
-            newSources.forEach { candidates += createPlayer(it) }
-        }?.let { failure ->
-            candidates.forEach { it.stop() }
-            throw failure
-        }
-        disposePlayers()
-        sources = newSources
-        delegate = Delegate { player ->
-            scope.launch(mainImmediateContext) {
-                if (!lifetime.isClosed && player in players && !player.isPlaying()) {
-                    finish(player)
+                IOSAudioSessionPolicy.resetDevice(notification)
+                stopEffects()
+                val version = sourceVersion
+                lifetime.scope.launch {
+                    if (sourceVersion == version) catching { restore?.invoke() }
                 }
             }
         }
-        players = candidates
-        players.forEach { it.delegate = delegate }
-        attachNotifications()
-    }
-
-    actual suspend fun loadFromByteArray(data: List<ByteArray>) {
-        if (lifetime.isClosed || data.all { it.isNotEmpty() }) return
-        Coroutines.main {
-            replaceSources(data.map { Source.Bytes(it.toNSData()) })
+        notifications += center.addObserverForName(UIApplicationDidEnterBackgroundNotification, null, NSOperationQueue.mainQueue) {
+            post(::stopEffects)
         }
     }
 
-    actual suspend fun loadFromPath(data: List<File>) {
-        if (lifetime.isClosed) return
-        Coroutines.main {
-            replaceSources(data.map { Source.Path(iosMediaURL(it.path)!!) })
+    private suspend fun replace(load: suspend () -> Boolean) = Coroutines.main {
+        if (lifetime.isClosed) return@main
+        sourceVersion++
+        if (load() && !lifetime.isClosed) {
+            restore = load
+            attachNotifications()
         }
     }
 
-    actual fun play(index: Int) {
-        scope.launch(mainImmediateContext) {
-            if (lifetime.isClosed) return@launch
-            val player = players.getOrNull(index) ?: return@launch
-            // 同一索引重播，不同索引可以同时播放。
-            player.stop()
-            player.currentTime = 0.0
-            playing += player
-            catchingError {
-                IOSAudioSessionPolicy.acquire(token)
-                check(!lifetime.isClosed && player.prepareToPlay() && !lifetime.isClosed && player.play()) { "播放音效失败" }
-            }?.let {
-                player.stop()
-                finish(player)
+    actual suspend fun loadFromByteArray(data: List<ByteArray>) = replace { bank.loadFromByteArray(data) }
+    actual suspend fun loadFromPath(data: List<File>) = replace { bank.loadFromPath(data) }
+
+    actual fun play(index: Int) = post {
+        val failure = catchingError {
+            IOSAudioSessionPolicy.acquire(token)
+            check(bank.play(index)) { "播放音效失败" }
+        }
+        if (playbackJob?.isActive != true) {
+            if (failure != null) stopEffects()
+            else playbackJob = lifetime.scope.launch {
+                do {
+                    delay(50.milliseconds)
+                } while (bank.withHandle(false, SoundNative::isPlaying))
+                stopEffects()
             }
         }
     }
 
     actual fun release() {
         lifetime.close {
-            disposePlayers()
-            sources = emptyList()
+            stopEffects()
+            bank.release()
+            restore = null
             notifications.forEach { NSNotificationCenter.defaultCenter.removeObserver(it) }
             notifications.clear()
         }

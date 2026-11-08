@@ -135,6 +135,8 @@ Linux 与 macOS 使用 `./gradlew`。具体任务是否能执行取决于当前�
 
 ### iOS 宿主与归档
 
+iOS 媒体库通过 `interop { ios { cpp("audio", "src/nativeMain/cpp") } }` 引用共享 C++ 源码。CMake 入口在 `src/iosMain/cpp`，Gradle 按真机和模拟器分别生成静态库并交给 CInterop。构建前请初始化 miniaudio 子模块，并确认 Xcode、CMake 和 Ninja 可用。
+
 首次打开 Xcode 工程或修改 SwiftPM 依赖后，在 macOS 的仓库根目录执行：
 
 ```bash

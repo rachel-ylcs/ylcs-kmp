@@ -16,6 +16,7 @@ internal object IOSAudioSessionPolicy {
     private var unavailable = false
     private var category: String? = null
     private var options: ULong? = null
+    private var lastDeviceReset: NSNotification? = null
 
     fun acquire(token: Token) {
         check(NSThread.isMainThread)
@@ -45,6 +46,13 @@ internal object IOSAudioSessionPolicy {
         unavailable = true
         category = null
         options = null
+    }
+
+    fun resetDevice(notification: NSNotification?) {
+        markUnavailable()
+        if (notification != null && notification === lastDeviceReset) return
+        lastDeviceReset = notification
+        AudioNative.resetDevice()
     }
 
     private fun configure() {

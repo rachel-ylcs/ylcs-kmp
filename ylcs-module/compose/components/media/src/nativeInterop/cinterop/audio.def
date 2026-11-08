@@ -5,3 +5,4 @@ staticLibraries = librachel_audio.a
 linkerOpts.mingw = -lruntimeobject -lshlwapi -lole32 -loleaut32 -luuid -lwindowsapp -ld3d11 -ldxgi
 linkerOpts.linux = -lstdc++ -lpthread -ldl -lm
 linkerOpts.osx = -lc++ -framework AVFoundation -framework CoreMedia -framework CoreVideo -framework Foundation -framework CoreFoundation -framework CoreAudio -framework AudioToolbox -framework AudioUnit
+linkerOpts.ios = -lc++ -framework AVFoundation -framework Foundation -framework CoreFoundation -framework CoreAudio -framework AudioToolbox

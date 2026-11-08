@@ -10,7 +10,10 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.extension.cleaning
 
-internal class AudioBackend(private val music: Boolean = false, private val video: Boolean = false) {
+internal class AudioBackend(
+    music: Boolean = false,
+    private val create: ((Long, Int, Long, String?) -> Unit) -> Long = { AudioNative.create(music, it) },
+) {
     private val lock = Lock()
     private var handle = 0L
     private var calls = 0
@@ -30,7 +33,7 @@ internal class AudioBackend(private val music: Boolean = false, private val vide
 
     suspend fun init() = Coroutines.io {
         if (isInit || isClosed) return@io
-        val created = if (video) VideoNative.create(::onEvent) else AudioNative.create(music, ::onEvent)
+        val created = create(::onEvent)
         check(created != 0L) { "Cannot initialize audio player" }
 
         val retained = lock.synchronized {

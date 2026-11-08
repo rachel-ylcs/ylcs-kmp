@@ -29,6 +29,9 @@ rachel {
             native {
                 cpp("audio")
             }
+            ios {
+                cpp("audio", "src/nativeMain/cpp")
+            }
         }
 
         sources {
@@ -51,17 +54,20 @@ rachel {
                 )
             }
 
-            iosMain(commonMain)
+            val audioMain by create(commonMain)
+            val nativeAudioMain by create(audioMain)
+
+            iosMain(nativeAudioMain)
 
             iosMainList(iosMain)
 
-            pcMain(commonMain)
+            pcMain(audioMain)
 
             desktopMain(pcMain) {
                 lib(projects.ylcsModule.foundation.libloader)
             }
 
-            nativeMain(pcMain)
+            nativeMain(pcMain, nativeAudioMain)
 
             windowsMain(nativeMain)
 

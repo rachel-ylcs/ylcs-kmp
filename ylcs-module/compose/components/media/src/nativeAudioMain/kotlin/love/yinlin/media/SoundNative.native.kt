@@ -10,4 +10,6 @@ internal actual object SoundNative {
     actual fun addFile(handle: Long, path: String): Boolean = rachel_sound_add_file(handle.toCPointer<CPointed>(), path)
     actual fun addBytes(handle: Long, data: ByteArray): Boolean = data.isNotEmpty() && data.usePinned { rachel_sound_add_memory(handle.toCPointer<CPointed>(), it.addressOf(0), data.size.toLong()) }
     actual fun play(handle: Long, index: Int): Boolean = rachel_sound_play(handle.toCPointer<CPointed>(), index)
+    fun isPlaying(handle: Long): Boolean = rachel_sound_is_playing(handle.toCPointer<CPointed>())
+    fun stop(handle: Long) = rachel_sound_stop(handle.toCPointer<CPointed>())
 }

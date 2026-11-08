@@ -5,6 +5,7 @@ import love.yinlin.gradle.cmakeCacheNeedsReset
 import love.yinlin.gradle.KonanMingwToolchain
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileTree
 import org.gradle.api.provider.ListProperty
@@ -34,6 +35,10 @@ abstract class BuildNativeCppTask : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val sourceFiles: FileTree get() = inputDir.asFileTree.matching { exclude("**/.git", "**/.git/**", "**/build/**") }
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val extraSourceFiles: ConfigurableFileCollection
 
     @get:Input
     abstract val nativeTarget: Property<String>
@@ -138,6 +143,10 @@ abstract class BuildNativeCppTask : DefaultTask() {
                 "-DCMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN=${toolchain.invariantSeparatorsPath}", "-DCMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN=${toolchain.invariantSeparatorsPath}", "-DCMAKE_SYSROOT=${sysroot.invariantSeparatorsPath}")
         }
         else if (target == "macos_arm64") options += listOf("-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0")
+        else if (target == "ios_arm64" || target == "ios_simulator_arm64") {
+            val sdk = if (target == "ios_arm64") "iphoneos" else "iphonesimulator"
+            options += listOf("-DCMAKE_SYSTEM_NAME=iOS", "-DCMAKE_OSX_SYSROOT=$sdk", "-DCMAKE_OSX_ARCHITECTURES=arm64")
+        }
         else throw GradleException("Unsupported Native C++ target: $target")
         options += cmakeOptions.get().map { (key, value) -> "-D$key=$value" }
         val executable = cmakeExecutable.get()

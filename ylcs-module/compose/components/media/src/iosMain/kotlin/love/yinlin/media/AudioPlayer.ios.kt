@@ -11,22 +11,24 @@ import love.yinlin.fs.File
 internal class IOSAudioPlayer(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     private val lifetime = IOSPlayerLifetime()
     private val scope = lifetime.scope
-    private var player: IOSAVPlayer? = null
+    private var player: IOSMiniaudioPlayer? = null
 
-    override val isInit: Boolean get() = !lifetime.isClosed && player != null
+    override val isInit: Boolean get() = !lifetime.isClosed && player?.isInit == true
     override val isPlaying: Boolean get() = isInit && player?.isPlaying == true
     override val position: Long get() = if (isInit) player?.position ?: 0L else 0L
     override val duration: Long get() = if (isInit) player?.duration ?: 0L else 0L
 
     override suspend fun init() = Coroutines.main {
         if (!lifetime.isClosed && player == null) {
-            player = IOSAVPlayer(lifetime, onEnded = { generation ->
+            player = IOSMiniaudioPlayer(lifetime, onEnded = { generation ->
                 val current = player
                 if (!lifetime.isClosed && current?.generation == generation) {
                     onEndListener()
                 }
             })
         }
+        player?.init()
+        Unit
     }
 
     override suspend fun load(path: File, playing: Boolean) = Coroutines.main {
@@ -37,7 +39,7 @@ internal class IOSAudioPlayer(context: PlatformContext, onEndListener: () -> Uni
         }
     }
 
-    private fun command(block: IOSAVPlayer.() -> Unit) {
+    private fun command(block: IOSMiniaudioPlayer.() -> Unit) {
         scope.launch(mainImmediateContext) {
             if (!lifetime.isClosed) player?.block()
         }

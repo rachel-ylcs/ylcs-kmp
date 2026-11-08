@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
+import kotlin.properties.PropertyDelegateProvider
+import kotlin.properties.ReadOnlyProperty
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
@@ -70,6 +72,14 @@ abstract class KotlinSourceSetsScope(
     ) : KotlinSourceSet = set.create(name) {
         for (parent in parents) dependsOn(parent)
         block()
+    }
+
+    fun create(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, KotlinSourceSet>> = PropertyDelegateProvider { _, property ->
+        val sourceSet = create(property.name, *parents, block = block)
+        ReadOnlyProperty { _, _ -> sourceSet }
     }
 
     operator fun KotlinSourceSet.invoke(

@@ -69,6 +69,7 @@ jobs:
             native: &native
               - *common
               - 'ylcs-module/**/src/{nativeMain,nativeTest,nativeInterop}/**'
+              - 'ylcs-module/compose/components/media/src/{audioMain,nativeAudioMain}/**'
             apple: &apple
               - *native
               - 'ylcs-module/**/src/{appleMain,appleTest,posixMain,posixTest}/**'
@@ -88,6 +89,7 @@ jobs:
             desktop:
               - *jvm
               - *skiko
+              - 'ylcs-module/compose/components/media/src/{audioMain,pcMain,nativeMain/cpp}/**'
               - 'ylcs-module/**/src/{desktopMain,desktopTest,main,test}/**'
             js:
               - *web

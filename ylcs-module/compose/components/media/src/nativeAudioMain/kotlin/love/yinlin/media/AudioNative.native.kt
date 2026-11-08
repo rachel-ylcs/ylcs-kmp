@@ -7,6 +7,7 @@ import love.yinlin.media.internal.*
 internal actual object AudioNative {
     actual fun create(music: Boolean, callback: (Long, Int, Long, String?) -> Unit): Long = createPlayer(music, false, callback)
     fun createVideo(callback: (Long, Int, Long, String?) -> Unit): Long = createPlayer(music = true, video = true, callback = callback)
+    fun resetDevice() = rachel_audio_reset_device()
 
     private fun createPlayer(music: Boolean, video: Boolean, callback: (Long, Int, Long, String?) -> Unit): Long {
         val context = StableRef.create(callback)
