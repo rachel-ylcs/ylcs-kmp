@@ -64,6 +64,9 @@ jobs:
   changes:
     name: Detect Native Maintenance Inputs
     runs-on: ubuntu-latest
+    concurrency:
+      group: gradle-distribution-${{ github.ref == 'refs/heads/main' && 'main' || github.run_id }}
+      queue: max
     outputs:
       native: ${{ steps.direct.outputs.changed || steps.catalog.outputs.catalog-changed }}
     steps:

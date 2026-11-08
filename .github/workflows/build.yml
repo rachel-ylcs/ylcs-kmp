@@ -26,6 +26,9 @@ jobs:
   changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    concurrency:
+      group: gradle-distribution-${{ github.ref == 'refs/heads/main' && 'main' || github.run_id }}
+      queue: max
     outputs:
       android: ${{ steps.filter.outputs.android }}
       ios: ${{ steps.filter.outputs.ios }}
