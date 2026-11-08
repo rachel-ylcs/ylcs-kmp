@@ -57,6 +57,9 @@ runs:
     - name: Validate Gradle Wrapper
       uses: gradle/actions/wrapper-validation@v6
 
+    - name: Restore the shared Gradle distribution
+      uses: ./.github/actions/setup-gradle-wrapper
+
     - name: Setup Android SDK
       if: ${{ inputs.android == 'true' }}
       uses: android-actions/setup-android@v4

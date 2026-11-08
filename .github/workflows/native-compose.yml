@@ -24,6 +24,7 @@ on:
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
       - '.github/actions/setup-native/**'
+      - '.github/actions/setup-gradle-wrapper/**'
   push:
     branches: [main]
     paths:
@@ -47,6 +48,7 @@ on:
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
       - '.github/actions/setup-native/**'
+      - '.github/actions/setup-gradle-wrapper/**'
 
 permissions:
   contents: read
@@ -92,10 +94,16 @@ jobs:
               - 'gradle/wrapper/**'
               - '.github/workflows/native-compose.yml'
               - '.github/actions/setup-native/**'
+              - '.github/actions/setup-gradle-wrapper/**'
       - name: Require maintenance verification for source or tooling changes
         id: direct
         if: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.native == 'true' }}
         run: echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Prepare Gradle before the Native jobs start
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: ./.github/actions/setup-gradle-wrapper
+        with:
+          prepare: 'true'
       - uses: actions/setup-java@v6
         if: ${{ steps.direct.outputs.changed != 'true' }}
         with:
@@ -104,6 +112,8 @@ jobs:
           cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - uses: gradle/actions/wrapper-validation@v6
+        if: ${{ steps.direct.outputs.changed != 'true' }}
+      - uses: ./.github/actions/setup-gradle-wrapper
         if: ${{ steps.direct.outputs.changed != 'true' }}
       - name: Compare Native dependencies in a catalog-only change
         id: catalog
@@ -164,6 +174,7 @@ jobs:
           cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - uses: gradle/actions/wrapper-validation@v6
+      - uses: ./.github/actions/setup-gradle-wrapper
       - name: Configure the Windows Native toolchain
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -277,6 +288,7 @@ jobs:
           cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - uses: gradle/actions/wrapper-validation@v6
+      - uses: ./.github/actions/setup-gradle-wrapper
       - uses: actions/download-artifact@v8
         with:
           pattern: native-compose-maven-*

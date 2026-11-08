@@ -1,0 +1,103 @@
+name: Prepare Gradle Wrapper Distribution
+description: Share the root Gradle distribution between CI jobs with the same Wrapper URL.
+
+inputs:
+  prepare:
+    description: Populate the shared cache on a Linux runner if the distribution is missing.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Locate the root Gradle distribution
+      id: distribution
+      shell: bash
+      run: |
+        node --input-type=module <<'NODE'
+        import { createHash } from 'node:crypto'
+        import { appendFileSync, existsSync, readFileSync } from 'node:fs'
+        import { homedir } from 'node:os'
+        import { basename, join } from 'node:path'
+
+        const properties = readFileSync('gradle/wrapper/gradle-wrapper.properties', 'utf8')
+        const url = properties.match(/^distributionUrl=(.+)$/m)?.[1].trim().replaceAll('\\:', ':')
+        if (!url) throw new Error('Missing root Gradle Wrapper distributionUrl')
+
+        const zipName = basename(new URL(url).pathname)
+        const key = createHash('sha256').update(url).digest('hex')
+        // Gradle's PathAssembler uses the URL's MD5 digest as an unsigned base-36 number.
+        const urlHash = BigInt('0x' + createHash('md5').update(url).digest('hex')).toString(36)
+        const directory = join(process.env.GRADLE_USER_HOME || join(homedir(), '.gradle'), 'wrapper', 'dists', zipName.slice(0, -4), urlHash)
+        const installed = existsSync(join(directory, zipName + '.ok'))
+        appendFileSync(process.env.GITHUB_OUTPUT, ['key=gradle-distribution-v1-' + key, 'directory=' + directory, 'installed=' + installed].join('\n') + '\n')
+        NODE
+
+    - name: Find the shared Gradle distribution
+      id: cache
+      if: ${{ inputs.prepare == 'true' || steps.distribution.outputs.installed != 'true' }}
+      uses: actions/cache/restore@v6
+      with:
+        path: .gradle/ci-wrapper.tar
+        key: ${{ steps.distribution.outputs.key }}
+        enableCrossOsArchive: true
+        lookup-only: ${{ inputs.prepare == 'true' }}
+
+    - name: Install the shared Gradle distribution
+      if: ${{ inputs.prepare != 'true' && steps.cache.outputs.cache-hit == 'true' }}
+      shell: bash
+      env:
+        DISTRIBUTION_DIRECTORY: ${{ steps.distribution.outputs.directory }}
+      run: |
+        if [[ "$RUNNER_OS" == 'Windows' ]]; then
+          DISTRIBUTION_DIRECTORY="$(cygpath -u "$DISTRIBUTION_DIRECTORY")"
+        fi
+        mkdir -p "$DISTRIBUTION_DIRECTORY"
+        tar -xf .gradle/ci-wrapper.tar -C "$DISTRIBUTION_DIRECTORY"
+
+    # The recursive checkout can reuse Wrapper caches already filled by Build and Test.
+    - name: Check out the Gradle cache inputs
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: actions/checkout@v7
+      with:
+        submodules: recursive
+
+    - name: Set up Java and restore the existing Gradle cache
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: actions/setup-java@v6
+      with:
+        distribution: oracle
+        java-version: '25'
+        cache: gradle
+        cache-read-only: true
+
+    - name: Validate the Gradle Wrapper
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: gradle/actions/wrapper-validation@v6
+
+    - name: Verify and archive the Gradle distribution
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      shell: bash
+      env:
+        DISTRIBUTION_DIRECTORY: ${{ steps.distribution.outputs.directory }}
+      run: |
+        bash ./gradlew --version
+        mkdir -p .gradle
+        tar --exclude='*.lck' --exclude='*.part' -cf .gradle/ci-wrapper.tar -C "$DISTRIBUTION_DIRECTORY" .
+
+    - name: Save the verified Gradle distribution
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v6
+      with:
+        path: .gradle/ci-wrapper.tar
+        key: ${{ steps.distribution.outputs.key }}
+        enableCrossOsArchive: true
+
+    - name: Confirm the distribution is available to downstream jobs
+      if: ${{ inputs.prepare == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: actions/cache/restore@v6
+      with:
+        path: .gradle/ci-wrapper.tar
+        key: ${{ steps.distribution.outputs.key }}
+        enableCrossOsArchive: true
+        lookup-only: true
+        fail-on-cache-miss: true

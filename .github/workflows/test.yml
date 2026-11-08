@@ -110,6 +110,12 @@ jobs:
               - *skiko
               - 'ylcs-module/**/src/{macosMain,macosTest}/**'
 
+      - name: Prepare Gradle before the test jobs start
+        if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || steps.filter.outputs.changes != '[]') }}
+        uses: ./.github/actions/setup-gradle-wrapper
+        with:
+          prepare: 'true'
+
   test-android:
     name: Test Android
     needs: changes

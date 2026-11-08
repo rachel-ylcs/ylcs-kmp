@@ -130,6 +130,12 @@ jobs:
               - *common
               - 'ylcs-app/modern-screen/**'
 
+      - name: Prepare Gradle before the build jobs start
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.changes != '[]' }}
+        uses: ./.github/actions/setup-gradle-wrapper
+        with:
+          prepare: 'true'
+
   build-android:
     name: Build Android
     needs: changes
