@@ -12,7 +12,6 @@ import androidx.compose.ui.text.input.PlatformImeOptions
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIAction
 import platform.UIKit.UIBarButtonItem
-import platform.UIKit.UIBarButtonSystemItemFlexibleSpace
 import platform.UIKit.UIToolbar
 import platform.UIKit.UIViewAutoresizingFlexibleWidth
 
@@ -28,7 +27,7 @@ internal fun IOSKeyboardDismissal(onDismiss: () -> Unit, content: @Composable ()
         }
         val toolbar = UIToolbar().apply {
             setItems([
-                UIBarButtonItem(barButtonSystemItem = UIBarButtonSystemItemFlexibleSpace, target = null, action = null),
+                UIBarButtonItem.flexibleSpaceItem(),
                 UIBarButtonItem(primaryAction = action, menu = null),
             ], animated = false)
             sizeToFit()
