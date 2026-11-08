@@ -92,7 +92,20 @@ jobs:
           mkdir -p build/test-report
           set -o pipefail
           export CHROME_BIN="$(command -v google-chrome)"
-          xvfb-run --auto-servernum ./gradlew "$GRADLE_TASK" --continue --console=plain --stacktrace 2>&1 | tee "$TEST_LOG"
+          for attempt in 1 2 3; do
+            if xvfb-run --auto-servernum ./gradlew "$GRADLE_TASK" --continue --console=plain --stacktrace 2>&1 | tee "$TEST_LOG"; then
+              exit 0
+            else
+              exit_code=$?
+            fi
+            if [[ "$attempt" == 3 ]] \
+              || ! grep -Eq "Could not (HEAD|GET) 'https://github\.com/yarnpkg/yarn/releases/download/" "$TEST_LOG" \
+              || ! grep -Eq 'Received status code (502|503|504) from server' "$TEST_LOG"; then
+              exit "$exit_code"
+            fi
+            echo "Yarn download failed with an upstream gateway error. Retrying browser tests."
+            sleep "$((attempt * 5))"
+          done
 
       - name: Summarize Tests
         if: ${{ always() }}
