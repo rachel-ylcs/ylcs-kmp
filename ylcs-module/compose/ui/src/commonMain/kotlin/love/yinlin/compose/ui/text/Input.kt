@@ -3,7 +3,6 @@ package love.yinlin.compose.ui.text
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -18,7 +17,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.zIndex
 import love.yinlin.annotation.NativeComposeSAM
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
@@ -26,7 +24,6 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.interaction.collectState
-import love.yinlin.compose.ui.node.fastAnimateAlpha
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
 
@@ -50,45 +47,39 @@ internal fun DecorationBox(
 
     val lightColor by animateColorAsState(
         targetValue = if (enabled) colorProvider.color(state, interactionState) else Theme.color.disabledContent,
-        animationSpec = tween(Theme.animation.duration.default)
+        animationSpec = tween(Theme.animation.duration.v7)
     )
     val backgroundColor = if (enabled) Theme.color.backgroundVariant else Theme.color.disabledContainer
 
-    Row(
-        modifier = Modifier
-            .width(IntrinsicSize.Max)
-            .defaultMinSize(minWidth = minWidth, minHeight = minWidth * 0.28f)
-            .shadow(shape, Theme.shadow.v7)
-            .clip(shape)
-            .background(backgroundColor)
-            .border(Theme.border.v6, lightColor, shape)
-            .pointerIcon(PointerIcon.Default)
-            .hoverable(state.interactionSource)
-            .padding(
-                horizontal = if (leading != null) Theme.padding.h else Theme.padding.h10,
-                vertical = Theme.padding.v10
-            ),
-        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
-    ) {
-        if (leading != null) {
-            Box(modifier = Modifier.align(leading.alignment)) {
-                leading.Content(state)
+    InputHintLayout(state, hint, shape, lightColor) { border, hintAnchor ->
+        Row(
+            modifier = Modifier
+                .width(IntrinsicSize.Max)
+                .defaultMinSize(minWidth = minWidth, minHeight = minWidth * 0.28f)
+                .shadow(shape, Theme.shadow.v7)
+                .clip(shape)
+                .background(backgroundColor)
+                .then(border)
+                .pointerIcon(PointerIcon.Default)
+                .hoverable(state.interactionSource)
+                .padding(
+                    horizontal = if (leading != null) Theme.padding.h else Theme.padding.h10,
+                    vertical = Theme.padding.v10
+                ),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+        ) {
+            if (leading != null) {
+                Box(modifier = Modifier.align(leading.alignment)) {
+                    leading.Content(state)
+                }
             }
-        }
-        Box(modifier = Modifier.weight(1f).align(alignment).pointerIcon(PointerIcon.Text, enabled = enabled)) {
-            Text(
-                text = hint ?: "",
-                color = LocalColorVariant.current,
-                modifier = Modifier.fastAnimateAlpha(if (state.isEmpty && hint != null) 0.5f else 0f).zIndex(1f)
-            )
-
-            Box(modifier = Modifier.zIndex(2f)) {
+            Box(modifier = Modifier.weight(1f).align(alignment).then(hintAnchor).pointerIcon(PointerIcon.Text, enabled = enabled)) {
                 innerContent()
             }
-        }
-        if (trailing != null) {
-            Box(modifier = Modifier.align(trailing.alignment)) {
-                trailing.Content(state)
+            if (trailing != null) {
+                Box(modifier = Modifier.align(trailing.alignment)) {
+                    trailing.Content(state)
+                }
             }
         }
     }
@@ -141,10 +132,7 @@ fun Input(
             },
             onKeyboardAction = remember(onImeClick) {
                 KeyboardActionHandler { perform ->
-                    if (onImeClick?.invoke() == true) {
-                        perform()
-                        println("fuck")
-                    }
+                    if (onImeClick?.invoke() == true) perform()
                 }
             },
             lineLimits = state.lineLimits,
