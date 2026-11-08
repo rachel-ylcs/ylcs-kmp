@@ -14,6 +14,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
@@ -28,7 +29,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberOffsetState
 import love.yinlin.compose.ui.container.SurfaceContainer
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
@@ -74,17 +75,17 @@ fun ContextMenu(
     enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    var position: Offset? by rememberState { null }
+    var position: Offset by rememberOffsetState { Offset.Unspecified }
     val inheritedItems = LocalContextMenuItems.current
 
     LaunchedEffect(enabled) {
-        if (!enabled) position = null
+        if (!enabled) position = Offset.Unspecified
     }
 
     Box(
         modifier = Modifier.onPointerEvent(PointerEventType.Press) { event ->
             if (enabled && event.buttons.isSecondaryPressed && event.changes.none { it.isConsumed }) {
-                position = event.changes.firstOrNull()?.position
+                position = event.changes.firstOrNull()?.position ?: Offset.Unspecified
                 for (change in event.changes) change.consume()
             }
         },
@@ -93,12 +94,12 @@ fun ContextMenu(
         content()
 
         val anchor = position
-        if (enabled && anchor != null) {
+        if (enabled && anchor.isSpecified) {
             val items = ContextMenuScope().apply(menus).build { it } + inheritedItems
             if (items.isNotEmpty()) {
                 Popup(
                     popupPositionProvider = remember(anchor) { ContextMenuPositionProvider(anchor) },
-                    onDismissRequest = { position = null },
+                    onDismissRequest = { position = Offset.Unspecified },
                     properties = PopupProperties(focusable = true),
                 ) {
                     Column(
@@ -115,7 +116,7 @@ fun ContextMenu(
                                 ThemeContainer(if (item.enabled) LocalColor.current else Theme.color.disabledContent) {
                                     Box(
                                         modifier = Modifier.fillMaxWidth().clickable(enabled = item.enabled, role = Role.Button) {
-                                            position = null
+                                            position = Offset.Unspecified
                                             item.onClick()
                                         }.padding(Theme.padding.value),
                                     ) {

@@ -35,7 +35,7 @@ import androidx.compose.ui.util.lerp
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberNull
 import kotlin.math.ceil
 
 private const val FloatingHintScale = 0.85f
@@ -75,7 +75,7 @@ internal fun InputHintLayout(
     val floatingHeight = measurer.measure(hint, style.scaleHint(FloatingHintScale), overflow = TextOverflow.Ellipsis, softWrap = false, maxLines = 1).size.height
     val gap = Theme.padding.h / 4
     val margin = Theme.padding.h10
-    var cutout: Rect? by rememberState { null }
+    var cutout: Rect? by rememberNull()
 
     Layout(content = {
         content(Modifier, Modifier.widthIn(min = with(LocalDensity.current) { inlineWidth.toDp() }).layout { measurable, constraints ->
