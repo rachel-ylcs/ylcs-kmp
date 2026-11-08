@@ -1,7 +1,6 @@
 package love.yinlin.cs.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -12,7 +11,7 @@ import love.yinlin.extension.toJson
 import kotlin.math.sqrt
 
 // 网格填词
-class BlockTextManager(mysql: MysqlService) : RankGameManager(mysql) {
+class BlockTextManager : RankGameManager() {
     override val config: BTConfig = BTConfig
 
     override suspend fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
@@ -59,7 +58,7 @@ class BlockTextManager(mysql: MysqlService) : RankGameManager(mysql) {
         return BTResult(correctCount = correctCount, totalCount = totalCount)
     }
 
-    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
+    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
         val btResult = verifyAnswer(details.answer, userAnswer)
         val isCompleted = btResult.correctCount == btResult.totalCount
         return GameResult(

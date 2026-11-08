@@ -1,6 +1,7 @@
 package love.yinlin.cs
 
 import love.yinlin.cs.service.throwExecuteSQL
+import love.yinlin.cs.service.throwQuerySQLSingle
 import love.yinlin.cs.service.values
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
@@ -16,20 +17,20 @@ fun ServerScope.rhymeAPI() {
 
     ApiRhymeUnlockCharacter.response { token, id ->
         val uid = AN.throwExpireToken(token)
-        val coin = VN.throwGetUser(uid, "coin")["coin"].Int
-        val cost = CharacterInfo.Pool[id]?.cost ?: failure("未知立绘")
-        if (coin < cost) failure("你的银币不够哦")
-        val rhyme = VN.throwGetUserData(uid, "rhyme").obj("rhyme")
-        val repository = rhyme.to<RhymeRepository>()
-        val characters = repository.characters.toMutableList()
-        if (id in characters) failure("你已经解锁该立绘")
-        characters += id
-        val newRhyme = repository.copy(characters = characters)
         mysql.throwTransaction { transaction ->
-            transaction.throwExecuteSQL("""
-                UPDATE user SET coin = coin - ? , exp = exp + ?
-                WHERE uid = ? AND coin >= ?
-            """, cost, cost / 2, uid, cost)
+            val coin = transaction.throwQuerySQLSingle("SELECT coin FROM user WHERE uid = ? FOR UPDATE", uid)["coin"].Int
+            val cost = CharacterInfo.Pool[id]?.cost ?: failure("未知立绘")
+            if (coin < cost) failure("你的银币不够哦")
+            val userData = transaction.throwQuerySQLSingle("SELECT rhyme FROM user_data WHERE uid = ? FOR UPDATE", uid)
+            val repository = userData.obj("rhyme").to<RhymeRepository>()
+            if (id in repository.characters) failure("你已经解锁该立绘")
+            val newRhyme = repository.copy(characters = repository.characters + id)
+            if (cost > 0) {
+                transaction.throwExecuteSQL("""
+                    UPDATE user SET coin = coin - ? , exp = exp + ?
+                    WHERE uid = ? AND coin >= ?
+                """, cost, cost / 2, uid, cost)
+            }
             transaction.throwExecuteSQL("UPDATE user_data SET rhyme = ? WHERE uid = ?", newRhyme.toJsonString(), uid)
         }
     }

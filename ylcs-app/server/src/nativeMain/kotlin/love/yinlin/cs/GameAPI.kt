@@ -1,6 +1,8 @@
 package love.yinlin.cs
 
+import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import love.yinlin.cs.APIConfig.coercePageNum
+import love.yinlin.cs.game.lockGameAccounts
 import love.yinlin.cs.game.manager
 import love.yinlin.cs.service.*
 import love.yinlin.cs.sockets.LyricsSockets
@@ -11,6 +13,19 @@ import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.*
 
+private suspend fun QueryExecutor.lockGameDetails(gid: Int): GameDetails = throwQuerySQLSingle("""
+    SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
+    FROM game
+    WHERE gid = ? AND isDeleted = 0
+    FOR UPDATE
+""", gid).to()
+
+private fun GameDetails.checkPlayable(uid: Int) {
+    if (this.uid == uid) throw FailureException("不能参与自己创建的游戏哦")
+    if (isCompleted || winner.size >= num) throw FailureException("不能参与已经结算的游戏哦")
+    if (uid in winner) throw FailureException("不能参与完成过的游戏哦")
+}
+
 fun ServerScope.gameAPI() {
     ApiGameCreateGame.response { token, args ->
         val (title, type, reward, num, cost, info, question, answer) = args
@@ -19,7 +34,7 @@ fun ServerScope.gameAPI() {
         VN.throwEmpty(title)
         VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
-        catchingError { type.manager(mysql).check(info, question, answer) }?.then { failure("数据配置非法") }
+        catchingError { type.manager().check(info, question, answer) }?.then { failure("数据配置非法") }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
         mysql.throwTransaction {
@@ -37,20 +52,21 @@ fun ServerScope.gameAPI() {
     ApiGameDeleteGame.response { token, gid ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
-        mysql.throwTransaction {
-            val result = it.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ? AND isDeleted = 0", gid)
-            val userUid = result["uid"].Int
+        mysql.throwTransaction { transaction ->
+            val game = transaction.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ? AND isDeleted = 0 FOR UPDATE", gid)
+            val userUid = game["uid"].Int
             if (userUid != uid) {
-                if (it.querySQLSingle("""
+                transaction.lockGameAccounts(uid, userUid)
+                if (transaction.throwQuerySQL("""
                     SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-                """, uid) == null) failure("无权限")
+                """, uid).isEmpty()) failure("无权限")
             }
-            val reward = result["reward"].Int
-            val useReward = reward / result["num"].Int * result["winner"].Array.size
+            val reward = game["reward"].Int
+            val useReward = reward / game["num"].Int * game["winner"].Array.size
             val remainReward = reward - useReward
-            it.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ?", gid)
+            transaction.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ?", gid)
             if (remainReward in 1 .. reward) {
-                it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", remainReward, userUid)
+                transaction.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", remainReward, userUid)
             }
         }
     }
@@ -120,34 +136,30 @@ fun ServerScope.gameAPI() {
     ApiGamePreflightGame.response { token, gid ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
-        val details = mysql.throwQuerySQLSingle("""
-            SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
-            FROM game
-            WHERE gid = ? AND isDeleted = 0
-        """, gid).to<GameDetails>()
-        if (details.uid == uid) failure("不能参与自己创建的游戏哦")
-        else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
-        else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else result(details.type.manager(mysql).preflight(uid, details).copy(info = details.info, question = details.question))
+        val preflight = mysql.throwTransaction { transaction ->
+            val details = transaction.lockGameDetails(gid)
+            details.checkPlayable(uid)
+            details.type.manager().preflight(transaction, uid, details).copy(info = details.info, question = details.question)
+        }
+        result(preflight)
     }
 
     ApiGameVerifyGame.response { token, gid, rid, answer ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid, rid)
-        val record = mysql.throwQuerySQLSingle("""
-            SELECT rid, gid, uid, ts, answer, result
-            FROM game_record
-            WHERE rid = ? AND gid = ? AND uid = ?
-        """, rid, gid, uid).to<GameRecord>()
-        val details = mysql.throwQuerySQLSingle("""
-            SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
-            FROM game
-            WHERE gid = ? AND isDeleted = 0
-        """, gid).to<GameDetails>()
-        if (details.uid == uid) failure("不能参与自己创建的游戏哦")
-        else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
-        else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else result(details.type.manager(mysql).verify(uid, details, record, answer))
+        val submittedAt = DateEx.CurrentLong
+        val verification = mysql.throwTransaction { transaction ->
+            val details = transaction.lockGameDetails(gid)
+            val record = transaction.throwQuerySQLSingle("""
+                SELECT rid, gid, uid, ts, answer, result
+                FROM game_record
+                WHERE rid = ? AND gid = ? AND uid = ?
+                FOR UPDATE
+            """, rid, gid, uid).to<GameRecord>()
+            details.checkPlayable(uid)
+            details.type.manager().verify(transaction, uid, details, record, answer, submittedAt)
+        }
+        result(verification)
     }
 
     LyricsSockets.connect { LyricsSocketsManager(mysql, AN, it) }

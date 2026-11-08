@@ -3,7 +3,6 @@ package love.yinlin.cs.game
 import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.cs.FailureException
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.cs.service.throwExecuteSQL
 import love.yinlin.cs.service.throwInsertSQLGeneratedKey
 import love.yinlin.cs.service.values
@@ -15,7 +14,7 @@ import love.yinlin.data.rachel.game.SpeedConfig
 import love.yinlin.extension.toJsonString
 
 // 竞速
-abstract class SpeedGameManager(mysql: MysqlService) : GameManager(mysql) {
+abstract class SpeedGameManager : GameManager() {
     override val config: SpeedConfig = SpeedConfig
 
     abstract fun fetchTimeLimit(info: JsonElement): Int
@@ -25,14 +24,14 @@ abstract class SpeedGameManager(mysql: MysqlService) : GameManager(mysql) {
         require(timeLimit in config.minTimeLimit .. config.maxTimeLimit)
     }
 
-    override suspend fun preflight(uid: Int, details: GameDetails): PreflightResult = mysql.throwTransaction {
+    override suspend fun preflight(transaction: QueryExecutor, uid: Int, details: GameDetails): PreflightResult {
         // 消费银币
-        if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
+        if (!transaction.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
         // 插入游戏记录
-        val rid = it.throwInsertSQLGeneratedKey("""
+        val rid = transaction.throwInsertSQLGeneratedKey("""
             INSERT INTO game_record(gid, uid) ${values(2)}
         """, details.gid, uid)
-        PreflightResult(rid)
+        return PreflightResult(rid)
     }
 
     override suspend fun QueryExecutor.updateRecord(record: GameRecord, answer: JsonElement, result: GameResult) {

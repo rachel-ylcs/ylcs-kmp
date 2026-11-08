@@ -1,7 +1,6 @@
 package love.yinlin.cs.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -15,7 +14,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 答题
-class AnswerQuestionManager(mysql: MysqlService) : RankGameManager(mysql) {
+class AnswerQuestionManager : RankGameManager() {
     override val config: AQConfig = AQConfig
 
     override suspend fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
@@ -40,7 +39,7 @@ class AnswerQuestionManager(mysql: MysqlService) : RankGameManager(mysql) {
         return AQResult(correctCount = correctCount, totalCount = size)
     }
 
-    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
+    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
         val info = details.info.to<AQInfo>()
         val aqResult = verifyAnswer(details.answer, userAnswer)
         val isCompleted = (aqResult.correctCount.toFloat() / aqResult.totalCount) >= info.threshold

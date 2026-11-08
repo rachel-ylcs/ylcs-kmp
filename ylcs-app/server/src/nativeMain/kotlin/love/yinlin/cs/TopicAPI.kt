@@ -1,12 +1,19 @@
 package love.yinlin.cs
 
+import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import love.yinlin.cs.APIConfig.coercePageNum
 import love.yinlin.cs.resource.NineGridProcessor
+import love.yinlin.cs.resource.copyNewPictures
 import love.yinlin.cs.service.*
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.extension.*
+
+private suspend fun QueryExecutor.lockCommentModeration(uid: Int, tid: Int, rawSection: Int) {
+    if (throwQuerySQL("SELECT uid FROM user WHERE uid = ? FOR SHARE", uid).isEmpty() ||
+        throwQuerySQL("SELECT tid FROM topic WHERE tid = ? AND rawSection = ? FOR UPDATE", tid, rawSection).isEmpty()) throw FailureException("无权限")
+}
 
 fun ServerScope.topicAPI() {
     ApiTopicGetTopics.response { uid, isTop, tid, num ->
@@ -174,15 +181,19 @@ fun ServerScope.topicAPI() {
         VN.throwSection(section)
         val ngp = NineGridProcessor(pics)
         val uid = AN.throwExpireToken(token)
-        val privilege = VN.throwGetUser(uid, "privilege")["privilege"].Int
-        if (!UserPrivilege.topic(privilege) || (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege))) failure("无权限")
-        val tid = mysql.throwInsertSQLGeneratedKey("""
-            INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
-        """, uid, title, content, ngp.jsonString, section, section).toInt()
-        // 复制主题图片
         val userPics = ServerRes.Users.User(uid).Pics()
-        val pic = ngp.copy { userPics.pic(it) }
-        result(tid, pic)
+        val tid = mysql.throwTransaction { transaction ->
+            // 有图片时按用户串行化写入，避免同名文件被覆盖。
+            val lock = if (ngp.actualPics.isEmpty()) "FOR SHARE" else "FOR UPDATE"
+            val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? $lock", uid)["privilege"].Int
+            if (!UserPrivilege.topic(privilege) || (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege))) failure("无权限")
+            ngp.sourcePics.copyNewPictures(ngp.actualPics.map { userPics.pic(it) }) {
+                transaction.throwInsertSQLGeneratedKey("""
+                    INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
+                """, uid, title, content, ngp.jsonString, section, section).toInt()
+            }
+        }
+        result(tid, ngp.actualPics.firstOrNull())
     }
 
     ApiTopicUpdateTopicTop.response { token, tid, isTop ->
@@ -197,25 +208,26 @@ fun ServerScope.topicAPI() {
     ApiTopicDeleteTopic.response { token, tid ->
         VN.throwId(tid)
         val uid = AN.throwExpireToken(token)
-        // 权限：主题本人，超管
-        if (mysql.querySQLSingle("""
-            SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
-			UNION
-			SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, uid) == null) failure("无权限")
-        // 逻辑删除
-        mysql.throwExecuteSQL("UPDATE topic SET isDeleted = 1 WHERE tid = ? AND isDeleted = 0", tid)
+        mysql.throwTransaction { transaction ->
+            val isModerator = transaction.throwQuerySQL("""
+                SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0 FOR SHARE
+            """, uid).isNotEmpty()
+            if (!isModerator && transaction.throwQuerySQL("""
+                SELECT 1 FROM topic WHERE tid = ? AND uid = ? AND isDeleted = 0 FOR UPDATE
+            """, tid, uid).isEmpty()) failure("无权限")
+            transaction.throwExecuteSQL("UPDATE topic SET isDeleted = 1 WHERE tid = ? AND isDeleted = 0", tid)
+        }
     }
 
     ApiTopicMoveTopic.response { token, tid, section ->
         VN.throwId(tid)
         VN.throwSection(section)
         val uid = AN.throwExpireToken(token)
-        // 权限：超管
-        val user = VN.throwGetUser(uid, "privilege")
-        if (!UserPrivilege.vipTopic(user["privilege"].Int)) failure("无权限")
-        // 移动主题
-        mysql.throwExecuteSQL("UPDATE topic SET section = ? WHERE tid = ? AND isDeleted = 0", section, tid)
+        mysql.throwTransaction { transaction ->
+            val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
+            if (!UserPrivilege.vipTopic(privilege)) failure("无权限")
+            transaction.throwExecuteSQL("UPDATE topic SET section = ? WHERE tid = ? AND isDeleted = 0", section, tid)
+        }
     }
 
     ApiTopicSendCoin.response { token, uid, tid, value ->
@@ -223,16 +235,20 @@ fun ServerScope.topicAPI() {
         VN.throwIf(value <= 0, value > UserConstraint.MIN_COIN_REWARD)
         val srcUid = AN.throwExpireToken(token)
         if (srcUid == uid) failure("不能给自己投币哦")
-        val user = VN.throwGetUser(srcUid, "coin, privilege")
-        if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
-        if ((user["coin"].Int) < value) failure("你的银币不够哦")
-        mysql.throwTransaction {
+        val rewardRecipient = value == UserConstraint.MIN_COIN_REWARD
+        mysql.throwTransaction { transaction ->
+            // 两个账户都需要更新时，按 UID 顺序取锁。
+            if (rewardRecipient && uid < srcUid) transaction.throwQuerySQL("SELECT uid FROM user WHERE uid = ? FOR UPDATE", uid)
+            val user = transaction.throwQuerySQLSingle("SELECT coin, privilege FROM user WHERE uid = ? FOR UPDATE", srcUid)
+            if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
+            if (user["coin"].Int < value) failure("你的银币不够哦")
+            if (rewardRecipient && uid > srcUid) transaction.throwQuerySQL("SELECT uid FROM user WHERE uid = ? FOR UPDATE", uid)
             // 更新主题投币数
-            it.throwExecuteSQL("""
+            transaction.throwExecuteSQL("""
                 UPDATE topic SET coinNum = coinNum + ? WHERE tid = ? AND uid = ? AND isDeleted = 0
             """, value, tid, uid)
             // 投币者减少银币
-            it.throwExecuteSQL("""
+            transaction.throwExecuteSQL("""
                 UPDATE user SET coin = coin - ? , exp = exp + ? WHERE uid = ? AND coin >= ?
             """, value, when (value) {
                 UserConstraint.MIN_COIN_REWARD -> 2
@@ -240,8 +256,7 @@ fun ServerScope.topicAPI() {
                 else -> 0
             }, srcUid, value)
             // 被投币者增加银币和经验
-            if (value == UserConstraint.MIN_COIN_REWARD)
-                it.throwExecuteSQL("UPDATE user SET exp = exp + 1 , coin = coin + 1 WHERE uid = ?", uid)
+            if (rewardRecipient) transaction.throwExecuteSQL("UPDATE user SET exp = exp + 1 , coin = coin + 1 WHERE uid = ?", uid)
         }
     }
 
@@ -250,13 +265,13 @@ fun ServerScope.topicAPI() {
         VN.throwEmpty(content)
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
-        val user = VN.throwGetUser(uid, "privilege")
-        if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
-        val cid = mysql.throwTransaction {
-            it.throwExecuteSQL("""
-				UPDATE topic SET commentNum = commentNum + 1 WHERE tid = ? AND isDeleted = 0
-			""", tid)
-            it.throwInsertSQLGeneratedKey("""
+        val cid = mysql.throwTransaction { transaction ->
+            val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
+            if (!UserPrivilege.topic(privilege)) failure("无权限")
+            transaction.throwExecuteSQL("""
+                UPDATE topic SET commentNum = commentNum + 1 WHERE tid = ? AND rawSection = ? AND isDeleted = 0
+            """, tid, rawSection)
+            transaction.throwInsertSQLGeneratedKey("""
                 INSERT INTO $tableName(tid, uid, content) ${values(3)}
             """, tid, uid, content).toInt()
         }
@@ -268,13 +283,17 @@ fun ServerScope.topicAPI() {
         VN.throwEmpty(content)
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
-        val user = VN.throwGetUser(uid, "privilege")
-        if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
-        val cid = mysql.throwTransaction {
-            it.throwExecuteSQL("""
-				UPDATE $tableName SET subCommentNum = subCommentNum + 1 WHERE cid = ? AND isDeleted = 0
-			""", cid)
-            it.throwInsertSQLGeneratedKey("""
+        val cid = mysql.throwTransaction { transaction ->
+            val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
+            if (!UserPrivilege.topic(privilege)) failure("无权限")
+            transaction.throwQuerySQLSingle("""
+                SELECT tid FROM topic WHERE tid = ? AND rawSection = ? AND isDeleted = 0 FOR UPDATE
+            """, tid, rawSection)
+            transaction.throwExecuteSQL("""
+                UPDATE $tableName SET subCommentNum = subCommentNum + 1
+                WHERE tid = ? AND cid = ? AND pid IS NULL AND isDeleted = 0
+            """, tid, cid)
+            transaction.throwInsertSQLGeneratedKey("""
                 INSERT INTO $tableName(pid, tid, uid, content) ${values(4)}
             """, cid, tid, uid, content).toInt()
         }
@@ -287,6 +306,7 @@ fun ServerScope.topicAPI() {
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人，超管
         mysql.throwTransaction { transaction ->
+            transaction.lockCommentModeration(uid, tid, rawSection)
             if (transaction.throwQuerySQL("""
                 SELECT c.cid
                 FROM $tableName AS c
@@ -299,7 +319,7 @@ fun ServerScope.topicAPI() {
                         (t.uid = u.uid AND t.isDeleted = 0)
                         OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
                     )
-                FOR UPDATE
+                FOR UPDATE OF c
             """, uid, tid, cid, rawSection).isEmpty()) failure("无权限")
             transaction.throwExecuteSQL("""
                 UPDATE $tableName SET isTop = ?
@@ -314,6 +334,7 @@ fun ServerScope.topicAPI() {
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
         mysql.throwTransaction { transaction ->
+            transaction.lockCommentModeration(uid, tid, rawSection)
             if (transaction.throwQuerySQL("""
                 SELECT c.cid
                 FROM $tableName AS c
@@ -327,7 +348,7 @@ fun ServerScope.topicAPI() {
                       OR (t.uid = u.uid AND t.isDeleted = 0)
                       OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
                   )
-                FOR UPDATE
+                FOR UPDATE OF c
             """, uid, tid, cid, rawSection).isEmpty()) failure("无权限")
             // 逻辑删除
             transaction.throwExecuteSQL("""
@@ -348,6 +369,7 @@ fun ServerScope.topicAPI() {
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
         mysql.throwTransaction { transaction ->
+            transaction.lockCommentModeration(uid, tid, rawSection)
             if (transaction.throwQuerySQL("""
                 SELECT c.cid
                 FROM $tableName AS c
@@ -363,7 +385,7 @@ fun ServerScope.topicAPI() {
                       OR (t.uid = u.uid AND t.isDeleted = 0)
                       OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
                   )
-                FOR UPDATE
+                FOR UPDATE OF c, p
             """, uid, tid, pid, cid, rawSection).isEmpty()) failure("无权限")
             // 逻辑删除
             transaction.throwExecuteSQL("""

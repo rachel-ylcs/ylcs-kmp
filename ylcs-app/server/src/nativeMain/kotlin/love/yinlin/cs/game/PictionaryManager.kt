@@ -1,7 +1,6 @@
 package love.yinlin.cs.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -12,7 +11,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 你画我猜
-class PictionaryManager(mysql: MysqlService) : RankGameManager(mysql) {
+class PictionaryManager : RankGameManager() {
     override val config: PConfig = PConfig
 
     override suspend fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
@@ -23,7 +22,7 @@ class PictionaryManager(mysql: MysqlService) : RankGameManager(mysql) {
         require(actualAnswer.length in PConfig.minAnswerLength .. PConfig.maxAnswerLength)
     }
 
-    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
+    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
         val isCompleted = details.answer.String == userAnswer.String
         return GameResult(
             isCompleted = isCompleted,

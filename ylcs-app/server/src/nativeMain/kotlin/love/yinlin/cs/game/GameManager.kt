@@ -2,22 +2,27 @@ package love.yinlin.cs.game
 
 import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.cs.service.throwExecuteSQL
+import love.yinlin.cs.service.throwQuerySQL
 import love.yinlin.cs.service.updateSQL
 import love.yinlin.data.rachel.game.*
 import love.yinlin.extension.toJsonString
 
-internal fun Game.manager(mysql: MysqlService): GameManager = when (this) {
-    Game.AnswerQuestion -> AnswerQuestionManager(mysql)
-    Game.BlockText -> BlockTextManager(mysql)
-    Game.FlowersOrder -> FlowersOrderManager(mysql)
-    Game.SearchAll -> SearchAllManager(mysql)
-    Game.Pictionary -> PictionaryManager(mysql)
+internal fun Game.manager(): GameManager = when (this) {
+    Game.AnswerQuestion -> AnswerQuestionManager()
+    Game.BlockText -> BlockTextManager()
+    Game.FlowersOrder -> FlowersOrderManager()
+    Game.SearchAll -> SearchAllManager()
+    Game.Pictionary -> PictionaryManager()
     Game.GuessLyrics, Game.Rhyme -> error("Unknown game: $this")
 }
 
-sealed class GameManager(protected val mysql: MysqlService) {
+internal suspend fun QueryExecutor.lockGameAccounts(uid1: Int, uid2: Int) {
+    throwQuerySQL("SELECT uid FROM user WHERE uid = ? FOR UPDATE", minOf(uid1, uid2))
+    throwQuerySQL("SELECT uid FROM user WHERE uid = ? FOR UPDATE", maxOf(uid1, uid2))
+}
+
+sealed class GameManager {
     open val config: GameConfig = GameConfig
 
     // 检查题目
@@ -27,6 +32,7 @@ sealed class GameManager(protected val mysql: MysqlService) {
     suspend fun QueryExecutor.consumeCoin(uid: Int, details: GameDetails): Boolean {
         val cost = details.cost
         if (cost > 0) {
+            lockGameAccounts(uid, details.uid)
             if (updateSQL("UPDATE user SET coin = coin - ?, exp = exp + 1 WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
                 // 增加发起者银币
                 throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
@@ -37,10 +43,12 @@ sealed class GameManager(protected val mysql: MysqlService) {
     }
 
     // 预检游戏
-    abstract suspend fun preflight(uid: Int, details: GameDetails): PreflightResult
+    abstract suspend fun preflight(transaction: QueryExecutor, uid: Int, details: GameDetails): PreflightResult
+
+    protected open fun checkSubmission(details: GameDetails, record: GameRecord) = Unit
 
     // 生成结果
-    abstract suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult
+    abstract suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult
 
     // 更新奖励
     suspend fun QueryExecutor.updateReward(uid: Int, details: GameDetails, result: GameResult) {
@@ -68,13 +76,13 @@ sealed class GameManager(protected val mysql: MysqlService) {
     }
 
     // 验证游戏
-    suspend fun verify(uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
-        val result = generateResult(details, record, userAnswer)
-        mysql.throwTransaction {
-            it.updateReward(uid, details, result)
-            it.updateRecord(record, userAnswer, result)
-            it.updateRank(uid, details, result.isCompleted)
-        }
+    suspend fun verify(transaction: QueryExecutor, uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
+        checkSubmission(details, record)
+        val result = generateResult(details, record, userAnswer, submittedAt)
+        if (result.isCompleted && details.winner.size + 1 == details.num) transaction.lockGameAccounts(uid, details.uid)
+        transaction.updateReward(uid, details, result)
+        transaction.updateRecord(record, userAnswer, result)
+        transaction.updateRank(uid, details, result.isCompleted)
         return result
     }
 }

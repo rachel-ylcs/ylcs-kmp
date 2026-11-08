@@ -1,7 +1,6 @@
 package love.yinlin.cs.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -14,7 +13,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 寻花令
-class FlowersOrderManager(mysql: MysqlService) : ExplorationGameManager(mysql) {
+class FlowersOrderManager : ExplorationGameManager() {
     override val config: FOConfig = FOConfig
 
     override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount
@@ -45,7 +44,7 @@ class FlowersOrderManager(mysql: MysqlService) : ExplorationGameManager(mysql) {
         return FOType.encode(items)
     }
 
-    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
+    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
         val foResult = verifyAnswer(details.answer, userAnswer)
         val isCompleted = FOType.verify(foResult)
         return GameResult(

@@ -1,6 +1,8 @@
 package love.yinlin.cs
 
 import love.yinlin.cs.APIConfig.coercePageNum
+import love.yinlin.cs.service.throwExecuteSQL
+import love.yinlin.cs.service.throwQuerySQL
 import love.yinlin.cs.service.values
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.data.rachel.song.SongPreview
@@ -118,15 +120,16 @@ fun ServerScope.songAPI() {
     }
 
     ApiSongDeleteSongComment.response { token, cid ->
-        VN.throwId( cid)
+        VN.throwId(cid)
         val uid = AN.throwExpireToken(token)
-        // 权限：评论本人，超管
-        if (mysql.querySQLSingle("""
-            SELECT 1 FROM song_comment WHERE uid = ? AND cid = ? AND isDeleted = 0
-            UNION
-            SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, cid, uid) == null) failure("无权限")
-        // 逻辑删除
-        mysql.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
+        mysql.throwTransaction { transaction ->
+            val isModerator = transaction.throwQuerySQL("""
+                SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0 FOR SHARE
+            """, uid).isNotEmpty()
+            if (!isModerator && transaction.throwQuerySQL("""
+                SELECT 1 FROM song_comment WHERE cid = ? AND uid = ? AND isDeleted = 0 FOR UPDATE
+            """, cid, uid).isEmpty()) failure("无权限")
+            transaction.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
+        }
     }
 }

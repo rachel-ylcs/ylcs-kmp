@@ -3,6 +3,8 @@ package love.yinlin.cs
 import love.yinlin.cs.service.querySQLSingle
 import love.yinlin.cs.service.throwExecuteSQL
 import love.yinlin.cs.service.throwInsertSQLGeneratedKey
+import love.yinlin.cs.service.throwQuerySQL
+import love.yinlin.cs.service.throwQuerySQLSingle
 import love.yinlin.cs.service.values
 import love.yinlin.cs.user.Token
 import love.yinlin.data.rachel.mail.Mail
@@ -89,25 +91,41 @@ fun ServerScope.accountAPI() {
         VN.throwName(name)
         VN.throwPassword(pwd)
 
-        val user = mysql.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name) ?: failure("ID\"${name}\"未注册")
-        val inviterUid = user["inviter"].IntNull ?: failure("原始ID请联系管理员修改密码")
+        // 先确定加锁顺序，事务内再核对账号和邀请关系。
+        val applicant = mysql.throwQuerySQL("SELECT uid, inviter FROM user WHERE name = ?", name)
+            .firstOrNull()?.Object ?: failure("ID\"${name}\"未注册")
+        val uid = applicant["uid"].Int
+        val inviterUid = applicant["inviter"].IntNull ?: failure("原始ID请联系管理员修改密码")
+        val inviterFirst = inviterUid < uid
+        val inviterQuery = "SELECT name, privilege FROM user WHERE uid = ? FOR SHARE"
+        val passwordHash = MD5.Default.encodeToHex(pwd)
+        mysql.throwTransaction { transaction ->
+            val earlierInviter = if (inviterFirst) transaction.throwQuerySQL(inviterQuery, inviterUid).firstOrNull()?.Object else null
+            val user = transaction.throwQuerySQL(
+                "SELECT inviter, CAST(name = ? AS SIGNED) AS nameMatches FROM user WHERE uid = ? FOR UPDATE", name, uid
+            ).firstOrNull()?.Object ?: failure("账号信息已变更，请重试")
+            if (user["nameMatches"].Int == 0) failure("账号信息已变更，请重试")
+            val currentInviterUid = user["inviter"].IntNull ?: failure("原始ID请联系管理员修改密码")
+            if (currentInviterUid != inviterUid) failure("账号信息已变更，请重试")
 
-        // 检查邀请人是否有审核资格
-        val inviter = mysql.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid) ?: failure("邀请人不存在")
-        val inviterName = inviter["name"].String
-        if (!UserPrivilege.vipAccount(inviter["privilege"].Int)) failure("邀请人\"${inviterName}\"无审核资格")
+            // 检查邀请人是否有审核资格
+            val inviter = (if (inviterFirst) earlierInviter else transaction.throwQuerySQL(inviterQuery, inviterUid).firstOrNull()?.Object)
+                ?: failure("邀请人不存在")
+            val inviterName = inviter["name"].String
+            if (!UserPrivilege.vipAccount(inviter["privilege"].Int)) failure("邀请人\"${inviterName}\"无审核资格")
 
-        // 查询ID是否注册过或是否正在审批
-        if (mysql.querySQLSingle("""
-            SELECT uid FROM mail
-            WHERE uid = ? AND filter = '${Mail.Filter.ForgotPassword}' AND param1 = ? AND processed = 0
-        """, inviterUid, name) != null) failure("已提交过审批，请等待邀请人\"${inviterName}\"审核")
+            // 目标用户行锁串行化同一账号的找回申请
+            if (transaction.throwQuerySQL("""
+                SELECT 1 FROM mail
+                WHERE uid = ? AND filter = '${Mail.Filter.ForgotPassword}' AND param1 = ? AND processed = 0
+                LIMIT 1
+            """, inviterUid, name).isNotEmpty()) failure("已提交过审批，请等待邀请人\"${inviterName}\"审核")
 
-        // 提交申请
-        mysql.throwExecuteSQL("""
-            INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
-        """, inviterUid, Mail.Type.DECISION, "用户修改密码审核",
-            "\"${name}\"需要修改密码，是否同意？", Mail.Filter.ForgotPassword.toString(), name, MD5.Default.encodeToHex(pwd))
+            transaction.throwExecuteSQL("""
+                INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
+            """, inviterUid, Mail.Type.DECISION, "用户修改密码审核",
+                "\"${name}\"需要修改密码，是否同意？", Mail.Filter.ForgotPassword.toString(), name, passwordHash)
+        }
     }
 
     callMap[Mail.Filter.ForgotPassword] = { transaction, (val name = param1, val pwd = param2) ->
@@ -121,14 +139,14 @@ fun ServerScope.accountAPI() {
     ApiAccountChangePassword.response { token, oldPwd, newPwd ->
         VN.throwPassword(oldPwd, newPwd)
         val uid = AN.throwExpireToken(token)
-        val user = VN.throwGetUser(uid, "pwd")
         val oldPwdMd5 = MD5.Default.encodeToHex(oldPwd)
         val newPwdMd5 = MD5.Default.encodeToHex(newPwd)
-        if (user["pwd"].String != oldPwdMd5) failure("原密码错误")
-        else if (oldPwdMd5 == newPwdMd5) failure("原密码与新密码相同")
-        else {
-            mysql.throwExecuteSQL("UPDATE user SET pwd = ? WHERE uid = ?", newPwdMd5, uid)
-            AN.removeAllTokens(uid)
+        mysql.throwTransaction { transaction ->
+            val user = transaction.throwQuerySQLSingle("SELECT pwd FROM user WHERE uid = ? FOR UPDATE", uid)
+            if (user["pwd"].String != oldPwdMd5) failure("原密码错误")
+            if (oldPwdMd5 == newPwdMd5) failure("原密码与新密码相同")
+            transaction.throwExecuteSQL("UPDATE user SET pwd = ? WHERE uid = ?", newPwdMd5, uid)
         }
+        AN.removeAllTokens(uid)
     }
 }

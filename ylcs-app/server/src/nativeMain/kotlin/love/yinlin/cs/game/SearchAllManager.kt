@@ -3,7 +3,6 @@ package love.yinlin.cs.game
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.cs.service.MysqlService
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -16,7 +15,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 词寻
-class SearchAllManager(mysql: MysqlService) : SpeedGameManager(mysql) {
+class SearchAllManager : SpeedGameManager() {
     override val config: SAConfig = SAConfig
 
     override fun fetchTimeLimit(info: JsonElement): Int = info.to<SAInfo>().timeLimit
@@ -52,11 +51,10 @@ class SearchAllManager(mysql: MysqlService) : SpeedGameManager(mysql) {
         )
     }
 
-    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
+    override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement, submittedAt: Long): GameResult {
         (val threshold, val timeLimit) = details.info.to<SAInfo>()
         val startTime = DateEx.Formatter.standardDateTime.parse(record.ts)!!.toInstant(TimeZone.UTC).toEpochMilliseconds()
-        val endTime = DateEx.CurrentLong
-        val duration = ((endTime - startTime) / 1000).toInt()
+        val duration = ((submittedAt - startTime).coerceAtLeast(0L) / 1000).toInt()
         val saResult = verifyAnswer(details.answer, userAnswer, duration)
         val isCompleted = saResult.correctCount.toFloat() / saResult.totalCount >= threshold && duration <= timeLimit
         return GameResult(

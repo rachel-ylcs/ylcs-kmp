@@ -35,7 +35,7 @@ fun ServerScope.concertAPI() {
         VN.throwId(cid)
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
-            if (transaction.throwQuerySQL("SELECT cid FROM concert WHERE cid = ?", cid).isEmpty()) failure("该演出不存在")
+            if (transaction.throwQuerySQL("SELECT cid FROM concert WHERE cid = ? FOR SHARE", cid).isEmpty()) failure("该演出不存在")
 
             val attendedConcerts = transaction.throwQuerySQLSingle("SELECT concerts FROM user_data WHERE uid = ? FOR UPDATE", uid)["concerts"]!!.to<List<Int>>()
 
