@@ -101,11 +101,10 @@ jobs:
         with:
           distribution: oracle
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
-        if: ${{ steps.direct.outputs.changed != 'true' }}
-        with:
-          cache-provider: basic
+          cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - uses: gradle/actions/wrapper-validation@v6
+        if: ${{ steps.direct.outputs.changed != 'true' }}
       - name: Compare Native dependencies in a catalog-only change
         id: catalog
         if: ${{ steps.direct.outputs.changed != 'true' }}
@@ -162,10 +161,9 @@ jobs:
         with:
           distribution: oracle
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-provider: basic
+          cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Configure the Windows Native toolchain
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -276,10 +274,9 @@ jobs:
         with:
           distribution: oracle
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-provider: basic
+          cache: gradle
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - uses: gradle/actions/wrapper-validation@v6
       - uses: actions/download-artifact@v8
         with:
           pattern: native-compose-maven-*
