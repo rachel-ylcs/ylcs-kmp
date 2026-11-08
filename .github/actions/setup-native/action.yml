@@ -14,6 +14,38 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Resolve Windows Gradle Wrapper cache inputs
+      id: gradle-wrapper-inputs
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: |
+        $distribution = Select-String -LiteralPath 'gradle/wrapper/gradle-wrapper.properties' -Pattern '^distributionUrl=(.+)$'
+        if (-not $distribution) { throw 'Gradle Wrapper distributionUrl is missing.' }
+        $distributionUrl = $distribution.Matches[0].Groups[1].Value
+        $urlBytes = [System.Text.Encoding]::UTF8.GetBytes($distributionUrl)
+        $distributionHash = [Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($urlBytes)).ToLowerInvariant()
+        $gradleUserHome = $env:GRADLE_USER_HOME ?? (Join-Path $HOME '.gradle')
+        $distributionPath = (Join-Path $gradleUserHome 'wrapper/dists').Replace('\', '/')
+        "key=gradle-wrapper-v1-$env:RUNNER_OS-$env:RUNNER_ARCH-$distributionHash" >> $env:GITHUB_OUTPUT
+        "path=$distributionPath" >> $env:GITHUB_OUTPUT
+    - name: Restore the Windows Gradle Wrapper distribution
+      id: gradle-wrapper-cache
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ steps.gradle-wrapper-inputs.outputs.path }}
+        key: ${{ steps.gradle-wrapper-inputs.outputs.key }}
+    - name: Verify the Windows Gradle Wrapper distribution before caching
+      id: verify-gradle-wrapper
+      if: ${{ runner.os == 'Windows' && github.ref == 'refs/heads/main' && steps.gradle-wrapper-cache.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: bash ./gradlew --version
+    - name: Save the verified Windows Gradle Wrapper distribution
+      if: ${{ steps.verify-gradle-wrapper.outcome == 'success' }}
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ steps.gradle-wrapper-inputs.outputs.path }}
+        key: ${{ steps.gradle-wrapper-inputs.outputs.key }}
     - name: Configure desktop Native CI compilation
       if: ${{ runner.os == 'macOS' || inputs.tools == 'true' }}
       shell: bash
