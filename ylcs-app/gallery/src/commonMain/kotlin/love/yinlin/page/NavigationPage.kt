@@ -13,16 +13,16 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.navigation.Breadcrumb
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.input.TextButton
+import love.yinlin.compose.ui.navigation.Segment
 
 @Stable
 object NavigationPage : Page() {
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("TabBar") {
-                var currentIndex by rememberValueState(0)
+            var currentIndex by rememberValueState(0)
 
-                GalleryBadge("当前选中 · Item $currentIndex")
+            Component("TabBar") {
                 TabBar(
                     size = 5,
                     index = currentIndex,
@@ -30,6 +30,16 @@ object NavigationPage : Page() {
                     titleProvider = { "Item $it" },
                     iconProvider = { if (it == 2) Icons.Home else null },
                     enabledProvider = { it != 3 }
+                )
+            }
+
+            Component("Segment") {
+                Segment(
+                    size = 5,
+                    index = currentIndex,
+                    onNavigate = { currentIndex = it },
+                    titleProvider = { "Item $it" },
+                    iconProvider = { if (it == 2) Icons.Home else null }
                 )
             }
 

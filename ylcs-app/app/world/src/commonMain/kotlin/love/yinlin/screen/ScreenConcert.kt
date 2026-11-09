@@ -55,8 +55,8 @@ import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.PrimaryButton
+import love.yinlin.compose.ui.navigation.Segment
 import love.yinlin.compose.ui.node.pointerIcon
-import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.cs.*
@@ -486,6 +486,12 @@ class ScreenConcert : BasicScreen() {
         }
     }
 
+    private val concertTabItems = [
+        "Live" to Icons.EventAvailable ,
+        "歌曲" to Icons.LibraryMusic,
+        "足迹" to Icons.History
+    ]
+
     @Composable
     private fun ConcertTabs(state: PagerState, modifier: Modifier = Modifier, onNavigate: (Int) -> Unit) {
         Row(
@@ -493,81 +499,20 @@ class ScreenConcert : BasicScreen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon = Icons.ArrowBack, onClick = ::onBack, modifier = Modifier.padding(start = Theme.padding.h))
+            Icon(icon = Icons.ArrowBack, onClick = ::onBack)
 
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .widthIn(max = Theme.size.cell1 * 2)
-                        .fillMaxWidth()
-                        .padding(Theme.padding.value)
-                        .clip(Theme.shape.circle)
-                        .background(Theme.color.primary.copy(alpha = 0.08f))
-                        .border(Theme.border.v7, Theme.color.outline.copy(alpha = 0.15f), Theme.shape.circle)
-                        .padding(Theme.padding.g5),
-                    contentAlignment = Alignment.Center
-                ) {
-                    val tabWidth = maxWidth / 3
-                    val showIcons = tabWidth >= (Theme.size.input5 + Theme.padding.h) * maxOf(1f, LocalDensity.current.fontScale)
-
-                    Box(modifier = Modifier.matchParentSize()) {
-                        Surface(
-                            modifier = Modifier.width(tabWidth).fillMaxHeight().offset {
-                                val position = (state.currentPage + state.currentPageOffsetFraction).coerceIn(0f, 2f)
-                                IntOffset(x = (tabWidth.toPx() * position).roundToInt(), y = 0)
-                            },
-                            shape = Theme.shape.circle,
-                            tonalLevel = 1,
-                            shadowElevation = Theme.shadow.v8,
-                            border = BorderStroke(Theme.border.v7, Theme.color.outline.copy(alpha = 0.1f)),
-                        ) {}
-                    }
-
-                    Row(modifier = Modifier.fillMaxWidth().selectableGroup()) {
-                        repeat(3) { index ->
-                            val selected = state.currentPage == index
-                            val color by animateColorAsState(
-                                targetValue = if (selected) Theme.color.primary else Theme.color.onSurfaceVariant,
-                                animationSpec = tween(Theme.animation.duration.v9),
-                            )
-
-                            Row(
-                                modifier = Modifier.weight(1f)
-                                    .clip(Theme.shape.circle)
-                                    .selectable(selected = selected, onClick = { if (!selected || state.isScrollInProgress) onNavigate(index) })
-                                    .pointerIcon(PointerIcon.Hand)
-                                    .heightIn(min = Theme.size.input8)
-                                    .padding(Theme.padding.value),
-                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.v, Alignment.CenterHorizontally),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (showIcons) Icon(
-                                    icon = when (index) {
-                                        1 -> Icons.LibraryMusic
-                                        2 -> Icons.History
-                                        else -> Icons.EventAvailable
-                                    },
-                                    color = color,
-                                    modifier = Modifier.size(Theme.size.smallIcon)
-                                )
-
-                                SimpleClipText(
-                                    text = when (index) {
-                                        1 -> "歌曲"
-                                        2 -> "足迹"
-                                        else -> "Live"
-                                    },
-                                    color = color,
-                                    style = Theme.typography.v7.bold,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    }
-                }
+                Segment(
+                    size = concertTabItems.size,
+                    index = state.currentPage,
+                    onNavigate = onNavigate,
+                    titleProvider = { concertTabItems[it].first },
+                    iconProvider = { concertTabItems[it].second },
+                    modifier = Modifier.widthIn(max = Theme.size.cell1 * 2).fillMaxWidth()
+                )
             }
         }
     }
@@ -923,7 +868,11 @@ class ScreenConcert : BasicScreen() {
         val animationScope = rememberCoroutineScope()
 
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            ConcertTabs(state = pagerState, modifier = Modifier.fillMaxWidth(), onNavigate = { animationScope.launch { pagerState.animateScrollToPage(it) } })
+            ConcertTabs(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                onNavigate = { animationScope.launch { pagerState.animateScrollToPage(it) } }
+            )
 
             StatefulBox(provider = provider, modifier = Modifier.fillMaxWidth().weight(1f)) {
                 HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize(), key = { it }) { page ->

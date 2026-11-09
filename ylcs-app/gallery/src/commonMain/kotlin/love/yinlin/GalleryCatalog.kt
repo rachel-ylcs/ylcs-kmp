@@ -112,6 +112,7 @@ internal data class PageItem(
             ]),
             PageItem("navigation", Icons.Anchor, "导航", "Navigation", "切换当前内容，或者沿着路径回到更上层的位置。", NavigationPage, PageGroup.Interaction, [
                 ComponentItem("TabBar", "切换五个标签，其中一个带图标，另一个处于禁用状态。"),
+                ComponentItem("Segment", "段标签切换"),
                 ComponentItem("Breadcrumb", "点击任一上层路径截断导航，重置后可以再次体验完整路径。"),
             ]),
             PageItem("floating", Icons.Cloud, "浮窗", "Floating", "打开弹窗、抽屉与浮层，体验提示、进度和悬浮操作。", FloatingPage, PageGroup.Interaction, [

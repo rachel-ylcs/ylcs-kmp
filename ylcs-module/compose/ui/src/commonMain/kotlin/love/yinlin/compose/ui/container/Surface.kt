@@ -39,6 +39,7 @@ fun Surface(
     tonalLevel: Int = 0,
     border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,
+    propagateMinConstraints: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val absoluteTonalLevel = LocalSurfaceTonalLevel.current + tonalLevel
@@ -64,7 +65,8 @@ fun Surface(
                     ifTrue = { clickable(onClick = onClick) },
                     ifFalse = { silentClick { } }
                 ).padding(contentPadding),
-            contentAlignment = contentAlignment
+            contentAlignment = contentAlignment,
+            propagateMinConstraints = propagateMinConstraints,
         ) {
             content()
         }
