@@ -20,7 +20,7 @@ import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TagView
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2

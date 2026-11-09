@@ -21,7 +21,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.StatefulStatus

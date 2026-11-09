@@ -26,8 +26,8 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.localComposition
 import love.yinlin.compose.scaleSize
-import love.yinlin.compose.ui.container.ActionScope
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText

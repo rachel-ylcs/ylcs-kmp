@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition

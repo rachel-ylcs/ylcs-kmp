@@ -43,7 +43,7 @@ import love.yinlin.compose.extension.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.floating.DialogModFactory
 import love.yinlin.compose.ui.floating.Menus
 import love.yinlin.compose.ui.floating.Sheet

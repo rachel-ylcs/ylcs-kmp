@@ -23,7 +23,7 @@ import love.yinlin.compose.data.*
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.OverlayAction
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogInput

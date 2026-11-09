@@ -13,7 +13,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.OverlayAction
 import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.RachelStatefulProvider

@@ -29,7 +29,7 @@ import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.TopPager
 import love.yinlin.compose.ui.common.value
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.icon.Icons

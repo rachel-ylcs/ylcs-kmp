@@ -24,7 +24,7 @@ import love.yinlin.compose.extension.mutableEnumStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.data.rachel.emoji.Emoji

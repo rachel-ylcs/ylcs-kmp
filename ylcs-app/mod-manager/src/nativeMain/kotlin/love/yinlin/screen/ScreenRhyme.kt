@@ -34,7 +34,7 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.screen.Screen
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.floating.Flyout

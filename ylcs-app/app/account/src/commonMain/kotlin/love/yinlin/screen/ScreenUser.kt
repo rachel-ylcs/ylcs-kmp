@@ -39,7 +39,7 @@ import love.yinlin.compose.ui.common.BoardButtonContainer
 import love.yinlin.compose.ui.common.PortraitValue
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.common.UserProfileCard
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.container.itemKey

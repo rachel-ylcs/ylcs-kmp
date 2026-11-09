@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
@@ -31,6 +30,7 @@ import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.extension.catching

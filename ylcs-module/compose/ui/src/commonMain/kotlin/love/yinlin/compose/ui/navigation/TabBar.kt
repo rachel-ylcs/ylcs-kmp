@@ -24,7 +24,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
