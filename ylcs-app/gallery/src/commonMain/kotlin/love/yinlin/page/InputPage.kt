@@ -1,9 +1,7 @@
 package love.yinlin.page
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -17,9 +15,13 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.delay
+import love.yinlin.GalleryActions
+import love.yinlin.GalleryBadge
+import love.yinlin.GalleryCaption
 import love.yinlin.Page
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
@@ -35,62 +37,49 @@ object InputPage : Page() {
     override fun Content() {
         ComponentColumn {
             Component("Button") {
-                ExampleRow {
-                    Example("PrimaryButton") {
-                        PrimaryButton("Click me", onClick = {})
-                    }
+                val sample = Modifier.widthIn(min = Theme.size.input4)
+                val load: suspend () -> Unit = { delay(2.seconds) }
 
-                    Example("SecondaryButton") {
-                        SecondaryButton("Click me", onClick = {})
-                    }
+                ButtonGroup("填充按钮", "Button", content = {
+                    PrimaryButton("主要", modifier = sample, onClick = {})
+                    SecondaryButton("次要", modifier = sample, onClick = {})
+                    TertiaryButton("辅助", modifier = sample, onClick = {})
+                    TertiaryButton("带图标", icon = Icons.Home, modifier = sample, onClick = {})
+                    PrimaryButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }) {
+                    PrimaryLoadingButton("主要", modifier = sample, onClick = load)
+                    SecondaryLoadingButton("次要", modifier = sample, onClick = load)
+                    TertiaryLoadingButton("辅助", modifier = sample, onClick = load)
+                    PrimaryLoadingButton("带图标", icon = Icons.Home, modifier = sample, onClick = load)
+                    PrimaryLoadingButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }
 
-                    Example("TertiaryButton") {
-                        TertiaryButton("Click me", onClick = {})
-                    }
+                ButtonGroup("描边按钮", "OutlinedButton", content = {
+                    PrimaryOutlinedButton("主要", modifier = sample, onClick = {})
+                    SecondaryOutlinedButton("次要", modifier = sample, onClick = {})
+                    TertiaryOutlinedButton("辅助", modifier = sample, onClick = {})
+                    PrimaryOutlinedButton("带图标", icon = Icons.Home, modifier = sample, onClick = {})
+                    PrimaryOutlinedButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }) {
+                    PrimaryLoadingOutlinedButton("主要", modifier = sample, onClick = load)
+                    SecondaryLoadingOutlinedButton("次要", modifier = sample, onClick = load)
+                    TertiaryLoadingOutlinedButton("辅助", modifier = sample, onClick = load)
+                    PrimaryLoadingOutlinedButton("带图标", icon = Icons.Home, modifier = sample, onClick = load)
+                    PrimaryLoadingOutlinedButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }
 
-                    Example("IconButton") {
-                        TertiaryButton("Click me", icon = Icons.Home, onClick = {})
-                    }
-
-                    Example("Disabled") {
-                        PrimaryButton("Click me", icon = Icons.Home, onClick = {}, enabled = false)
-                    }
-
-                    Example("LoadingButton") {
-                        PrimaryLoadingButton("Click me", onClick = { delay(2.seconds) })
-                    }
-
-                    Example("LoadingIconButton") {
-                        PrimaryLoadingButton("Click me", icon = Icons.Home, onClick = { delay(2.seconds) })
-                    }
-
-                    Example("Disabled") {
-                        PrimaryLoadingButton("Click me", icon = Icons.Home, enabled = false, onClick = {})
-                    }
-
-                    Example("TextButton") {
-                        PrimaryTextButton("Click me", onClick = {})
-                    }
-
-                    Example("IconTextButton") {
-                        PrimaryTextButton("Click me", icon = Icons.Home, onClick = {})
-                    }
-
-                    Example("Disabled") {
-                        PrimaryTextButton("Click me", icon = Icons.Home, onClick = {}, enabled = false)
-                    }
-
-                    Example("LoadingTextButton") {
-                        PrimaryLoadingTextButton("Click me", onClick = { delay(2.seconds) })
-                    }
-
-                    Example("LoadingIconTextButton") {
-                        PrimaryLoadingTextButton("Click me", icon = Icons.Home, onClick = { delay(2.seconds) })
-                    }
-
-                    Example("Disabled") {
-                        PrimaryLoadingTextButton("Click me", icon = Icons.Home, onClick = {}, enabled = false)
-                    }
+                ButtonGroup("文字按钮", "TextButton", content = {
+                    PrimaryTextButton("主要", modifier = sample, onClick = {})
+                    SecondaryTextButton("次要", modifier = sample, onClick = {})
+                    TertiaryTextButton("辅助", modifier = sample, onClick = {})
+                    PrimaryTextButton("带图标", icon = Icons.Home, modifier = sample, onClick = {})
+                    PrimaryTextButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }) {
+                    PrimaryLoadingTextButton("主要", modifier = sample, onClick = load)
+                    SecondaryLoadingTextButton("次要", modifier = sample, onClick = load)
+                    TertiaryLoadingTextButton("辅助", modifier = sample, onClick = load)
+                    PrimaryLoadingTextButton("带图标", icon = Icons.Home, modifier = sample, onClick = load)
+                    PrimaryLoadingTextButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
                 }
             }
 
@@ -286,6 +275,34 @@ object InputPage : Page() {
 
             Component("ColorPicker") {
                 ColorPicker(onColorChangeFinished = {})
+            }
+        }
+    }
+
+    @Composable
+    private fun ButtonGroup(
+        title: String,
+        api: String,
+        content: @Composable FlowRowScope.() -> Unit,
+        loadingContent: @Composable FlowRowScope.() -> Unit
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .background(Theme.color.backgroundVariant.copy(alpha = 0.45f), Theme.shape.v3)
+                .padding(Theme.padding.eValue6),
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Theme.padding.h), verticalAlignment = Alignment.CenterVertically) {
+                Text(title, style = Theme.typography.v6.bold)
+                GalleryBadge(api, Theme.color.onSurfaceVariant)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                GalleryCaption("普通")
+                GalleryActions(content)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                GalleryCaption("加载")
+                GalleryActions(loadingContent)
             }
         }
     }

@@ -22,6 +22,7 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.concurrent.Mutex
 import love.yinlin.extension.catching
+import love.yinlin.extension.cleaning
 
 @Composable
 fun LoadingTextButton(
@@ -39,17 +40,12 @@ fun LoadingTextButton(
     val mutex = remember { Mutex() }
 
     TextButton(onClick = {
-        if (!isLoading) {
-            scope.launch {
-                if (!isLoading) {
-                    mutex.with {
-                        if (!isLoading) {
-                            isLoading = true
-                            catching { onClick() }
-                            isLoading = false
-                        }
-                    }
-                }
+        scope.launch {
+            if (!mutex.tryLock()) return@launch
+            isLoading = true
+            cleaning({ catching { onClick() } }) {
+                isLoading = false
+                mutex.unlock()
             }
         }
     }, enabled = enabled, modifier = modifier) {

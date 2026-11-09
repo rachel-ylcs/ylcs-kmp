@@ -44,7 +44,13 @@ internal data class PageItem(
                 ComponentItem("RichText", "同一段内容包含样式、链接与内联图标，并展示它的编码结果。"),
             ]),
             PageItem("input", Icons.CheckBox, "输入", "Input", "点击、选择、拖动，体验控件在可用、禁用和加载时的表现。", InputPage, PageGroup.Interaction, [
-                ComponentItem("Button", "对照三种按钮层级、图标、文字与禁用状态；加载按钮模拟两秒任务。", "PrimaryButton SecondaryButton TertiaryButton PrimaryLoadingButton PrimaryTextButton PrimaryLoadingTextButton IconButton TextButton LoadingButton"),
+                ComponentItem(
+                    "Button",
+                    "对照填充、描边和文字按钮的三种主题层级，以及图标和禁用状态。点击加载示例可体验两秒任务。",
+                    "PrimaryButton SecondaryButton TertiaryButton PrimaryLoadingButton SecondaryLoadingButton TertiaryLoadingButton " +
+                        "IconButton TextButton PrimaryTextButton SecondaryTextButton TertiaryTextButton PrimaryLoadingTextButton SecondaryLoadingTextButton TertiaryLoadingTextButton LoadingButton " +
+                        "OutlinedButton LoadingOutlinedButton PrimaryOutlinedButton SecondaryOutlinedButton TertiaryOutlinedButton PrimaryLoadingOutlinedButton SecondaryLoadingOutlinedButton TertiaryLoadingOutlinedButton",
+                ),
                 ComponentItem("Switch", "两个开关共享同一状态，另一个保留禁用状态。"),
                 ComponentItem("Radio / CheckBox", "体验单选、多选和三态选择，并比较禁用选项。", "RadioGroup TriStateCheckBox"),
                 ComponentItem("Slider", "拖动数值滑块，对照无滑块、禁用和字符转换示例。"),
