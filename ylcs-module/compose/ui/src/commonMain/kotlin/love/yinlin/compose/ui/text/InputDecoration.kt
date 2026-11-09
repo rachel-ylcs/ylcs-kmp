@@ -24,6 +24,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.layout.MeasurePolicies
+import love.yinlin.extension.cleaning
 
 /**
  * 输入框装饰
@@ -123,10 +124,13 @@ interface InputDecoration {
                         awaitEachGesture {
                             awaitFirstDown()
                             isPressed = true
-                            state.maskStatus = TextObfuscationMode.Visible
-                            waitForUpOrCancellation()
-                            isPressed = false
-                            state.maskStatus = state.mask.mode.asTextObfuscationMode
+                            cleaning({
+                                state.maskStatus = TextObfuscationMode.Visible
+                                waitForUpOrCancellation()
+                            }) {
+                                isPressed = false
+                                state.maskStatus = state.mask.mode.asTextObfuscationMode
+                            }
                         }
                     }
                 )

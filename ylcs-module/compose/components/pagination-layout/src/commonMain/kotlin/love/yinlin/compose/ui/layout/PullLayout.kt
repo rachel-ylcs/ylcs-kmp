@@ -160,12 +160,15 @@ class PullState(
     }
 
     // 单独处理电脑端拖拽逻辑
-
     suspend fun PointerInputScope.fixOverflowScroll() {
         awaitPointerEventScope {
-            while (true) {
-                val event = awaitPointerEvent(PointerEventPass.Initial)
-                isPointerPressed = event.changes.any { it.pressed }
+            cleaning({
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    isPointerPressed = event.changes.any { it.pressed }
+                }
+            }) {
+                isPointerPressed = false
             }
         }
     }

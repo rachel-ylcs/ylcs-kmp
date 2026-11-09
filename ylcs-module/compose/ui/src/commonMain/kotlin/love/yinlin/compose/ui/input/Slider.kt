@@ -38,6 +38,7 @@ import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
+import love.yinlin.extension.cleaning
 
 @Stable
 private enum class SliderMeasureId : MeasureId {
@@ -115,29 +116,31 @@ fun Slider(
                 val down = awaitFirstDown(requireUnconsumed = false)
 
                 isDragging = true
-                val width = size.width.toFloat()
-                if (width > 0) {
-                    val newPercent = (down.position.x / width).fastCoerceIn(0f, 1f)
-                    currentPercent = newPercent
-                    updatedOnValueChange?.invoke(newPercent)
-                }
-
-                var dragChange = down
-                do {
-                    val event = awaitPointerEvent()
-                    val change = event.changes.firstOrNull() ?: break
-                    if (change.pressed != dragChange.pressed) break
-
-                    if (change.positionChange() != Offset.Zero) {
-                        val newPercent = (change.position.x / width).fastCoerceIn(0f, 1f)
+                cleaning({
+                    val width = size.width.toFloat()
+                    if (width > 0) {
+                        val newPercent = (down.position.x / width).fastCoerceIn(0f, 1f)
                         currentPercent = newPercent
                         updatedOnValueChange?.invoke(newPercent)
-                        change.consume()
                     }
-                    dragChange = change
-                } while (dragChange.pressed)
 
-                isDragging = false
+                    var dragChange = down
+                    do {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull() ?: break
+                        if (change.pressed != dragChange.pressed) break
+
+                        if (change.positionChange() != Offset.Zero) {
+                            val newPercent = (change.position.x / width).fastCoerceIn(0f, 1f)
+                            currentPercent = newPercent
+                            updatedOnValueChange?.invoke(newPercent)
+                            change.consume()
+                        }
+                        dragChange = change
+                    } while (dragChange.pressed)
+                }) {
+                    isDragging = false
+                }
                 updatedOnValueChangeFinished(currentPercent)
             }
         }

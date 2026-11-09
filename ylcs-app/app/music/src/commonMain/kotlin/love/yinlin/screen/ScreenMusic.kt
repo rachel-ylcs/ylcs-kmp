@@ -66,6 +66,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.startup.StartupMusicPlayer
@@ -280,26 +281,30 @@ class ScreenMusic : BasicScreen() {
 
                 isDragging = true
 
-                displayTime = (down.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
-                var dragChange = down
-                do {
-                    val event = awaitPointerEvent()
-                    val change = event.changes.firstOrNull() ?: break
-                    if (change.pressed != dragChange.pressed) break
+                cleaning({
+                    displayTime = (down.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
+                    var dragChange = down
 
-                    if (change.positionChange() != Offset.Zero) {
-                        displayTime = (change.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
-                        change.consume()
+                    do {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull() ?: break
+                        if (change.pressed != dragChange.pressed) break
+
+                        if (change.positionChange() != Offset.Zero) {
+                            displayTime = (change.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
+                            change.consume()
+                        }
+                        dragChange = change
+                    } while (dragChange.pressed)
+
+                    launch {
+                        // 检查是否在副歌点附近
+                        val seekTime = musicInfo?.chorus?.find { abs(it - displayTime) <= 3000L } ?: displayTime
+                        player.seekTo(seekTime)
                     }
-                    dragChange = change
-                } while (dragChange.pressed)
-                launch {
-                    // 检查是否在副歌点附近
-                    val seekTime = musicInfo?.chorus?.find { abs(it - displayTime) <= 3000L } ?: displayTime
-                    player.seekTo(seekTime)
+                }) {
+                    isDragging = false
                 }
-
-                isDragging = false
             }
         }.drawWithContent {
             val duration = musicPlayer?.duration ?: 0L
