@@ -15,6 +15,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.animation.IndeterminateLoadingAnimation
+import love.yinlin.extension.cleaning
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -42,12 +43,10 @@ fun LoadingIcon(
     if (isLoading) animation.Content(color = color)
     else {
         Icon(painter = painter, color = color, tip = tip, enabled = enabled, modifier = modifier, onClick = {
-            if (!isLoading) {
-                scope.launch {
-                    isLoading = true
-                    onClick()
-                    isLoading = false
-                }
+            scope.launch {
+                if (isLoading) return@launch
+                isLoading = true
+                cleaning({ onClick() }) { isLoading = false }
             }
         })
     }

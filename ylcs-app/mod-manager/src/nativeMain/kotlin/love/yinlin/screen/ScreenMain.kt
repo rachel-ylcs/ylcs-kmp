@@ -404,13 +404,17 @@ class ScreenMain : BasicScreen() {
                     val paths = dropResult.path
                     if (paths.size == 1) {
                         launch {
+                            if (isRunning) return@launch
                             reset()
                             isRunning = true
-                            catchingError {
-                                result = paths[0].read { source -> ModFactory.Preview(source).process() }
-                                statusText = ""
-                            }?.then { statusText = it.message ?: "未知错误" }
-                            isRunning = false
+                            cleaning({
+                                catchingError {
+                                    result = paths[0].read { source -> ModFactory.Preview(source).process() }
+                                    statusText = ""
+                                }?.then { statusText = it.message ?: "未知错误" }
+                            }) {
+                                isRunning = false
+                            }
                         }
                     }
                 }
@@ -476,17 +480,21 @@ class ScreenMain : BasicScreen() {
                     val paths = dropResult.path
                     if (paths.isNotEmpty()) {
                         launch {
+                            if (isRunning) return@launch
                             isRunning = true
-                            catchingError {
-                                Coroutines.io {
-                                    for (path in paths) {
-                                        runReleaseTask(path) { index, total, id ->
-                                            statusText = "[$index/$total] -> $id"
+                            cleaning({
+                                catchingError {
+                                    Coroutines.io {
+                                        for (path in paths) {
+                                            runReleaseTask(path) { index, total, id ->
+                                                statusText = "[$index/$total] -> $id"
+                                            }
                                         }
                                     }
-                                }
-                            }?.then { statusText = it.message ?: "未知错误" }
-                            isRunning = false
+                                }?.then { statusText = it.message ?: "未知错误" }
+                            }) {
+                                isRunning = false
+                            }
                             close()
                             loadLibrary()
                         }
@@ -614,15 +622,19 @@ class ScreenMain : BasicScreen() {
                         enabled = canSubmit && !isRunning,
                         onClick = {
                             launch {
+                                if (isRunning) return@launch
                                 isRunning = true
-                                catchingError {
-                                    Coroutines.io {
-                                        runMergeTask(filters, mergeMode) { index, total, name ->
-                                            statusText = "[$index/$total] -> $name"
+                                cleaning({
+                                    catchingError {
+                                        Coroutines.io {
+                                            runMergeTask(filters, mergeMode) { index, total, name ->
+                                                statusText = "[$index/$total] -> $name"
+                                            }
                                         }
-                                    }
-                                }?.then { statusText = it.message ?: "未知错误" }
-                                isRunning = false
+                                    }?.then { statusText = it.message ?: "未知错误" }
+                                }) {
+                                    isRunning = false
+                                }
                                 close()
                             }
                         }

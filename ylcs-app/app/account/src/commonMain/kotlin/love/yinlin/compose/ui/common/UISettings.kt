@@ -23,6 +23,7 @@ import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.extension.cleaning
 
 internal val LocalSettingsThemeColor = localComposition<Color>()
 
@@ -155,9 +156,9 @@ object SettingsScope {
             enabled = enabled && !isLoading,
             onClick = {
                 scope.launch {
+                    if (isLoading) return@launch
                     isLoading = true
-                    onClick()
-                    isLoading = false
+                    cleaning({ onClick() }) { isLoading = false }
                 }
             }
         ) {

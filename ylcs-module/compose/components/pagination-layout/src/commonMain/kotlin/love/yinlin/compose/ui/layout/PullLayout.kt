@@ -27,6 +27,7 @@ import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Colors
@@ -36,7 +37,9 @@ import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.extension.cleaning
 
 @Stable
 class PullState(
@@ -72,22 +75,32 @@ class PullState(
         val current = dragOffset.value
         return if (current != 0f && !isProcessing) {
             scope.launch {
+                if (isProcessing) return@launch
                 isProcessing = true
 
-                catching {
-                    // 检查是否达到阈值
-                    if (current >= threshold) {
-                        dragOffset.animateTo(threshold, tween(300))
-                        onRefresh.value?.invoke()
+                cleaning({
+                    try {
+                        catching {
+                            // 检查是否达到阈值
+                            if (current >= threshold) {
+                                dragOffset.animateTo(threshold, tween(300))
+                                onRefresh.value?.invoke()
+                            }
+                            else if (current <= -threshold) {
+                                dragOffset.animateTo(-threshold, tween(300))
+                                onLoading.value?.invoke()
+                            }
+                        }
                     }
-                    else if (current <= -threshold) {
-                        dragOffset.animateTo(-threshold, tween(300))
-                        onLoading.value?.invoke()
+                    catch (error: CancellationException) {
+                        Coroutines.wait { dragOffset.snapTo(0f) }
+                        throw error
                     }
+                }) {
+                    isProcessing = false
                 }
 
                 // 无论是否触发回调，都通过动画平滑恢复到原位
-                isProcessing = false
                 dragOffset.animateTo(0f, animationSpec = tween(durationMillis = 300))
             }
             true

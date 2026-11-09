@@ -8,6 +8,7 @@ import love.yinlin.cs.*
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.cleaning
 import love.yinlin.fs.File
 
 @Stable
@@ -27,7 +28,9 @@ object DataSourceAccount {
 
     suspend fun updateUserToken(): Boolean {
         val token = app.config.userToken
-        if (token.isNotEmpty() && isUpdateToken.compareAndSet(expect = false, update = true)) {
+        val needUpdate = token.isNotEmpty() && isUpdateToken.compareAndSet(expect = false, update = true)
+
+        return !needUpdate || cleaning({
             val currentTime = DateEx.CurrentLong
             val duration = currentTime - app.config.userShortToken
             val isExpired = if (duration > 7 * 24 * 3600 * 1000L) { // 更新 Token
@@ -35,17 +38,14 @@ object DataSourceAccount {
                     app.config.userShortToken = currentTime
                     app.config.userToken = it
                 } is UnauthorizedException
-            }
-            else { // 校验 Token
+            } else { // 校验 Token
                 ApiAccountValidateToken.request(token).getOrNull()?.o1 == false
             }
-            if (isExpired) {
-                cleanUserToken()
-                return false
-            }
+            if (isExpired) cleanUserToken() // 清理 Token
+            !isExpired
+        }) {
             isUpdateToken.value = false
         }
-        return true
     }
 
     suspend fun updateUserProfile() {
