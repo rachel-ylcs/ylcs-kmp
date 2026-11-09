@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.container.itemKey
 
 @Composable
 fun <T> PaginationStaggeredGrid(
@@ -50,10 +50,7 @@ fun <T> PaginationStaggeredGrid(
             horizontalArrangement = horizontalArrangement
         ) {
             if (header != null) {
-                item(
-                    key = ItemKey("Header"),
-                    span = StaggeredGridItemSpan.FullLine
-                ) {
+                itemKey("Header", span = StaggeredGridItemSpan.FullLine) {
                     header()
                 }
             }

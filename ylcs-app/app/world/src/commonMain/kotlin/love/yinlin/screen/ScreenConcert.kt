@@ -38,7 +38,6 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.rememberDeviceType
@@ -48,6 +47,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -536,7 +536,7 @@ class ScreenConcert : BasicScreen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.v),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
                 ) {
-                    item(key = ItemKey("concert"), span = { GridItemSpan(maxLineSpan) }) {
+                    itemKey("concert", span = { GridItemSpan(maxLineSpan) }) {
                         ConcertCard(
                             item = item,
                             pendingCid = pendingCid,
@@ -544,7 +544,7 @@ class ScreenConcert : BasicScreen() {
                         )
                     }
 
-                    item(key = ItemKey("setlist-title"), span = { GridItemSpan(maxLineSpan) }) {
+                    itemKey("setlist-title", span = { GridItemSpan(maxLineSpan) }) {
                         SimpleEllipsisText(
                             text = "现场歌单 · ${item.songs.size} 首",
                             style = Theme.typography.v8.bold,
@@ -553,7 +553,7 @@ class ScreenConcert : BasicScreen() {
                     }
 
                     if (item.songs.isEmpty()) {
-                        item(key = ItemKey("empty"), span = { GridItemSpan(maxLineSpan) }) {
+                        itemKey("empty", span = { GridItemSpan(maxLineSpan) }) {
                             SimpleEllipsisText(
                                 text = "现场歌单还在整理中",
                                 style = Theme.typography.v8,
@@ -580,14 +580,14 @@ class ScreenConcert : BasicScreen() {
             verticalArrangement = Arrangement.spacedBy(Theme.padding.e7),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.e7),
         ) {
-            item(key = ItemKey("overview"), span = { GridItemSpan(maxLineSpan) }) {
+            itemKey("overview", span = { GridItemSpan(maxLineSpan) }) {
                 ConcertSectionTitle(
                     title = "演出现场",
                     subtitle = "${memory.concerts.size} 场演出 · 已点亮 ${memory.attendedConcerts.size} 场"
                 )
             }
             if (memory.concerts.isEmpty()) {
-                item(key = ItemKey("empty"), span = { GridItemSpan(maxLineSpan) }) {
+                itemKey("empty", span = { GridItemSpan(maxLineSpan) }) {
                     ConcertMessage(
                         title = "演出现场正在整理中",
                         description = "新的演出会在这里与你见面。"
@@ -645,7 +645,7 @@ class ScreenConcert : BasicScreen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
             ) {
                 if (songs.isEmpty()) {
-                    item(key = ItemKey("empty")) {
+                    itemKey("empty") {
                         ConcertMessage(
                             title = if (memory.songs.isEmpty()) "现场歌单正在整理中" else when (selected) {
                                 1 -> "还没有听过的现场歌曲"
@@ -817,7 +817,7 @@ class ScreenConcert : BasicScreen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.e7),
             verticalArrangement = Arrangement.spacedBy(if (selected == 0) Theme.padding.e7 else Theme.padding.v7),
         ) {
-            item(key = ItemKey("summary"), span = { GridItemSpan(maxLineSpan) }) {
+            itemKey("summary", span = { GridItemSpan(maxLineSpan) }) {
                 ConcertFootprintsSummary(
                     memory = memory,
                     selected = selected,
@@ -826,7 +826,7 @@ class ScreenConcert : BasicScreen() {
             }
 
             if (selected == 0 && memory.attendedConcerts.isEmpty()) {
-                item(key = ItemKey("empty"), span = { GridItemSpan(maxLineSpan) }) {
+                itemKey("empty", span = { GridItemSpan(maxLineSpan) }) {
                     ConcertMessage(
                         title = "你的第一场现场，值得记住",
                         description = "点亮看过的演出，它的歌单就会成为你的足迹。",
@@ -846,7 +846,7 @@ class ScreenConcert : BasicScreen() {
                 }
             }
             else if (memory.heardSongs.isEmpty()) {
-                item(key = ItemKey("songs-empty"), span = { GridItemSpan(maxLineSpan) }) {
+                itemKey("songs-empty", span = { GridItemSpan(maxLineSpan) }) {
                     ConcertMessage(
                         title = if (memory.attendedConcerts.isEmpty()) "还没有听过的现场歌曲" else "现场歌单正在整理中",
                         description = if (memory.attendedConcerts.isEmpty()) "点亮看过的演出，就能收集它的现场歌曲。" else "补齐现场的歌单，会自动计入你的记忆。",

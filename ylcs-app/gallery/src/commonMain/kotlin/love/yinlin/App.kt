@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.MainScope
 import love.yinlin.compose.Theme
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.TextButton
@@ -100,7 +100,7 @@ private fun GallerySidebar(selected: PageItem, filtered: List<PageItem>, search:
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             if (PageItem.overview in filtered) {
-                item(key = ItemKey("overview")) { GalleryNavItem(PageItem.overview, selected) }
+                itemKey("overview") { GalleryNavItem(PageItem.overview, selected) }
             }
             PageGroup.entries.forEach { group ->
                 val pages = filtered.filter { it.group == group }
@@ -113,7 +113,7 @@ private fun GallerySidebar(selected: PageItem, filtered: List<PageItem>, search:
                 }
             }
             if (filtered.isEmpty()) {
-                item(key = ItemKey("empty")) {
+                itemKey("empty") {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         GalleryParagraph("没有找到匹配的组件。试试 Button、输入或日历。")
                         TextButton("清除搜索", icon = Icons.Clear) { search.clear() }

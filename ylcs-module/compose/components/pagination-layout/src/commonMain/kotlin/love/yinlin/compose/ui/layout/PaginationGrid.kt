@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.container.itemKey
 
 @Composable
 fun <T> PaginationGrid(
@@ -49,10 +49,7 @@ fun <T> PaginationGrid(
             horizontalArrangement = horizontalArrangement,
         ) {
             if (header != null) {
-                item(
-                    key = ItemKey("Header"),
-                    span = { GridItemSpan(maxLineSpan) }
-                ) {
+                itemKey("Header", span = { GridItemSpan(maxLineSpan) }) {
                     header()
                 }
             }
