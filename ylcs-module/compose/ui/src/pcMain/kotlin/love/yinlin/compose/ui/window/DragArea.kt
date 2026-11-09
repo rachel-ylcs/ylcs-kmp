@@ -9,9 +9,9 @@ import androidx.compose.ui.geometry.Offset
  */
 @Composable
 expect fun WindowScope.DragArea(
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onLongClick: ((Offset) -> Unit)? = null,
     onDoubleClick: ((Offset) -> Unit)? = null,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 )

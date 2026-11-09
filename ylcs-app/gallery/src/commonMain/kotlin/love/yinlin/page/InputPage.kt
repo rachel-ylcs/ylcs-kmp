@@ -88,11 +88,11 @@ object InputPage : Page() {
                     var checked by rememberFalse()
 
                     Example("Normal") {
-                        Switch(checked, { checked = it })
+                        Switch(checked, onCheckedChange = { checked = it })
                     }
 
                     Example("Normal") {
-                        Switch(!checked, { checked = !it })
+                        Switch(!checked, onCheckedChange = { checked = !it })
                     }
 
                     Example("Disabled") {

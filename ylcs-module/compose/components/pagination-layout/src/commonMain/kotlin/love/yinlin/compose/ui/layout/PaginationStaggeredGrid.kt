@@ -13,6 +13,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 @Composable
 fun <T> PaginationStaggeredGrid(
     items: List<T>,
+    modifier: Modifier = Modifier,
     key: ((T) -> Any)? = null,
     columns: StaggeredGridCells,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
@@ -20,7 +21,6 @@ fun <T> PaginationStaggeredGrid(
     canLoading: Boolean = false,
     onRefresh: (suspend () -> Unit)? = null,
     onLoading: (suspend () -> Unit)? = null,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues.Zero,
     verticalItemSpacing: Dp = Dp.Hairline,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,

@@ -87,19 +87,19 @@ object TextPage : Page() {
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
                         Text(text = "加粗")
-                        Switch(isBold, { isBold = it })
+                        Switch(isBold, onCheckedChange = { isBold = it })
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
                         Text(text = "斜体")
-                        Switch(isItalic, { isItalic = it })
+                        Switch(isItalic, onCheckedChange = { isItalic = it })
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
                         Text(text = "下划线")
-                        Switch(isUnderline, { isUnderline = it })
+                        Switch(isUnderline, onCheckedChange = { isUnderline = it })
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
                         Text(text = "删除线")
-                        Switch(isStrikethrough, { isStrikethrough = it })
+                        Switch(isStrikethrough, onCheckedChange = { isStrikethrough = it })
                     }
                 }
 

@@ -27,7 +27,7 @@ internal class PolicyLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, Ga
     @Composable
     override fun PageContent() {
         PageHeading("01", "选择策略，辨认同一份页面", "A 与 B 是两种页面类型。相同类型可以有多份实例；参数并不参与 Move、Resume 和 Replace 的匹配。")
-        GalleryCard("策略实验台", "建议先创建示例栈 H → A1 → B1 → A2 → B2，再选择 A、请求参数 99，比较实际显示的实例编号和逐次 pop 的顺序。") {
+        GalleryCard("策略实验台", description = "建议先创建示例栈 H → A1 → B1 → A2 → B2，再选择 A、请求参数 99，比较实际显示的实例编号和逐次 pop 的顺序。") {
             ScreenManager.Navigation<PolicyRootScreen>(Modifier.fillMaxWidth().height(660.dp)) {
                 val scope = PolicyRoutes(journal, "策略 $instanceId")
                 journal.event(scope.name, "注册", "独立导航 · H / A(Int) / B(Int)")
@@ -193,7 +193,7 @@ internal abstract class PolicyPage(
                 }
             }
             Paragraph(scope.lastResult)
-            GalleryCard("示例推演 · 预期顺序", "下面针对固定示例栈推演，不读取或模拟 Manager 的实际栈。自由操作后，请通过 pop 和实例编号确认真实顺序。") {
+            GalleryCard("示例推演 · 预期顺序", description = "下面针对固定示例栈推演，不读取或模拟 Manager 的实际栈。自由操作后，请通过 pop 和实例编号确认真实顺序。") {
                 Paragraph(scope.seedDescription)
                 CodeBlock("起点：H → A1 → B1 → A2 → B2\n预期：${scope.prediction()}")
                 Paragraph("示例栈把 A2 的计数预设为 3。同类匹配忽略参数：请求 A(99) 应命中 A2；Move / Resume 应保留编号和计数，Replace 应创建计数为 0 的新实例。")

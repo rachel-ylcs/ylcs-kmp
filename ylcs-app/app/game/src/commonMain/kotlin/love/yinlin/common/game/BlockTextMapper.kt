@@ -80,12 +80,12 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
     private fun CharacterBlock(
         blockSize: Int,
         data: List<BlockCharacter>,
+        modifier: Modifier = Modifier,
         enabled: Boolean = true,
         writeMode: Boolean,
         onCharacterSelected: suspend (Char?) -> Char? = { null },
         onStringSelected: suspend () -> String? = { null },
-        onCharacterChanged: (Int, BlockCharacter) -> Unit = { _, _ -> },
-        modifier: Modifier = Modifier
+        onCharacterChanged: (Int, BlockCharacter) -> Unit = { _, _ -> }
     ) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             var openIndex by rememberValueState(-1)

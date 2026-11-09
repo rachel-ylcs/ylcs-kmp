@@ -229,15 +229,15 @@ object BlurPage : Page() {
 
         GalleryActions {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
-                Switch(animate, { animate = it })
+                Switch(animate, onCheckedChange = { animate = it })
                 Text("动态背景")
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
-                Switch(showSource, { showSource = it })
+                Switch(showSource, onCheckedChange = { showSource = it })
                 Text("显示 Source")
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
-                Switch(showTarget, { showTarget = it })
+                Switch(showTarget, onCheckedChange = { showTarget = it })
                 Text("显示 Target")
             }
             PrimaryTextButton("替换 State", onClick = { state = BlurState() })

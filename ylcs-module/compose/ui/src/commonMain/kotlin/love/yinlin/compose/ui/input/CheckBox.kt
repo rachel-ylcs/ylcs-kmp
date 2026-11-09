@@ -35,10 +35,10 @@ fun CheckBox(
     checked: Boolean,
     onChecked: (Boolean) -> Unit,
     text: String,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     color: Color = Theme.color.primaryContainer,
-    contentColor: Color = Theme.color.onContainer,
-    modifier: Modifier = Modifier
+    contentColor: Color = Theme.color.onContainer
 ) {
     Row(
         modifier = modifier.pointerIcon(PointerIcon.Hand, enabled = enabled),

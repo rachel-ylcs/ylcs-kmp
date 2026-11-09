@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import love.yinlin.compose.platform.inspector
 
 @Composable
-actual fun WindowScope.DragArea(enabled: Boolean, onLongClick: ((Offset) -> Unit)?, onDoubleClick: ((Offset) -> Unit)?, modifier: Modifier, content: @Composable () -> Unit) {
+actual fun WindowScope.DragArea(modifier: Modifier, enabled: Boolean, onLongClick: ((Offset) -> Unit)?, onDoubleClick: ((Offset) -> Unit)?, content: @Composable () -> Unit) {
     Box(modifier = modifier then WindowDragAreaElement(this, enabled, onLongClick, onDoubleClick), propagateMinConstraints = true, content = { content() })
 }
 

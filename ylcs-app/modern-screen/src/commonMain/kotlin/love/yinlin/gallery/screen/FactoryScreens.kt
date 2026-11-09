@@ -40,7 +40,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
     @Composable
     override fun PageContent() {
         PageHeading("05", "注册工厂与导航构造式", "导航里的构造式只参与类型推导。实际实例来自注册工厂；依赖可以由工厂闭包提供，不必塞进可序列化的导航参数。")
-        GalleryCard("证明哪个构造式被执行", "成功请求传 Int。导航构造式内放置了计数和 error；如果它被执行，请求就会失败。正确行为是只执行注册工厂。") {
+        GalleryCard("证明哪个构造式被执行", description = "成功请求传 Int。导航构造式内放置了计数和 error；如果它被执行，请求就会失败。正确行为是只执行注册工厂。") {
             Actions {
                 Metric("注册工厂执行", routes.factoryCalls.toString())
                 Metric("导航构造式执行", routes.markerCalls.toString())
@@ -64,7 +64,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
             """)
             Paragraph("主页面也遵循同样规则：它的注册工厂必须接收 0 个导航参数。内部构造依赖可通过闭包注入。工厂表在 Manager 首次创建时建立，不随普通重组反复注册。")
         }
-        GalleryCard("通过字符串 key 导航", "注册时显式绑定 gallery.probe，调用方只需提供字符串和参数，就能打开 Probe 页面。") {
+        GalleryCard("通过字符串 key 导航", description = "注册时显式绑定 gallery.probe，调用方只需提供字符串和参数，就能打开 Probe 页面。") {
             Actions {
                 PrimaryButton("按 key 打开 Probe(42)") {
                     journal.event("工厂实验", "字符串导航", "gallery.probe → Probe(42)，应只执行注册工厂。")
@@ -87,7 +87,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
             Paragraph("字符串导航只查显式绑定的 key；注册类名不会自动成为 key。后两个按钮都应显示 404，即使 Probe 类已经注册。key 按原字符串精确匹配，重复绑定会报错。")
             Paragraph("成功绑定后，字符串导航和构造式导航指向同一种页面。打开 Probe 后，可以混用两种方式测试 Move 与 Resume：实例编号保留，Resume 更新状态，注册工厂执行次数不增加。字符串调用方需要与注册模块约定参数数量和类型。")
         }
-        GalleryCard("失败请求，保持可操作", "这些失败发生在发布导航栈之前。执行后本页应保持原编号；再发起一次成功导航并返回，检查管理器仍然可用。") {
+        GalleryCard("失败请求，保持可操作", description = "这些失败发生在发布导航栈之前。执行后本页应保持原编号；再发起一次成功导航并返回，检查管理器仍然可用。") {
             Actions {
                 SecondaryButton("参数数量错误") {
                     attempt("工厂要求 1 个参数，实际传 0 个") { navigate({ routes.factoryProbe(0) }) }
@@ -103,7 +103,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
             Paragraph("Int 解析失败和参数数量错误不应增加成功工厂的执行次数。主动拒绝构造只增加拒绝计数。这里用框架 catchingError 展示异常，并保留协程取消的语义。")
             Paragraph("这组实验不覆盖 initialize / resume 内部抛错；这两个回调执行时导航可能已经完成，不能用本组案例推断回调异常会回滚导航。")
         }
-        GalleryCard("默认 404", "普通 navigate 请求未注册页面时会进入默认 404。返回后，本实验的计数和状态应保留。下方同时展示未注册主页面的兜底。") {
+        GalleryCard("默认 404", description = "普通 navigate 请求未注册页面时会进入默认 404。返回后，本实验的计数和状态应保留。下方同时展示未注册主页面的兜底。") {
             PrimaryButton("navigate 到未注册页面") {
                 journal.event("工厂实验", "请求", "未注册类型交给默认 404 工厂；导航构造式不会执行。")
                 navigate<UnregisteredProbeScreen>({ error("不会调用") })
@@ -111,7 +111,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
             ScreenManager.Navigation<UnregisteredProbeScreen>(Modifier.fillMaxWidth().height(220.dp)) { }
             Paragraph("404 使用原导航条目的 UUID，并由对应 Manager 保存和清理。按钮进入的 404 可以返回本实验；下方独立区域只有根条目，因此返回按钮会保留它。")
         }
-        GalleryCard("自定义 404 · 无参注册", "另一个导航使用相同的未注册主页面类型，但设置了自己的无参 404 工厂。两份导航各自管理实例。") {
+        GalleryCard("自定义 404 · 无参注册", description = "另一个导航使用相同的未注册主页面类型，但设置了自己的无参 404 工厂。两份导航各自管理实例。") {
             ScreenManager.Navigation<UnregisteredProbeScreen>(Modifier.fillMaxWidth().height(350.dp)) {
                 screen404(::Gallery404Screen)
             }

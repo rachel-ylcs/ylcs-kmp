@@ -59,11 +59,11 @@ internal fun LoadingOutlinedButton(
 @Composable
 fun PrimaryLoadingOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingOutlinedButton(text = text, icon = icon, color = Theme.color.primary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -72,11 +72,11 @@ fun PrimaryLoadingOutlinedButton(
 @Composable
 fun SecondaryLoadingOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingOutlinedButton(text = text, icon = icon, color = Theme.color.secondary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -85,11 +85,11 @@ fun SecondaryLoadingOutlinedButton(
 @Composable
 fun TertiaryLoadingOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingOutlinedButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)

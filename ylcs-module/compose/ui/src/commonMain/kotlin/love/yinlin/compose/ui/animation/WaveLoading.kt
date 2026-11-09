@@ -38,7 +38,7 @@ object WaveLoading : IndeterminateLoadingAnimation {
     }
 
     @Composable
-    override fun Content(color: Color, modifier: Modifier) {
+    override fun Content(modifier: Modifier, color: Color) {
         val minSize = Theme.size.icon
         val transition = rememberInfiniteTransition()
         val duration = Theme.animation.duration.v4

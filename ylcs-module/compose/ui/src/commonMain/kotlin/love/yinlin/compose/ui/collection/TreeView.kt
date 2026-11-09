@@ -146,11 +146,11 @@ object TreeViewScope {
 
 @Composable
 fun TreeView(
+    modifier: Modifier = Modifier,
     color: Color = LocalColor.current,
     style: TextStyle = LocalStyle.current,
     padding: PaddingValues = Theme.padding.value,
     indent: Dp = Theme.padding.h10,
-    modifier: Modifier = Modifier,
     children: @Composable TreeViewScope.() -> Unit
 ) {
     CompositionLocalProvider(

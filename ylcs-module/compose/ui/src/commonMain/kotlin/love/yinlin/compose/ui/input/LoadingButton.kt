@@ -28,10 +28,10 @@ private fun LoadingButton(
     text: String,
     icon: ImageVector?,
     color: Color,
+    modifier: Modifier = Modifier,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -59,11 +59,11 @@ private fun LoadingButton(
 @Composable
 fun PrimaryLoadingButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)
@@ -72,11 +72,11 @@ fun PrimaryLoadingButton(
 @Composable
 fun SecondaryLoadingButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)
@@ -85,11 +85,11 @@ fun SecondaryLoadingButton(
 @Composable
 fun TertiaryLoadingButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)

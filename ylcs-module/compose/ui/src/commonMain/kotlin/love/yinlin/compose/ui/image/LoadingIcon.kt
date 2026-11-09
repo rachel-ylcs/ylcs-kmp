@@ -30,11 +30,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun LoadingIcon(
     painter: Painter,
+    modifier: Modifier = Modifier,
     color: Color = LocalColor.current,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     tip: String = "",
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -63,11 +63,11 @@ fun LoadingIcon(
 @Composable
 fun LoadingIcon(
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     color: Color = LocalColor.current,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     tip: String = "",
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit,
 ) {
     LoadingIcon(painter = rememberVectorPainter(icon), color = color, animation = animation, tip = tip, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -83,10 +83,10 @@ fun LoadingIcon(
 @Composable
 fun LoadingIcon(
     icon: DrawableResource,
+    modifier: Modifier = Modifier,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     tip: String = "",
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit,
 ) {
     LoadingIcon(painter = painterResource(icon), color = Colors.Unspecified, animation = animation, tip = tip, enabled = enabled, modifier = modifier, onClick = onClick)

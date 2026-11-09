@@ -97,9 +97,9 @@ internal fun GalleryActions(content: @Composable FlowRowScope.() -> Unit) {
 
 @Composable
 internal fun GalleryCard(
+    modifier: Modifier = Modifier,
     title: String? = null,
     description: String? = null,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {

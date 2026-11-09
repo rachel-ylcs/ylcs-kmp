@@ -37,9 +37,9 @@ fun Radio(
     group: RadioGroup,
     index: Int,
     text: String,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    color: Color = Theme.color.primaryContainer,
-    modifier: Modifier = Modifier
+    color: Color = Theme.color.primaryContainer
 ) {
     Row(
         modifier = modifier.pointerIcon(PointerIcon.Hand, enabled = enabled),

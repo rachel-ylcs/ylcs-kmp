@@ -40,11 +40,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun Icon(
     painter: Painter,
+    modifier: Modifier = Modifier,
     color: Color = LocalColor.current,
     tip: String = "",
     enabled: Boolean = true,
     indication: Indication? = LocalIndication.current,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
     val minSize = Theme.size.icon
@@ -82,11 +82,11 @@ fun Icon(
 @Composable
 fun Icon(
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     color: Color = LocalColor.current,
     tip: String = "",
     enabled: Boolean = true,
     indication: Indication? = LocalIndication.current,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
     Icon(painter = rememberVectorPainter(icon), color = color, tip = tip, enabled = enabled, indication = indication, modifier = modifier, onClick = onClick)
@@ -102,10 +102,10 @@ fun Icon(
 @Composable
 fun Icon(
     icon: DrawableResource,
+    modifier: Modifier = Modifier,
     tip: String = "",
     enabled: Boolean = true,
     indication: Indication? = LocalIndication.current,
-    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
     Icon(painter = painterResource(icon), color = Colors.Unspecified, tip = tip, enabled = enabled, indication = indication, modifier = modifier, onClick = onClick)

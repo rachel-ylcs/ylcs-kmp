@@ -27,12 +27,12 @@ import love.yinlin.extension.cleaning
 @Composable
 fun LoadingTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     color: Color = LocalColor.current,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -61,11 +61,11 @@ fun LoadingTextButton(
 @Composable
 fun PrimaryLoadingTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingTextButton(text = text, icon = icon, color = Theme.color.primary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -74,11 +74,11 @@ fun PrimaryLoadingTextButton(
 @Composable
 fun SecondaryLoadingTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingTextButton(text = text, icon = icon, color = Theme.color.secondary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -87,11 +87,11 @@ fun SecondaryLoadingTextButton(
 @Composable
 fun TertiaryLoadingTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: suspend () -> Unit
 ) {
     LoadingTextButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, animation = animation, enabled = enabled, modifier = modifier, onClick = onClick)

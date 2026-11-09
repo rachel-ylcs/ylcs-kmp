@@ -61,10 +61,10 @@ private class DragHandler(private val window: Window) {
 
 @Composable
 actual fun WindowScope.DragArea(
+    modifier: Modifier,
     enabled: Boolean,
     onLongClick: ((Offset) -> Unit)?,
     onDoubleClick: ((Offset) -> Unit)?,
-    modifier: Modifier,
     content: @Composable () -> Unit
 ) {
     DragAreaContent(enabled, modifier, onLongClick, onDoubleClick, content)

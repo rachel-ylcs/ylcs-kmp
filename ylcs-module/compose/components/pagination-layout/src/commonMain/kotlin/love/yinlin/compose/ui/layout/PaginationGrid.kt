@@ -12,6 +12,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 @Composable
 fun <T> PaginationGrid(
     items: List<T>,
+    modifier: Modifier = Modifier,
     key: ((T) -> Any)? = null,
     columns: GridCells,
     state: LazyGridState = rememberLazyGridState(),
@@ -19,7 +20,6 @@ fun <T> PaginationGrid(
     canLoading: Boolean = false,
     onRefresh: (suspend () -> Unit)? = null,
     onLoading: (suspend () -> Unit)? = null,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues.Zero,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,

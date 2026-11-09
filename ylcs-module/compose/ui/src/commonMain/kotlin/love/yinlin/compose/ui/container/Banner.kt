@@ -174,7 +174,7 @@ fun Banner(
                 modifier = Modifier.fillMaxSize().background(Theme.color.surface).rotate(-15f).background(brush),
                 contentAlignment = Alignment.Center
             ) {
-                WaveLoading.Content(contentColor)
+                WaveLoading.Content(color = contentColor)
             }
         }
     }

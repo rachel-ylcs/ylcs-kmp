@@ -89,7 +89,7 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
         val summary = "VM计数 $counter · ticks $ticks · 草稿 $draftLength 字 · 资源${if (resource?.released == true) "已释放" else "占用中"}"
         SideEffect { journal.state(instanceId, summary) }
         PageHeading("03", "页面被覆盖，数据还在", "给三种状态各加几次，然后打开覆盖页。等待退出动画结束再返回，比较 UI 状态与 ViewModel 状态。")
-        GalleryCard("三种状态，各自归属", "普通 remember 在内容真正离开组合后会重新创建；rememberSaveable 由条目状态持有者保存；ViewModel 状态留在本实例里。") {
+        GalleryCard("三种状态，各自归属", description = "普通 remember 在内容真正离开组合后会重新创建；rememberSaveable 由条目状态持有者保存；ViewModel 状态留在本实例里。") {
             Actions {
                 Metric("ViewModel 计数", counter.toString())
                 Metric("remember 计数", rememberedCounter.toString())
@@ -103,7 +103,7 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
             Input(modifier = Modifier.fillMaxWidth(), state = draft, hint = "编辑一份页面草稿")
             Paragraph("草稿由 VM 的 InputState 保存。这里的保存指仍在当前进程、当前导航条目作用域内保留。")
         }
-        GalleryCard("后台页面的协程与资源", "页面留在栈内时，viewModelScope 不会因为 UI 被覆盖而取消。计时应继续；只有页面清理或主动暂停才结束计时任务。") {
+        GalleryCard("后台页面的协程与资源", description = "页面留在栈内时，viewModelScope 不会因为 UI 被覆盖而取消。计时应继续；只有页面清理或主动暂停才结束计时任务。") {
             Actions {
                 Metric("累计 ticks", ticks.toString())
                 Metric("计时任务", if (running) "运行中" else "已暂停")
@@ -152,7 +152,7 @@ internal class CoverScreen(routes: GalleryRoutes, message: String) : GalleryScre
     @Composable
     override fun PageContent() {
         PageHeading("03 / 04", "前一个页面暂时看不见", message)
-        GalleryCard("被保留的实例快照", "下方记录来自各页面自己的状态更新。组合数为 0 仍可能有存活的 VM 和运行中的协程。") {
+        GalleryCard("被保留的实例快照", description = "下方记录来自各页面自己的状态更新。组合数为 0 仍可能有存活的 VM 和运行中的协程。") {
             val records = journal.instances.filter { (val id, val cleared) -> !cleared && id != instanceId }
             records.takeLast(12).forEach { (val id, val scope, val name, val compositions, val state) ->
                 Badge("$scope · $name $id · 组合 $compositions")

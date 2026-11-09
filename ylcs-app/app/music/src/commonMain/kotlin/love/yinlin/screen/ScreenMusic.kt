@@ -549,7 +549,7 @@ class ScreenMusic : BasicScreen() {
                                     modifier = Modifier.fillMaxHeight().aspectRatio(1f),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    if (isCurrent) WaveLoading.Content(Theme.color.primary, modifier = Modifier.fillMaxSize(fraction = 0.5f))
+                                    if (isCurrent) WaveLoading.Content(color = Theme.color.primary, modifier = Modifier.fillMaxSize(fraction = 0.5f))
                                 }
                             }
                         }

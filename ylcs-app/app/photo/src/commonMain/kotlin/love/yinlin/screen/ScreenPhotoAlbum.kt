@@ -129,7 +129,7 @@ class ScreenPhotoAlbum : BasicScreen() {
                                         navigate(::ScreenImagePreview, pics, index)
                                     }
                                 )
-                                if (index != album.picNum - 1) VerticalDivider(Theme.border.v4, Theme.color.tertiary)
+                                if (index != album.picNum - 1) VerticalDivider(thickness = Theme.border.v4, color = Theme.color.tertiary)
                             }
                         }
                     }
@@ -160,7 +160,7 @@ class ScreenPhotoAlbum : BasicScreen() {
                     canLoading = page.canLoading,
                     onRefresh = ::requestNewPhotos,
                     onLoading = ::requestMorePhotos,
-                    itemDivider = { HorizontalDivider(Theme.border.v3, Theme.color.secondary) },
+                    itemDivider = { HorizontalDivider(thickness = Theme.border.v3, color = Theme.color.secondary) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     PhotoAlbumLayout(album = it, modifier = Modifier.fillMaxWidth())

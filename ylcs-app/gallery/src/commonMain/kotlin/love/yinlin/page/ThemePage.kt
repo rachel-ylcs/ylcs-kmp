@@ -25,7 +25,7 @@ object ThemePage : Page() {
     @Composable
     override fun Content() {
         ComponentColumn(showTabs = false) {
-            GalleryCard("选择你的外观", "下方色块来自当前主题。切换配色或明暗模式，可以即时对照整个界面。") {
+            GalleryCard(title = "选择你的外观", description = "下方色块来自当前主题。切换配色或明暗模式，可以即时对照整个界面。") {
                 GalleryActions {
                     GalleryPalette.entries.forEach { palette ->
                         TextButton(palette.title, icon = if (galleryPalette == palette) Icons.Check else Icons.Theme,
@@ -49,23 +49,23 @@ object ThemePage : Page() {
             Component("Container") {
                 val roles = ["onContainer" to Theme.color.onContainer, "onContainerVariant" to Theme.color.onContainerVariant]
                 SwatchRow {
-                    Swatch("primaryContainer", Theme.color.primaryContainer, roles, Modifier.weight(1f))
-                    Swatch("secondaryContainer", Theme.color.secondaryContainer, roles, Modifier.weight(1f))
-                    Swatch("tertiaryContainer", Theme.color.tertiaryContainer, roles, Modifier.weight(1f))
+                    Swatch("primaryContainer", Theme.color.primaryContainer, roles = roles, modifier = Modifier.weight(1f))
+                    Swatch("secondaryContainer", Theme.color.secondaryContainer, roles = roles, modifier = Modifier.weight(1f))
+                    Swatch("tertiaryContainer", Theme.color.tertiaryContainer, roles = roles, modifier = Modifier.weight(1f))
                 }
             }
             Component("Background / Surface") {
                 val backgroundRoles = ["onBackground" to Theme.color.onBackground, "onBackgroundVariant" to Theme.color.onBackgroundVariant]
                 SwatchRow {
-                    Swatch("background", Theme.color.background, backgroundRoles, Modifier.weight(1f))
-                    Swatch("backgroundVariant", Theme.color.backgroundVariant, backgroundRoles, Modifier.weight(1f))
-                    Swatch("surface", Theme.color.surface, ["onSurface" to Theme.color.onSurface, "onSurfaceVariant" to Theme.color.onSurfaceVariant], Modifier.weight(1f))
+                    Swatch("background", Theme.color.background, roles = backgroundRoles, modifier = Modifier.weight(1f))
+                    Swatch("backgroundVariant", Theme.color.backgroundVariant, roles = backgroundRoles, modifier = Modifier.weight(1f))
+                    Swatch("surface", Theme.color.surface, roles = ["onSurface" to Theme.color.onSurface, "onSurfaceVariant" to Theme.color.onSurfaceVariant], modifier = Modifier.weight(1f))
                 }
             }
             Component("Status") {
                 SwatchRow {
-                    Swatch("error", Theme.color.error, ["onError" to Theme.color.onError], Modifier.weight(1f))
-                    Swatch("warning", Theme.color.warning, ["onWarning" to Theme.color.onWarning], Modifier.weight(1f))
+                    Swatch("error", Theme.color.error, roles = ["onError" to Theme.color.onError], modifier = Modifier.weight(1f))
+                    Swatch("warning", Theme.color.warning, roles = ["onWarning" to Theme.color.onWarning], modifier = Modifier.weight(1f))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Box(Modifier.fillMaxWidth().height(114.dp).clip(RoundedCornerShape(13.dp)).background(Theme.color.backgroundVariant),
                             contentAlignment = Alignment.Center) {
@@ -90,7 +90,7 @@ object ThemePage : Page() {
                         GalleryCaption(Theme.color.outline.hex())
                     }
                     Swatch("disabledContainer", Theme.color.disabledContainer,
-                        ["disabledContent" to Theme.color.disabledContent], Modifier.weight(1f))
+                        roles = ["disabledContent" to Theme.color.disabledContent], modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -111,8 +111,8 @@ object ThemePage : Page() {
     private fun Swatch(
         name: String,
         color: Color,
-        roles: List<Pair<String, Color>> = [],
         modifier: Modifier = Modifier,
+        roles: List<Pair<String, Color>> = [],
     ) {
         Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(

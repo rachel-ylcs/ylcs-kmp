@@ -72,7 +72,7 @@ internal object OverviewPage : Page() {
                     }
                 }
             }
-            GalleryCard("从这里开始", "这些页面展示的是实际组件，可以直接输入、点击和拖动。") {
+            GalleryCard(title = "从这里开始", description = "这些页面展示的是实际组件，可以直接输入、点击和拖动。") {
                 GalleryActions {
                     GalleryBadge("01 · 选择一个分类")
                     GalleryBadge("02 · 操作真实控件")
@@ -121,7 +121,7 @@ internal object OverviewPage : Page() {
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("启用控件", modifier = Modifier.weight(1f), fontSize = 13.sp)
-                        Switch(enabled, { enabled = it })
+                        Switch(enabled, onCheckedChange = { enabled = it })
                     }
                     Slider(value, { value = it }, onValueChange = { value = it }, enabled = enabled, modifier = Modifier.fillMaxWidth())
                     GalleryCaption("滑块值  ${(value * 100).toInt()}%")

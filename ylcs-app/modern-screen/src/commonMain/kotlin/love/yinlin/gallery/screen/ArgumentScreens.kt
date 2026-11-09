@@ -48,7 +48,7 @@ internal class ArgumentLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, 
     @Composable
     override fun PageContent() {
         PageHeading("02", "参数传递，保持类型", "六种工厂签名对应 0–5 个导航参数。观察实际构造值，再发送一轮 Resume，比较初始参数与当前状态。")
-        GalleryCard("参数实验台", "先 New，再切换到下一轮数据并 Resume。同一个编号意味着复用；初始参数应保留，而当前状态由 withResume 更新。") {
+        GalleryCard("参数实验台", description = "先 New，再切换到下一轮数据并 Resume。同一个编号意味着复用；初始参数应保留，而当前状态由 withResume 更新。") {
             ScreenManager.Navigation<ArgumentRootScreen>(Modifier.fillMaxWidth().height(720.dp)) {
                 val scope = ArgumentRoutes(journal, "参数 $instanceId")
                 journal.event(scope.name, "注册", "无参入口与 0–5 参数页面")
@@ -169,8 +169,8 @@ internal abstract class ArgumentPage(
                 }
             }
             Paragraph(scope.lastResult)
-            GalleryCard("初始参数 · 本次构造时收到", "Resume 后这一组仍保持原值；它来自构造函数，不读取内部 key。") { FieldRows(initialFields) }
-            GalleryCard("当前状态 · 实际 ViewModel", "withResume 解包新请求并更新这里。Move 不触发更新；New 和 Replace 会产生新的编号。") { FieldRows(currentFields) }
+            GalleryCard("初始参数 · 本次构造时收到", description = "Resume 后这一组仍保持原值；它来自构造函数，不读取内部 key。") { FieldRows(initialFields) }
+            GalleryCard("当前状态 · 实际 ViewModel", description = "withResume 解包新请求并更新这里。Move 不触发更新；New 和 Replace 会产生新的编号。") { FieldRows(currentFields) }
             CodeBlock(scope.code())
         }
     }

@@ -40,7 +40,7 @@ internal class NestedLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, Ga
                 key("right") { NestedPanel("右侧", Modifier.width(panelWidth)) }
             }
         }
-        GalleryCard("观察父子作用域", "覆盖父页面应保留两份子导航；清理父页面后，两个子 Manager 及它们的 Screen 都应清理。") {
+        GalleryCard("观察父子作用域", description = "覆盖父页面应保留两份子导航；清理父页面后，两个子 Manager 及它们的 Screen 都应清理。") {
             Actions {
                 PrimaryButton("覆盖整个父页面") {
                     navigate(routes::cover, "嵌套实验父页 $instanceId 被覆盖。两边的根页面 VM 应继续计时；返回后，两份导航的位置、编号和草稿应保留。")
@@ -65,7 +65,7 @@ internal class NestedLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, Ga
 
     @Composable
     private fun NestedPanel(label: String, modifier: Modifier = Modifier) {
-        GalleryCard("${label}导航", "计数和草稿由这一侧的页面 VM 维护。", modifier) {
+        GalleryCard("${label}导航", description = "计数和草稿由这一侧的页面 VM 维护。", modifier = modifier) {
             ScreenManager.Navigation<NestedRootScreen>(Modifier.fillMaxWidth().height(360.dp)) {
                 val scope = NestedRoutes(journal, "$label / 父 $instanceId")
                 journal.event(scope.name, "注册", "独立子导航 · 同样的 Root / Detail 类型")

@@ -174,8 +174,8 @@ private fun CalendarDayGrid(
 
 @Composable
 fun Calendar(
-    state: CalendarState = rememberCalendarState(),
     modifier: Modifier = Modifier,
+    state: CalendarState = rememberCalendarState(),
     events: Map<Long, String> = emptyMap(),
     actions: @Composable RowScope.() -> Unit = {},
     onEventClick: (LocalDate) -> Unit = {},

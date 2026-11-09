@@ -20,8 +20,8 @@ import love.yinlin.compose.ui.node.silentClick
 @Composable
 fun Switch(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit = {},
     enabled: Boolean = true
 ) {
     val width = Theme.size.input8

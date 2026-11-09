@@ -28,10 +28,10 @@ import love.yinlin.compose.ui.node.fastClipCircle
 @Composable
 fun ColorIcon(
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     size: Dp = Theme.size.icon,
     color: Color = Theme.color.onContainer,
     background: Color = Theme.color.primaryContainer,
-    modifier: Modifier = Modifier,
 ) {
     val colorFilter = remember(color) { if (color == Colors.Unspecified) null else ColorFilter.tint(color) }
 

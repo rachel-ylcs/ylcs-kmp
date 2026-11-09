@@ -33,9 +33,9 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 fun Button(
     onClick: () -> Unit,
     color: Color,
+    modifier: Modifier = Modifier,
     padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     ThemeContainer(enabled) {
@@ -65,10 +65,10 @@ fun Button(
     text: String,
     icon: ImageVector?,
     color: Color,
+    modifier: Modifier = Modifier,
     style: TextStyle = LocalStyle.current.bold,
     padding: PaddingValues = Theme.padding.value,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Button(onClick = onClick, color = color, padding = padding, enabled = enabled, modifier = modifier) {
         TextIconAdapter { iconId, textId ->
@@ -81,11 +81,11 @@ fun Button(
 @Composable
 fun PrimaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)
@@ -94,11 +94,11 @@ fun PrimaryButton(
 @Composable
 fun SecondaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)
@@ -107,11 +107,11 @@ fun SecondaryButton(
 @Composable
 fun TertiaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)

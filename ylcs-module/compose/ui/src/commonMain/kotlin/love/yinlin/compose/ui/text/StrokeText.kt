@@ -27,8 +27,8 @@ import love.yinlin.compose.ui.node.semantics
 fun StrokeText(
     text: String,
     strokeColor: Color,
-    strokeWidth: TextUnit = style.fontSize / 12f,
     modifier: Modifier = Modifier,
+    strokeWidth: TextUnit = style.fontSize / 12f,
     color: Color = Colors.Unspecified,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,

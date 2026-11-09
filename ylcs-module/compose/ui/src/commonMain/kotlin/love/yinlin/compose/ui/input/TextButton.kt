@@ -26,8 +26,8 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 
 @Composable
 internal fun TextButton(
-    enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -52,11 +52,11 @@ internal fun TextButton(
 @Composable
 fun TextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     color: Color = LocalColor.current,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     TextButton(enabled = enabled, modifier = modifier, onClick = onClick) {
@@ -71,10 +71,10 @@ fun TextButton(
 @Composable
 fun PrimaryTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     TextButton(text = text, icon = icon, color = Theme.color.primary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -83,10 +83,10 @@ fun PrimaryTextButton(
 @Composable
 fun SecondaryTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     TextButton(text = text, icon = icon, color = Theme.color.secondary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -95,10 +95,10 @@ fun SecondaryTextButton(
 @Composable
 fun TertiaryTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     TextButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -107,10 +107,10 @@ fun TertiaryTextButton(
 @Composable
 fun ErrorTextButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     TextButton(text = text, icon = icon, color = Theme.color.error, style = style, enabled = enabled, modifier = modifier, onClick = onClick)

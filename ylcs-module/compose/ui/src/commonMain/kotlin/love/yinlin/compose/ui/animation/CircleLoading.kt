@@ -24,7 +24,7 @@ import love.yinlin.compose.ui.layout.MeasurePolicies
 @Stable
 object CircleLoading : IndeterminateLoadingAnimation {
     @Composable
-    override fun Content(color: Color, modifier: Modifier) {
+    override fun Content(modifier: Modifier, color: Color) {
         val minSize = Theme.size.icon
         val duration = Theme.animation.duration.v4
 

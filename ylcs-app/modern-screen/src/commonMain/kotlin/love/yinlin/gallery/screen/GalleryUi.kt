@@ -119,7 +119,7 @@ internal abstract class GalleryScreen(
                             }
                             PageContent()
                             if (section != GallerySection.Journal) {
-                                GalleryCard("最近发生", "真实的构造、生命周期回调与组合事件。可在「观察记录」查看完整会话。") {
+                                GalleryCard("最近发生", description = "真实的构造、生命周期回调与组合事件。可在「观察记录」查看完整会话。") {
                                     EventRows(journal.events.takeLast(5).asReversed())
                                 }
                             }
@@ -163,7 +163,7 @@ internal fun Actions(content: @Composable FlowRowScope.() -> Unit) {
 }
 
 @Composable
-internal fun GalleryCard(title: String, description: String? = null, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun GalleryCard(title: String, modifier: Modifier = Modifier, description: String? = null, content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp),
         border = BorderStroke(1.dp, Theme.color.outline.copy(alpha = 0.35f)),

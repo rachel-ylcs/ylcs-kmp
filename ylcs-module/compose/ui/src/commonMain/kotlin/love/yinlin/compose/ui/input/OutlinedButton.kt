@@ -53,10 +53,10 @@ internal fun OutlinedButton(
 @Composable
 fun PrimaryOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(text = text, icon = icon, color = Theme.color.primary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -65,10 +65,10 @@ fun PrimaryOutlinedButton(
 @Composable
 fun SecondaryOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(text = text, icon = icon, color = Theme.color.secondary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
@@ -77,10 +77,10 @@ fun SecondaryOutlinedButton(
 @Composable
 fun TertiaryOutlinedButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)

@@ -9,5 +9,5 @@ import love.yinlin.compose.LocalColor
 @Stable
 interface IndeterminateLoadingAnimation {
     @Composable
-    fun Content(color: Color = LocalColor.current, modifier: Modifier = Modifier)
+    fun Content(modifier: Modifier = Modifier, color: Color = LocalColor.current)
 }

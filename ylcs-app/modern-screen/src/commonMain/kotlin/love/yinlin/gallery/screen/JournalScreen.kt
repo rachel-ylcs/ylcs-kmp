@@ -37,7 +37,7 @@ internal class JournalScreen(routes: GalleryRoutes) : GalleryScreen(routes, Gall
             }
             Paragraph("尚未清理包括栈内页面和仍被退出动画引用的页面。一个页面离开组合，不等于 ViewModel 已被清理。")
         }
-        GalleryCard("实例观察", "默认查看尚未清理的实例。最多展示最近 24 份记录；全部存活实例与最近 40 份已清理实例会保留在会话中。") {
+        GalleryCard("实例观察", description = "默认查看尚未清理的实例。最多展示最近 24 份记录；全部存活实例与最近 40 份已清理实例会保留在会话中。") {
             Filter(size = instanceLabels.size, selectedProvider = { instanceFilter == it }, titleProvider = { instanceLabels[it] },
                 onClick = { index, _ -> instanceFilter = index })
             val records = journal.instances.filter {
@@ -45,7 +45,7 @@ internal class JournalScreen(routes: GalleryRoutes) : GalleryScreen(routes, Gall
             }.takeLast(24).asReversed()
             if (records.isEmpty()) Paragraph("这个筛选条件下还没有实例。")
             records.forEach { (val id, val scope, val name, val initial, val initialized, val cleared, val compositions, val resumes, val state) ->
-                GalleryCard("$name $id", scope) {
+                GalleryCard("$name $id", description = scope) {
                     Actions {
                         Badge(when {
                             cleared -> "已清理"
@@ -61,7 +61,7 @@ internal class JournalScreen(routes: GalleryRoutes) : GalleryScreen(routes, Gall
                 }
             }
         }
-        GalleryCard("事件时间线", "按最近发生的顺序显示。保留最近 160 条，本页最多显示筛选后的 60 条；时间从本次 Gallery 会话创建开始计算。") {
+        GalleryCard("事件时间线", description = "按最近发生的顺序显示。保留最近 160 条，本页最多显示筛选后的 60 条；时间从本次 Gallery 会话创建开始计算。") {
             Filter(size = eventLabels.size, selectedProvider = { eventFilter == it }, titleProvider = { eventLabels[it] },
                 onClick = { index, _ -> eventFilter = index })
             TextButton("清空事件记录") {

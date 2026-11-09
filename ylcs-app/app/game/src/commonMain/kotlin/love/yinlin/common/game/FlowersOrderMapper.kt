@@ -58,8 +58,8 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
     private fun FlowersOrderText(
         text: String,
         key: Int,
-        style: TextStyle = Theme.typography.v7.bold,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        style: TextStyle = Theme.typography.v7.bold
     ) {
         val items = remember(key) { FOType.decode(key) }
         Box(modifier = modifier) {

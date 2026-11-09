@@ -151,8 +151,8 @@ private fun PaintCanvasView(
 @Composable
 fun PaintCanvas(
     state: PaintCanvasState,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Column(modifier = modifier.width(IntrinsicSize.Min).border(Theme.border.v6, Theme.color.primary).clipToBounds()) {
         BackgroundContainer {

@@ -13,13 +13,13 @@ import love.yinlin.compose.ui.container.itemKey
 @Composable
 fun <T> PaginationColumn(
     items: List<T>,
+    modifier: Modifier = Modifier,
     key: ((T) -> Any)? = null,
     state: LazyListState = rememberLazyListState(),
     canRefresh: Boolean = true,
     canLoading: Boolean = false,
     onRefresh: (suspend () -> Unit)? = null,
     onLoading: (suspend () -> Unit)? = null,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues.Zero,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
