@@ -487,7 +487,7 @@ class ScreenConcert : BasicScreen() {
     }
 
     private val concertTabItems = [
-        "Live" to Icons.EventAvailable ,
+        "Live" to Icons.EventAvailable,
         "歌曲" to Icons.LibraryMusic,
         "足迹" to Icons.History
     ]

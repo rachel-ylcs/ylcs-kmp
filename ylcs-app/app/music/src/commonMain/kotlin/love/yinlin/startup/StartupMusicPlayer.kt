@@ -144,7 +144,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                         engine = currentEngine
                         // 更新状态标志
                         currentHasAnimation = music.path(modPath, ModResourceType.Animation).isFile()
-                        currentHasVideo = music.path(modPath,ModResourceType.Video).isFile()
+                        currentHasVideo = music.path(modPath, ModResourceType.Video).isFile()
                         currentHasAccompaniment = music.path(modPath, ModResourceType.Accompaniment).isFile()
                     }
                 }

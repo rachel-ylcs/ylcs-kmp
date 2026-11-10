@@ -218,7 +218,7 @@ class PullState(
 private fun PullIndicator(
     pullState: PullState,
     isTop: Boolean,
-    indicatorPadding: Dp ,
+    indicatorPadding: Dp,
     modifier: Modifier
 ) {
     val fraction by rememberDerivedState(isTop) { pullState.calcFraction(isTop) }

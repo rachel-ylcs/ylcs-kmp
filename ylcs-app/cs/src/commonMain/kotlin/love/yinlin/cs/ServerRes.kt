@@ -54,6 +54,6 @@ object ServerRes : APIRes("public") {
     }
 
     object Prize : APIRes(this, "prize") {
-        fun prize(itemID: Int) = APIRes(this,"${itemID}.webp")
+        fun prize(itemID: Int) = APIRes(this, "${itemID}.webp")
     }
 }

@@ -20,7 +20,7 @@ import love.yinlin.compose.Theme
 @Composable
 fun Flyout(
     visible: Boolean,
-    onClickOutside: () -> Unit ,
+    onClickOutside: () -> Unit,
     position: FlyoutPosition = FlyoutPosition.Top,
     focusable: Boolean = true,
     clip: Boolean = false,

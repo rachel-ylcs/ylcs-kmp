@@ -62,7 +62,7 @@ class ScreenPhotoAlbum : BasicScreen() {
     private suspend fun requestNewPhotos(newKeyword: String? = null) {
         keyword = newKeyword
         provider.withLoading {
-            val result = ApiPhotoSearchPhotoAlbums.requestNull(newKeyword, page.default, page.default1,page.pageNum)!!
+            val result = ApiPhotoSearchPhotoAlbums.requestNull(newKeyword, page.default, page.default1, page.pageNum)!!
             listState.requestScrollToItem(0)
             page.newData(result.o1)
         }

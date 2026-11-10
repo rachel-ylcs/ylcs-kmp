@@ -204,8 +204,8 @@ class MultipleBlock(
                     }
                     if (progress >= 1f) mapLayer.updateCustomResult(1f, status.noteProgressList)
                 }
-                is Status.Release -> updateCustomRelease(status, tick) { Status.Done(status.noteProgressList.map { p -> p != null },false, it.result) }
-                is Status.Missing -> updateCustomRelease(status, tick) { Status.Done(status.noteProgressList.map { p -> p != null },true, BlockResult.MISS) }
+                is Status.Release -> updateCustomRelease(status, tick) { Status.Done(status.noteProgressList.map { p -> p != null }, false, it.result) }
+                is Status.Missing -> updateCustomRelease(status, tick) { Status.Done(status.noteProgressList.map { p -> p != null }, true, BlockResult.MISS) }
                 is Status.Done -> return@withMapLayer false
             }
             true
