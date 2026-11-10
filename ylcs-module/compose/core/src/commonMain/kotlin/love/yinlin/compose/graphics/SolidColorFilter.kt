@@ -13,7 +13,7 @@ object SolidColorFilter {
             0.21f * r, 0.71f * r, 0.07f * r, 0f, 0f,
             0.21f * g, 0.71f * g, 0.07f * g, 0f, 0f,
             0.21f * b, 0.71f * b, 0.07f * b, 0f, 0f,
-            0f,        0f,        0f,        1f, 0f
+            0f, 0f, 0f, 1f, 0f
         ]))
     }
 }

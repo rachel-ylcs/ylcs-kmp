@@ -37,7 +37,7 @@ class RichRenderer(
 @Composable
 fun rememberRichRenderer(
     drawerProvider: () -> List<RichDrawer> = { [] },
-    onAction: (RichObject) -> Unit  = {}
+    onAction: (RichObject) -> Unit = {}
 ): RichRenderer {
     val onActionUpdate by rememberUpdatedState(onAction)
     return remember { RichRenderer(drawerProvider()) { onActionUpdate(it) } }

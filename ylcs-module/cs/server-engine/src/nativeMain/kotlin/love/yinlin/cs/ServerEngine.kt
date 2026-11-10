@@ -36,7 +36,7 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     /**
      * 配置
      */
-    var config: JsonObject = makeObject {  }
+    var config: JsonObject = makeObject { }
         private set
 
     /**

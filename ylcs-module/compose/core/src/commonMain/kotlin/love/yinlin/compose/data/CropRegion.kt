@@ -23,7 +23,7 @@ data class CropRegion(
     override fun toString(): String = "CropRegion($xPercent, $yPercent, $widthPercent, $heightPercent)"
 
     operator fun times(container: Size) = Rect(
-        offset = Offset(container.width * xPercent,  container.height * yPercent),
+        offset = Offset(container.width * xPercent, container.height * yPercent),
         size = Size(container.width * widthPercent, container.height * heightPercent)
     )
 

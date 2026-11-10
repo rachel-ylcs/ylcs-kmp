@@ -37,7 +37,7 @@ object DouyinEncoder {
 
     // 构造Token
 
-    private const val GUEST_ALPHABET =  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-"
+    private const val GUEST_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-"
 
     fun buildMsToken(): String {
         val arr = CharArray(128) { GUEST_ALPHABET.random() }

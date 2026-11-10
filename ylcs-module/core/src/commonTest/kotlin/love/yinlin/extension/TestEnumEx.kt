@@ -13,7 +13,7 @@ class TestEnumEx {
     fun testEnum() {
         assertEquals(Foo.A, enum(0))
         assertEquals(Foo.B, enum<Foo>(1))
-        assertFailsWith<IndexOutOfBoundsException> { enum<Foo>(3)  }
+        assertFailsWith<IndexOutOfBoundsException> { enum<Foo>(3) }
         assertEquals(Foo.C, enum(-1, Foo.C))
 
         assertEquals(Foo.B, enum { it.text.length == 2 })

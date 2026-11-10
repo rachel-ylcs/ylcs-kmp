@@ -96,7 +96,7 @@ fun AndroidMatrix.asComposeMatrix(): Matrix {
     return Matrix([
         v[AndroidMatrix.MSCALE_X], v[AndroidMatrix.MSKEW_Y], 0f, v[AndroidMatrix.MPERSP_0], // Column 0: ScaleX, SkewY, 0, Persp0
         v[AndroidMatrix.MSKEW_X], v[AndroidMatrix.MSCALE_Y], 0f, v[AndroidMatrix.MPERSP_1], // Column 1: SkewX, ScaleY, 0, Persp1
-        0f, 0f, 1f, 0f,   // Column 2: 0, 0, ScaleZ, 0
-        v[AndroidMatrix.MTRANS_X], v[AndroidMatrix.MTRANS_Y], 0f, v[AndroidMatrix.MPERSP_2]  // Column 3: TransX, TransY, 0, Persp2
+        0f, 0f, 1f, 0f, // Column 2: 0, 0, ScaleZ, 0
+        v[AndroidMatrix.MTRANS_X], v[AndroidMatrix.MTRANS_Y], 0f, v[AndroidMatrix.MPERSP_2] // Column 3: TransX, TransY, 0, Persp2
     ])
 }

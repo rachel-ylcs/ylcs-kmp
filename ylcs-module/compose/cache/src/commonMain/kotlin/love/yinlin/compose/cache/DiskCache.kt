@@ -7,7 +7,7 @@ import love.yinlin.fs.File
 
 class DiskCache<S : Any>(
     cachePath: File,
-    private val key: (S) -> Any =  { it },
+    private val key: (S) -> Any = { it },
     private val fetcher: suspend (source: S, sink: Sink) -> Unit
 ) {
     private val storage: DiskStorage = FileDiskStorage(cachePath, DiskPolicy.Persistent)

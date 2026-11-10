@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 // 奖品类，可以有一二三等多种奖项，以及不同的奖项描述。该类作为Prize类的内部类关联
 data class PrizeItem(
     val itemID: Int, // 奖品ID
-    val pid: Int,   // 关联的抽奖事件id
+    val pid: Int, // 关联的抽奖事件id
     val name: String, // 奖品名称
     val description: String?, // 奖品描述
     val pic: String?, // 图片描述

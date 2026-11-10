@@ -217,7 +217,7 @@ internal class ImageLoader(
                 context = context,
                 maxBytes = configuration.maxSourceBytes,
                 onProgress = { progress.value = it },
-                network =  { source ->
+                network = { source ->
                     fetchNetwork(key, source, request.diskCache, progress)
                 }
             )

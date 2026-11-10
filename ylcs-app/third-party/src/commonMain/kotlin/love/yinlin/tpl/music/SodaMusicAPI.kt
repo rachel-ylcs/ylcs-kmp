@@ -116,7 +116,7 @@ object SodaMusicAPI : PlatformMusicAPI {
 
         // 2. 音频格式过滤：仅丢弃 .mp4 视频，其他所有格式都保留
         if (audioUrl.isNotEmpty() && audioUrl.lowercase().endsWith(".mp4")) {
-            return null  // 丢弃整首视频歌曲
+            return null // 丢弃整首视频歌曲
         }
 
         // 3. 元数据 API

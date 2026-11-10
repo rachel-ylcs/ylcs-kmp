@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Stable
 @Serializable
 data class Prize(
-    val pid: Int,  // 抽奖事件ID
+    val pid: Int, // 抽奖事件ID
     val title: String, // 标题
     val content: String, // 内容描述
     val ts: String, // 成功创建某个抽奖时的创建时间

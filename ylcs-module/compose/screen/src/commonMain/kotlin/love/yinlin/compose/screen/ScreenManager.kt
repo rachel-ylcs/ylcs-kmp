@@ -137,7 +137,7 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
                 val firstRemoved = if (plan is NavigationPlan.Create) fromIndex else fromIndex + 1
                 if (popCurrent || firstRemoved < toIndex) removed = buildList {
                     if (popCurrent) add(backStack.last())
-                    for (index in firstRemoved  ..< toIndex) add(backStack[index])
+                    for (index in firstRemoved ..< toIndex) add(backStack[index])
                 }
                 runCatching {
                     Snapshot.withMutableSnapshot {

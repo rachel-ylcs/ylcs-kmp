@@ -307,7 +307,7 @@ object WeiboAPI {
         val items: MutableList<Weibo> = []
         for (item in cards) {
             val card = item.Object
-            if (card["card_type"].Int != 9) continue  // 非微博类型
+            if (card["card_type"].Int != 9) continue // 非微博类型
             items += Fetcher.extractWeibo(card.obj("mblog"))
         }
         items

@@ -225,7 +225,7 @@ class ScreenRhyme : BasicScreen() {
                             musicInfo = info,
                             lyricsConfig = lyricsConfig,
                             musicRecord = recordImage,
-                            characterCV =  characterImage
+                            characterCV = characterImage
                         ),
                         character = character,
                         audio = audio

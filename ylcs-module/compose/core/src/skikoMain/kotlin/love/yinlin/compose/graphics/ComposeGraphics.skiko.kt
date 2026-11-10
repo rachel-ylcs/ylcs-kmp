@@ -76,17 +76,17 @@ fun Matrix.asSkiaMatrix33(): Matrix33 {
     return Matrix33(
         v[0], v[4], v[12], // Skia Row0: ScaleX, SkewX, TransX
         v[1], v[5], v[13], // Skia Row1: SkewY, ScaleY, TransY
-        v[3], v[7], v[15]  // Skia Row2: Persp0, Persp1, Persp2
+        v[3], v[7], v[15] // Skia Row2: Persp0, Persp1, Persp2
     )
 }
 
 fun Matrix.asSkiaMatrix44(): Matrix44 {
     val v = this.values
     return Matrix44(
-        v[0], v[4], v[8],  v[12], // Skia Row 0
-        v[1], v[5], v[9],  v[13], // Skia Row 1
+        v[0], v[4], v[8], v[12], // Skia Row 0
+        v[1], v[5], v[9], v[13], // Skia Row 1
         v[2], v[6], v[10], v[14], // Skia Row 2
-        v[3], v[7], v[11], v[15]  // Skia Row 3
+        v[3], v[7], v[11], v[15] // Skia Row 3
     )
 }
 
@@ -95,17 +95,17 @@ fun Matrix33.asComposeMatrix(): Matrix {
     return Matrix([
         s[0], s[3], 0f, s[6], // Col 0: ScaleX, SkewY, 0, Persp0
         s[1], s[4], 0f, s[7], // Col 1: SkewX, ScaleY, 0, Persp1
-        0f,   0f,   1f, 0f,   // Col 2: 0, 0, 1, 0 (Identity Z)
-        s[2], s[5], 0f, s[8]  // Col 3: TransX, TransY, 0, Persp2
+        0f, 0f, 1f, 0f, // Col 2: 0, 0, 1, 0 (Identity Z)
+        s[2], s[5], 0f, s[8] // Col 3: TransX, TransY, 0, Persp2
     ])
 }
 
 fun Matrix44.asComposeMatrix(): Matrix {
     val s = this.mat
     return Matrix([
-        s[0], s[4], s[8],  s[12], // Compose Col 0
-        s[1], s[5], s[9],  s[13], // Compose Col 1
+        s[0], s[4], s[8], s[12], // Compose Col 0
+        s[1], s[5], s[9], s[13], // Compose Col 1
         s[2], s[6], s[10], s[14], // Compose Col 2
-        s[3], s[7], s[11], s[15]  // Compose Col 3
+        s[3], s[7], s[11], s[15] // Compose Col 3
     ])
 }

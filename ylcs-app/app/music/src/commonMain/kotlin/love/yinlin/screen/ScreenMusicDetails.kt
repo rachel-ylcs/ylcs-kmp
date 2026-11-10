@@ -170,7 +170,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 slot.loading.open {
                     // 解压
                     path.read { source ->
-                        val result = ModFactory.Release(source, app.modPath).process { _, _, _ ->  }
+                        val result = ModFactory.Release(source, app.modPath).process { _, _, _ -> }
                         require(result.metadata.version == ModFactory.VERSION) { "不匹配的MOD版本" }
                     }
                     path.delete() // 删除临时文件

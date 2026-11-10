@@ -64,7 +64,7 @@ fun <T> AdderBox(
             BackgroundContainer {
                 val itemNum = items.size
 
-                for (index in 0 ..< minOf(itemNum, maxNum))  {
+                for (index in 0 ..< minOf(itemNum, maxNum)) {
                     val item = items[index]
 
                     key(key?.invoke(item) ?: index) {

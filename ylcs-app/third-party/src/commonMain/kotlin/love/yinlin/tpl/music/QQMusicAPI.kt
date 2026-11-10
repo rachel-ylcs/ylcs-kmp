@@ -60,7 +60,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
             finalUrl.contains("albumDetail") -> {
                 val id = finalUrl.substringAfterLast("/").substringBefore("?")
-                requestAlbum(id)  // 专辑有专用接口了
+                requestAlbum(id) // 专辑有专用接口了
             }
             finalUrl.contains("songDetail") -> {
                 val id = finalUrl.substringAfterLast("/").substringBefore("?")

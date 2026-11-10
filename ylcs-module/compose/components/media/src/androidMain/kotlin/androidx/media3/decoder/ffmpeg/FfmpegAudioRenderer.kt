@@ -32,7 +32,7 @@ class FfmpegAudioRenderer(
     eventListener: AudioRendererEventListener?,
     audioSink: AudioSink
 ) : DecoderAudioRenderer<FfmpegAudioDecoder>(eventHandler, eventListener, audioSink) {
-    constructor(context: Context) : this(context, null,  null)
+    constructor(context: Context) : this(context, null, null)
 
     /**
      * Creates a new instance.
@@ -96,7 +96,7 @@ class FfmpegAudioRenderer(
         return when (formatSupport) {
             // using for all other formats.
             AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY -> MimeTypes.AUDIO_AC3 != inputFormat.sampleMimeType // AC-3 is always 16-bit, so there's no point using floating point. Assume that it's worth
-            AudioSink.SINK_FORMAT_UNSUPPORTED, AudioSink.SINK_FORMAT_SUPPORTED_WITH_TRANSCODING -> false   // Always prefer 16-bit PCM if the sink does not provide direct support for floating point.
+            AudioSink.SINK_FORMAT_UNSUPPORTED, AudioSink.SINK_FORMAT_SUPPORTED_WITH_TRANSCODING -> false // Always prefer 16-bit PCM if the sink does not provide direct support for floating point.
             else -> false
         }
     }
