@@ -9,6 +9,7 @@ import io.github.ktlint.core.rule.engine.core.api.editorconfig.ALL_RULES_EXECUTI
 import io.github.ktlint.core.rule.engine.core.api.editorconfig.RuleExecution
 import io.github.ktlint.core.rule.engine.core.api.editorconfig.createRuleExecutionEditorConfigProperty
 import io.github.ktlint.core.ruleset.standard.StandardRuleSetProvider
+import love.yinlin.lint.KtlintReport.Finding
 import java.io.File
 
 internal object RepositoryKtlint {
@@ -16,9 +17,9 @@ internal object RepositoryKtlint {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val (repositoryPath, reportPath, sourceListPath) = args
+        val (repositoryPath, reportsPath, xlsxWriterPath, sourceListPath) = args
         val root = File(repositoryPath)
-        val report = File(reportPath)
+        val reports = File(reportsPath)
         val sources = File(sourceListPath).readLines()
         check(sources.isNotEmpty()) { "No Kotlin sources found in ylcs-module or ylcs-app" }
 
@@ -53,44 +54,15 @@ internal object RepositoryKtlint {
                 }
             } catch (error: KtLintParseException) {
                 engineErrors++
-                findings.add(Finding(path, error.line, error.col, "ktlint:parse", KtlintSeverity.ERROR, error.message.orEmpty()))
+                findings.add(Finding(path, error.line, error.col, "ktlint:parse", KtlintSeverity.ERROR, error.message.orEmpty(), "语法解析错误"))
             } catch (error: KtLintRuleException) {
                 engineErrors++
-                findings.add(Finding(path, error.line, error.col, error.ruleId, KtlintSeverity.ERROR, error.message))
+                findings.add(Finding(path, error.line, error.col, error.ruleId, KtlintSeverity.ERROR, error.message, "规则执行错误"))
             }
         }
 
-        report.parentFile.mkdirs()
-        report.bufferedWriter().use { output ->
-            output.appendLine("# Kotlin 规范检查")
-            output.appendLine()
-            output.appendLine("扫描文件 ${sources.size} 个，共发现 ${findings.size} 项（含解析或规则执行错误 ${engineErrors} 项）。")
-            val counts = findings.groupingBy { it.severity }.eachCount()
-            val summary = KtlintSeverity.entries
-                .joinToString(" · ") { "${it.label} ${counts[it] ?: 0}" }
-            output.appendLine(summary)
-            output.appendLine()
-            if (findings.isNotEmpty()) {
-                output.appendLine("| 文件 | 行 | 列 | 规则 | 级别 | 说明 |")
-                output.appendLine("| --- | ---: | ---: | --- | --- | --- |")
-                for (finding in findings.sortedWith(compareBy(Finding::path, Finding::line, Finding::column, Finding::rule))) {
-                    output.appendLine("| ${escapeCell(finding.path)} | ${finding.line} | ${finding.column} | ${finding.rule} | ${finding.severity.label} | ${escapeCell(finding.message)} |")
-                }
-            }
-        }
-        println("ktlint: ${sources.size} files, ${findings.size} findings. Report: ${report.absolutePath}")
-        check(engineErrors == 0) { "ktlint could not complete $engineErrors checks. See ${report.absolutePath}" }
+        KtlintReport(sources.size, engineErrors, findings).write(reports, File(xlsxWriterPath))
+        println("ktlint: ${sources.size} files, ${findings.size} findings. Reports: ${reports.absolutePath}")
+        check(engineErrors == 0) { "ktlint could not complete $engineErrors checks. See ${reports.absolutePath}" }
     }
-
-    private fun escapeCell(text: String): String = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        .replace("|", "&#124;").replace("`", "&#96;").replace('\r', ' ').replace('\n', ' ')
-
-    private data class Finding(
-        val path: String,
-        val line: Int,
-        val column: Int,
-        val rule: String,
-        val severity: KtlintSeverity,
-        val message: String
-    )
 }

@@ -1,4 +1,4 @@
-package love.yinlin.lint
+package love.yinlin.lint.rule
 
 import io.github.ktlint.core.rule.engine.core.api.AutocorrectDecision
 import io.github.ktlint.core.rule.engine.core.api.ElementType.RANGE

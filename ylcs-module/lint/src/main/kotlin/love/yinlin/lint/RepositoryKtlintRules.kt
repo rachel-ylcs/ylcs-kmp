@@ -3,6 +3,8 @@ package love.yinlin.lint
 import io.github.ktlint.core.rule.engine.api.EditorConfigOverride
 import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
 import love.yinlin.lint.KtlintSeverity.*
+import love.yinlin.lint.rule.RangeSpacingRule
+import love.yinlin.lint.rule.TrailingCommaRule
 
 internal data class KtlintRule(
     val name: String,
@@ -13,10 +15,8 @@ internal data class KtlintRule(
 
 internal object RepositoryKtlintRules {
     val rules = listOf(
-        KtlintRule("standard:annotation", true, WARNING, "注解的排列与换行"),
         KtlintRule("standard:annotation-spacing", true, ERROR, "注解前后的空格"),
         KtlintRule("standard:blank-line-before-imports", true, WARNING, "导入区前的空行"),
-        KtlintRule("standard:blank-line-between-when-conditions", true, WARNING, "when 分支条件之间的空行"),
         KtlintRule("standard:block-comment-initial-star-alignment", true, WARNING, "块注释行首星号的对齐"),
         KtlintRule("standard:class-naming", true, ERROR, "类和接口的命名"),
         KtlintRule("standard:colon-spacing", true, WARNING, "冒号前后的空格"),
@@ -74,18 +74,20 @@ internal object RepositoryKtlintRules {
         KtlintRule("standard:square-brackets-spacing", true, WARNING, "方括号前后的空格"),
         KtlintRule("standard:string-template-indent", true, WARNING, "多行字符串模板的缩进"),
         KtlintRule("standard:then-spacing", true, WARNING, "if 条件与随后分支之间的空格"),
-        KtlintRule("standard:trailing-comma-on-call-site", true, WARNING, "调用处的尾随逗号"),
-        KtlintRule("standard:trailing-comma-on-declaration-site", true, WARNING, "声明处的尾随逗号"),
         KtlintRule("standard:try-catch-finally-spacing", true, WARNING, "try、catch 和 finally 周围的空格"),
         KtlintRule("standard:type-argument-list-spacing", true, WARNING, "类型实参列表周围的空格"),
         KtlintRule("standard:type-parameter-list-spacing", true, WARNING, "类型形参列表周围的空格"),
         KtlintRule("standard:unary-op-spacing", true, WARNING, "一元运算符附近的空格"),
         KtlintRule("standard:unnecessary-parentheses-before-trailing-lambda", true, WARNING, "尾随 Lambda 前的多余空圆括号"),
         KtlintRule(RangeSpacingRule.ID, true, WARNING, "范围运算符两侧必须留空格"),
+        KtlintRule(TrailingCommaRule.Site.CALL.id, true, WARNING, TrailingCommaRule.Site.CALL.description),
+        KtlintRule(TrailingCommaRule.Site.DECLARATION.id, true, WARNING, TrailingCommaRule.Site.DECLARATION.description),
     )
 
     val custom = setOf(
-        RuleV2Provider { RangeSpacingRule() }
+        RuleV2Provider { RangeSpacingRule() },
+        RuleV2Provider { TrailingCommaRule(TrailingCommaRule.Site.CALL) },
+        RuleV2Provider { TrailingCommaRule(TrailingCommaRule.Site.DECLARATION) }
     )
 
     val options = EditorConfigOverride.EMPTY_EDITOR_CONFIG_OVERRIDE

@@ -16,7 +16,8 @@ val kotlinSources = fileTree(repositoryDirectory) {
     include("ylcs-module/**/*.kt", "ylcs-app/**/*.kt")
     exclude("**/build/**", "**/.gradle/**", "**/cpp/**")
 }
-val ktlintReport = layout.buildDirectory.file("reports/ktlint/ktlint.md")
+val ktlintReports = layout.buildDirectory.dir("reports/ktlint")
+val xlsxWriter = layout.projectDirectory.file("write_ktlint_xlsx.py")
 
 tasks.register<JavaExec>("ktlintCheck") {
     group = "verification"
@@ -27,9 +28,10 @@ tasks.register<JavaExec>("ktlintCheck") {
     systemProperty("kotlin-logging-to-jul", "true")
     systemProperty("kotlin-logging.logStartupMessage", "false")
     inputs.files(kotlinSources).withPathSensitivity(PathSensitivity.RELATIVE)
-    outputs.file(ktlintReport)
+    inputs.file(xlsxWriter).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.dir(ktlintReports)
     outputs.upToDateWhen { false }
-    args(repositoryDirectory.asFile.absolutePath, ktlintReport.get().asFile.absolutePath)
+    args(repositoryDirectory.asFile.absolutePath, ktlintReports.get().asFile.absolutePath, xlsxWriter.asFile.absolutePath)
     doFirst {
         val sourceList = temporaryDir.resolve("sources.txt")
         val paths = kotlinSources.files.map { it.relativeTo(repositoryDirectory.asFile).invariantSeparatorsPath }.sorted()
