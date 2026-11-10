@@ -9,7 +9,7 @@ class SHA3(type: BitType = BitType.B256) : ByteDigest() {
         B224(224),
         B256(256),
         B384(384),
-        B512(512);
+        B512(512)
     }
 
     private companion object {

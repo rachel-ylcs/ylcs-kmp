@@ -15,13 +15,13 @@ data class Device(val size: Size, val type: Type) {
     @Stable
     @Serializable
     enum class Size {
-        SMALL, MEDIUM, LARGE;
+        SMALL, MEDIUM, LARGE
     }
 
     @Stable
     @Serializable
     enum class Type {
-        PORTRAIT, LANDSCAPE, SQUARE;
+        PORTRAIT, LANDSCAPE, SQUARE
     }
 
     constructor(width: Dp) : this(

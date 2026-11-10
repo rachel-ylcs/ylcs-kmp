@@ -16,13 +16,13 @@ enum class ContactInfo(
 ) {
     Weibo(title = "微博", icon = "fa-brands fa-weibo", url = "https://weibo.com/u/7969517430"),
     Bilibili(title = "B站", icon = "fa-brands fa-bilibili", url = "https://space.bilibili.com/3546773870086322"),
-    QQGroup(title = "QQ水群", icon = "fa-brands fa-qq", url = "https://qm.qq.com/q/8sfRdA1XPy");
+    QQGroup(title = "QQ水群", icon = "fa-brands fa-qq", url = "https://qm.qq.com/q/8sfRdA1XPy")
 }
 
 enum class AppPlatformVersion(val title: String, val textColor: String, val bgColor: String) {
     STABLE("Stable", "text-green-500", "bg-green-500/10"),
     ALPHA("Alpha", "text-pink-500", "bg-pink-500/10"),
-    BETA("Beta", "text-orange-500", "bg-orange-500/10");
+    BETA("Beta", "text-orange-500", "bg-orange-500/10")
 }
 
 enum class AppPlatform(

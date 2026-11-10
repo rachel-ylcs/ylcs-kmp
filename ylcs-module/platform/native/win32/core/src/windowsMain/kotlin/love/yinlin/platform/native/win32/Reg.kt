@@ -41,7 +41,7 @@ class Reg(
         _RL(8U),
         _FRD(9U),
         _RRL(10U),
-        _N64(11U);
+        _N64(11U)
     }
 
     constructor(base: KeyBase, route: String, wow64: Boolean = true) : this(null, wow64) {

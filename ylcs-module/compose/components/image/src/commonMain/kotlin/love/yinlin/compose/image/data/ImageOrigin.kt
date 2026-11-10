@@ -8,5 +8,5 @@ enum class ImageOrigin {
     Disk,
     Network,
     Local,
-    Resource;
+    Resource
 }

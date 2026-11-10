@@ -11,5 +11,5 @@ enum class LayerType {
     /**
      * 绝对定位，与相机位置无关
      */
-    Absolute;
+    Absolute
 }

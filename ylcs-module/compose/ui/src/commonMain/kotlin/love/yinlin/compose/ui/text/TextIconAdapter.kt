@@ -20,7 +20,7 @@ import love.yinlin.compose.ui.layout.provider
 import love.yinlin.compose.ui.layout.require
 
 private enum class TextIconAdapterMeasureId : MeasureId {
-    Text, Icon;
+    Text, Icon
 }
 
 /**

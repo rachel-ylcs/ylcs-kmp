@@ -11,11 +11,11 @@ class AES(
     enum class KeySize(val bytes: Int) {
         B128(16),
         B192(24),
-        B256(32);
+        B256(32)
     }
 
     enum class Mode {
-        ECB;
+        ECB
     }
 
     enum class Padding {

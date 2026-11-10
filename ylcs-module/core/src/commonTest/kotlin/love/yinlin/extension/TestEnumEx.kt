@@ -6,7 +6,7 @@ import kotlin.test.assertFailsWith
 
 class TestEnumEx {
     enum class Foo(val text: String) {
-        A("1"), B("23"), C("456");
+        A("1"), B("23"), C("456")
     }
 
     @Test

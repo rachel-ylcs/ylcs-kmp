@@ -37,7 +37,7 @@ class ScreenLogin : Screen() {
     private enum class Mode(val title: String) {
         Login("登录"),
         Register("注册"),
-        ForgotPassword("忘记密码");
+        ForgotPassword("忘记密码")
     }
 
     private var inviters: List<String> by mutableRefStateOf([])

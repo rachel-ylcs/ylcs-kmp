@@ -47,7 +47,7 @@ import love.yinlin.extension.then
 
 @Stable
 private enum class CropImageHandle {
-    TopLeft, TopRight, BottomLeft, BottomRight, Inside;
+    TopLeft, TopRight, BottomLeft, BottomRight, Inside
 }
 
 private fun DrawScope.drawCorner(

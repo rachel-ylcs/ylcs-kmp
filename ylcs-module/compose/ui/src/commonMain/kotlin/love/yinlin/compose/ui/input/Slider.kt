@@ -42,7 +42,7 @@ import love.yinlin.extension.cleaning
 
 @Stable
 private enum class SliderMeasureId : MeasureId {
-    Track, ActiveTrack, Thumb, Content;
+    Track, ActiveTrack, Thumb, Content
 }
 
 /**

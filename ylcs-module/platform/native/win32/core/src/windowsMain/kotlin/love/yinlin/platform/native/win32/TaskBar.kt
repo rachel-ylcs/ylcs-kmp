@@ -12,7 +12,7 @@ object TaskBar {
     }
 
     enum class IconStyle(val value: UInt) {
-        Normal(0U), Busy(1U), Info(2U), Error(4U), Warning(8U);
+        Normal(0U), Busy(1U), Info(2U), Error(4U), Warning(8U)
     }
 
     @Suppress("RETURN_VALUE_NOT_USED")

@@ -112,7 +112,7 @@ enum class RichEditorPage(val icon: ImageVector) {
     IMAGE(Icons.AddPhotoAlternate),
     LINK(Icons.InsertLink),
     TOPIC(Icons.Tag),
-    AT(Icons.AlternateEmail);
+    AT(Icons.AlternateEmail)
 }
 
 @Stable

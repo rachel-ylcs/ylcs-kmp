@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
     @Stable
     enum class Type {
-        Info, Success, Warning, Error;
+        Info, Success, Warning, Error
     }
 
     @Stable

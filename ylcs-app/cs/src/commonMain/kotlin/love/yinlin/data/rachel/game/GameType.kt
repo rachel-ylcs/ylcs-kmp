@@ -8,5 +8,5 @@ enum class GameType(val order: Int, val title: String) {
     EXPLORATION(2, "探索"),
     SPEED(3, "竞速"),
     SINGLE(0, "独立"),
-    BATTLE(4, "对战");
+    BATTLE(4, "对战")
 }

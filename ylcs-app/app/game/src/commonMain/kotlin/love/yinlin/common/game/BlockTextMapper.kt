@@ -73,7 +73,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
 
     @Stable
     private enum class CharacterBlockInputMode(val icon: ImageVector) {
-        DISABLED(Icons.MobiledataOff), HORIZONTAL(Icons.SwapHoriz), VERTICAL(Icons.SwapVert);
+        DISABLED(Icons.MobiledataOff), HORIZONTAL(Icons.SwapHoriz), VERTICAL(Icons.SwapVert)
     }
 
     @Composable

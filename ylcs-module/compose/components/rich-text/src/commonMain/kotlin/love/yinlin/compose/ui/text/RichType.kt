@@ -12,5 +12,5 @@ enum class RichType(val value: String) {
     Link("lk"),
     Topic("tp"),
     At("at"),
-    Style("s");
+    Style("s")
 }

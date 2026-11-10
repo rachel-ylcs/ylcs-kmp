@@ -131,7 +131,7 @@ open class DataTableSelectionCell(options: List<String>, initialIndex: Int = 0) 
                         }
                         Key.Enter, Key.NumPadEnter -> {
                             state.commit()
-                            focus.clearFocus();
+                            focus.clearFocus()
                             true
                         }
                         Key.DirectionDown, Key.DirectionUp -> {

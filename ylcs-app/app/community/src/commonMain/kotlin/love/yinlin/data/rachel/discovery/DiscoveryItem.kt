@@ -13,5 +13,5 @@ internal enum class DiscoveryItem(val id: Int, val icon: ImageVector) {
     Notification(Comment.Section.NOTIFICATION, Icons.Campaign),
     Water(Comment.Section.WATER, Icons.WaterDrop),
     Activity(Comment.Section.ACTIVITY, Icons.Celebration),
-    Discussion(Comment.Section.DISCUSSION, Icons.Chat);
+    Discussion(Comment.Section.DISCUSSION, Icons.Chat)
 }

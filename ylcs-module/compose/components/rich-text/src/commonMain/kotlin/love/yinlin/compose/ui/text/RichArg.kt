@@ -15,5 +15,5 @@ enum class RichArg(val value: String) {
     Bold("b"),
     Italic("i"),
     Underline("u"),
-    Strikethrough("d");
+    Strikethrough("d")
 }

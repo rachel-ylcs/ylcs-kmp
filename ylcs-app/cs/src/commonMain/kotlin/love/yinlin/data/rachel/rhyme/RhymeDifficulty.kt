@@ -9,5 +9,5 @@ enum class RhymeDifficulty(val title: String) {
     Easy("简单"),
     Medium("普通"),
     Hard("困难"),
-    Extreme("极限");
+    Extreme("极限")
 }

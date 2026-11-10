@@ -37,7 +37,7 @@ private val LocalTreeNodeIndent = localComposition<Dp>()
 private val LocalTreeNodeDepth = localComposition<Int>()
 
 private enum class TreeViewMeasureId : MeasureId {
-    Text, ExpandIcon, Icon;
+    Text, ExpandIcon, Icon
 }
 
 @Stable
