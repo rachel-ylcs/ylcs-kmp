@@ -13,8 +13,8 @@ data class YamlConfiguration(
     val maxNodes: Int = 1000000,
 ) {
     init {
-        require(indent in 1..9) { "indent must be between 1 and 9" }
-        require(maxDepth in 1..1_024) { "maxDepth must be between 1 and 1024" }
+        require(indent in 1 .. 9) { "indent must be between 1 and 9" }
+        require(maxDepth in 1 .. 1_024) { "maxDepth must be between 1 and 1024" }
         require(maxAliases >= 0) { "maxAliases must not be negative" }
         require(maxNodes > 0) { "maxNodes must be positive" }
     }

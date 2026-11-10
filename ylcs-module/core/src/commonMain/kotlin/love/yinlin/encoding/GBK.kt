@@ -120,7 +120,7 @@ internal fun convertStringToGBK(data: String): ByteArray {
             code < 0x80 -> bytes[output++] = code.toByte()
             code == 0x20AC -> bytes[output++] = 0x80.toByte()
             code in 0xD800 .. 0xDFFF -> {
-                if (code <= 0xDBFF && input < length && data[input].code in 0xDC00..0xDFFF) input++
+                if (code <= 0xDBFF && input < length && data[input].code in 0xDC00 .. 0xDFFF) input++
                 bytes[output++] = 0x3F
             }
             else -> {
@@ -150,7 +150,7 @@ internal fun convertGBKToString(data: ByteArray): String {
         when {
             lead < 0x80 -> chars[output++] = lead.toChar()
             lead == 0x80 -> chars[output++] = '\u20AC'
-            lead in 0x81..0xFE && input < data.size -> {
+            lead in 0x81 .. 0xFE && input < data.size -> {
                 val trail = data[input].toInt() and 0xFF
                 if (trail in 0x40 .. 0xFE && trail != 0x7F) {
                     val column = trail - 0x40 - if (trail > 0x7F) 1 else 0

@@ -96,7 +96,7 @@ class TestCompressionErrors {
                 assertTrue(codec.decompress(data).size <= 512)
             } catch (_: CompressionException) { }
             try {
-                assertTrue(codec.decompressPlaceable(data, ByteArray(520), 4) in 0..512)
+                assertTrue(codec.decompressPlaceable(data, ByteArray(520), 4) in 0 .. 512)
             } catch (_: CompressionException) { }
         }
     }

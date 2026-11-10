@@ -138,7 +138,7 @@ val File.shortcutTarget: File? get() = memScoped {
     }
     val shortcutSize = merge64(vFileSize.HighPart.toUInt(), vFileSize.LowPart)
     val headerSize = sizeOf<LINKFILE_HEADER>()
-    if (shortcutSize !in headerSize..8192L) {
+    if (shortcutSize !in headerSize .. 8192L) {
         CloseHandle(hFile)
         return null
     }

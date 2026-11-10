@@ -132,7 +132,7 @@ object PictionaryMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
         override fun init(preflightResult: PreflightResult) {
             preflight = catchingNull {
                 val question = preflightResult.question.to<PictionaryQuestion>()
-                require(question.count in PConfig.minAnswerLength ..PConfig.maxAnswerLength)
+                require(question.count in PConfig.minAnswerLength .. PConfig.maxAnswerLength)
                 require(question.paths.isNotEmpty())
                 Preflight(question = question)
             }

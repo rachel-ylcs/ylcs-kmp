@@ -28,12 +28,12 @@ internal enum class YamlScalarKind {
                 }
             }
             var digits = 0
-            while (i < text.length && text[i] in '0'..'9') { i++; digits++ }
+            while (i < text.length && text[i] in '0' .. '9') { i++; digits++ }
             var floating = false
             if (i < text.length && text[i] == '.') {
                 floating = true
                 i++
-                while (i < text.length && text[i] in '0'..'9') { i++; digits++ }
+                while (i < text.length && text[i] in '0' .. '9') { i++; digits++ }
             }
             if (digits == 0) return String
             if (i < text.length && (text[i] == 'e' || text[i] == 'E')) {
@@ -41,7 +41,7 @@ internal enum class YamlScalarKind {
                 i++
                 if (i < text.length && (text[i] == '+' || text[i] == '-')) i++
                 val exponent = i
-                while (i < text.length && text[i] in '0'..'9') i++
+                while (i < text.length && text[i] in '0' .. '9') i++
                 if (i == exponent) return String
             }
             return if (i != text.length) String else if (floating) Float else Integer

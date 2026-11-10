@@ -3,7 +3,7 @@ package love.yinlin.foundation.parser.markdown
 internal data class MarkdownLinkTarget(val destination: String, val title: String? = null)
 internal data class MarkdownScan(val value: String, val end: Int)
 
-internal fun markdownPunctuation(c: Char): Boolean = c in '!'..'/' || c in ':'..'@' || c in '['..'`' || c in '{'..'~'
+internal fun markdownPunctuation(c: Char): Boolean = c in '!' .. '/' || c in ':' .. '@' || c in '[' .. '`' || c in '{' .. '~'
 internal fun markdownSpace(c: Char): Boolean = c == ' ' || c == '\t' || c == '\n' || c == '\r'
 
 internal fun markdownReference(label: String): String = buildString {
@@ -100,7 +100,7 @@ internal fun scanMarkdownEntity(text: String, start: Int): MarkdownScan? {
         val digits = name.substring(if (hex) 2 else 1)
         if (digits.isEmpty() || digits.length > if (hex) 6 else 7) return null
         val number = digits.toIntOrNull(if (hex) 16 else 10) ?: return null
-        if (number == 0 || number > 0x10ffff || number in 0xd800..0xdfff) "\ufffd"
+        if (number == 0 || number > 0x10ffff || number in 0xd800 .. 0xdfff) "\ufffd"
         else if (number <= 0xffff) number.toChar().toString()
         else {
             val code = number - 0x10000

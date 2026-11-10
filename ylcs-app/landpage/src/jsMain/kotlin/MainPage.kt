@@ -44,7 +44,7 @@ object MainPage : Page {
             val grid = getElementById<HTMLElement>("section-4-grid") ?: return@ScrollAnimationManager
             val containerY = (0.5 - progress) * 100
             grid.style.transform = "rotateX(20deg) rotateZ(-8deg) skewY(2deg) translateX(0%) translateY(${containerY}px)"
-            (1..6).forEach { i ->
+            (1 .. 6).forEach { i ->
                 val phone = getElementById<HTMLElement>("s4-phone-$i") ?: return@forEach
                 val wave = kotlin.math.sin(progress * 4.0 + i * 0.8) * 20
                 val lift = (1.0 - progress) * 100
@@ -242,7 +242,7 @@ object MainPage : Page {
                     div("grid grid-cols-3 gap-x-16 gap-y-8 md:gap-x-32 md:gap-y-16 transform-style-3d") {
                         id = "section-4-grid"
                         style = "transform: rotateX(20deg) rotateZ(-8deg) skewY(2deg) translateX(0%);"
-                        (1..6).forEach { i ->
+                        (1 .. 6).forEach { i ->
                             div("relative w-[180px] h-[380px] md:w-[260px] md:h-[540px] bg-white dark:bg-zinc-900 rounded-[2.5rem] border-[6px] border-gray-200 dark:border-zinc-700 shadow-[0_30px_60px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-100") {
                                 id = "s4-phone-$i"
                                 img(src = "section4_$i.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")

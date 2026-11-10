@@ -213,7 +213,7 @@ internal class YamlParser(private val source: String, private val config: YamlCo
                     if (chomp != ' ') fail("Duplicate chomping indicator", p)
                     chomp = c
                 }
-                in '1'..'9' -> {
+                in '1' .. '9' -> {
                     if (indicator != 0) fail("Duplicate indentation indicator", p)
                     indicator = c - '0'
                 }
@@ -568,7 +568,7 @@ internal class YamlParser(private val source: String, private val config: YamlCo
                 position++
                 value = (value shl 4) or digit.toLong()
             }
-            if (value > 0x10ffff || value in 0xd800..0xdfff) fail("Invalid Unicode code point", start)
+            if (value > 0x10ffff || value in 0xd800 .. 0xdfff) fail("Invalid Unicode code point", start)
             return value.toInt()
         }
 
@@ -702,7 +702,7 @@ internal class YamlParser(private val source: String, private val config: YamlCo
         }
         for (i in source.indices) {
             val c = source[i]
-            if ((c < ' ' && c != '\t' && c != '\r' && c != '\n') || c in '\u007f'..'\u0084' || c in '\u0086'..'\u009f' || c == '\ufffe' || c == '\uffff') {
+            if ((c < ' ' && c != '\t' && c != '\r' && c != '\n') || c in '\u007f' .. '\u0084' || c in '\u0086' .. '\u009f' || c == '\ufffe' || c == '\uffff') {
                 // Initialization cannot call fail(), which uses the not-yet-assigned lines property.
                 var index = 0
                 while (index + 1 < result.size && result[index + 1].start <= i) index++

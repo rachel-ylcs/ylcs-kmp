@@ -121,7 +121,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         override val config = SAConfig
 
-        override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..SAConfig.maxCount }
+        override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount .. SAConfig.maxCount }
 
         override val submitInfo: JsonElement get() = SAInfo(threshold = threshold.value, timeLimit = timeLimit.value).toJson()
 
@@ -154,7 +154,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                 trailing = InputDecoration.LengthViewer,
                 onImeClick = {
                     val text = inputState.text
-                    if (text.length in SAConfig.minLength ..SAConfig.maxLength) {
+                    if (text.length in SAConfig.minLength .. SAConfig.maxLength) {
                         items.add(text)
                         inputState.text = ""
                         true
@@ -193,7 +193,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
         private val tags by derivedStateOf { items.toList() }
         private var time by mutableLongStateOf(0L)
 
-        override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..(preflight?.count ?: SAConfig.maxCount) }
+        override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount .. (preflight?.count ?: SAConfig.maxCount) }
 
         override val submitAnswer: JsonElement get() = items.toSet().toJson()
 
@@ -244,7 +244,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                     hint = "答案 ${items.size} / $question",
                     onImeClick = {
                         val text = inputState.text
-                        if (text.length in SAConfig.minLength ..SAConfig.maxLength) {
+                        if (text.length in SAConfig.minLength .. SAConfig.maxLength) {
                             items.add(text)
                             inputState.text = ""
                             true

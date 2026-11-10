@@ -12,5 +12,5 @@ object UserConstraint {
 	const val MAX_SIGNATURE_LENGTH = 64
 
 	fun checkName(vararg args: String) = args.all { it.length in MIN_NAME_LENGTH .. MAX_NAME_LENGTH }
-	fun checkPassword(vararg args: String) = args.all { it.length in MIN_PWD_LENGTH..MAX_PWD_LENGTH }
+	fun checkPassword(vararg args: String) = args.all { it.length in MIN_PWD_LENGTH .. MAX_PWD_LENGTH }
 }

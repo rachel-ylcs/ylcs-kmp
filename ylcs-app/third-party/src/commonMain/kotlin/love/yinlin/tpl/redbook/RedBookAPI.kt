@@ -51,7 +51,7 @@ object RedBookAPI {
                         when (ch) {
                             '"', '\'', '`' -> inStr = ch
                             open -> depth++
-                            close -> if (--depth == 0) return start..i
+                            close -> if (--depth == 0) return start .. i
                         }
                     }
                     i++

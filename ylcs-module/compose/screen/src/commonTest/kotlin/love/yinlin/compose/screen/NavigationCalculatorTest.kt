@@ -46,7 +46,7 @@ class NavigationCalculatorTest {
     private fun requireChange(before: List<ScreenKey>, plan: NavigationPlan, message: String = "change"): Result {
         (val fromIndex, val toIndex, val popCurrent) = assertNotNull(plan.change, message)
         assertTrue(fromIndex in 0 .. before.size, message)
-        assertTrue(toIndex in fromIndex.. before.size, message)
+        assertTrue(toIndex in fromIndex .. before.size, message)
         val after = buildList {
             for (index in before.indices) {
                 if (index !in fromIndex ..< toIndex && !(popCurrent && index == before.lastIndex)) add(before[index])
@@ -56,7 +56,7 @@ class NavigationCalculatorTest {
         val firstRemoved = if (plan is NavigationPlan.Create) fromIndex else fromIndex + 1
         val removed = buildList {
             if (popCurrent) add(before.last())
-            for (index in firstRemoved ..<toIndex) add(before[index])
+            for (index in firstRemoved ..< toIndex) add(before[index])
         }
         return Result(after, removed)
     }

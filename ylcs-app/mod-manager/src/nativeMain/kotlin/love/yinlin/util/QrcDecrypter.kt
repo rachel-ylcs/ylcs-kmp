@@ -269,7 +269,7 @@ object QrcDecrypter {
         expanded[3] = (t2 shr 24) and 0xFF
         expanded[4] = (t2 shr 16) and 0xFF
         expanded[5] = (t2 shr 8) and 0xFF
-        for (i in 0..5) {
+        for (i in 0 .. 5) {
             expanded[i] = expanded[i] xor (roundKey[i].toInt() and 0xFF)
         }
         val sboxInputs = IntArray(8)
@@ -343,29 +343,29 @@ object QrcDecrypter {
         var leftHalf = 0
         var rightHalf = 0
         var j = 31
-        for (i in 0..27) {
+        for (i in 0 .. 27) {
             leftHalf = leftHalf or extractBitFromBytes(masterKey, keyPermC[i], j)
             j--
         }
         j = 31
-        for (i in 0..27) {
+        for (i in 0 .. 27) {
             rightHalf = rightHalf or extractBitFromBytes(masterKey, keyPermD[i], j)
             j--
         }
-        for (roundNum in 0..15) {
+        for (roundNum in 0 .. 15) {
             val shift = keyRotation[roundNum]
             leftHalf = ((leftHalf shl shift) or (leftHalf ushr (28 - shift))) and -0x10
             rightHalf = ((rightHalf shl shift) or (rightHalf ushr (28 - shift))) and -0x10
             val scheduleIndex: Int = if (mode == DECRYPT_MODE) 15 - roundNum else roundNum
-            for (k in 0..5) {
+            for (k in 0 .. 5) {
                 keySchedule[scheduleIndex][k] = 0
             }
-            for (k in 0..23) {
+            for (k in 0 .. 23) {
                 keySchedule[scheduleIndex][k / 8] = (keySchedule[scheduleIndex][k / 8].toInt() or extractBitFromInt(
                     leftHalf, keyCompression[k], 7 - (k % 8)
                 ).toByte().toInt()).toByte()
             }
-            for (k in 24..47) {
+            for (k in 24 .. 47) {
                 keySchedule[scheduleIndex][k / 8] = (keySchedule[scheduleIndex][k / 8].toInt() or extractBitFromInt(
                     rightHalf, keyCompression[k] - 27, 7 - (k % 8)
                 ).toByte().toInt()).toByte()
@@ -376,7 +376,7 @@ object QrcDecrypter {
     private fun processDesBlock(inputBlock: ByteArray, keySchedule: Array<ByteArray>): ByteArray {
         val state = IntArray(2)
         initialPermutation(state, inputBlock)
-        for (roundIdx in 0..14) {
+        for (roundIdx in 0 .. 14) {
             val temp = state[1]
             state[1] = feistelFunction(state[1], keySchedule[roundIdx]) xor state[0]
             state[0] = temp

@@ -136,7 +136,7 @@ private fun CalendarDayGrid(
                                 val color = when {
                                     isToday -> Theme.color.onContainer
                                     eventTitle != null -> Theme.color.primary
-                                    dayIndex !in startDay..endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
+                                    dayIndex !in startDay .. endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
                                     date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Theme.color.tertiary
                                     else -> LocalColor.current
                                 }

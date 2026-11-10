@@ -24,7 +24,7 @@ data class Token(
             val magic = io.readInt(4, Endian.LITTLE)
             val platform = io.readEnum<Platform>(8, Endian.LITTLE)
             val timestamp = io.readLong(12, Endian.LITTLE)
-            require(uid > 0 && magic == MAGIC && timestamp in 1727755860000..1917058260000)
+            require(uid > 0 && magic == MAGIC && timestamp in 1727755860000 .. 1917058260000)
             return Token(uid = uid, platform = platform, timestamp = timestamp)
         }
 

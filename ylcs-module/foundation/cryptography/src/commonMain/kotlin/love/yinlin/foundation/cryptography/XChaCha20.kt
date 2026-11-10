@@ -42,8 +42,8 @@ class XChaCha20(private val key: ByteArray) : Cipher() {
             Constants.copyInto(working)
             val keyIO = ByteArrayIO(key)
             val nonceIO = ByteArrayIO(nonce)
-            for (index in 0..7) working[4 + index] = keyIO.readInt(index * 4, Endian.LITTLE)
-            for (index in 0..3) working[12 + index] = nonceIO.readInt(index * 4, Endian.LITTLE)
+            for (index in 0 .. 7) working[4 + index] = keyIO.readInt(index * 4, Endian.LITTLE)
+            for (index in 0 .. 3) working[12 + index] = nonceIO.readInt(index * 4, Endian.LITTLE)
             permute(working)
             return ByteArrayIO(32).write {
                 for ([destination, source] in Destinations) writeInt(destination * 4, working[source], Endian.LITTLE)

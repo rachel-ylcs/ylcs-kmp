@@ -95,7 +95,7 @@ internal class YamlWriter(private val config: YamlConfiguration) {
     private fun canUseLiteral(value: YamlElement): Boolean = config.blockStrings &&
         value is YamlPrimitive && value.isString && '\n' in value.content &&
         value.content.any { it != '\n' && it != ' ' && it != '\t' } &&
-        value.content.none { (it < ' ' && it != '\n' && it != '\t') || it in '\u007f'..'\u009f' || it == '\ufffe' || it == '\uffff' }
+        value.content.none { (it < ' ' && it != '\n' && it != '\t') || it in '\u007f' .. '\u009f' || it == '\ufffe' || it == '\uffff' }
 
     private fun writeLiteral(text: String, indent: Int) {
         var trailing = 0
@@ -125,7 +125,7 @@ internal class YamlWriter(private val config: YamlConfiguration) {
                 '\t' -> output.append("\\t")
                 '\b' -> output.append("\\b")
                 '\u000c' -> output.append("\\f")
-                else -> if (c < ' ' || c in '\u007f'..'\u009f' || c == '\ufffe' || c == '\uffff') {
+                else -> if (c < ' ' || c in '\u007f' .. '\u009f' || c == '\ufffe' || c == '\uffff') {
                     output.append("\\u")
                     for (shift in 12 downTo 0 step 4) output.append("0123456789abcdef"[(c.code ushr shift) and 15])
                 } else output.append(c)
@@ -142,7 +142,7 @@ internal class YamlWriter(private val config: YamlConfiguration) {
         if (text == "---" || text == "...") return false
         for (i in text.indices) {
             val c = text[i]
-            if (c < ' ' || c in '\u007f'..'\u009f' || c == '\ufffe' || c == '\uffff' ||
+            if (c < ' ' || c in '\u007f' .. '\u009f' || c == '\ufffe' || c == '\uffff' ||
                 c == '\u2028' || c == '\u2029' || c == '\ufeff') return false
             if (flow && c in "[]{},:") return false
             if (c == ':' && (i == text.lastIndex || text[i + 1].isWhitespace())) return false

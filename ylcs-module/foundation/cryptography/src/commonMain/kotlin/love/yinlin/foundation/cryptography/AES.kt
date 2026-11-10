@@ -132,8 +132,8 @@ class AES(
     }
 
     private val decryptionKeys = IntArray(encryptionKeys.size).also { words ->
-        for (round in 0..rounds) {
-            for (column in 0..3) {
+        for (round in 0 .. rounds) {
+            for (column in 0 .. 3) {
                 val word = encryptionKeys[(rounds - round) * 4 + column]
                 words[round * 4 + column] = if (round == 0 || round == rounds) word else inverseMixWord(word)
             }
@@ -185,7 +185,7 @@ class AES(
         decryptBlock(data, lastOffset, lastBlock, 0)
 
         val padSize = lastBlock[BLOCK_SIZE - 1].toInt() and 0xff
-        var invalidPadding = if (padSize in 1..BLOCK_SIZE) 0 else 1
+        var invalidPadding = if (padSize in 1 .. BLOCK_SIZE) 0 else 1
         for (i in 0 until BLOCK_SIZE) {
             val mask = if (i < padSize) 0xff else 0
             invalidPadding = invalidPadding or (((lastBlock[BLOCK_SIZE - 1 - i].toInt() and 0xff) xor padSize) and mask)

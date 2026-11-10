@@ -409,7 +409,7 @@ internal class MarkdownInlineParser(
         if (end == source.length) return null
         val value = source.substring(start + 1, end)
         val colon = value.indexOf(':')
-        if (colon in 2..32 && value[0].isLetter() && value.substring(0, colon).all { it.isLetterOrDigit() || it in "+.-" } &&
+        if (colon in 2 .. 32 && value[0].isLetter() && value.substring(0, colon).all { it.isLetterOrDigit() || it in "+.-" } &&
             value.none { it.isWhitespace() || it == '<' || it == '>' }) {
             return MarkdownLink(value, value) to end + 1
         }

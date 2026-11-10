@@ -36,7 +36,7 @@ class TestArgumentsStrings {
     @Test
     fun everyBackslashQuotePairEscapesJustTheQuote() {
         // 不采用 shell 的奇偶反斜杠规则，也不把两个反斜杠合并为一个。
-        for (count in 1..8) {
+        for (count in 1 .. 8) {
             val slashes = "\\".repeat(count)
             val token = "value=\"$slashes\"end\""
             val expected = "\\".repeat(count - 1) + "\"end"

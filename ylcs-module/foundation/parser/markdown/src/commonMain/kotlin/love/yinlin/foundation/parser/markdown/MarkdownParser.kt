@@ -407,10 +407,10 @@ internal class MarkdownParser(source: String, private val config: MarkdownConfig
         val start = prefix(text)
         if (start < 0 || start == text.length) return null
         var i = start
-        val ordered = text[i] in '0'..'9'
+        val ordered = text[i] in '0' .. '9'
         var number = 1
         if (ordered) {
-            while (text.getOrNull(i) in '0'..'9') i++
+            while (text.getOrNull(i) in '0' .. '9') i++
             if (i - start > 9 || text.getOrNull(i) !in ['.', ')']) return null
             number = text.substring(start, i).toInt()
         } else if (text[i] !in "-+*") return null
@@ -425,7 +425,7 @@ internal class MarkdownParser(source: String, private val config: MarkdownConfig
         }
         val padding = columns - before
         val content = if (padding > 4) after + 1 else i
-        val width = before + if (padding in 1..4 && i < text.length) padding else 1
+        val width = before + if (padding in 1 .. 4 && i < text.length) padding else 1
         return Marker(ordered, number, char, indent(text), content, width)
     }
 

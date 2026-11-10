@@ -23,9 +23,9 @@ data class Emoji(
 
     companion object {
         fun fromId(id: Int): Emoji? = when (id) {
-            in EmojiType.Static.start..EmojiType.Static.tail -> Emoji(id, EmojiType.Static)
-            in EmojiType.Dynamic.start..EmojiType.Dynamic.tail -> Emoji(id, EmojiType.Dynamic)
-            in EmojiType.Lottie.start..EmojiType.Lottie.tail -> Emoji(id, EmojiType.Lottie)
+            in EmojiType.Static.start .. EmojiType.Static.tail -> Emoji(id, EmojiType.Static)
+            in EmojiType.Dynamic.start .. EmojiType.Dynamic.tail -> Emoji(id, EmojiType.Dynamic)
+            in EmojiType.Lottie.start .. EmojiType.Lottie.tail -> Emoji(id, EmojiType.Lottie)
             else -> null
         }
     }

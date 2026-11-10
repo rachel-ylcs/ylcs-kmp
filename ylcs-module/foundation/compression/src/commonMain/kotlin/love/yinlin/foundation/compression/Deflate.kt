@@ -13,24 +13,24 @@ class Deflate(private val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DE
         val CODE_LENGTH_ORDER: IntArray = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]
         val LENGTH_CODES = IntArray(259).apply {
             var code = 0
-            for (length in 3..258) {
+            for (length in 3 .. 258) {
                 while (code < 28 && length >= LENGTH_BASE[code + 1]) code++
                 this[length] = code
             }
         }
         val FIXED_LENGTHS = IntArray(288) { symbol ->
             when (symbol) {
-                in 0..143 -> 8
-                in 144..255 -> 9
-                in 256..279 -> 7
+                in 0 .. 143 -> 8
+                in 144 .. 255 -> 9
+                in 256 .. 279 -> 7
                 else -> 8
             }
         }
         val FIXED_CODES = IntArray(288) { symbol ->
             val code = when (symbol) {
-                in 0..143 -> 0x30 + symbol
-                in 144..255 -> 0x190 + symbol - 144
-                in 256..279 -> symbol - 256
+                in 0 .. 143 -> 0x30 + symbol
+                in 144 .. 255 -> 0x190 + symbol - 144
+                in 256 .. 279 -> symbol - 256
                 else -> 0xC0 + symbol - 280
             }
             reverseBits(code, FIXED_LENGTHS[symbol])

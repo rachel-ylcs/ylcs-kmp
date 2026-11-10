@@ -118,10 +118,10 @@ internal class TomlWriter(private val configuration: TomlConfiguration) {
                     for (shift in 12 downTo 0 step 4) builder.append("0123456789abcdef"[(char.code shr shift) and 15])
                 }
                 start = i + 1
-            } else if (char in '\ud800'..'\udbff') {
-                require(text.getOrNull(i + 1) in '\udc00'..'\udfff') { "Unpaired Unicode surrogate in TOML string" }
+            } else if (char in '\ud800' .. '\udbff') {
+                require(text.getOrNull(i + 1) in '\udc00' .. '\udfff') { "Unpaired Unicode surrogate in TOML string" }
                 ++i
-            } else require(char !in '\udc00'..'\udfff') { "Unpaired Unicode surrogate in TOML string" }
+            } else require(char !in '\udc00' .. '\udfff') { "Unpaired Unicode surrogate in TOML string" }
             ++i
         }
         builder.append(text, start, text.length).append('"')

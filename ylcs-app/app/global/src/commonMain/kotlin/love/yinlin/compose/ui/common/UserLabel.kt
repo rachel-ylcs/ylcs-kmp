@@ -42,12 +42,12 @@ private object UserLabelMeta {
 
     @Suppress("SpellCheckingInspection")
     fun image(level: Int, darkMode: Boolean): String = when (level) {
-        in 1..4 -> "fucaoweiying"
-        in 5..8 -> "pifuduhai"
-        in 9..12 -> "fenghuaxueyue"
-        in 13..16 -> "liuli"
-        in 17..20 -> if (darkMode) "lidishigongfen2" else "lidishigongfen1"
-        in 21..99 -> "shanseyouwuzhong"
+        in 1 .. 4 -> "fucaoweiying"
+        in 5 .. 8 -> "pifuduhai"
+        in 9 .. 12 -> "fenghuaxueyue"
+        in 13 .. 16 -> "liuli"
+        in 17 .. 20 -> if (darkMode) "lidishigongfen2" else "lidishigongfen1"
+        in 21 .. 99 -> "shanseyouwuzhong"
         else -> "fucaoweiying"
     }
 

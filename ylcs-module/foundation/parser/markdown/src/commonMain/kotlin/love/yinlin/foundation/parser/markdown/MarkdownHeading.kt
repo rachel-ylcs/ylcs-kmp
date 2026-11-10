@@ -7,7 +7,7 @@ class MarkdownHeading(@IntRange(1, 6) val level: Int, content: List<MarkdownInli
     constructor(level: Int, text: String) : this(level, [MarkdownText(text)])
 
     init {
-        require(level in 1..6) { "Heading level must be between 1 and 6" }
+        require(level in 1 .. 6) { "Heading level must be between 1 and 6" }
         require(children.none { it is MarkdownSoftBreak || it is MarkdownHardBreak }) { "A heading must be a single line" }
     }
 

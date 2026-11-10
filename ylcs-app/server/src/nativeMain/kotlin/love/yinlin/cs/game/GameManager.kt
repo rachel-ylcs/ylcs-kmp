@@ -53,7 +53,7 @@ sealed class GameManager {
     // 更新奖励
     suspend fun QueryExecutor.updateReward(uid: Int, details: GameDetails, result: GameResult) {
         val perReward = details.reward / details.num
-        if (result.isCompleted && perReward in 1 ..GameConfig.maxReward / details.num) {
+        if (result.isCompleted && perReward in 1 .. GameConfig.maxReward / details.num) {
             throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", perReward, uid)
         }
     }

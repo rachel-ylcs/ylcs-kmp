@@ -31,7 +31,7 @@ class Snappy(val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DECOMPRESSI
         var remaining = length
         while (remaining > 0) {
             val count = minOf(remaining, 64)
-            if (count in 4..11 && distance < 2048) {
+            if (count in 4 .. 11 && distance < 2048) {
                 output.writeByte(1 or ((count - 4) shl 2) or ((distance ushr 8) shl 5))
                 output.writeByte(distance)
             }

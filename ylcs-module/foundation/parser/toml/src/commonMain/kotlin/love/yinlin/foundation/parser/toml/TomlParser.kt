@@ -136,7 +136,7 @@ internal class TomlParser(private val source: String, private val configuration:
         // RFC 3339 permits exactly one space in place of the date/time separator.
         if (position - start == 10 && source.getOrNull(start + 4) == '-' &&
             source.getOrNull(start + 7) == '-' && source.getOrNull(position) == ' ' &&
-            source.getOrNull(position + 1) in '0'..'9') {
+            source.getOrNull(position + 1) in '0' .. '9') {
             ++position
             while (position < source.length && !valueEnd(source[position])) ++position
         }
@@ -276,7 +276,7 @@ internal class TomlParser(private val source: String, private val configuration:
                     codePoint = codePoint * 16 + digit
                     ++position
                 }
-                if (codePoint > 0x10ffff || codePoint in 0xd800..0xdfff) fail("Invalid Unicode scalar value")
+                if (codePoint > 0x10ffff || codePoint in 0xd800 .. 0xdfff) fail("Invalid Unicode scalar value")
                 if (codePoint <= 0xffff) output.append(codePoint.toInt().toChar()) else {
                     val value = codePoint.toInt() - 0x10000
                     output.append((0xd800 + (value shr 10)).toChar())
@@ -290,10 +290,10 @@ internal class TomlParser(private val source: String, private val configuration:
     /** Validate UTF-16 as it is consumed, avoiding a second pass over the source. */
     private fun unicodeChar() {
         val char = source[position++]
-        if (char in '\ud800'..'\udbff') {
-            if (source.getOrNull(position) !in '\udc00'..'\udfff') fail("Unpaired Unicode surrogate", position - 1)
+        if (char in '\ud800' .. '\udbff') {
+            if (source.getOrNull(position) !in '\udc00' .. '\udfff') fail("Unpaired Unicode surrogate", position - 1)
             ++position
-        } else if (char in '\udc00'..'\udfff') fail("Unpaired Unicode surrogate", position - 1)
+        } else if (char in '\udc00' .. '\udfff') fail("Unpaired Unicode surrogate", position - 1)
     }
 
     private fun skipHorizontal() {

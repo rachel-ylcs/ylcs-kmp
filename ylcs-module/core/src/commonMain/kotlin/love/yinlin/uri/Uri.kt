@@ -159,16 +159,16 @@ data class Uri(
                         '%' -> {
                             var hexValue: Byte = 0
                             var vaild = true
-                            for (_ in 0..1) {
+                            for (_ in 0 .. 1) {
                                 if (i >= length) {
                                     flushDecodingByteAccumulator(builder)
                                     builder.append('\uFFFD')
                                     return builder.toString()
                                 }
                                 val newDigit: Int = when (val nextC = str[i++]) {
-                                    in '0'..'9' -> nextC.code - '0'.code
-                                    in 'a'..'f' -> 10 + nextC.code - 'a'.code
-                                    in 'A'..'F' -> 10 + nextC.code - 'A'.code
+                                    in '0' .. '9' -> nextC.code - '0'.code
+                                    in 'a' .. 'f' -> 10 + nextC.code - 'a'.code
+                                    in 'A' .. 'F' -> 10 + nextC.code - 'A'.code
                                     else -> -1
                                 }
                                 if (newDigit < 0) {

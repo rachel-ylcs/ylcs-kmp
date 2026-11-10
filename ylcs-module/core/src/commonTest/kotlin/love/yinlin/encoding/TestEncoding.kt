@@ -199,8 +199,8 @@ class TestEncoding {
         var assigned = 0
         val corpus = StringBuilder()
         val corpusBytes = ByteArray(21791 * 2)
-        for (lead in 0x81..0xFE) {
-            for (trail in 0x40..0xFE) {
+        for (lead in 0x81 .. 0xFE) {
+            for (trail in 0x40 .. 0xFE) {
                 if (trail == 0x7F) continue
                 val bytes: ByteArray = [lead.toByte(), trail.toByte()]
                 val text = convertGBKToString(bytes)

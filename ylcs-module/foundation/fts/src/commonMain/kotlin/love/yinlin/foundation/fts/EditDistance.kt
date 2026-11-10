@@ -24,7 +24,7 @@ internal class EditDistance(
         val previousStart = start(depth - 1)
         val previousEnd = end(depth - 1)
         var minimum = infinity
-        for (column in from..to) {
+        for (column in from .. to) {
             val current = if (column == 0) depth else {
                 val diagonal = value(rows, previousOffset, column - 1, previousStart, previousEnd)
                 minOf(
