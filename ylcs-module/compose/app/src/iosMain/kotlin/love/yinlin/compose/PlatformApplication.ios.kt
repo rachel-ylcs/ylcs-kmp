@@ -18,7 +18,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     self: BaseLazyReference<A>,
     context: PlatformContext,
 ) : Application<A>(self, context) {
-    constructor(self: BaseLazyReference<A>): this(self, PlatformContext.Instance)
+    constructor(self: BaseLazyReference<A>) : this(self, PlatformContext.Instance)
 
     @Composable
     protected open fun BeginContent() {}

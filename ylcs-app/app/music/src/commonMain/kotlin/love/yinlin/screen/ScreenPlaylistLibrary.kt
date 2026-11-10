@@ -75,7 +75,7 @@ class ScreenPlaylistLibrary : Screen() {
         val isDeleted: Boolean
     ) {
         constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, false)
-        constructor(id: String): this(id, "[$id]", "", true)
+        constructor(id: String) : this(id, "[$id]", "", true)
 
         fun path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
     }

@@ -130,7 +130,7 @@ object ModFactory {
     class Release(
         source: Source,
         private val savePath: File
-    ): BaseRelease(source) {
+    ) : BaseRelease(source) {
         @Stable
         data class ReleaseResult(
             val metadata: ModMetadata,

@@ -37,7 +37,7 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
     }
 
     @Stable
-    class MultiModFilter(val filters: List<ModFilter>): ModFilter() {
+    class MultiModFilter(val filters: List<ModFilter>) : ModFilter() {
         override val isSuspend: Boolean = true
         override suspend fun checkSuspend(musicInfo: MusicInfo): Boolean {
             for (filter in filters) {
@@ -63,7 +63,7 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
     }
 
     @Stable
-    class ResourceModFilter(val resourceType: ModResourceType): ModFilter() {
+    class ResourceModFilter(val resourceType: ModResourceType) : ModFilter() {
         override val isSuspend: Boolean = true
         override suspend fun checkSuspend(musicInfo: MusicInfo): Boolean = musicInfo.path(app.modPath, resourceType).exists()
     }

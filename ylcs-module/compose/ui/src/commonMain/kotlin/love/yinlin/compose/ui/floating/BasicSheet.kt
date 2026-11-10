@@ -49,7 +49,7 @@ import love.yinlin.compose.ui.node.fastAnimateOffsetX
 import love.yinlin.compose.ui.node.fastAnimateOffsetY
 
 @Stable
-abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
+abstract class BasicSheet<A : Any> internal constructor() : Floating<A>() {
     override fun alignment(device: Device): Alignment = when (device.type) {
         Device.Type.PORTRAIT -> Alignment.BottomCenter
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd

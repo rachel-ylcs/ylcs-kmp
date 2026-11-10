@@ -7,7 +7,7 @@ import love.yinlin.extension.Array
 import love.yinlin.extension.JsonObjectScope
 
 @Stable
-class RichString @PublishedApi internal constructor(): RichList() {
+class RichString @PublishedApi internal constructor() : RichList() {
     override val type: String = RichType.Root.value
 
     override fun JsonObjectScope.children() { }

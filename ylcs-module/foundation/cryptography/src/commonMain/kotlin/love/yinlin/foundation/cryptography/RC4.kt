@@ -2,7 +2,7 @@ package love.yinlin.foundation.cryptography
 
 import love.yinlin.encoding.convert
 
-class RC4(private val key: ByteArray): Cipher() {
+class RC4(private val key: ByteArray) : Cipher() {
     constructor(key: String) : this(key.convert())
 
     init {

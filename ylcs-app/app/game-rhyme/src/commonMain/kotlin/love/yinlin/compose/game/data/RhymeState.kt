@@ -16,7 +16,7 @@ internal sealed interface RhymeState {
     @Stable
     data object Help : RhymeState // 帮助
     @Stable
-    data class Prepare(val info: MusicInfo): RhymeState // 准备
+    data class Prepare(val info: MusicInfo) : RhymeState // 准备
     @Stable
     data class Playing(val info: MusicInfo, val playConfig: RhymePlayConfig) : RhymeState // 游戏中
     @Stable

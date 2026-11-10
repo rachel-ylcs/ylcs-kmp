@@ -15,7 +15,7 @@ sealed interface Viewport {
     fun applyCanvasBounds(canvasSize: IntSize): Pair<Size, Float>
 
     @Stable
-    data class Fixed(val width: Int, val height: Int): Viewport {
+    data class Fixed(val width: Int, val height: Int) : Viewport {
         override fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect {
             require(width > 0 && height > 0)
             val scaleX = outerWidth / width.toFloat()
@@ -37,7 +37,7 @@ sealed interface Viewport {
     }
 
     @Stable
-    data class MatchWidth(val width: Int): Viewport {
+    data class MatchWidth(val width: Int) : Viewport {
         override fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect {
             require(width > 0)
             return IntRect(0, 0, outerWidth, outerHeight)
