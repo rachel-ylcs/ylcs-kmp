@@ -10,6 +10,8 @@ rachelMinimumCode = "370"
 # ----- [Plugin] -----
 
 kotlin = "2.5.0-Beta2"
+
+#noinspection UnusedVersionCatalogEntry
 gradle = "9.8.2"
 agp = "9.3.3"
 cmp = "1.13.0-beta02"
@@ -20,6 +22,7 @@ dokka = "2.3.0"
 
 skiko = "0.156.1"
 sdl = "3.4.20"
+#noinspection UnusedVersionCatalogEntry
 icu = "78.2"
 webview2 = "1.0.4314.35"
 windowsSdkCpp = "10.0.26100.4204"
@@ -117,13 +120,18 @@ compose-foundation-layout = { module = "org.jetbrains.compose.foundation:foundat
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-animation-graphics = { module = "org.jetbrains.compose.animation:animation-graphics", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
+#noinspection UnusedVersionCatalogEntry
 compose-material-ripple = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
+#noinspection UnusedVersionCatalogEntry
 compose-material3-ripple = { module = "org.jetbrains.compose.material3:material3-ripple", version.ref = "cmp" }
 compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "cmp" }
 compose-material3-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "cmp" }
+#noinspection UnusedVersionCatalogEntry
 compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive" }
+#noinspection UnusedVersionCatalogEntry
 compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "material3-adaptive" }
+#noinspection UnusedVersionCatalogEntry
 compose-material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
 compose-material3-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "material3-adaptive" }
 
