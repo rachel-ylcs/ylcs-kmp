@@ -20,7 +20,6 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.extension.cleaning
 
@@ -34,8 +33,16 @@ data object Ripple : IndicationNodeFactory {
     const val FADEOUT_DURATION = 175
     const val RIPPLE_EXTRA_RADIUS = 5
 
+    private val defaultStateLayerSpec = tween<Float>(durationMillis = 15, easing = LinearEasing)
+    private val focusAndDragEnterSpec = tween<Float>(durationMillis = 45, easing = LinearEasing)
+    private val dragExitSpec = tween<Float>(durationMillis = 150, easing = LinearEasing)
+    private val expansionSpec = tween<Float>(durationMillis = RADIUS_DURATION, easing = LinearEasing)
+    private val fadeInProgressScale = RADIUS_DURATION.toFloat() / FADEIN_DURATION
+    private val fadeOutSpec = tween<Float>(durationMillis = FADEOUT_DURATION, easing = LinearEasing)
+
     class StateLayer {
-        val animatedAlpha = Animatable(0f)
+        private var alphaAnimation = Animatable(0f)
+        val animatedAlpha get() = alphaAnimation
         val interactions: MutableList<Interaction> = []
         var currentInteraction: Interaction? = null
 
@@ -52,34 +59,30 @@ data object Ripple : IndicationNodeFactory {
             }
 
             val newInteraction = interactions.lastOrNull()
-            if (currentInteraction != newInteraction) {
-                val defaultTweenSpec = TweenSpec<Float>(durationMillis = 15, easing = LinearEasing)
-                if (newInteraction != null) {
-                    val targetAlpha = when (newInteraction) {
-                        is HoverInteraction.Enter -> HOVERED_ALPHA
-                        is FocusInteraction.Focus -> FOCUSED_ALPHA
-                        is DragInteraction.Start -> DRAGGED_ALPHA
-                        else -> 0f
-                    }
-                    val incomingAnimationSpec = when (newInteraction) {
-                        is HoverInteraction.Enter -> defaultTweenSpec
-                        is FocusInteraction.Focus -> TweenSpec(durationMillis = 45, easing = LinearEasing)
-                        is DragInteraction.Start -> TweenSpec(durationMillis = 45, easing = LinearEasing)
-                        else -> defaultTweenSpec
-                    }
-                    scope.launch { animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec) }
-                }
-                else {
-                    val outgoingAnimationSpec = when (currentInteraction) {
-                        is HoverInteraction.Enter -> defaultTweenSpec
-                        is FocusInteraction.Focus -> defaultTweenSpec
-                        is DragInteraction.Start -> TweenSpec(durationMillis = 150, easing = LinearEasing)
-                        else -> defaultTweenSpec
-                    }
-                    scope.launch { animatedAlpha.animateTo(0f, outgoingAnimationSpec) }
-                }
-                currentInteraction = newInteraction
+            if (currentInteraction == newInteraction) return
+
+            val targetAlpha = when (newInteraction) {
+                is HoverInteraction.Enter -> HOVERED_ALPHA
+                is FocusInteraction.Focus -> FOCUSED_ALPHA
+                is DragInteraction.Start -> DRAGGED_ALPHA
+                else -> 0f
             }
+            val animationSpec = when (newInteraction) {
+                is FocusInteraction.Focus, is DragInteraction.Start -> focusAndDragEnterSpec
+                null -> if (currentInteraction is DragInteraction.Start) dragExitSpec else defaultStateLayerSpec
+                else -> defaultStateLayerSpec
+            }
+            val alpha = animatedAlpha
+            scope.launch { alpha.animateTo(targetAlpha, animationSpec) }
+            currentInteraction = newInteraction
+        }
+
+        internal fun reset() {
+            if (currentInteraction != null || animatedAlpha.isRunning || animatedAlpha.value != 0f) {
+                alphaAnimation = Animatable(0f)
+            }
+            interactions.clear()
+            currentInteraction = null
         }
 
         fun DrawScope.drawStateLayer(radius: Float, color: Color) {
@@ -92,35 +95,17 @@ data object Ripple : IndicationNodeFactory {
         var startRadius: Float? = null
         var targetCenter: Offset? = null
 
-        val animatedAlpha = Animatable(0f)
-        val animatedRadiusPercent = Animatable(0f)
-        val animatedCenterPercent = Animatable(0f)
+        private val animatedProgress = Animatable(0f)
         val finishSignalDeferred = CompletableDeferred<Unit>(null)
 
         var finishedFadingIn by mutableStateOf(false)
         var finishRequested by mutableStateOf(false)
 
         suspend fun animate() {
-            coroutineScope {
-                launch {
-                    animatedAlpha.animateTo(1f, tween(durationMillis = FADEIN_DURATION, easing = LinearEasing))
-                }
-                launch {
-                    animatedRadiusPercent.animateTo(1f, tween(durationMillis = RADIUS_DURATION, easing = FastOutSlowInEasing))
-                }
-                launch {
-                    animatedCenterPercent.animateTo(1f, tween(durationMillis = RADIUS_DURATION, easing = LinearEasing))
-                }
-            }
-
+            animatedProgress.animateTo(1f, expansionSpec)
             finishedFadingIn = true
             finishSignalDeferred.await()
-
-            coroutineScope {
-                launch {
-                    animatedAlpha.animateTo(0f, tween(durationMillis = FADEOUT_DURATION, easing = LinearEasing))
-                }
-            }
+            animatedProgress.animateTo(0f, fadeOutSpec)
         }
 
         fun finish() {
@@ -129,30 +114,39 @@ data object Ripple : IndicationNodeFactory {
         }
 
         fun DrawScope.draw(color: Color) {
+            clipRect { drawUnclipped(color) }
+        }
+
+        internal fun DrawScope.drawUnclipped(color: Color) {
             if (startRadius == null) startRadius = maxOf(size.width, size.height) * 0.3f
             if (origin == null) origin = center
             if (targetCenter == null) targetCenter = Offset(size.width / 2.0f, size.height / 2.0f)
 
-            val alpha = if (finishRequested && !finishedFadingIn) 1f else animatedAlpha.value
+            val progress = animatedProgress.value
+            val isExpanded = finishedFadingIn
+            val expansion = if (isExpanded) 1f else progress
+            val alpha = when {
+                isExpanded -> progress
+                finishRequested -> 1f
+                else -> (progress * fadeInProgressScale).coerceAtMost(1f)
+            }
             val centerOffset = Offset(
-                lerp(origin!!.x, targetCenter!!.x, animatedCenterPercent.value),
-                lerp(origin!!.y, targetCenter!!.y, animatedCenterPercent.value)
+                lerp(origin!!.x, targetCenter!!.x, expansion),
+                lerp(origin!!.y, targetCenter!!.y, expansion)
             )
 
-            clipRect {
-                drawCircle(
-                    color = color.copy(alpha = color.alpha * alpha),
-                    radius = lerp(startRadius!!, radius, animatedRadiusPercent.value),
-                    center = centerOffset
-                )
-            }
+            drawCircle(
+                color = color.copy(alpha = color.alpha * alpha),
+                radius = lerp(startRadius!!, radius, FastOutSlowInEasing.transform(expansion)),
+                center = centerOffset
+            )
         }
     }
 
     class RippleNode(private val interactionSource: InteractionSource) : Modifier.Node(), LayoutAwareModifierNode, CompositionLocalConsumerModifierNode, DrawModifierNode {
         var targetRadius: Float = 0f
         val pendingInteractions: MutableList<PressInteraction> = []
-        val ripples = MutableScatterMap<PressInteraction.Press, RippleAnimation>()
+        val ripples = MutableScatterMap<PressInteraction.Press, RippleAnimation>(initialCapacity = 0)
         val stateLayer: StateLayer = StateLayer()
         var hasValidSize: Boolean = false
         var needRedraw: Boolean = true
@@ -170,8 +164,7 @@ data object Ripple : IndicationNodeFactory {
                         cleaning({
                             rippleAnimation.animate()
                         }) {
-                            ripples.remove(pressInteraction)
-                            invalidateDraw()
+                            if (ripples.remove(pressInteraction, rippleAnimation)) invalidateDraw()
                         }
                     }
                     invalidateDraw()
@@ -184,9 +177,13 @@ data object Ripple : IndicationNodeFactory {
         override fun onRemeasured(size: IntSize) {
             hasValidSize = true
             val density = requireDensity()
-            targetRadius = with(density) {
+            val newTargetRadius = with(density) {
                 val radiusCoveringBounds = Offset(size.width.toFloat(), size.height.toFloat()).getDistance() / 2f
                 radiusCoveringBounds + RIPPLE_EXTRA_RADIUS.dp.toPx()
+            }
+            if (targetRadius != newTargetRadius) {
+                targetRadius = newTargetRadius
+                if (stateLayer.animatedAlpha.value > 0f) invalidateDraw()
             }
             pendingInteractions.fastForEach { handlePressInteraction(it) }
             pendingInteractions.clear()
@@ -214,17 +211,30 @@ data object Ripple : IndicationNodeFactory {
 
         override fun onDetach() {
             ripples.clear()
+            stateLayer.reset()
+            pendingInteractions.clear()
+            targetRadius = 0f
+            hasValidSize = false
+            needRedraw = true
         }
 
         override fun ContentDrawScope.draw() {
             drawContent()
+            // Observe alpha even when idle so a state-layer animation can invalidate drawing.
+            val stateAlpha = stateLayer.animatedAlpha.value
+            val hasRipples = ripples.isNotEmpty()
+            if (stateAlpha <= 0f && !hasRipples) return
+
             val rippleColor = currentValueOf(LocalColor)
-            with(stateLayer) { drawStateLayer(targetRadius, rippleColor) }
-            ripples.forEach { _, ripple -> with(ripple) { draw(rippleColor.copy(alpha = PRESSED_ALPHA)) } }
+            clipRect {
+                if (stateAlpha > 0f) drawCircle(rippleColor.copy(alpha = stateAlpha), targetRadius)
+                if (hasRipples) {
+                    val pressedColor = rippleColor.copy(alpha = PRESSED_ALPHA)
+                    ripples.forEach { _, ripple -> with(ripple) { drawUnclipped(pressedColor) } }
+                }
+            }
         }
     }
 
-    override fun create(interactionSource: InteractionSource): DelegatableNode = object : DelegatingNode() {
-        init { delegate(RippleNode(interactionSource)) }
-    }
+    override fun create(interactionSource: InteractionSource): DelegatableNode = RippleNode(interactionSource)
 }

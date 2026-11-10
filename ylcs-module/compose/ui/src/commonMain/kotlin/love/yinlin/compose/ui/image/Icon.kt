@@ -3,7 +3,6 @@ package love.yinlin.compose.ui.image
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -60,7 +59,7 @@ fun Icon(
                 .paint(painter = painter, colorFilter = colorFilter, contentScale = ContentScale.Fit)
                 .condition(onClick != null) {
                     clickable(
-                        interactionSource = remember { MutableInteractionSource() },
+                        interactionSource = null,
                         indication = indication,
                         enabled = enabled,
                         onClick = onClick
