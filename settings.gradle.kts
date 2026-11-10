@@ -98,7 +98,7 @@ repository {
         module("ylcs-module") {
             /* -----------------  工具模块  ----------------- */
 
-            module("build-tool", "dokka")
+            module("build-tool", "dokka", "lint")
 
             /* -----------------  库模块  ----------------- */
 

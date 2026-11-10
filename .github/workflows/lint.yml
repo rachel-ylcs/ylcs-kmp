@@ -1,0 +1,54 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '*'
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
+
+permissions:
+  contents: read
+
+jobs:
+  ktlint:
+    name: Kotlin Style Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          android: 'true'
+
+      - name: Run ktlint
+        run: bash ./gradlew :ylcs-module:lint:ktlintCheck
+
+      - name: Upload ktlint report
+        id: ktlint-report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ktlint-report
+          path: ylcs-module/lint/build/reports/ktlint/ktlint.md
+
+      - name: Publish ktlint summary
+        if: ${{ !cancelled() && steps.ktlint-report.outputs.artifact-url != '' }}
+        env:
+          REPORT_URL: ${{ steps.ktlint-report.outputs.artifact-url }}
+        run: |
+          head -n 27 ylcs-module/lint/build/reports/ktlint/ktlint.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n[下载完整 ktlint 报告](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"

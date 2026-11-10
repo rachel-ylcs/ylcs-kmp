@@ -17,6 +17,7 @@ agp = "9.3.3"
 cmp = "1.13.0-beta02"
 mavenPublish = "0.37.0"
 dokka = "2.3.0"
+ktlint = "2.0.0-ALPHA-4"
 
 # ----- [Common] -----
 
@@ -75,6 +76,8 @@ gradle-plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compile
 gradle-plugin-serialization = { module = "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
 gradle-plugin-mavenPublish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+ktlint-engine = { module = "io.github.ktlint.core:ktlint-rule-engine", version.ref = "ktlint" }
+ktlint-standard = { module = "io.github.ktlint.core:ktlint-ruleset-standard", version.ref = "ktlint" }
 
 # ----- [Common] -----
 
