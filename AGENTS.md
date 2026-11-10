@@ -59,6 +59,8 @@ Kotlin 编译器版本以 `libs.versions.toml` 为准，语言特性开关位于
 
 但要注意只有app和module模块使用的是最新的 kotlin 版本，而 build-logic 和 native-compose 里为了兼容还是使用旧版 kotlin, 这时只有新的语法糖不适用，但其他规则应当遵守。
 
+更多严格细节请参考 `ylcs-module/lint` 下 `RepositoryKtlint` 的相关规则。
+
 - 集合字面量采用 kotlin 2.5 的语法糖：用 `[]`替换 `emptyList`以及`listOf`等各类`List`、`Array`、`Set`的辅助函数。
 - 结构化绑定采用 kotlin 2.5 的规范，基于位置的使用`[]`，基于名称的使用`()`。
 - kotlin 文件末尾不需要多余空行。

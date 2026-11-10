@@ -2,9 +2,10 @@ package love.yinlin.lint
 
 import io.github.ktlint.core.rule.engine.api.EditorConfigOverride
 import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
+import io.github.ktlint.core.ruleset.standard.rules.FunctionNamingRule
 import love.yinlin.lint.KtlintSeverity.*
+import love.yinlin.lint.rule.ComposableFunctionNamingRule
 import love.yinlin.lint.rule.RangeSpacingRule
-import love.yinlin.lint.rule.TrailingCommaRule
 
 internal data class KtlintRule(
     val name: String,
@@ -31,31 +32,20 @@ internal object RepositoryKtlintRules {
         KtlintRule("standard:enum-entry-name-case", true, WARNING, "枚举项名称的大小写"),
         KtlintRule("standard:filename", true, ERROR, "源文件名及其与顶层声明的对应关系"),
         KtlintRule("standard:fun-keyword-spacing", true, WARNING, "fun 关键字周围的空格"),
-        KtlintRule("standard:function-expression-body", true, INFO, "可以简化为表达式体的函数"),
-        KtlintRule("standard:function-literal", true, WARNING, "函数文字量的参数及函数体布局"),
         KtlintRule("standard:function-naming", true, WARNING, "函数名的命名"),
         KtlintRule("standard:function-return-type-spacing", true, WARNING, "函数返回类型附近的空格"),
         KtlintRule("standard:function-start-of-body-spacing", true, WARNING, "函数体起始位置附近的空格"),
         KtlintRule("standard:function-type-modifier-spacing", true, WARNING, "函数类型修饰符附近的空格"),
         KtlintRule("standard:function-type-reference-spacing", true, WARNING, "函数类型引用附近的空格"),
-        KtlintRule("standard:indent", true, WARNING, "代码缩进"),
         KtlintRule("standard:kdoc", true, WARNING, "KDoc 的位置与基本结构"),
         KtlintRule("standard:kdoc-wrapping", true, WARNING, "KDoc 注释的换行"),
-        KtlintRule("standard:keyword-spacing", true, WARNING, "关键字前后的空格"),
-        KtlintRule("standard:lambda-return", true, INFO, "Lambda 中返回表达式的写法"),
-        KtlintRule("standard:mixed-condition-operators", true, ERROR, "条件表达式中混用逻辑运算符"),
         KtlintRule("standard:modifier-list-spacing", true, WARNING, "修饰符列表中的空格"),
         KtlintRule("standard:modifier-order", true, WARNING, "修饰符的顺序"),
         KtlintRule("standard:no-blank-line-at-start-of-file", true, ERROR, "文件开头的多余空行"),
-        KtlintRule("standard:no-blank-line-before-rbrace", true, WARNING, "右花括号前的多余空行"),
-        KtlintRule("standard:no-blank-line-in-list", true, WARNING, "列表项之间的多余空行"),
         KtlintRule("standard:no-blank-lines-in-chained-method-calls", true, WARNING, "链式调用中的空行"),
-        KtlintRule("standard:no-consecutive-blank-lines", true, INFO, "连续的多余空行"),
         KtlintRule("standard:no-consecutive-comments", true, WARNING, "相邻行注释的组织"),
         KtlintRule("standard:no-empty-class-body", true, WARNING, "多余的空类体"),
         KtlintRule("standard:no-empty-file", true, ERROR, "没有实际声明的空文件"),
-        KtlintRule("standard:no-empty-first-line-in-class-body", true, INFO, "类体开头的空行"),
-        KtlintRule("standard:no-empty-first-line-in-method-block", true, WARNING, "函数体开头的空行"),
         KtlintRule("standard:no-line-break-after-else", true, WARNING, "else 关键字之后的多余换行"),
         KtlintRule("standard:no-line-break-before-assignment", true, WARNING, "赋值符之前的多余换行"),
         KtlintRule("standard:no-multi-spaces", true, WARNING, "多余的连续空格"),
@@ -72,23 +62,21 @@ internal object RepositoryKtlintRules {
         KtlintRule("standard:spacing-around-angle-brackets", true, WARNING, "尖括号前后的空格"),
         KtlintRule("standard:spacing-between-function-name-and-opening-parenthesis", true, WARNING, "函数名与左圆括号之间的空格"),
         KtlintRule("standard:square-brackets-spacing", true, WARNING, "方括号前后的空格"),
-        KtlintRule("standard:string-template-indent", true, WARNING, "多行字符串模板的缩进"),
         KtlintRule("standard:then-spacing", true, WARNING, "if 条件与随后分支之间的空格"),
-        KtlintRule("standard:try-catch-finally-spacing", true, WARNING, "try、catch 和 finally 周围的空格"),
         KtlintRule("standard:type-argument-list-spacing", true, WARNING, "类型实参列表周围的空格"),
         KtlintRule("standard:type-parameter-list-spacing", true, WARNING, "类型形参列表周围的空格"),
         KtlintRule("standard:unary-op-spacing", true, WARNING, "一元运算符附近的空格"),
         KtlintRule("standard:unnecessary-parentheses-before-trailing-lambda", true, WARNING, "尾随 Lambda 前的多余空圆括号"),
         KtlintRule(RangeSpacingRule.ID, true, WARNING, "范围运算符两侧必须留空格"),
-        KtlintRule(TrailingCommaRule.Site.CALL.id, true, WARNING, TrailingCommaRule.Site.CALL.description),
-        KtlintRule(TrailingCommaRule.Site.DECLARATION.id, true, WARNING, TrailingCommaRule.Site.DECLARATION.description),
+        KtlintRule(ComposableFunctionNamingRule.ID, true, WARNING, "Composable 函数名的首字母大小写"),
     )
 
     val custom = setOf(
         RuleV2Provider { RangeSpacingRule() },
-        RuleV2Provider { TrailingCommaRule(TrailingCommaRule.Site.CALL) },
-        RuleV2Provider { TrailingCommaRule(TrailingCommaRule.Site.DECLARATION) }
+        RuleV2Provider { ComposableFunctionNamingRule() },
     )
 
-    val options = EditorConfigOverride.EMPTY_EDITOR_CONFIG_OVERRIDE
+    val options = EditorConfigOverride.from(
+        FunctionNamingRule.IGNORE_WHEN_ANNOTATED_WITH_PROPERTY to "Composable"
+    )
 }
