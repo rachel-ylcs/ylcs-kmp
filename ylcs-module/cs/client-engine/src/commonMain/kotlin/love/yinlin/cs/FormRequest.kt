@@ -89,7 +89,7 @@ suspend inline fun <reified R : Any> API<APIType.Form>.internalForm(
 suspend inline fun API<APIType.Form>.internalFormCallback(
     crossinline factory: APIFormScope.() -> Unit,
     crossinline block: suspend (HttpResponse) -> Unit
-)  = catchingError { internalForm(factory, block) }
+) = catchingError { internalForm(factory, block) }
 
 suspend inline fun <reified R : Any> API<APIType.Form>.internalFormReturn(
     crossinline factory: APIFormScope.() -> Unit,
@@ -599,7 +599,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>.request(i1: I1, i2: I2, i3: I3) =  internalFormReturn(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>.request(i1: I1, i2: I2, i3: I3) = internalFormReturn(factory = {
     add(i1)
     add(i2)
     add(i3)
@@ -858,7 +858,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>.requestNull(i1: I1, i2: I2, i3: I3) =  internalFormReturnNull(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>.requestNull(i1: I1, i2: I2, i3: I3) = internalFormReturnNull(factory = {
     add(i1)
     add(i2)
     add(i3)

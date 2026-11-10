@@ -17,7 +17,7 @@ actual class KV actual constructor(context: PlatformContext, initPath: File) : A
         MMKV.defaultMMKV()!!
     }
 
-    actual fun set(key: String, value: Boolean, expire: Int)  { kv.setBool(value, key, expire.toUInt()) }
+    actual fun set(key: String, value: Boolean, expire: Int) { kv.setBool(value, key, expire.toUInt()) }
     actual fun set(key: String, value: Int, expire: Int) { kv.setInt32(value, key, expire.toUInt()) }
     actual fun set(key: String, value: Long, expire: Int) { kv.setInt64(value, key, expire.toUInt()) }
     actual fun set(key: String, value: Float, expire: Int) { kv.setFloat(value, key, expire.toUInt()) }

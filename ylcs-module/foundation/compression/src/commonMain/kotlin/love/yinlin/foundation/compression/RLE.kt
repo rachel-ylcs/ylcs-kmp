@@ -8,7 +8,7 @@ class RLE(val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DECOMPRESSION_
 
     override fun maxCompressedSize(sourceSize: Int): Int = CompressionCodec.compressedBound(sourceSize, (sourceSize.toLong() + 127) / 128)
 
-    override fun compress(data: ByteArray): ByteArray  {
+    override fun compress(data: ByteArray): ByteArray {
         val output = ByteArray(maxCompressedSize(data.size))
         val size = compressPlaceable(data, output)
         return if (size == output.size) output else output.copyOf(size)

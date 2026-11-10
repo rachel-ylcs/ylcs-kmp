@@ -9,7 +9,7 @@ class Gzip(val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DECOMPRESSION
 
     override fun maxCompressedSize(sourceSize: Int): Int = CompressionCodec.compressedBound(deflate.maxCompressedSize(sourceSize), 18)
 
-    override fun compress(data: ByteArray): ByteArray  {
+    override fun compress(data: ByteArray): ByteArray {
         val output = ByteArray(maxCompressedSize(data.size))
         val size = compressPlaceable(data, output)
         return if (size == output.size) output else output.copyOf(size)

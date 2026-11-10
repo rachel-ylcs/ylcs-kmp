@@ -268,7 +268,7 @@ class Deflate(private val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DE
         bits.align()
     }
 
-    override fun compress(data: ByteArray): ByteArray  {
+    override fun compress(data: ByteArray): ByteArray {
         val output = ByteArray(maxCompressedSize(data.size))
         val size = compressPlaceable(data, output)
         return if (size == output.size) output else output.copyOf(size)

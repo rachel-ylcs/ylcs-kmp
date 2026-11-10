@@ -21,7 +21,7 @@ class LZ4(val maxDecompressedSize: Int = CompressionCodec.DEFAULT_DECOMPRESSION_
         output.writeByte(remaining)
     }
 
-    override fun compress(data: ByteArray): ByteArray  {
+    override fun compress(data: ByteArray): ByteArray {
         val output = ByteArray(maxCompressedSize(data.size))
         val size = compressPlaceable(data, output)
         return if (size == output.size) output else output.copyOf(size)
