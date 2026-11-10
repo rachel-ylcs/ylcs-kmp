@@ -1,17 +1,25 @@
 package love.yinlin.page
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.delay
+import love.yinlin.GalleryActions
+import love.yinlin.GalleryCaption
 import love.yinlin.Page
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -47,50 +55,51 @@ object PicturePage : Page() {
     override fun Content() {
         ComponentColumn {
             Component("Icon") {
-                ExampleRow {
-                    Example("Normal") {
-                        Icon(Icons.Home)
-                    }
-
-                    Example("Size") {
-                        Icon(Icons.Home, modifier = Modifier.size(Theme.size.image8))
-                    }
-
-                    Example("Tip") {
-                        Icon(Icons.Home, tip = "主页")
-                    }
-
-                    Example("Click") {
-                        Icon(Icons.Home, onClick = { })
-                    }
-
-                    Example("LoadingIcon") {
-                        LoadingIcon(
-                            icon = Icons.Home,
-                            animation = CircleLoading,
-                            onClick = {
-                                delay(2.seconds)
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(Theme.color.backgroundVariant.copy(alpha = 0.45f), Theme.shape.v3)
+                        .padding(Theme.padding.eValue6),
+                ) {
+                    GalleryActions {
+                        IconSample("Normal") {
+                            Icon(Icons.Home)
+                        }
+                        IconSample("Size") {
+                            Icon(Icons.Home, modifier = Modifier.size(Theme.size.image8))
+                        }
+                        IconSample("Tip") {
+                            Icon(Icons.Home, tip = "主页")
+                        }
+                        IconSample("Click") {
+                            Icon(Icons.Home, onClick = { })
+                        }
+                        IconSample("LoadingIcon") {
+                            LoadingIcon(
+                                icon = Icons.Home,
+                                animation = CircleLoading,
+                                onClick = {
+                                    delay(2.seconds)
+                                }
+                            )
+                        }
+                        IconSample("ColorIcon") {
+                            Row(horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
+                                ColorIcon(
+                                    icon = Icons.Home,
+                                    color = Theme.color.onContainer,
+                                    background = Theme.color.primaryContainer,
+                                )
+                                ColorIcon(
+                                    icon = Icons.Home,
+                                    color = Theme.color.onContainer,
+                                    background = Theme.color.secondaryContainer,
+                                )
+                                ColorIcon(
+                                    icon = Icons.Home,
+                                    color = Theme.color.onContainer,
+                                    background = Theme.color.tertiaryContainer,
+                                )
                             }
-                        )
-                    }
-
-                    Example("ColorIcon") {
-                        Row(horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
-                            ColorIcon(
-                                icon = Icons.Home,
-                                color = Theme.color.onContainer,
-                                background = Theme.color.primaryContainer,
-                            )
-                            ColorIcon(
-                                icon = Icons.Home,
-                                color = Theme.color.onContainer,
-                                background = Theme.color.secondaryContainer,
-                            )
-                            ColorIcon(
-                                icon = Icons.Home,
-                                color = Theme.color.onContainer,
-                                background = Theme.color.tertiaryContainer,
-                            )
                         }
                     }
                 }
@@ -164,6 +173,19 @@ object PicturePage : Page() {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun IconSample(title: String, content: @Composable () -> Unit) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+        ) {
+            Box(Modifier.heightIn(min = Theme.size.image8), contentAlignment = Alignment.Center) {
+                content()
+            }
+            GalleryCaption(title)
         }
     }
 }
