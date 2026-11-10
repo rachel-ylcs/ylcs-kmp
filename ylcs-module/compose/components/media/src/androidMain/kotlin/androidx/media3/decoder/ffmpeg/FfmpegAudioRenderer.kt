@@ -32,7 +32,7 @@ class FfmpegAudioRenderer(
     eventListener: AudioRendererEventListener?,
     audioSink: AudioSink
 ) : DecoderAudioRenderer<FfmpegAudioDecoder>(eventHandler, eventListener, audioSink) {
-    constructor(context: Context) : this(context, /* eventHandler= */null,  /* eventListener= */null)
+    constructor(context: Context) : this(context, null,  null)
 
     /**
      * Creates a new instance.

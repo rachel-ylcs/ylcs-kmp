@@ -91,16 +91,14 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun API00<APIType.Post>
-            .response(crossinline block: suspend APIResponseScope.() -> Unit) = internalResponsePost {
+    inline fun API00<APIType.Post>.response(crossinline block: suspend APIResponseScope.() -> Unit) = internalResponsePost {
         APIResponseScope().block()
         makeArray {
 
         }
     }
 
-    inline fun <reified I1> API10<APIType.Post, I1>
-            .response(crossinline block: suspend APIResponseScope.(I1) -> Unit) = internalResponsePost {
+    inline fun <reified I1> API10<APIType.Post, I1>.response(crossinline block: suspend APIResponseScope.(I1) -> Unit) = internalResponsePost {
         val [i1] = it
         APIResponseScope().block(i1.to())
         makeArray {
@@ -108,8 +106,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2> API20<APIType.Post, I1, I2>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2) -> Unit) = internalResponsePost {
+    inline fun <reified I1, reified I2> API20<APIType.Post, I1, I2>.response(crossinline block: suspend APIResponseScope.(I1, I2) -> Unit) = internalResponsePost {
         val [i1, i2] = it
         APIResponseScope().block(i1.to(), i2.to())
         makeArray {
@@ -117,8 +114,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3> API30<APIType.Post, I1, I2, I3>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3) -> Unit) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3> API30<APIType.Post, I1, I2, I3>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3) -> Unit) = internalResponsePost {
         val [i1, i2, i3] = it
         APIResponseScope().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -126,8 +122,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Post, I1, I2, I3, I4>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4) -> Unit) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Post, I1, I2, I3, I4>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4) -> Unit) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         APIResponseScope().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -135,8 +130,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Post, I1, I2, I3, I4, I5>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4, I5) -> Unit) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Post, I1, I2, I3, I4, I5>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4, I5) -> Unit) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         APIResponseScope().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -144,16 +138,14 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified O1> API01<APIType.Post, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.() -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified O1> API01<APIType.Post, O1>.response(crossinline block: suspend APIResultScope1<O1>.() -> APIResult1<O1>) = internalResponsePost {
         val (o1) = APIResultScope1<O1>().block()
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1) -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1) -> APIResult1<O1>) = internalResponsePost {
         val [i1] = it
         val (o1) = APIResultScope1<O1>().block(i1.to())
         makeArray {
@@ -161,8 +153,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, I2, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2) -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, I2, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2) -> APIResult1<O1>) = internalResponsePost {
         val [i1, i2] = it
         val (o1) = APIResultScope1<O1>().block(i1.to(), i2.to())
         makeArray {
@@ -170,8 +161,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Post, I1, I2, I3, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3) -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Post, I1, I2, I3, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3) -> APIResult1<O1>) = internalResponsePost {
         val [i1, i2, i3] = it
         val (o1) = APIResultScope1<O1>().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -179,8 +169,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Post, I1, I2, I3, I4, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4) -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Post, I1, I2, I3, I4, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4) -> APIResult1<O1>) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         val (o1) = APIResultScope1<O1>().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -188,8 +177,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Post, I1, I2, I3, I4, I5, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4, I5) -> APIResult1<O1>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Post, I1, I2, I3, I4, I5, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4, I5) -> APIResult1<O1>) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         val (o1) = APIResultScope1<O1>().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -197,8 +185,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.() -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.() -> APIResult2<O1, O2>) = internalResponsePost {
         val (o1, o2) = APIResultScope2<O1, O2>().block()
         makeArray {
             add(o1.toJson())
@@ -206,8 +193,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1) -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1) -> APIResult2<O1, O2>) = internalResponsePost {
         val [i1] = it
         val (o1, o2) = APIResultScope2<O1, O2>().block(i1.to())
         makeArray {
@@ -216,8 +202,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Post, I1, I2, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2) -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Post, I1, I2, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2) -> APIResult2<O1, O2>) = internalResponsePost {
         val [i1, i2] = it
         val (o1, o2) = APIResultScope2<O1, O2>().block(i1.to(), i2.to())
         makeArray {
@@ -226,8 +211,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Post, I1, I2, I3, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3) -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Post, I1, I2, I3, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3) -> APIResult2<O1, O2>) = internalResponsePost {
         val [i1, i2, i3] = it
         val (o1, o2) = APIResultScope2<O1, O2>().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -236,8 +220,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Post, I1, I2, I3, I4, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4) -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Post, I1, I2, I3, I4, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4) -> APIResult2<O1, O2>) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         val (o1, o2) = APIResultScope2<O1, O2>().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -246,8 +229,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Post, I1, I2, I3, I4, I5, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4, I5) -> APIResult2<O1, O2>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Post, I1, I2, I3, I4, I5, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4, I5) -> APIResult2<O1, O2>) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         val (o1, o2) = APIResultScope2<O1, O2>().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -256,8 +238,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.() -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.() -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block()
         makeArray {
             add(o1.toJson())
@@ -266,8 +247,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Post, I1, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1) -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Post, I1, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1) -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val [i1] = it
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(i1.to())
         makeArray {
@@ -277,8 +257,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Post, I1, I2, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2) -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Post, I1, I2, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2) -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val [i1, i2] = it
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(i1.to(), i2.to())
         makeArray {
@@ -288,8 +267,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Post, I1, I2, I3, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3) -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Post, I1, I2, I3, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3) -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val [i1, i2, i3] = it
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -299,8 +277,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Post, I1, I2, I3, I4, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4) -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Post, I1, I2, I3, I4, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4) -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -310,8 +287,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4, I5) -> APIResult3<O1, O2, O3>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4, I5) -> APIResult3<O1, O2, O3>) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -321,8 +297,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified O1, reified O2, reified O3, reified O4> API04<APIType.Post, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.() -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified O1, reified O2, reified O3, reified O4> API04<APIType.Post, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.() -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block()
         makeArray {
             add(o1.toJson())
@@ -332,8 +307,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Post, I1, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Post, I1, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val [i1] = it
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(i1.to())
         makeArray {
@@ -344,8 +318,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Post, I1, I2, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Post, I1, I2, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val [i1, i2] = it
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(i1.to(), i2.to())
         makeArray {
@@ -356,8 +329,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Post, I1, I2, I3, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Post, I1, I2, I3, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val [i1, i2, i3] = it
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -368,8 +340,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -380,8 +351,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4, I5) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4, I5) -> APIResult4<O1, O2, O3, O4>) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -392,8 +362,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> API05<APIType.Post, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.() -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> API05<APIType.Post, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.() -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block()
         makeArray {
             add(o1.toJson())
@@ -404,8 +373,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Post, I1, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Post, I1, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val [i1] = it
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(i1.to())
         makeArray {
@@ -417,8 +385,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Post, I1, I2, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Post, I1, I2, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val [i1, i2] = it
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(i1.to(), i2.to())
         makeArray {
@@ -430,8 +397,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Post, I1, I2, I3, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Post, I1, I2, I3, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val [i1, i2, i3] = it
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(i1.to(), i2.to(), i3.to())
         makeArray {
@@ -443,8 +409,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val [i1, i2, i3, i4] = it
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(i1.to(), i2.to(), i3.to(), i4.to())
         makeArray {
@@ -456,8 +421,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4, I5) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4, I5) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponsePost {
         val [i1, i2, i3, i4, i5] = it
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(i1.to(), i2.to(), i3.to(), i4.to(), i5.to())
         makeArray {
@@ -538,7 +502,7 @@ abstract class APIScope(val engine: ServerEngine) {
 
             require(parameterIndex !in fileItems) { "Expected JSON at parameter $parameterIndex" }
 
-            return requireNotNull(dataItems[parameterIndex]) { "Missing form parameter $parameterIndex"}.to()
+            return requireNotNull(dataItems[parameterIndex]) { "Missing form parameter $parameterIndex" }.to()
         }
 
         override fun close() {
@@ -566,88 +530,77 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1> API10<APIType.Form, I1>
-            .response(crossinline block: suspend APIResponseScope.(I1) -> Unit) = internalResponseForm {
+    inline fun <reified I1> API10<APIType.Form, I1>.response(crossinline block: suspend APIResponseScope.(I1) -> Unit) = internalResponseForm {
         APIResponseScope().block(it())
         makeArray {
 
         }
     }
 
-    inline fun <reified I1, reified I2> API20<APIType.Form, I1, I2>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2) -> Unit) = internalResponseForm {
+    inline fun <reified I1, reified I2> API20<APIType.Form, I1, I2>.response(crossinline block: suspend APIResponseScope.(I1, I2) -> Unit) = internalResponseForm {
         APIResponseScope().block(it(), it())
         makeArray {
 
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, I2, I3>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3) -> Unit) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, I2, I3>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3) -> Unit) = internalResponseForm {
         APIResponseScope().block(it(), it(), it())
         makeArray {
 
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4) -> Unit) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4) -> Unit) = internalResponseForm {
         APIResponseScope().block(it(), it(), it(), it())
         makeArray {
 
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>
-            .response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4, I5) -> Unit) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>.response(crossinline block: suspend APIResponseScope.(I1, I2, I3, I4, I5) -> Unit) = internalResponseForm {
         APIResponseScope().block(it(), it(), it(), it(), it())
         makeArray {
 
         }
     }
 
-    inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1) -> APIResult1<O1>) = internalResponseForm {
+    inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1) -> APIResult1<O1>) = internalResponseForm {
         val (o1) = APIResultScope1<O1>().block(it())
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, I2, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2) -> APIResult1<O1>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, I2, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2) -> APIResult1<O1>) = internalResponseForm {
         val (o1) = APIResultScope1<O1>().block(it(), it())
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Form, I1, I2, I3, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3) -> APIResult1<O1>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Form, I1, I2, I3, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3) -> APIResult1<O1>) = internalResponseForm {
         val (o1) = APIResultScope1<O1>().block(it(), it(), it())
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Form, I1, I2, I3, I4, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4) -> APIResult1<O1>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Form, I1, I2, I3, I4, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4) -> APIResult1<O1>) = internalResponseForm {
         val (o1) = APIResultScope1<O1>().block(it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Form, I1, I2, I3, I4, I5, O1>
-            .response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4, I5) -> APIResult1<O1>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Form, I1, I2, I3, I4, I5, O1>.response(crossinline block: suspend APIResultScope1<O1>.(I1, I2, I3, I4, I5) -> APIResult1<O1>) = internalResponseForm {
         val (o1) = APIResultScope1<O1>().block(it(), it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1) -> APIResult2<O1, O2>) = internalResponseForm {
+    inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1) -> APIResult2<O1, O2>) = internalResponseForm {
         val (o1, o2) = APIResultScope2<O1, O2>().block(it())
         makeArray {
             add(o1.toJson())
@@ -655,8 +608,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Form, I1, I2, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2) -> APIResult2<O1, O2>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Form, I1, I2, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2) -> APIResult2<O1, O2>) = internalResponseForm {
         val (o1, o2) = APIResultScope2<O1, O2>().block(it(), it())
         makeArray {
             add(o1.toJson())
@@ -664,8 +616,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Form, I1, I2, I3, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3) -> APIResult2<O1, O2>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Form, I1, I2, I3, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3) -> APIResult2<O1, O2>) = internalResponseForm {
         val (o1, o2) = APIResultScope2<O1, O2>().block(it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -673,8 +624,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Form, I1, I2, I3, I4, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4) -> APIResult2<O1, O2>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Form, I1, I2, I3, I4, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4) -> APIResult2<O1, O2>) = internalResponseForm {
         val (o1, o2) = APIResultScope2<O1, O2>().block(it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -682,8 +632,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Form, I1, I2, I3, I4, I5, O1, O2>
-            .response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4, I5) -> APIResult2<O1, O2>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Form, I1, I2, I3, I4, I5, O1, O2>.response(crossinline block: suspend APIResultScope2<O1, O2>.(I1, I2, I3, I4, I5) -> APIResult2<O1, O2>) = internalResponseForm {
         val (o1, o2) = APIResultScope2<O1, O2>().block(it(), it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -691,8 +640,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1) -> APIResult3<O1, O2, O3>) = internalResponseForm {
+    inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1) -> APIResult3<O1, O2, O3>) = internalResponseForm {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(it())
         makeArray {
             add(o1.toJson())
@@ -701,8 +649,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Form, I1, I2, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2) -> APIResult3<O1, O2, O3>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Form, I1, I2, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2) -> APIResult3<O1, O2, O3>) = internalResponseForm {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(it(), it())
         makeArray {
             add(o1.toJson())
@@ -711,8 +658,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Form, I1, I2, I3, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3) -> APIResult3<O1, O2, O3>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Form, I1, I2, I3, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3) -> APIResult3<O1, O2, O3>) = internalResponseForm {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -721,8 +667,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Form, I1, I2, I3, I4, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4) -> APIResult3<O1, O2, O3>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Form, I1, I2, I3, I4, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4) -> APIResult3<O1, O2, O3>) = internalResponseForm {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -731,8 +676,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3>
-            .response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4, I5) -> APIResult3<O1, O2, O3>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3>.response(crossinline block: suspend APIResultScope3<O1, O2, O3>.(I1, I2, I3, I4, I5) -> APIResult3<O1, O2, O3>) = internalResponseForm {
         val (o1, o2, o3) = APIResultScope3<O1, O2, O3>().block(it(), it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -741,8 +685,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
+    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(it())
         makeArray {
             add(o1.toJson())
@@ -752,8 +695,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Form, I1, I2, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Form, I1, I2, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(it(), it())
         makeArray {
             add(o1.toJson())
@@ -763,8 +705,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Form, I1, I2, I3, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Form, I1, I2, I3, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -774,8 +715,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -785,8 +725,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4>
-            .response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4, I5) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4>.response(crossinline block: suspend APIResultScope4<O1, O2, O3, O4>.(I1, I2, I3, I4, I5) -> APIResult4<O1, O2, O3, O4>) = internalResponseForm {
         val (o1, o2, o3, o4) = APIResultScope4<O1, O2, O3, O4>().block(it(), it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -796,8 +735,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
+    inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(it())
         makeArray {
             add(o1.toJson())
@@ -808,8 +746,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Form, I1, I2, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Form, I1, I2, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(it(), it())
         makeArray {
             add(o1.toJson())
@@ -820,8 +757,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -832,8 +768,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(it(), it(), it(), it())
         makeArray {
             add(o1.toJson())
@@ -844,8 +779,7 @@ abstract class APIScope(val engine: ServerEngine) {
         }
     }
 
-    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>
-            .response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4, I5) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
+    inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>.response(crossinline block: suspend APIResultScope5<O1, O2, O3, O4, O5>.(I1, I2, I3, I4, I5) -> APIResult5<O1, O2, O3, O4, O5>) = internalResponseForm {
         val (o1, o2, o3, o4, o5) = APIResultScope5<O1, O2, O3, O4, O5>().block(it(), it(), it(), it(), it())
         makeArray {
             add(o1.toJson())

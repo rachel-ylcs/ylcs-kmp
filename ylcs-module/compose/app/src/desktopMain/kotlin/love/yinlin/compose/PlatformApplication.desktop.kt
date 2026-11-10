@@ -178,7 +178,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                         windowStarter { initPoolLater(this) }
                     }
 
-                    Fixup.swingWindowMinimize(this, minSize)
+                    Fixup.SwingWindowMinimize(this, minSize)
 
                     val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
                     val borderWidth = Theme.border.v10 / 2

@@ -6,7 +6,7 @@ import love.yinlin.data.rachel.profile.UserLevel
 
 @Stable
 @Serializable
-data class TopicDetails (
+data class TopicDetails(
 	val ts: String,
 	val content: String,
 	val pics: List<String>,

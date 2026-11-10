@@ -26,7 +26,7 @@ private object GBKMapping {
     private fun digit(): Int {
         var code: Int
         do {
-            code = GBKTableData[index++].code
+            code = GBK_TABLE_DATA[index++].code
         } while (code <= 32)
         return code - 33 - (if (code > 34) 1 else 0) - (if (code > 36) 1 else 0) - (if (code > 92) 1 else 0)
     }

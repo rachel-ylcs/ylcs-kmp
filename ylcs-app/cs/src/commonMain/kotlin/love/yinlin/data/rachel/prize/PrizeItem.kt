@@ -1,4 +1,5 @@
 package love.yinlin.data.rachel.prize
+
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 

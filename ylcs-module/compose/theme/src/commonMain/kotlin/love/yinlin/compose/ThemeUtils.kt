@@ -22,7 +22,7 @@ fun rememberFontFamily(
 }
 
 @Composable
-fun mainFont() : FontFamily = LocalMainFontResource.current?.let { rememberFontFamily(it) } ?: FontFamily.Default
+fun mainFont(): FontFamily = LocalMainFontResource.current?.let { rememberFontFamily(it) } ?: FontFamily.Default
 
 val TextStyle.bold: TextStyle get() = this.copy(fontWeight = FontWeight.SemiBold)
 

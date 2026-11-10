@@ -104,7 +104,7 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
                         itemsIndexed(
                             items = data.items,
                             key = { _, item -> item.key }
-                        ){ index, [pic] ->
+                        ) { index, [pic] ->
                             WebImage(
                                 source = pic.image,
                                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),

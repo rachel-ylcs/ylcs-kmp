@@ -49,7 +49,7 @@ object BilibiliEncoder {
         return "$query&w_rid=${MD5.Default.encodeToHex(query + mixinKey)}"
     }
 
-    internal fun sign(params: Map<String, String>) : String = params.entries.sortedBy { it.key }.joinToString("&") { (key, value) ->
+    internal fun sign(params: Map<String, String>): String = params.entries.sortedBy { it.key }.joinToString("&") { (key, value) ->
         val filtered = value.filter { it !in "!'()*" }
         "${percentEncode(key)}=${percentEncode(filtered)}"
     }

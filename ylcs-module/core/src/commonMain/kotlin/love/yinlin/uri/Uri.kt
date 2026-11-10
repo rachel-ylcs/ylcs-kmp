@@ -42,7 +42,7 @@ data class Uri(
 
         private val hexDigits: CharArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
         private val defaultSet: CharArray = ['_', '-', '!', '.', '~', '\'', '(', ')', '*']
-        private fun isAllowed(c: Char): Boolean = c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9' || c in defaultSet
+        private fun isAllowed(c: Char): Boolean = c in 'a' .. 'z' || c in 'A' .. 'Z' || c in '0' .. '9' || c in defaultSet
 
         private class ByteBuffer(private val size: Int) {
             private val buffer by lazy { ByteArray(size) }

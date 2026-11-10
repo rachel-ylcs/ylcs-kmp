@@ -56,7 +56,7 @@ class ScreenEntryTest {
         return ViewModelProvider.create(
             store = owner,
             factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial, TestNavigationTimeSource()) } }
-        )[TestManagerID, ScreenManager::class]
+        )[TEST_MANAGER_ID, ScreenManager::class]
     }
 
     @AfterTest

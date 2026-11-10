@@ -15,7 +15,7 @@ import java.awt.Rectangle
 actual object Fixup {
     // See https://youtrack.jetbrains.com/issue/CMP-2285/Min-Max-size-window
     @Composable
-    fun swingWindowMinimize(scope: FrameWindowScope, minSize: DpSize) {
+    fun SwingWindowMinimize(scope: FrameWindowScope, minSize: DpSize) {
         LaunchedEffect(LocalDensity.current) {
             scope.window.minimumSize = Dimension(minSize.width.value.toInt(), minSize.height.value.toInt())
         }

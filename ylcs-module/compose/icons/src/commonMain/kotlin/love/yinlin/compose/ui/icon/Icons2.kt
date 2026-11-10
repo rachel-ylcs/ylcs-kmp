@@ -1,4 +1,5 @@
 package love.yinlin.compose.ui.icon
+
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
@@ -1200,7 +1201,7 @@ object Icons2 {
             color = Color(0xFFFF2442),
             strokeLineWidth = 0f,
             strokeLineMiter = 4f
-        ){
+        ) {
             moveTo(960f, 797.2f)
             verticalLineTo(226.8f)
             curveTo(960f, 137.2f, 886.8f, 64f, 797.2f, 64f)

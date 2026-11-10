@@ -389,16 +389,14 @@ suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, 
     add(i3)
 }) { }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4) = internalFormReturn(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>.request(i1: I1, i2: I2, i3: I3, i4: I4) = internalFormReturn(factory = {
     add(i1)
     add(i2)
     add(i3)
     add(i4)
 }) { }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5) = internalFormReturn(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>.request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5) = internalFormReturn(factory = {
     add(i1)
     add(i2)
     add(i3)
@@ -650,16 +648,14 @@ suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, 
     add(i3)
 }) { }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>
-        .requestNull(i1: I1, i2: I2, i3: I3, i4: I4) = internalFormReturnNull(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>.requestNull(i1: I1, i2: I2, i3: I3, i4: I4) = internalFormReturnNull(factory = {
     add(i1)
     add(i2)
     add(i3)
     add(i4)
 }) { }
 
-suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>
-        .requestNull(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5) = internalFormReturnNull(factory = {
+suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>.requestNull(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5) = internalFormReturnNull(factory = {
     add(i1)
     add(i2)
     add(i3)

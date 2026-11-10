@@ -18,7 +18,7 @@ private object TailcardSelector : RouteSelector() {
     override fun toString(): String = "(static-content)"
 }
 
-private const val pathParameterName = "static-content-path-parameter"
+private const val PATH_PARAMETER_NAME = "static-content-path-parameter"
 
 private fun ContentType.withCharsetUTF8IfNeeded(): ContentType = if (charset() != null) this else withCharset(Charsets.UTF_8)
 
@@ -33,9 +33,9 @@ private fun ContentType.matchApplicationTypeWithCharset(): Boolean = match(Conte
 
 // fork Ktor Source, keep...
 internal fun Route.staticFiles(remotePath: String, dir: File): Route = createChild(TailcardSelector).route(remotePath) {
-    route("{${pathParameterName}...}") {
+    route("{${PATH_PARAMETER_NAME}...}") {
         get {
-            val relativePath = call.parameters.getAll(pathParameterName)?.joinToString(PlatformFileSystem.PathSeparator.toString())
+            val relativePath = call.parameters.getAll(PATH_PARAMETER_NAME)?.joinToString(PlatformFileSystem.PathSeparator.toString())
             if (relativePath != null) {
                 val file = File(dir, relativePath)
                 val requestedFile = if (file.isDirectory()) File(file, "index.html") else file

@@ -1,6 +1,6 @@
 package love.yinlin.encoding
 
-internal const val GBKTableData = """
+internal const val GBK_TABLE_DATA = """
 |r#~(#%~OkP!BBM%8!+~c9^(Mz^2ePZ9-%s_+*Y1,P-q)3:PMPf=W2dd+~C#P,WJ#V#&&-(SF.QQ.SW'@?+))/S9iP`;M^&B#S*4dg%)S8^[~.f=hdj]v=@i~.p;Z:L0|aQ9@.-#EPa}6*#PQg-%vY'~;:TPfiW=dKfiV=<:d4)CKb`(p+lAa#B{P9;!R:=d1q%!BVI~I)}}Q&lKwg#~6!?/-qWI.!n%~U-qWI.!n%s&-qWI
 'X#~B'ZgBCJ}b&[U#~z#h|{|9.^9yDq}D^[|!P_95Eq}N`[|9._9Q%q}z.qmWI#!a<r/TL6{9.<.1q9!^Ue<aTN`69saup9!]()tJKd}^+G#!!{xf{!P=!r%=dH!kDe!!~<%!!BVe<r/m!N#1q;1kDg!!~<%!!BVe<r/'k+1#+b)}(n!_5[[Z._.~Ag]W_~%|(@/t9)/~=Wt6/k_:{!PU9E==d1qWIO0|m+r8*=X'3}3HWt9
 v3<#o#%~e<r/F~](1!*(jriDE!.(~5%!@!W)`p#!^!4(1YTg`!O7Aj'P~#{NQ9@!g%:o^(dg2!W%O?%!!!V&@<#!!!c)!!`/j#(h#~G!#~x#m(Vc1qNT7%RlZJS^K:,,H8s`M+_/~O#!](o(A/&!!!^(!!n~74n)+^742%l[+4f<DJ>d;2;21qWI>d5d!!p/KVe<[!)!^Ue<r/,!]##~A&!!a<r/KVS?HsHjf0#@/c3&,~|R

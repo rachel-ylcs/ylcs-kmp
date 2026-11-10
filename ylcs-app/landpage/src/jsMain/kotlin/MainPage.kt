@@ -163,7 +163,7 @@ object MainPage : Page {
     private fun TagConsumer<HTMLElement>.renderSection2() {
         section(Styles.section) {
             id = "section-2-container"
-            div( "flex flex-col md:flex-row w-full gap-4 md:gap-10 items-center") {
+            div("flex flex-col md:flex-row w-full gap-4 md:gap-10 items-center") {
                 div("w-full md:w-1/4 space-y-6 flex flex-col justify-center") {
                     id = "text-box-2"
                     h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"无损音质听歌" }
@@ -190,7 +190,7 @@ object MainPage : Page {
     private fun TagConsumer<HTMLElement>.renderSection3() {
         section(Styles.section) {
             id = "section-3-container"
-            div( "flex flex-col md:flex-row w-full gap-4 md:gap-10 items-start") {
+            div("flex flex-col md:flex-row w-full gap-4 md:gap-10 items-start") {
                 div("w-full md:w-1/4 space-y-6 flex flex-col justify-center") {
                     h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"银临最新资讯" }
                     p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"实时同步微博、超话、抖音等信息流，无需登录也能浏览和下载" }
@@ -258,7 +258,7 @@ object MainPage : Page {
     private fun TagConsumer<HTMLElement>.renderSection5() {
         section(Styles.section) {
             id = "section-5-container"
-            div( "flex flex-col md:flex-row items-start") {
+            div("flex flex-col md:flex-row items-start") {
                 div("w-full md:w-1/4 space-y-6 flex flex-col justify-center") {
                     h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"银临美图相册" }
                     p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"全网演出官摄图集收录，每一张都是绝美壁纸。" }

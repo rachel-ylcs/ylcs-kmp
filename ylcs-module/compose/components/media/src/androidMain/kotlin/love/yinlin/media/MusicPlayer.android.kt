@@ -58,7 +58,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
             isPlayingFlow.value = value
         } ?: Unit
 
-        override fun onTimelineChanged(timeline: Timeline, reason: Int)= withPlayer {
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) = withPlayer {
             when (reason) {
                 Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED if timeline !is Timeline.RemotableTimeline -> {
                     // timeline可能是 Timeline.RemotableTimeline 或 PlaylistTimeline

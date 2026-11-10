@@ -22,8 +22,8 @@ object FfmpegLibrary {
         }
     }
 
+    // Returns the version of the underlying library if available, or null otherwise.
     var version: String? = null
-        /** Returns the version of the underlying library if available, or null otherwise.  */
         get() {
             if (!isAvailable) return null
             if (field == null) field = ffmpegGetVersion()
@@ -31,11 +31,11 @@ object FfmpegLibrary {
         }
         private set
 
+    /**
+     * Returns the required amount of padding for input buffers in bytes, or [C.LENGTH_UNSET] if
+     * the underlying library is not available.
+     */
     var inputBufferPaddingSize: Int = C.LENGTH_UNSET
-        /**
-         * Returns the required amount of padding for input buffers in bytes, or [C.LENGTH_UNSET] if
-         * the underlying library is not available.
-         */
         get() {
             if (!isAvailable) return C.LENGTH_UNSET
             if (field == C.LENGTH_UNSET) field = ffmpegGetInputBufferPaddingSize()
@@ -43,8 +43,8 @@ object FfmpegLibrary {
         }
         private set
 
+    /** Returns whether the underlying library is available, loading it if necessary.  */
     val isAvailable: Boolean get() = LOADER.isAvailable()
-        /** Returns whether the underlying library is available, loading it if necessary.  */
 
     /**
      * Returns whether the underlying library supports the specified MIME type.

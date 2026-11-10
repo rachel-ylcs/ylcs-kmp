@@ -19,7 +19,7 @@ sealed interface Playlist {
     data object Default : Playlist {
         override val name: String = "默认歌单"
     }
-    
+
     @Stable
     @Serializable
     data class User(override val name: String) : Playlist

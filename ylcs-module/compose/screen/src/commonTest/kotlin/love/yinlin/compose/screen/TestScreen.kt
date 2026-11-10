@@ -11,4 +11,4 @@ internal open class TestScreen : ScreenModel() {
 
 internal inline fun <reified S : ScreenModel> ScreenManager.requireTopScreen(): S = assertIs<S>(store[backStack.last().id])
 
-internal const val TestManagerID = "screen.manager"
+internal const val TEST_MANAGER_ID = "screen.manager"

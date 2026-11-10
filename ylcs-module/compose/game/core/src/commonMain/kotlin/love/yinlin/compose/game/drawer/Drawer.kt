@@ -241,7 +241,7 @@ class Drawer internal constructor(
     // 拓展函数 - Transform
 
     inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {
-        rawScope?.translate(x, y) { block()}
+        rawScope?.translate(x, y) { block() }
     }
 
     inline fun translate(offset: Offset, block: Drawer.() -> Unit) {

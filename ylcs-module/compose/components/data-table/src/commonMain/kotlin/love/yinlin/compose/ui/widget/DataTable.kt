@@ -254,7 +254,7 @@ private fun DataTableBodyCell(
 ) {
     val cell = remember(rowId, column.key) { DataTableCellAddress(rowId, column.key) }
     val value = state.cellOrNull(row, column.key)
-    val selected by rememberDerivedState(state, cell) { state.selectedAddress == cell}
+    val selected by rememberDerivedState(state, cell) { state.selectedAddress == cell }
     val editing by rememberDerivedState(state, cell) { state.editing?.takeIf { it.cell == cell } }
     val edit = if (preview || readonly) null else editing
 

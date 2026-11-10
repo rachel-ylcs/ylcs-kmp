@@ -273,7 +273,7 @@ class ScreenMain : BasicScreen() {
                     })
                 },
                 right = {
-                    Icon(Icons.MusicNote, tip = "音游配置", onClick = { navigate(::ScreenRhyme, null)} )
+                    Icon(Icons.MusicNote, tip = "音游配置", onClick = { navigate(::ScreenRhyme, null) })
                     Icon(Icons.Preview, tip = "预览", onClick = previewSheet::open)
                     Icon(Icons.Download, tip = "导入", onClick = importSheet::open)
                     if (selectedLibrary.isNotEmpty()) {

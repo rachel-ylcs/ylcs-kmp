@@ -189,7 +189,7 @@ class FfmpegAudioDecoder(
             alacAtom.putInt(alacAtomLength)
             alacAtom.putInt(0x616c6163) // type=alac
             alacAtom.putInt(0) // version=0, flags=0
-            alacAtom.put(magicCookie,  /* offset= */0, magicCookie.size)
+            alacAtom.put(magicCookie, 0, magicCookie.size)
             return alacAtom.array()
         }
 

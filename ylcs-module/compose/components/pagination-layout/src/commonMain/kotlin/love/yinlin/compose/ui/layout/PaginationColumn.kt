@@ -57,7 +57,7 @@ fun <T> PaginationColumn(
             itemsIndexed(
                 items = items,
                 key = key?.let { { _, item -> it(item) } }
-            ) {index, item->
+            ) { index, item ->
                 itemContent(item)
                 if (itemDivider != null && index != items.lastIndex) itemDivider()
             }

@@ -1,5 +1,3 @@
 package love.yinlin.tpl
 
-class TestPlatformMusic {
-    
-}
+class TestPlatformMusic

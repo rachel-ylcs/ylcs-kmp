@@ -61,7 +61,7 @@ object DataSourceActivity {
 
     suspend fun addActivityPhotos(aid: Int, key: String, files: List<File>, block: (List<String>, Activity) -> Activity): Throwable? {
         return ApiActivityAddActivityPhotos.request(app.config.userToken, aid, key, apiFile(files)!!) { newPics ->
-            activities.findAssign(predicate = { it.aid == aid}) {
+            activities.findAssign(predicate = { it.aid == aid }) {
                 block(newPics, it)
             }
         }

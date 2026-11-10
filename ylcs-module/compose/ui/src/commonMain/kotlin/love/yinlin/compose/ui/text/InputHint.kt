@@ -38,7 +38,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberNull
 import kotlin.math.ceil
 
-private const val FloatingHintScale = 0.85f
+private const val FLOATING_HINT_SCALE = 0.85f
 
 private val EditorLeft = VerticalAlignmentLine(::minOf)
 private val EditorRight = VerticalAlignmentLine(::maxOf)
@@ -72,7 +72,7 @@ internal fun InputHintLayout(
     )
     val measurer = rememberTextMeasurer()
     val inlineWidth = measurer.measure(hint, style).size.width
-    val floatingHeight = measurer.measure(hint, style.scaleHint(FloatingHintScale), overflow = TextOverflow.Ellipsis, softWrap = false, maxLines = 1).size.height
+    val floatingHeight = measurer.measure(hint, style.scaleHint(FLOATING_HINT_SCALE), overflow = TextOverflow.Ellipsis, softWrap = false, maxLines = 1).size.height
     val gap = Theme.padding.h / 4
     val margin = Theme.padding.h10
     var cutout: Rect? by rememberNull()
@@ -102,7 +102,7 @@ internal fun InputHintLayout(
         Text(
             text = hint,
             color = LocalColorVariant.current,
-            style = style.scaleHint(lerp(1f, FloatingHintScale, progress)),
+            style = style.scaleHint(lerp(1f, FLOATING_HINT_SCALE, progress)),
             overflow = if (inline) TextOverflow.Clip else TextOverflow.Ellipsis,
             softWrap = inline,
             maxLines = if (inline) Int.MAX_VALUE else 1

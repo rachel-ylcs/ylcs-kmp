@@ -6,7 +6,6 @@ import love.yinlin.extension.then
 import platform.windows.*
 
 // 任务栏
-
 object TaskBar {
     fun show(visible: Boolean) {
         SetWindowPos(FindWindowW("Shell_traywnd", null), HWND_TOPMOST, 0, 0, 0, 0, (if (visible) SWP_SHOWWINDOW else SWP_HIDEWINDOW).convert())

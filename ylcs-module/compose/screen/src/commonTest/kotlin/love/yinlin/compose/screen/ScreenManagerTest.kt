@@ -113,7 +113,7 @@ class ScreenManagerTest {
         initial: List<ScreenKey> = [key<RootScreen>()],
         registry: ScreenRegistry = defaultRegistry(),
         owner: ViewModelStore = newOwner(),
-        name: String = TestManagerID
+        name: String = TEST_MANAGER_ID
     ): ScreenManager = ViewModelProvider.create(
         store = owner,
         factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial, TestNavigationTimeSource()) } }
@@ -162,7 +162,7 @@ class ScreenManagerTest {
         val manager = ViewModelProvider.create(
             store = owner,
             factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(defaultRegistry()) } }
-        )[TestManagerID, ScreenManager::class]
+        )[TEST_MANAGER_ID, ScreenManager::class]
         assertTrue(manager.backStack.isEmpty())
 
         manager.navigate(::RootScreen)

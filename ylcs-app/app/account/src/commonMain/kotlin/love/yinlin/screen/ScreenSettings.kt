@@ -51,8 +51,8 @@ import love.yinlin.cs.url
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
 import love.yinlin.data.rachel.literal.AppAbout
-import love.yinlin.data.rachel.literal.AppDescription
-import love.yinlin.data.rachel.literal.AppPrivacyPolicy
+import love.yinlin.data.rachel.literal.APP_DESCRIPTION
+import love.yinlin.data.rachel.literal.APP_PRIVACY_POLICY
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.enum
@@ -458,7 +458,7 @@ class ScreenSettings : Screen() {
         override fun Content() {
             Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9)) {
                 SelectionBox {
-                    Text(text = AppPrivacyPolicy, modifier = Modifier.fillMaxWidth())
+                    Text(text = APP_PRIVACY_POLICY, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
@@ -491,7 +491,7 @@ class ScreenSettings : Screen() {
                     SimpleEllipsisText(text = Local.info.name, style = Theme.typography.v6.bold, color = Theme.color.primary)
                     SimpleEllipsisText(text = Local.info.versionName, style = Theme.typography.v6)
                 }
-                Text(text = AppDescription, overflow = TextOverflow.Ellipsis)
+                Text(text = APP_DESCRIPTION, overflow = TextOverflow.Ellipsis)
                 SimpleEllipsisText(text = "支持平台", style = Theme.typography.v6.bold)
 
                 FlowRow(
