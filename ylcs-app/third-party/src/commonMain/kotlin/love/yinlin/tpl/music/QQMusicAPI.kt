@@ -23,7 +23,7 @@ object QQMusicAPI : PlatformMusicAPI {
         }
         return arr
     }
-    //解析专辑
+    // 解析专辑
     suspend fun requestAlbum(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
         url = buildUrl {
             obj("req_0") {
@@ -44,8 +44,8 @@ object QQMusicAPI : PlatformMusicAPI {
         for (mid in list) requestMusic(mid)?.then { items += it }
         items.ifEmpty { null }
     }
-    //解析短链
-    //处理分支
+    // 解析短链
+    // 处理分支
     private suspend fun resolveQQShortLink(shortUrl: String): List<PlatformMusicInfo>? {
         val finalUrl: String = NetClient.Common.request<String, String>({
             url = shortUrl

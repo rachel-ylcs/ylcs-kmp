@@ -434,7 +434,7 @@ val ApiSongSendSongComment by API.post.i<String, String, String>().o<Long>()
 @APIParam("cid")
 val ApiSongDeleteSongComment by API.post.i<String, Long>().o()
 
-//prize
+// prize
 @APIParam("pid")
 @APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
 val ApiPrizeGetPrize by API.post.i<Int, Int>().o<List<Prize>>()
