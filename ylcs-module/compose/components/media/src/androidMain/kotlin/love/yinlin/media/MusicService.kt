@@ -66,7 +66,7 @@ abstract class MusicService : MediaSessionService() {
                             player.shuffleModeEnabled = true
                         }
                     }
-                    session.setCustomLayout(MediaCommands.prepareButtons(playMode))
+                    session.setMediaButtonPreferences(controller, MediaCommands.prepareButtons(playMode))
                     Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
                 }
                 MediaCommands.Stop -> {
@@ -87,7 +87,7 @@ abstract class MusicService : MediaSessionService() {
         val forwardPlayer = ForwardPlayer(ffmpegPlayer)
         exoPlayer = ffmpegPlayer
         musicSession = MediaSession.Builder(context, forwardPlayer)
-            .setCustomLayout(MediaCommands.prepareButtons(MediaPlayMode.Order))
+            .setMediaButtonPreferences(MediaCommands.prepareButtons(MediaPlayMode.Order))
             .setCallback(listener)
             .setSessionActivity(
                 PendingIntent.getActivity(

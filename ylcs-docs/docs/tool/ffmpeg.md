@@ -4,17 +4,6 @@
 
 ## 当前配置
 
-| 项目 | 源码或产物值 |
-| --- | --- |
-| Media3 | 1.12.0-alpha02，来自根版本目录 |
-| Android NDK | 29.0.14206865 |
-| minSdk | 28，来自根构建配置 |
-| 打包 ABI | `arm64-v8a` |
-| JNI 库名 | `ffmpegJNI` |
-| 文件 | `ylcs-module/compose/components/media/src/androidMain/jniLibs/arm64-v8a/libffmpegJNI.so` |
-| 文件大小 | 1,017,368 字节 |
-| SHA-256 | `A11F6693B92AF70338A538666CBDA144CBAFCDE4FB29A73E88FC8077838870F9` |
-
 Kotlin 适配代码位于 `androidx.media3.decoder.ffmpeg` 包下。项目依赖版本与预编译二进制来源是不同信息：当前仓库未提供该产物对应的完整 FFmpeg 提交、decoder 列表与重建命令，不能仅凭依赖版本精确复现该文件。
 
 ## 运行时检查
