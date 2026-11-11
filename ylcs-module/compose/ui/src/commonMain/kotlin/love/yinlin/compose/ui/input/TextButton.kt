@@ -3,6 +3,7 @@ package love.yinlin.compose.ui.input
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -26,8 +27,9 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 
 @Composable
 internal fun TextButton(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
+    modifier: Modifier,
+    padding: PaddingValues,
+    enabled: Boolean,
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -36,12 +38,12 @@ internal fun TextButton(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minWidth = minWidth, minHeight = minWidth / 3)
+            .defaultMinSize(minWidth = minWidth, minHeight = minWidth / DEFAULT_BUTTON_HEIGHT_ASPECT_RATIO)
             .clip(shape)
             .pointerIcon(PointerIcon.Hand, enabled = enabled)
             .semantics(Role.Button)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(Theme.padding.value)
+            .padding(padding)
             .animateContentSize(),
         contentAlignment = Alignment.Center,
     ) {
@@ -56,10 +58,11 @@ fun TextButton(
     icon: ImageVector? = null,
     color: Color = LocalColor.current,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    TextButton(enabled = enabled, modifier = modifier, onClick = onClick) {
+    TextButton(modifier = modifier, padding = padding, enabled = enabled, onClick = onClick) {
         val contentColor = if (enabled) color else Theme.color.disabledContent
         TextIconAdapter { iconId, textId ->
             if (icon != null) Icon(icon = icon, color = contentColor, modifier = Modifier.iconId())
@@ -74,10 +77,11 @@ fun PrimaryTextButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    TextButton(text = text, icon = icon, color = Theme.color.primary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
+    TextButton(text = text, icon = icon, color = Theme.color.primary, style = style, padding = padding, enabled = enabled, modifier = modifier, onClick = onClick)
 }
 
 @Composable
@@ -86,10 +90,11 @@ fun SecondaryTextButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    TextButton(text = text, icon = icon, color = Theme.color.secondary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
+    TextButton(text = text, icon = icon, color = Theme.color.secondary, style = style, padding = padding, enabled = enabled, modifier = modifier, onClick = onClick)
 }
 
 @Composable
@@ -98,10 +103,11 @@ fun TertiaryTextButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    TextButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
+    TextButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, padding = padding, enabled = enabled, modifier = modifier, onClick = onClick)
 }
 
 @Composable
@@ -110,8 +116,9 @@ fun ErrorTextButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    TextButton(text = text, icon = icon, color = Theme.color.error, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
+    TextButton(text = text, icon = icon, color = Theme.color.error, style = style, padding = padding, enabled = enabled, modifier = modifier, onClick = onClick)
 }

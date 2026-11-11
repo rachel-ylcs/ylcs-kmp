@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.input
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -9,19 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
-import kotlinx.coroutines.launch
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.animation.IndeterminateLoadingAnimation
-import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.text.Text
-import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.concurrent.Mutex
-import love.yinlin.extension.catching
-import love.yinlin.extension.cleaning
 
 @Composable
 private fun LoadingButton(
@@ -31,6 +27,7 @@ private fun LoadingButton(
     modifier: Modifier = Modifier,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: suspend () -> Unit
 ) {
@@ -39,20 +36,9 @@ private fun LoadingButton(
     val mutex = remember { Mutex() }
 
     Button(onClick = {
-        scope.launch {
-            if (!mutex.tryLock()) return@launch
-            isLoading = true
-            cleaning({ catching { onClick() } }) {
-                isLoading = false
-                mutex.unlock()
-            }
-        }
-    }, color = color, enabled = enabled, modifier = modifier) {
-        TextIconAdapter { iconId, textId ->
-            if (isLoading) animation.Content(modifier = Modifier.iconId())
-            else if (icon != null) Icon(icon = icon, modifier = Modifier.iconId())
-            Text(text = text, style = style, modifier = Modifier.textId())
-        }
+        scope.onButtonLoading(mutex, onClick) { isLoading = it }
+    }, color = color, padding = padding, enabled = enabled, modifier = modifier) {
+        LoadingButtonAdapter(isLoading, text, icon, LocalColor.current, style, animation)
     }
 }
 
@@ -63,10 +49,11 @@ fun PrimaryLoadingButton(
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: suspend () -> Unit
 ) {
-    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)
+    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, animation = animation, padding = padding, enabled = enabled, modifier = modifier)
 }
 
 @Composable
@@ -76,10 +63,11 @@ fun SecondaryLoadingButton(
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: suspend () -> Unit
 ) {
-    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)
+    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, animation = animation, padding = padding, enabled = enabled, modifier = modifier)
 }
 
 @Composable
@@ -89,8 +77,9 @@ fun TertiaryLoadingButton(
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
     animation: IndeterminateLoadingAnimation = CircleLoading,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: suspend () -> Unit
 ) {
-    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, animation = animation, enabled = enabled, modifier = modifier)
+    LoadingButton(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, animation = animation, padding = padding, enabled = enabled, modifier = modifier)
 }

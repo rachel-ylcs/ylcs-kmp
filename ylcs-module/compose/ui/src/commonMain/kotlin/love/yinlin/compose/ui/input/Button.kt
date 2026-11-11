@@ -17,9 +17,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ui.animation.IndeterminateLoadingAnimation
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.pointerIcon
@@ -27,6 +30,40 @@ import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
+import love.yinlin.concurrent.Mutex
+import love.yinlin.extension.catching
+import love.yinlin.extension.cleaning
+
+internal const val DEFAULT_BUTTON_HEIGHT_ASPECT_RATIO = 2.5f
+
+internal inline fun CoroutineScope.onButtonLoading(mutex: Mutex, crossinline onClick: suspend () -> Unit, crossinline onLoading: (Boolean) -> Unit) {
+    this.launch {
+        if (!mutex.tryLock()) return@launch
+        onLoading(true)
+        cleaning({
+            catching { onClick() }
+        }) {
+            onLoading(false)
+            mutex.unlock()
+        }
+    }
+}
+
+@Composable
+internal fun LoadingButtonAdapter(
+    isLoading: Boolean,
+    text: String,
+    icon: ImageVector?,
+    color: Color,
+    style: TextStyle,
+    animation: IndeterminateLoadingAnimation
+) {
+    TextIconAdapter { iconId, textId ->
+        if (isLoading) animation.Content(color = color, modifier = Modifier.iconId())
+        else if (icon != null) Icon(icon = icon, color = color, modifier = Modifier.iconId())
+        Text(text = text, color = color, style = style, modifier = Modifier.textId())
+    }
+}
 
 @Composable
 @NonRestartableComposable
@@ -34,7 +71,7 @@ fun Button(
     onClick: () -> Unit,
     color: Color,
     modifier: Modifier = Modifier,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -43,7 +80,7 @@ fun Button(
         val minWidth = Theme.size.input5
         Box(
             modifier = modifier
-                .defaultMinSize(minWidth = minWidth, minHeight = minWidth / 3)
+                .defaultMinSize(minWidth = minWidth, minHeight = minWidth / DEFAULT_BUTTON_HEIGHT_ASPECT_RATIO)
                 .shadow(shape, Theme.shadow.v6)
                 .clip(shape)
                 .background(color = if (enabled) color else Theme.color.disabledContainer)
@@ -67,7 +104,7 @@ fun Button(
     color: Color,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalStyle.current.bold,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true
 ) {
     Button(onClick = onClick, color = color, padding = padding, enabled = enabled, modifier = modifier) {
@@ -84,7 +121,7 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -97,7 +134,7 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -110,7 +147,7 @@ fun TertiaryButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value10,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
