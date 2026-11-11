@@ -2,7 +2,6 @@ package org.jetbrains.skiko.window
 
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
-import org.jetbrains.skiko.internal.sdl.SDL_MouseWheelDirection.SDL_MOUSEWHEEL_FLIPPED
 
 internal class SdlWindowEvents(private val window: COpaquePointer, private val wakeEventType: UInt, private val send: (NativeWindowEvent) -> Unit) {
     private var x = 0f
@@ -51,9 +50,9 @@ internal class SdlWindowEvents(private val window: COpaquePointer, private val w
             SDL_EVENT_MOUSE_WHEEL -> {
                 x = event.wheel.mouse_x * scale
                 y = event.wheel.mouse_y * scale
-                val direction = if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) 1f else -1f
-                send(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, x, y, buttons,
-                    scrollX = event.wheel.x * direction, scrollY = event.wheel.y * direction, modifiers = SDL_GetModState().toInt()))
+                // AppKit has already applied the macOS natural-scrolling preference to x/y.
+                // Do not invert the deltas again based on SDL_MOUSEWHEEL_FLIPPED.
+                send(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, x, y, buttons, scrollX = event.wheel.x, scrollY = event.wheel.y, modifiers = SDL_GetModState().toInt()))
             }
             SDL_EVENT_WINDOW_MOUSE_ENTER -> pointer(NativeWindowEvent.Pointer.Kind.ENTER)
             SDL_EVENT_WINDOW_MOUSE_LEAVE -> pointer(NativeWindowEvent.Pointer.Kind.EXIT)

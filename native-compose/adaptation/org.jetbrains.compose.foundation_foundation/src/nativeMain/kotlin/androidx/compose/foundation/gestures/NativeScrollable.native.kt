@@ -13,7 +13,7 @@ import kotlin.math.sqrt
 
 internal actual fun CompositionLocalConsumerModifierNode.platformScrollConfig(): ScrollConfig = NativeScrollConfig
 
-/** SDL reports wheel units, already normalized for flipped devices by the window host. */
+/** SDL's Cocoa backend forwards AppKit deltas with the macOS natural-scrolling preference already applied. */
 private object NativeScrollConfig : ScrollConfig {
     override fun isPreciseWheelScroll(event: PointerEvent): Boolean = DesktopPlatform.Current != DesktopPlatform.Windows && event.changes.any {
         abs(it.scrollDelta.x - round(it.scrollDelta.x)) > 0.001f || abs(it.scrollDelta.y - round(it.scrollDelta.y)) > 0.001f

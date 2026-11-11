@@ -58,20 +58,25 @@ class NativeSceneTest {
     }
 
     @Test
-    fun pointerButtonsAndScrollReachTheComposedNode() {
+    fun pointerButtonsAndScrollDeltasKeepTheirSigns() {
         NativeSceneFixture().use { fixture ->
             var primary = false
-            var scroll = 0f
+            val scrollDeltas = mutableListOf<Float>()
             fixture.content {
-                Layout(content = {}, modifier = Modifier
-                    .onPointerEvent(PointerEventType.Press) { primary = it.buttons.isPrimaryPressed }
-                    .onPointerEvent(PointerEventType.Scroll) { scroll = it.changes.first().scrollDelta.y }) { _, _ -> layout(96, 64) {} }
+                Layout(
+                    content = {},
+                    modifier = Modifier.onPointerEvent(PointerEventType.Press) { primary = it.buttons.isPrimaryPressed }
+                        .onPointerEvent(PointerEventType.Scroll) { scrollDeltas += it.changes.first().scrollDelta.y }
+                ) { _, _ ->
+                    layout(96, 64) {}
+                }
             }
             fixture.render()
             fixture.host.onEvent(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.PRESS, 12f, 14f, 1, 1))
             fixture.host.onEvent(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, 12f, 14f, 0, scrollY = -2f))
+            fixture.host.onEvent(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, 12f, 14f, 0, scrollY = 1.25f))
             assertTrue(primary)
-            assertEquals(-2f, scroll)
+            assertEquals(listOf(-2f, 1.25f), scrollDeltas)
         }
     }
 
