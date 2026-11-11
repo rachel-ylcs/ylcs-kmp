@@ -95,7 +95,7 @@ class ScreenConcert : BasicScreen() {
         val concerts: List<ConcertItem>,
         val songs: List<ConcertSongItem>,
     ) {
-        val uniqueSongs: List<ConcertSongItem> = songs.filter { it.concertCount == 1 }
+        val uniqueSongs: List<ConcertSongItem> = songs.filter { it.concertCount == 1 && it.song.pid != null } // 存在现有曲库里的
         val attendedConcerts: List<ConcertItem> = concerts.filter { it.attended }
         val heardSongs: List<ConcertSongItem> = songs.filter { it.heardCount > 0 }
         val unheardSongs: List<ConcertSongItem> = songs.filter { it.heardCount == 0 }
@@ -629,7 +629,7 @@ class ScreenConcert : BasicScreen() {
                 },
                 style = Theme.typography.v8,
                 activeIcon = null,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.e7, vertical = Theme.padding.v),
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
                 onClick = { index, _ ->
                     if (index != selected) {
                         selected = index
@@ -639,9 +639,8 @@ class ScreenConcert : BasicScreen() {
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier.fillMaxWidth().weight(1f).padding(Theme.padding.eValue),
                 state = state,
-                contentPadding = Theme.padding.eValue7,
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
             ) {
                 if (songs.isEmpty()) {
@@ -654,9 +653,9 @@ class ScreenConcert : BasicScreen() {
                                 else -> "现场歌单正在整理中"
                             },
                             description = when (selected) {
-                                1 -> "快去点亮一场看过的演出吧。"
-                                3 -> "收录只在一场演出中出现过的歌曲。"
-                                else -> "每一首歌，都可能在下一场与你相遇。"
+                                1 -> "快去点亮一场看过的演出吧"
+                                3 -> "收录只在一场演出中出现过的歌曲"
+                                else -> "每一首歌都可能在下一场与你相遇"
                             },
                         )
                     }
