@@ -237,4 +237,8 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
         capturedBackground = Color.Unspecified
         hasCapture = false
     }
+
+    override fun onHostStopped() {
+        releaseResources()
+    }
 }
