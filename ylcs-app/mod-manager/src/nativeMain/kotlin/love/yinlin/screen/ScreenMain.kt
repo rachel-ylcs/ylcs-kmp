@@ -52,7 +52,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
-import org.jetbrains.skiko.window.NativeDesktop
+import love.yinlin.uri.Uri
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -209,7 +209,9 @@ class ScreenMain : BasicScreen() {
                 }
             }
             item(text = "打开所在目录", icon = Icons.GotoNext) {
-                NativeDesktop.openFile(item.path.path)
+                launch {
+                    Uri.parse(item.path.path)?.then { app.openUri(it) }
+                }
             }
             item(text = "音游编辑", icon = Icons.MusicNote) {
                 launch { navigate(::ScreenRhyme, item.path.path) }
