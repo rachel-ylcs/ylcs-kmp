@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import love.yinlin.annotation.NativeComposeSAM
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
@@ -72,13 +71,8 @@ fun Input(
             cursorBrush = remember(contentColor) { SolidColor(contentColor) },
             outputTransformation = null,
             decorator = remember(state, hint, alignment, enabled, colorProvider, leading, trailing) {
-                @NativeComposeSAM
-                @Suppress("ObjectLiteralToLambda")
-                object : TextFieldDecorator {
-                    @Composable
-                    override fun Decoration(innerTextField: @Composable () -> Unit) {
-                        DecorationBox(state, hint, alignment, enabled, colorProvider, leading, trailing, innerTextField)
-                    }
+                TextFieldDecorator { innerTextField ->
+                    DecorationBox(state, hint, alignment, enabled, colorProvider, leading, trailing, innerTextField)
                 }
             },
             scrollState = state.scrollState
