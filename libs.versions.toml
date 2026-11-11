@@ -1,16 +1,18 @@
+##########################
+####      版本目录     ####
+##########################
 [versions]
 
-# ----- [Rachel] -----
+# ----- [Rachel] ----- #
 
 rachel = "3.7.2"
 rachelCode = "372"
 rachelMinimum = "3.7.0"
 rachelMinimumCode = "370"
 
-# ----- [Plugin] -----
+# ----- [Plugin] ----- #
 
-kotlin = "2.5.0-Beta2"
-
+kotlin = "2.5.0-RC"
 #noinspection UnusedVersionCatalogEntry
 gradle = "9.8.2"
 agp = "9.3.3"
@@ -19,14 +21,9 @@ mavenPublish = "0.37.0"
 dokka = "2.3.0"
 ktlint = "2.0.0-ALPHA-4"
 
-# ----- [Common] -----
+# ----- [Common] ----- #
 
 skiko = "0.156.1"
-sdl = "3.4.20"
-#noinspection UnusedVersionCatalogEntry
-icu = "78.2"
-webview2 = "1.0.4314.35"
-windowsSdkCpp = "10.0.26100.4204"
 lifecycle = "2.11.0"
 savedstate = "1.5.0"
 material3-adaptive = "1.4.0-alpha01"
@@ -35,19 +32,25 @@ coroutines = "1.11.0"
 ktor = "3.6.1"
 mmkv = "2.4.3"
 
-# ----- [Android] -----
+# ----- [Android] ----- #
 
 androidx-activity = "1.13.0"
 media3 = "1.12.0-alpha02"
 
+# ----- [Native Desktop] ----- #
 
+sdl = "3.4.20"
+#noinspection UnusedVersionCatalogEntry
+icu = "78.2"
+webview2 = "1.0.4314.35"
+windowsSdkCpp = "10.0.26100.4204"
 
-
-
-
+########################
+####      插件组     ####
+########################
 [plugins]
 
-# ----- [Plugin] -----
+# ----- [Plugin] ----- #
 
 rachel = { id = "love.yinlin.rachel", version.ref = "rachel" }
 repository = { id = "ylcs.repository", version.ref = "rachel" }
@@ -65,9 +68,12 @@ androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref 
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
+########################
+####      库组      ####
+########################
 [libraries]
 
-# ----- [Gradle] -----
+# ----- [Gradle] ----- #
 
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -79,7 +85,7 @@ gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 ktlint-engine = { module = "io.github.ktlint.core:ktlint-rule-engine", version.ref = "ktlint" }
 ktlint-standard = { module = "io.github.ktlint.core:ktlint-ruleset-standard", version.ref = "ktlint" }
 
-# ----- [Common] -----
+# ----- [Common] ----- #
 
 # test
 test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -148,21 +154,24 @@ kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", ve
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html", version = "0.12.0" }
 
 # ktor
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-# ----- [Jvm] -----
+# ----- [Jvm] ----- #
 
 # ktor
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
-# skiko
-skiko-lottie-jvm = { module = "org.jetbrains.skiko:skiko-skottie-awt-runtime-all", version.ref = "skiko" }
+# ----- [Apple] ----- #
 
-# ----- [Android] -----
+# ktor
+ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+
+# ----- [Android] ----- #
 
 # androidx
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
@@ -186,17 +195,15 @@ scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "
 # lottie
 lottie-android = { module = "com.airbnb.android:lottie-compose", version = "6.7.1" }
 
-# ----- [Apple] -----
-
-# ktor
-ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-
-# ----- [Desktop] -----
+# ----- [Desktop] ----- #
 
 # kotlinx
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
-# ----- [Web] -----
+# skiko
+skiko-lottie-awt = { module = "org.jetbrains.skiko:skiko-skottie-awt-runtime-all", version.ref = "skiko" }
+
+# ----- [Web] ----- #
 
 # kotlinx
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
@@ -204,17 +211,14 @@ kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = 
 # ktor
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 
-# ----- [Windows] -----
+# ----- [Windows] ----- #
 
 # ktor
 ktor-windows = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 
-# ----- [Linux] -----
+# ----- [Linux] ----- #
 
-# ktor
-ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-
-# ----- [Server] -----
+# ----- [Server] ----- #
 
 # ktor
 ktor-server = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }

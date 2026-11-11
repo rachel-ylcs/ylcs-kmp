@@ -37,7 +37,7 @@ rachel {
             iosMainList(skikoMain)
 
             desktopMain(skikoMain) {
-                lib(libs.skiko.lottie.jvm)
+                lib(libs.skiko.lottie.awt)
             }
 
             nativeMain(skikoMain)

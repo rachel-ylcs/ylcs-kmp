@@ -47,7 +47,11 @@ fun windowsCmakeRoots(): List<File> {
         .orEmpty().lineSequence().map(String::trim).filter(String::isNotEmpty).map(::File).toList()
     val standard = programDirectories.flatMap { File(it, "Microsoft Visual Studio").listFiles().orEmpty().filter(File::isDirectory) }
         .flatMap { it.listFiles().orEmpty().filter(File::isDirectory) }
-    return (hints + registered + standard).map { it.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake") }.distinct()
+    return buildList {
+        addAll(hints)
+        addAll(registered)
+        addAll(standard)
+    }.map { it.resolve("Common7/IDE/CommonExtensions/Microsoft/CMake") }.distinct()
 }
 
 fun nativeTool(name: String, hints: List<File>, versionPrefix: String = ""): Pair<File, String> {
@@ -55,8 +59,7 @@ fun nativeTool(name: String, hints: List<File>, versionPrefix: String = ""): Pai
     for (candidate in candidates) {
         val executable = candidate.canonicalFile
         val output = quickOutput(executable.path, "--version") ?: continue
-        val version = output.lineSequence().map(String::trim)
-            .firstOrNull { it.isNotEmpty() && it.startsWith(versionPrefix) } ?: continue
+        val version = output.lineSequence().map(String::trim).firstOrNull { it.isNotEmpty() && it.startsWith(versionPrefix) } ?: continue
         report(name, "$version — ${executable.path}")
         return executable to version
     }
@@ -83,7 +86,7 @@ command("git", listOfNotNull(
 val props = Properties()
 val local = settingsDir.resolve("local.properties")
 if (local.isFile) local.inputStream().use(props::load)
-val home = System.getProperty("user.home")
+val home = System.getProperty("user.home")!!
 
 // # 3 : Android SDK
 val sdk = listOfNotNull(
@@ -111,20 +114,24 @@ val xcode = if (mac) {
 // # 5 : cmake
 val windowsCmake = windowsCmakeRoots()
 val androidCmake = File(android, "cmake").listFiles().orEmpty().filter(File::isDirectory).sortedByDescending { it.name }
-val cmakeHints = listOfNotNull(
-    if (mac) File("/opt/homebrew/bin/cmake") else null,
-    if (mac) File("/Applications/CMake.app/Contents/bin/cmake") else null
-) + windowsCmake.map { it.resolve("CMake/bin/cmake.exe") } + androidCmake.map { it.resolve("bin/cmake$exe") }
+val cmakeHints = buildList {
+    if (mac) {
+        add(File("/opt/homebrew/bin/cmake"))
+        add(File("/Applications/CMake.app/Contents/bin/cmake"))
+    }
+    windowsCmake.mapTo(this) { it.resolve("CMake/bin/cmake.exe") }
+    androidCmake.mapTo(this) { it.resolve("bin/cmake$exe") }
+}
 val (cmake, cmakeVersion) = nativeTool("cmake", cmakeHints, versionPrefix = "cmake version ")
 val version = Regex("cmake version (\\d+)\\.(\\d+)").find(cmakeVersion)?.groupValues
+if (!(version != null && (version[1].toInt() > 3 || version[1].toInt() == 3 && version[2].toInt() >= 24))) {
+    throw GradleException("[ERROR] CMake — 检测到 $cmakeVersion；本仓库的 CMake 脚本需要 >= 3.24")
+}
 
-// # 6 : cmake version
-report("CMake >= 3.24", if (version != null && (version[1].toInt() > 3 || version[1].toInt() == 3 && version[2].toInt() >= 24)) cmakeVersion else null, "检测到 $cmakeVersion；本仓库的 CMake 脚本需要 >= 3.24")
-
-// # 7 : ninja
+// # 6 : ninja
 val ninja = nativeTool("ninja", windowsCmake.map { it.resolve("Ninja/ninja.exe") } + androidCmake.map { it.resolve("bin/ninja$exe") }).first
 
-// # 8 : Submodules
+// # 7 : Submodules
 for ((name, relative) in listOf(
     "MMKV 子模块" to "ylcs-module/foundation/kv/src/nativeMain/cpp/mmkv/Core/CMakeLists.txt",
     "miniaudio 子模块" to "ylcs-module/compose/components/media/src/nativeMain/cpp/miniaudio/miniaudio.c"
@@ -133,19 +140,19 @@ for ((name, relative) in listOf(
     report(name, source.takeIf { it.isFile }?.parentFile?.absolutePath, "缺少 ${source.absolutePath}；执行 git submodule update --init --recursive", false)
 }
 
-// # 9 : Android Platform Tools
+// # 8 : Android Platform Tools
 val platform = File(android, "platforms/android-37.1")
 report("Android SDK Platform 37.1", platform.takeIf { it.isDirectory }?.absolutePath, "未安装 ${platform.absolutePath}；Android 构建可能需要补装", false)
 
-// # 10 : Android NDK
+// # 9 : Android NDK
 val ndk = File(android, "ndk/29.0.14206865")
 report("Android NDK 29.0.14206865", ndk.takeIf { File(it, "source.properties").isFile }?.absolutePath, "未安装 ${ndk.absolutePath}；原生构建可能需要补装", false)
 
-// # 11 : Android ADB
+// # 10 : Android ADB
 val adb = File(android, "platform-tools/adb$exe")
 report("Android ADB", adb.takeIf { it.isFile }?.absolutePath, "缺少 ${adb.absolutePath}；真机运行可能受限", false)
 
-// # 12 : Chrome
+// # 11 : Chrome
 val chrome = locate("google-chrome", listOfNotNull(
     env["CHROME_BIN"]?.let(::File),
     if (win) env["ProgramFiles"]?.let { File(it, "Google/Chrome/Application/chrome.exe") } else null,
@@ -153,7 +160,7 @@ val chrome = locate("google-chrome", listOfNotNull(
 ) ?: locate("chromium") ?: locate("chromium-browser")
 report("Chrome / Chromium", chrome?.absolutePath, "未找到浏览器；Web ChromeHeadless 测试可能不可用", false)
 
-// # 13 : iOS Simulator
+// # 12 : iOS Simulator
 if (mac) {
     val simulator = File(xcode!!, "Platforms/iPhoneSimulator.platform/Developer/SDKs")
     report("iOS Simulator SDK", simulator.takeIf { it.isDirectory }?.absolutePath, "缺少 ${simulator.absolutePath}；模拟器运行可能受限", false)
