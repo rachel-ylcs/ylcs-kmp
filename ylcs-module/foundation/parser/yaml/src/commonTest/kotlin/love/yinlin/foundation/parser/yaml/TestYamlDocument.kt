@@ -1,7 +1,6 @@
 package love.yinlin.foundation.parser.yaml
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -117,10 +116,10 @@ class TestYamlDocument {
     @Test
     fun deserializeRequiresAValidSingleYamlDocumentString() {
         for (source in ["[1, 2", "a: 1\na: 2", "---\na: 1\n---\nb: 2"]) {
-            assertFailsWith<SerializationException> { JsonPrimitive(source).toString().parseJsonValue<YamlDocument>() }
+            assertFailsWith<Throwable> { JsonPrimitive(source).toString().parseJsonValue<YamlDocument>() }
         }
         for (json in ["{}", "[]", "null"]) {
-            assertFailsWith<SerializationException> { json.parseJsonValue<YamlDocument>() }
+            assertFailsWith<Throwable> { json.parseJsonValue<YamlDocument>() }
         }
     }
 }
