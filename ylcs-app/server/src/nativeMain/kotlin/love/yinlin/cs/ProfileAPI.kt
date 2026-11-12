@@ -47,7 +47,10 @@ fun ServerScope.profileAPI() {
     }
 
     ApiProfileGetPublicProfile.response { token, uid2 ->
-        VN.throwId(uid2)
+        checker {
+            ID check uid2
+        }
+
         val uid1 = token?.let { AN.throwExpireToken(it) }
         val user = mysql.throwQuerySQLSingle("""
             SELECT u.uid, u.name, u.signature, u.label, u.exp, u.follows, u.followers,
@@ -77,7 +80,10 @@ fun ServerScope.profileAPI() {
     }
 
     ApiProfileUpdateName.response { token, name ->
-        VN.throwName(name)
+        checker {
+            Username check name
+        }
+
         val uid = AN.throwExpireToken(token)
         val cost = UserConstraint.RENAME_COIN_COST
         val nameTaken = "ID\"${name}\"已被注册"
@@ -97,7 +103,10 @@ fun ServerScope.profileAPI() {
     }
 
     ApiProfileUpdateSignature.response { token, signature ->
-        VN.throwEmpty(signature)
+        checker {
+            NotEmpty check signature
+        }
+
         val uid = AN.throwExpireToken(token)
         mysql.throwExecuteSQL("UPDATE user SET signature = ? WHERE uid = ?", signature, uid)
     }

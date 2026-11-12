@@ -19,8 +19,11 @@ fun ServerScope.accountAPI() {
     }
 
     ApiAccountLogin.response { name, pwd, platform ->
-        VN.throwName(name)
-        VN.throwPassword(pwd)
+        checker {
+            Username check name
+            Password check pwd
+        }
+
         val user = mysql.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: failure("ID未注册")
         if (user["pwd"].String != MD5.Default.encodeToHex(pwd)) failure("密码错误")
         val uid = user["uid"].Int
@@ -41,8 +44,10 @@ fun ServerScope.accountAPI() {
     }
 
     ApiAccountRegister.response { name, pwd, inviterName ->
-        VN.throwName(name, inviterName)
-        VN.throwPassword(pwd)
+        checker {
+            Username check [name, inviterName]
+            Password check pwd
+        }
 
         // 查询ID是否注册过或是否正在审批
         if (mysql.querySQLSingle("""
@@ -88,8 +93,10 @@ fun ServerScope.accountAPI() {
     }
 
     ApiAccountForgotPassword.response { name, pwd ->
-        VN.throwName(name)
-        VN.throwPassword(pwd)
+        checker {
+            Username check name
+            Password check pwd
+        }
 
         // 先确定加锁顺序，事务内再核对账号和邀请关系。
         val applicant = mysql.throwQuerySQL("SELECT uid, inviter FROM user WHERE name = ?", name)
@@ -137,7 +144,10 @@ fun ServerScope.accountAPI() {
     }
 
     ApiAccountChangePassword.response { token, oldPwd, newPwd ->
-        VN.throwPassword(oldPwd, newPwd)
+        checker {
+            Password check [oldPwd, newPwd]
+        }
+
         val uid = AN.throwExpireToken(token)
         val oldPwdMd5 = MD5.Default.encodeToHex(oldPwd)
         val newPwdMd5 = MD5.Default.encodeToHex(newPwd)

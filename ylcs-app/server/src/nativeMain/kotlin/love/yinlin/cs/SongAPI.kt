@@ -111,7 +111,10 @@ fun ServerScope.songAPI() {
     }
 
     ApiSongSendSongComment.response { token, sid, content ->
-        VN.throwEmpty(content)
+        checker {
+            NotEmpty check content
+        }
+
         val uid = AN.throwExpireToken(token)
         val cid = mysql.throwInsertSQLGeneratedKey("""
             INSERT INTO song_comment(sid, uid, content) ${values(3)}
@@ -120,7 +123,10 @@ fun ServerScope.songAPI() {
     }
 
     ApiSongDeleteSongComment.response { token, cid ->
-        VN.throwId(cid)
+        checker {
+            ID check cid
+        }
+
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
             val isModerator = transaction.throwQuerySQL("""

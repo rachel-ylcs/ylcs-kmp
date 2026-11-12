@@ -75,7 +75,7 @@ abstract class APIScope(val engine: ServerEngine) {
                     logger.error("CallError: ${call.request.uri}", err)
                     when (err) {
                         is UnauthorizedException -> call.respond(status = HttpStatusCode.Unauthorized, message = makeArray { })
-                        is FailureException -> call.respondText(status = HttpStatusCode.Accepted, text = err.message ?: "Unknown Error")
+                        is FailureException, is CheckerException -> call.respondText(status = HttpStatusCode.Accepted, text = err.message ?: "Unknown Error")
                         else -> call.respond(status = HttpStatusCode.Forbidden, message = makeArray { })
                     }
                 }

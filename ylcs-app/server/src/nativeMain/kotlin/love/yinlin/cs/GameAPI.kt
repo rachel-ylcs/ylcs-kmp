@@ -27,12 +27,13 @@ private fun GameDetails.checkPlayable(uid: Int) {
 }
 
 fun ServerScope.gameAPI() {
-    ApiGameCreateGame.response { token, args ->
-        val (title, type, reward, num, cost, info, question, answer) = args
+    ApiGameCreateGame.response { token, (val title, val type, val reward, val num, val cost, val info, val question, val answer) ->
+        checker {  // 检查游戏奖励与名额
+            NotEmpty check title
+            True check GameConfig.checkReward(reward, num, cost)
+        }
+
         val uid = AN.throwExpireToken(token)
-        // 检查游戏奖励与名额
-        VN.throwEmpty(title)
-        VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
         catchingError { type.manager().check(info, question, answer) }?.then { failure("数据配置非法") }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
@@ -50,8 +51,11 @@ fun ServerScope.gameAPI() {
     }
 
     ApiGameDeleteGame.response { token, gid ->
+        checker {
+            ID check gid
+        }
+
         val uid = AN.throwExpireToken(token)
-        VN.throwId(gid)
         mysql.throwTransaction { transaction ->
             val game = transaction.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ? AND isDeleted = 0 FOR UPDATE", gid)
             val userUid = game["uid"].Int
@@ -134,8 +138,11 @@ fun ServerScope.gameAPI() {
     }
 
     ApiGamePreflightGame.response { token, gid ->
+        checker {
+            ID check gid
+        }
+
         val uid = AN.throwExpireToken(token)
-        VN.throwId(gid)
         val preflight = mysql.throwTransaction { transaction ->
             val details = transaction.lockGameDetails(gid)
             details.checkPlayable(uid)
@@ -145,8 +152,11 @@ fun ServerScope.gameAPI() {
     }
 
     ApiGameVerifyGame.response { token, gid, rid, answer ->
+        checker {
+            ID check [gid, rid]
+        }
+
         val uid = AN.throwExpireToken(token)
-        VN.throwId(gid, rid)
         val submittedAt = DateEx.CurrentLong
         val verification = mysql.throwTransaction { transaction ->
             val details = transaction.lockGameDetails(gid)

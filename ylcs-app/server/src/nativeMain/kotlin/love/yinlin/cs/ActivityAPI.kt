@@ -78,7 +78,10 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityUpdateActivityPhoto.response { token, aid, key, pic ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+        }
+
         val picName = activityTransaction(token) {
             val photo = lockActivityPhoto(aid)
             val name = DateEx.uniqueTimeId()
@@ -90,7 +93,10 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityDeleteActivityPhoto.response { token, aid, key ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+        }
+
         activityTransaction(token) {
             val photo = lockActivityPhoto(aid)
             if (photo.remove(key) != null) writeActivityPhoto(aid, photo)
@@ -98,12 +104,20 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityAddActivityPhotos.response { token, aid, key, pics ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+            HasFile check pics
+        }
+
         val ngp = NineGridProcessor(pics)
         val picNames = activityTransaction(token) {
             val photo = lockActivityPhoto(aid)
             val oldPics = photo[key]?.to<MutableList<String>>() ?: []
-            VN.throwIf(pics.isEmpty, oldPics.size + pics.num > 9)
+
+            checker {
+                AtMost(9) check oldPics.size + pics.num
+            }
+
             val names = ngp.actualPics
             oldPics += names
             photo[key] = oldPics.toJson()
@@ -114,11 +128,18 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityUpdateActivityPhotos.response { token, aid, key, index, pic ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+        }
+
         val picName = activityTransaction(token) {
             val photo = lockActivityPhoto(aid)
             val oldPics = photo[key]!!.to<MutableList<String>>()
-            VN.throwIf(index < 0, index >= oldPics.size)
+
+            checker {
+                Range(oldPics.indices) check index
+            }
+
             val name = DateEx.uniqueTimeId()
             oldPics[index] = name
             photo[key] = oldPics.toJson()
@@ -129,11 +150,18 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityDeleteActivityPhotos.response { token, aid, key, index ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+        }
+
         activityTransaction(token) {
             val photo = lockActivityPhoto(aid)
             val oldPics = photo[key]!!.to<MutableList<String>>()
-            VN.throwIf(index < 0, index >= oldPics.size)
+
+            checker {
+                Range(oldPics.indices) check index
+            }
+
             oldPics.removeAt(index)
             photo[key] = oldPics.toJson()
             writeActivityPhoto(aid, photo)
@@ -141,7 +169,10 @@ fun ServerScope.activityAPI() {
     }
 
     ApiActivityDeleteActivity.response { token, aid ->
-        VN.throwId(aid)
+        checker {
+            ID check aid
+        }
+
         activityTransaction(token) {
             if (!deleteSQL("DELETE FROM activity WHERE aid = ?", aid)) failure("该活动不存在")
         }

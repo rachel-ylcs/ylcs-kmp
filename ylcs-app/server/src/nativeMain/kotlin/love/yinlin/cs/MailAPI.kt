@@ -25,8 +25,11 @@ fun ServerScope.mailAPI() {
     }
 
     ApiMailProcessMail.response { token, mid, confirm ->
+        checker {
+            ID check mid
+        }
+
         val uid = AN.throwExpireToken(token)
-        VN.throwId(mid)
         val ret = mysql.throwTransaction { transaction ->
             val mailEntry = transaction.throwQuerySQLSingle("""
                 SELECT uid, processed, filter, param1, param2, param3, info
@@ -55,8 +58,11 @@ fun ServerScope.mailAPI() {
     }
 
     ApiMailDeleteMail.response { token, mid ->
+        checker {
+            ID check mid
+        }
+
         val uid = AN.throwExpireToken(token)
-        VN.throwId(mid)
         mysql.throwExecuteSQL("DELETE FROM mail WHERE mid = ? AND uid = ?", mid, uid)
     }
 }

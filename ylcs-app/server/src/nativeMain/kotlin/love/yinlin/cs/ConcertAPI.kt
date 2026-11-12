@@ -32,7 +32,10 @@ fun ServerScope.concertAPI() {
     }
 
     ApiConcertSetAttended.response { token, cid, attended ->
-        VN.throwId(cid)
+        checker {
+            ID check cid
+        }
+
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
             if (transaction.throwQuerySQL("SELECT cid FROM concert WHERE cid = ? FOR SHARE", cid).isEmpty()) failure("该演出不存在")

@@ -17,7 +17,10 @@ private suspend fun QueryExecutor.lockCommentModeration(uid: Int, tid: Int, rawS
 
 fun ServerScope.topicAPI() {
     ApiTopicGetTopics.response { uid, isTop, tid, num ->
-        VN.throwId(uid)
+        checker {
+            ID check uid
+        }
+
         val topics = mysql.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
             FROM topic
@@ -132,7 +135,10 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicGetTopicDetails.response { tid ->
-        VN.throwId(tid)
+        checker {
+            ID check tid
+        }
+
         val topics = mysql.throwQuerySQLSingle("""
 			SELECT tid, user.uid, ts, title, content, pics, isTop, coinNum, commentNum, section, rawSection, name, label, exp
 			FROM topic
@@ -144,8 +150,12 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicGetTopicComments.response { tid, rawSection, isTop, cid, num ->
-        VN.throwId(tid)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check tid
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val comments = mysql.throwQuerySQL("""
 			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, exp
             FROM $tableName
@@ -162,8 +172,12 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicGetTopicSubComments.response { pid, rawSection, cid, num ->
-        VN.throwId(pid)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check pid
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val subComments = mysql.throwQuerySQL("""
 			SELECT cid, user.uid, ts, content, name, label, exp
 			FROM $tableName
@@ -177,8 +191,11 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicSendTopic.response { token, title, content, section, pics ->
-        VN.throwEmpty(title, content)
-        VN.throwSection(section)
+        checker {
+            NotEmpty check [title, content]
+            Section check section
+        }
+
         val ngp = NineGridProcessor(pics)
         val uid = AN.throwExpireToken(token)
         val userPics = ServerRes.Users.User(uid).Pics()
@@ -197,7 +214,10 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicUpdateTopicTop.response { token, tid, isTop ->
-        VN.throwId(tid)
+        checker {
+            ID check tid
+        }
+
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人
         if (!mysql.updateSQL("""
@@ -206,7 +226,10 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicDeleteTopic.response { token, tid ->
-        VN.throwId(tid)
+        checker {
+            ID check tid
+        }
+
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
             val isModerator = transaction.throwQuerySQL("""
@@ -220,8 +243,11 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicMoveTopic.response { token, tid, section ->
-        VN.throwId(tid)
-        VN.throwSection(section)
+        checker {
+            ID check tid
+            Section check section
+        }
+
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
             val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
@@ -231,8 +257,11 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicSendCoin.response { token, uid, tid, value ->
-        VN.throwId(uid, tid)
-        VN.throwIf(value <= 0, value > UserConstraint.MIN_COIN_REWARD)
+        checker {
+            ID check [uid, tid]
+            Range(1 .. UserConstraint.MIN_COIN_REWARD) check value
+        }
+
         val srcUid = AN.throwExpireToken(token)
         if (srcUid == uid) failure("不能给自己投币哦")
         val rewardRecipient = value == UserConstraint.MIN_COIN_REWARD
@@ -261,9 +290,13 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicSendComment.response { token, tid, rawSection, content ->
-        VN.throwId(tid)
-        VN.throwEmpty(content)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check tid
+            NotEmpty check content
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val uid = AN.throwExpireToken(token)
         val cid = mysql.throwTransaction { transaction ->
             val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
@@ -279,9 +312,13 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicSendSubComment.response { token, tid, cid, rawSection, content ->
-        VN.throwId(tid, cid)
-        VN.throwEmpty(content)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check [tid, cid]
+            NotEmpty check content
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val uid = AN.throwExpireToken(token)
         val cid = mysql.throwTransaction { transaction ->
             val privilege = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)["privilege"].Int
@@ -301,8 +338,12 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicUpdateCommentTop.response { token, tid, cid, rawSection, isTop ->
-        VN.throwId(tid, cid)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check [tid, cid]
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人，超管
         mysql.throwTransaction { transaction ->
@@ -329,8 +370,12 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicDeleteComment.response { token, tid, cid, rawSection ->
-        VN.throwId(tid, cid)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check [tid, cid]
+            Section check rawSection
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
         mysql.throwTransaction { transaction ->
@@ -364,8 +409,11 @@ fun ServerScope.topicAPI() {
     }
 
     ApiTopicDeleteSubComment.response { token, tid, pid, cid, rawSection ->
-        VN.throwId(tid, pid, cid)
-        val tableName = VN.throwSection(rawSection)
+        checker {
+            ID check [tid, pid, cid]
+        }
+
+        val tableName = Comment.Section.commentTable(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
         mysql.throwTransaction { transaction ->

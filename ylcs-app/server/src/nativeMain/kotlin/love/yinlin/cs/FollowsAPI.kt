@@ -109,7 +109,11 @@ fun ServerScope.followsAPI() {
 
     ApiFollowsUnblockUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
-        VN.throwIf(uid1 == uid2)
+
+        checker {
+            NotEquals check (uid1 to uid2)
+        }
+
         mysql.relationshipTransaction(uid1, uid2) { _, relationship2 ->
             if (relationship2 == true) throwExecuteSQL("DELETE FROM follows WHERE uid1 = ? AND uid2 = ? AND isBlocked = 1", uid2, uid1)
         }

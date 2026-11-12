@@ -4,4 +4,6 @@ class RequestTimeoutException(timeout: Long) : Exception("request timeout $timeo
 
 class FailureException(message: String?) : Exception(message)
 
+class CheckerException(name: String, arg: Any?, message: String?) : Exception("$name check error: ${message ?: ""} with $arg")
+
 class UnauthorizedException(message: String?) : Exception(message)

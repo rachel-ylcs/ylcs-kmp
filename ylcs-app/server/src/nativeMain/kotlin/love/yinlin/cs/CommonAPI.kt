@@ -23,7 +23,11 @@ fun ServerScope.commonAPI() {
 
     callMap[Mail.Filter.CoinReward] = { transaction, (val uid, val param1) ->
         val coin = param1?.toIntOrNull() ?: 0
-        VN.throwIf(coin <= 0)
+
+        checker {
+            Positive check coin
+        }
+
         transaction.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", coin, uid)
         "领取成功"
     }

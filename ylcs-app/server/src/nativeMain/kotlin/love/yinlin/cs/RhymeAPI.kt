@@ -11,8 +11,8 @@ import love.yinlin.extension.*
 fun ServerScope.rhymeAPI() {
     ApiRhymeGetUserRepository.response { token ->
         val uid = AN.throwExpireToken(token)
-        val rhyme = VN.throwGetUserData(uid, "rhyme").obj("rhyme")
-        result(rhyme.to<RhymeRepository>())
+        val userData = mysql.throwQuerySQLSingle("SELECT rhyme FROM user_data WHERE uid = ?", uid)
+        result(userData.obj("rhyme").to<RhymeRepository>())
     }
 
     ApiRhymeUnlockCharacter.response { token, id ->
