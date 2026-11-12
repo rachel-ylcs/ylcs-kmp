@@ -29,13 +29,12 @@ class NativeUpstreamSync(directory: File) {
 
     private fun inputHashes(): Map<String, String> {
         val files = mutableListOf<File>()
-        for (relative in listOf("native-compose/upstream", "native-compose/gradle",
+        for (relative in listOf("native-compose/upstream", "native-compose/gradle", "native-compose/adaptation/provenance",
             "build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose", "build-logic/native-bridge/gradle")) {
             files.addAll(repository.resolve(relative).walkTopDown().filter { it.isFile })
         }
         files.addAll(listOf("native-compose/build.gradle.kts", ".gitattributes", "settings.gradle.kts", "gradle.properties", "gradle/wrapper/gradle-wrapper.properties",
             "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map(repository::resolve))
-        files.add(skikoOrigins)
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
 
