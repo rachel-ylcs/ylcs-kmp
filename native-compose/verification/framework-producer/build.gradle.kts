@@ -15,6 +15,8 @@ val generation = gradle.extensions.extraProperties.get("love.yinlin.nativeCompos
 tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
 layout.buildDirectory.set(generation.resolve("build/framework-producer"))
 
+apply(from = "../../gradle/compiler-warnings.gradle.kts")
+
 val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
 val compilerProfile = gradle.extensions.extraProperties
 

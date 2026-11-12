@@ -36,6 +36,13 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
 }
 
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
+apply(from = nativeComposeDirectory.resolve("gradle/compiler-warnings.gradle.kts"))
+
+allprojects {
+    tasks.withType<CompileSkikoCppTask>().configureEach {
+        flags.add(buildTargetOS.map { if (it.isWindows) "/w" else "-w" })
+    }
+}
 
 if (dokkaBuild) {
     apply(plugin = "love.yinlin.native-dokka")

@@ -1,3 +1,5 @@
+@file:Suppress("warnings")
+
 import groovy.json.JsonSlurper
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.publish.PublishingExtension
@@ -21,6 +23,7 @@ plugins {
 
 val generation = rootDir.resolve("../../..").canonicalFile
 val nativeDirectory = generation.resolve("../../..").canonicalFile
+apply(from = nativeDirectory.resolve("gradle/compiler-warnings.gradle.kts"))
 val sourceMetadata = JsonSlurper().parse(generation.resolve("metadata/compose.json")) as Map<*, *>
 val modules = sourceMetadata["modules"] as Map<*, *>
 val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"

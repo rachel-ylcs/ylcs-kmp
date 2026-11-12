@@ -1,3 +1,5 @@
+@file:Suppress("warnings")
+
 import groovy.json.JsonSlurper
 import love.yinlin.nativebridge.NativeBridgeSourcesExtension
 import java.security.MessageDigest

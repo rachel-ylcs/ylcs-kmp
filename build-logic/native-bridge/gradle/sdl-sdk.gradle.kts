@@ -103,7 +103,7 @@ fun Project.sdkLinuxOptions(nativeHome: File, variables: Map<String, String>, wo
     }
     check(required.all { it.isFile }) { "Kotlin/Native Linux C toolchain is incomplete: ${required.filter { !it.isFile }}" }
     return listOf("-DCMAKE_C_COMPILER=$compiler", "-DCMAKE_C_COMPILER_TARGET=x86_64-unknown-linux-gnu", "-DCMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN=$toolchain",
-        "-DCMAKE_SYSROOT=$sysroot", "-DCMAKE_AR=$ar", "-DCMAKE_RANLIB=$ranlib", "-DCMAKE_C_FLAGS=-idirafter /usr/include -idirafter /usr/include/x86_64-linux-gnu") to identities
+        "-DCMAKE_SYSROOT=$sysroot", "-DCMAKE_AR=$ar", "-DCMAKE_RANLIB=$ranlib", "-DCMAKE_C_FLAGS=-idirafter /usr/include -idirafter /usr/include/x86_64-linux-gnu -w") to identities
 }
 
 fun sdkLinkOptions(text: String): List<String> {
@@ -197,6 +197,8 @@ tasks.register("prepareSdlStatic") {
         val build = Files.createTempDirectory(work.toPath(), "configure-").toFile()
         val options = mutableListOf("-DCMAKE_INSTALL_PREFIX=$sdkPrefix", "-DCMAKE_INSTALL_LIBDIR=lib", "-DCMAKE_BUILD_TYPE=Release", "-DSDL_SHARED=OFF", "-DSDL_STATIC=ON",
             "-DCMAKE_POSITION_INDEPENDENT_CODE=ON", "-DSDL_TEST_LIBRARY=OFF", "-DSDL_TESTS=OFF", "-DSDL_EXAMPLES=OFF")
+        val warningFlag = if (sdkHost == "mingw_x64") "/w" else "-w"
+        options.addAll(listOf("-DCMAKE_C_FLAGS_INIT=$warningFlag", "-DCMAKE_CXX_FLAGS_INIT=$warningFlag"))
         options.addAll(sdkCmakeProfile.map { (name, value) -> "-D$name=${if (value == true) "ON" else "OFF"}" })
         options.addAll(nativeOptions)
         try {
