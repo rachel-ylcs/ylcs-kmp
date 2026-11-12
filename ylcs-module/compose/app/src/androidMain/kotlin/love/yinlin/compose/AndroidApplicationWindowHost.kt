@@ -43,7 +43,7 @@ internal class AndroidApplicationWindowHost(
 
     init {
         owner.lifecycle.addObserver(this)
-        scope.launch { for (_ in changes) Snapshot.sendApplyNotifications() }
+        scope.launch { for (_: Unit in changes) Snapshot.sendApplyNotifications() }
         scope.launch { recomposer.runRecomposeAndApplyChanges() }
         scope.launch {
             snapshotFlow { windows.isEmpty }.first { it }
