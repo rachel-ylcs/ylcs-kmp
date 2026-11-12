@@ -9,6 +9,47 @@ import kotlin.test.assertTrue
 
 class SourceWorkspaceTest {
     @Test
+    fun generatedBuildRefreshPreservesSourcesOutputsAndLocalEdits() {
+        val vendor = Files.createTempDirectory("native-generated-build").toFile()
+        try {
+            val staging = vendor.resolve("staging").apply { mkdirs() }
+            staging.resolve("src/A.kt").apply {
+                parentFile.mkdirs()
+                writeText("upstream source")
+            }
+            staging.resolve("gradle.properties").writeText("version=old")
+            val destination = vendor.resolve("workspace")
+            val record = vendor.resolve("state.json")
+            val identity = mapOf("source" to "release")
+            val workspace = SourceWorkspace(vendor)
+            workspace.synchronize(staging, destination, record, identity)
+            val source = destination.resolve("src/A.kt")
+            assertTrue(source.setLastModified(1234567890000L))
+            val timestamp = source.lastModified()
+            val output = destination.resolve("build/output.bin").apply {
+                parentFile.mkdirs()
+                writeText("compiled")
+            }
+            val generated = vendor.resolve("generated").apply { mkdirs() }
+            generated.resolve("gradle.properties").writeText("version=new")
+            workspace.updateGenerated(generated, destination, record)
+            assertEquals("version=new", destination.resolve("gradle.properties").readText())
+            assertEquals(timestamp, source.lastModified())
+            assertEquals("compiled", output.readText())
+            assertTrue(workspace.reusable(destination, record, identity))
+            val properties = destination.resolve("gradle.properties")
+            assertTrue(properties.setLastModified(timestamp))
+            workspace.updateGenerated(generated, destination, record)
+            assertEquals(timestamp, properties.lastModified())
+            properties.writeText("local edit")
+            generated.resolve("new.properties").writeText("new file")
+            assertFailsWith<IllegalStateException> { workspace.updateGenerated(generated, destination, record) }
+            assertEquals("local edit", properties.readText())
+            assertFalse(destination.resolve("new.properties").exists())
+        } finally { assertTrue(vendor.deleteRecursively()) }
+    }
+
+    @Test
     fun reuseValidatesSourcesWithoutWritingAndMissingFilesCanBeRepaired() {
         val vendor = Files.createTempDirectory("native-source-reuse").toFile()
         try {

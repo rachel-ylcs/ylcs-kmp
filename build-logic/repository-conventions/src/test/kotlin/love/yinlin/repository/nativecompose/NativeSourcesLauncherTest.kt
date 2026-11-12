@@ -20,7 +20,7 @@ class NativeSourcesLauncherTest {
                 "gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat")) {
                 original.resolve(relative).copyTo(work.resolve(relative))
             }
-            work.resolve("libs.versions.toml").writeText("[versions]\ncmp = \"1.13.0-beta02\"\nskiko = \"0.156.1\"\nsdl = \"3.4.20\"\nicu = \"78.2\"\n[libraries]\n")
+            work.resolve("libs.versions.toml").writeText("[versions]\nkotlin = \"2.5.0-RC\"\ncmp = \"1.13.0-beta02\"\nskiko = \"0.156.1\"\nsdl = \"3.4.20\"\nicu = \"78.2\"\n[libraries]\n")
             work.resolve("settings.gradle.kts").writeText("repository { rachel { jvm { version = 25 } } }")
             native.resolve("upstream/patches").mkdirs()
             native.resolve("upstream/compose.json").writeText("""{"repository":"JetBrains/compose-multiplatform-core","modules":{}}""")

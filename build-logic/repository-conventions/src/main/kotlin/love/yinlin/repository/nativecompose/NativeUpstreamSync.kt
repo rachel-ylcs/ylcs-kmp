@@ -29,12 +29,13 @@ class NativeUpstreamSync(directory: File) {
 
     private fun inputHashes(): Map<String, String> {
         val files = mutableListOf<File>()
-        for (relative in listOf("native-compose/upstream", "native-compose/gradle", "native-compose/adaptation",
+        for (relative in listOf("native-compose/upstream", "native-compose/gradle",
             "build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose", "build-logic/native-bridge/gradle")) {
             files.addAll(repository.resolve(relative).walkTopDown().filter { it.isFile })
         }
         files.addAll(listOf("native-compose/build.gradle.kts", ".gitattributes", "settings.gradle.kts", "gradle.properties", "gradle/wrapper/gradle-wrapper.properties",
             "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map(repository::resolve))
+        files.add(skikoOrigins)
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
 
@@ -74,6 +75,7 @@ class NativeUpstreamSync(directory: File) {
         val sdlVersion = version("sdl")
         val icuVersion = version("icu")
         val composeSpec = nativeDirectory.resolve("upstream/compose.json").sourceJson()
+        val versions = catalog.upstreamVersions(composeSpec["modules"].sourceObject())
         val skikoSpec = nativeDirectory.resolve("upstream/skiko.json").sourceJson()
         check(skikoSpec["group"] == "love.yinlin.native.skiko") { "Invalid Native Skiko publication namespace" }
         val sdlSpec = nativeDirectory.resolve("upstream/sdl.json").sourceJson()
@@ -107,16 +109,17 @@ class NativeUpstreamSync(directory: File) {
         val sdlArchive = resolver.archive("sdl", sdlVersion, "https://github.com/libsdl-org/SDL/releases/download/release-$sdlVersion/SDL3-$sdlVersion.zip", 128L * 1024 * 1024)
         val sdl = sdlSpec + mapOf("version" to sdlVersion, "source" to sdlArchive.metadata)
         val icuArchive = resolver.archive("icu", icuVersion, "https://github.com/unicode-org/icu/releases/download/release-$icuVersion/icu4c-$icuVersion-data-bin-l.zip", 64L * 1024 * 1024)
-        val identity = mapOf("schema" to 1, "host" to skiaHostKey(), "catalogSha256" to catalogHash, "inputs" to inputs, "patches" to patches.manifest,
-            "compose" to compose, "skiko" to skiko, "sdl" to sdl, "icu" to icuArchive.metadata)
-        val hash = bytesHash(sourceBytes(sourceIdentity(identity)))
+        val hash = bytesHash(sourceBytes(versions))
         // Keep paths short for MSVC/CMake; the marker always verifies all 256 bits.
         val generation = checkedSourcePath(vendor, vendor.resolve("g/${hash.take(24)}"))
         val owner = checkedSourcePath(vendor, generation.resolve(".rachel-generation.json"))
         if (generation.exists()) {
             check(owner.isFile && owner.sourceJson()["sha256"] == hash) { "Unrecognized Native generation preserved: $generation" }
         }
-        else writeSource(vendor, owner, sourceBytes(mapOf("sha256" to hash, "identity" to identity)))
+        else writeSource(vendor, owner, sourceBytes(mapOf("sha256" to hash, "identity" to versions)))
+        // This directory is reused across configuration and patch changes; a failed refresh is not ready.
+        val ready = checkedSourcePath(vendor, generation.resolve("ready.json"))
+        check(!ready.exists() || ready.delete()) { "Cannot invalidate Native source readiness: $ready" }
         writeMetadata(generation, "skiko", skiko)
         writeMetadata(generation, "compose", compose)
         writeMetadata(generation, "sdl", sdl)
@@ -130,12 +133,6 @@ class NativeUpstreamSync(directory: File) {
         writeSource(vendor, vendor.resolve("current.json"), sourceBytes(current))
         println("Prepared Native Compose $cmpVersion / Skiko $skikoVersion / SDL $sdlVersion: $generation")
         generation
-    }
-
-    private fun sourceIdentity(value: Any?): Any? = when (value) {
-        is Map<*, *> -> value.filterKeys { it != "publishedSha256" }.mapValues { (_, item) -> sourceIdentity(item) }
-        is List<*> -> value.map(::sourceIdentity)
-        else -> value
     }
 
     private fun writeMetadata(generation: File, name: String, metadata: SourceObject) {
@@ -153,7 +150,7 @@ class NativeUpstreamSync(directory: File) {
     private fun prepareIcu(generation: File, version: String, archive: NativeSourceInputs.Archive, sdk: NativeSourceInputs.Archive, runtime: SourceObject, skia: String) {
         val destination = generation.resolve("icu/workspace")
         val record = generation.resolve("icu/files.json")
-        val identity = mapOf("archiveSha256" to archive.metadata["sha256"], "sdkSha256" to sdk.metadata["sha256"])
+        val identity = mapOf("archiveSha256" to archive.metadata["sha256"], "sdkSha256" to sdk.metadata["sha256"], "version" to version, "runtime" to runtime)
         if (!workspace.reusable(destination, record, identity)) stage(".icu-") { staging ->
             val dataFile = "icudt${version.substringBefore('.')}l.dat"
             val extracted = SourceArchive.extract(archive.file, staging, false) { relative ->
@@ -177,7 +174,7 @@ class NativeUpstreamSync(directory: File) {
     private fun prepareSkiko(generation: File, archive: File, skiko: SourceObject, sdl: SourceObject, sdk: Map<String, NativeSourceInputs.Archive>) {
         val destination = generation.resolve("skiko/workspace")
         val record = generation.resolve("skiko/files.json")
-        val identity = mapOf("sourceSha256" to skiko["source"].sourceObject()["sha256"])
+        val identity = mapOf("sourceSha256" to skiko["source"].sourceObject()["sha256"], "patch" to patches.manifest["skiko"], "originsSha256" to skikoOrigins.sourceHash())
         if (!workspace.reusable(destination, record, identity)) stage(".skiko-") { staging ->
             SourceArchive.extract(archive, staging, true)
             patches.apply(staging, patches.manifest["skiko"].sourceObject())
@@ -198,6 +195,7 @@ class NativeUpstreamSync(directory: File) {
             removeShadows(staging)
             workspace.synchronize(staging, destination, record, identity, setOf("skiko/dependencies/skia"))
         }
+        refreshSkikoBuild(destination, record, skiko, sdl, sdk)
         val key = skiaHostKey()
         val verified = sdk.getValue(key)
         val skia = skiko["skia"]
@@ -213,6 +211,21 @@ class NativeUpstreamSync(directory: File) {
             finally { temporary.delete() }
         }
         else check(target.sourceHash() == verified.metadata["sha256"]) { "Skia SDK SHA-256 mismatch: $target" }
+    }
+
+    private fun refreshSkikoBuild(destination: File, record: File, skiko: SourceObject, sdl: SourceObject, sdk: Map<String, NativeSourceInputs.Archive>) {
+        stage(".skiko-build-") { staging ->
+            val files = mutableSetOf("dependencies.toml", "skiko/gradle.properties", "skiko/buildSrc/build.gradle.kts", "LICENSE", "NOTICE")
+            files.addAll(destination.walkTopDown().onEnter { it.name !in setOf("build", ".gradle", ".git", ".kotlin", "dependencies") }.filter {
+                it.name == "gradle-wrapper.properties" && it.parentFile.name == "wrapper" && it.parentFile.parentFile.name == "gradle"
+            }.map { it.relativeTo(destination).invariantSeparatorsPath })
+            for (relative in files) destination.resolve(relative).copyTo(staging.resolve(relative))
+            catalog.alignUpstreamCatalog(staging.resolve("dependencies.toml"))
+            updateSkikoProfile(staging, skiko, sdk)
+            catalog.copyWrappers(staging)
+            prepareNotices(staging, skiko, sdl)
+            workspace.updateGenerated(staging, destination, record)
+        }
     }
 
     private fun updateSkikoProfile(directory: File, skiko: SourceObject, sdk: Map<String, NativeSourceInputs.Archive>) {
@@ -231,11 +244,12 @@ class NativeUpstreamSync(directory: File) {
         properties.writeText(text)
         val buildSrc = directory.resolve("skiko/buildSrc/build.gradle.kts")
         val buildScript = Regex("jvmToolchain\\(\\d+\\)").replace(buildSrc.readText(), "jvmToolchain(${catalog.java})")
-        buildSrc.writeText(buildScript + """
+        val generationInputs = """
             |tasks.configureEach {
             |    inputs.property("rachel.native.generation", projectDir.resolve("../../../..").canonicalFile.name)
             |}
-        """.trimMargin() + "\n")
+        """.trimMargin() + "\n"
+        buildSrc.writeText(if (generationInputs in buildScript) buildScript else buildScript + generationInputs)
     }
 
     private fun prepareNotices(directory: File, skiko: SourceObject, sdl: SourceObject) {
@@ -262,7 +276,7 @@ class NativeUpstreamSync(directory: File) {
     private fun prepareSdl(generation: File, archive: File, metadata: SourceObject) {
         val destination = generation.resolve("sdl/source")
         val record = generation.resolve("sdl/files.json")
-        val identity = mapOf("sourceSha256" to metadata["source"].sourceObject()["sha256"])
+        val identity = mapOf("sourceSha256" to metadata["source"].sourceObject()["sha256"], "patch" to patches.manifest["sdl"], "build" to metadata["build"])
         if (workspace.reusable(destination, record, identity)) return
         stage(".sdl-") { staging ->
             SourceArchive.extract(archive, staging, true)

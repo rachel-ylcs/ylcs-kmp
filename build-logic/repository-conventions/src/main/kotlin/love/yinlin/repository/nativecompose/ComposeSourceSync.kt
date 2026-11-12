@@ -55,11 +55,12 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync, private v
     private fun prepareTree(name: String, tree: NativeSourceInputs.GitTree) {
         val destination = generation.resolve("$name/workspace")
         val record = generation.resolve("$name/files.json")
-        if (sync.workspace.reusable(destination, record, tree.metadata)) return
+        val identity = tree.metadata + ("patch" to sync.patches.manifest[name])
+        if (sync.workspace.reusable(destination, record, identity)) return
         sync.stage(".compose-source-") { staging ->
             for (relative in tree.files.keys) tree.directory.resolve(relative).copyTo(staging.resolve(relative))
             sync.patches.apply(staging, sync.patches.manifest[name].sourceObject())
-            sync.workspace.synchronize(staging, destination, record, tree.metadata)
+            sync.workspace.synchronize(staging, destination, record, identity)
         }
     }
 
@@ -70,7 +71,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync, private v
         for (relative in replacements.values) check(nativeDirectory.resolve("adaptation/${adaptation(name, module)}/${sourceRelativePath(relative as String)}").isFile) { "Missing maintained replacement: $relative" }
         val destination = generation.resolve("maven/workspace/$name")
         val record = generation.resolve("maven/states/$name.json")
-        val identity = mapOf("sha256" to archive.metadata["sha256"])
+        val identity = mapOf("sha256" to archive.metadata["sha256"], "module" to module, "patch" to patch)
         if (sync.workspace.reusable(destination, record, identity)) return
         val selected = module["sourceSets"].sourceObject().values.flatMap { it as List<*> }.map { (it as String).split('/')[1] }.toSet()
         sync.stage(".maven-source-") { staging ->

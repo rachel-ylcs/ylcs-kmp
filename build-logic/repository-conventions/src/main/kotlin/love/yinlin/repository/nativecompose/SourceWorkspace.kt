@@ -30,6 +30,27 @@ internal class SourceWorkspace(private val vendor: File) {
         it.isFile && it.extension in setOf("kt", "cc", "cpp", "h", "hh", "def") && "/src/" in it.invariantSeparatorsPath
     }.map { it.relativeTo(destination).invariantSeparatorsPath }.toSet()
 
+    /** Refresh generated build configuration without replacing upstream sources or build outputs. */
+    fun updateGenerated(staging: File, destination: File, record: File) {
+        checkedSourcePath(vendor, destination)
+        checkedSourcePath(vendor, record)
+        val previous = record.sourceJson()
+        val known = previous["fileHashes"].sourceObject()
+        val files = staging.walkTopDown().filter { it.isFile }.associateBy { sourceRelativePath(it.relativeTo(staging).invariantSeparatorsPath) }
+        val hashes = files.mapValues { it.value.sourceHash() }
+        for ((relative, _) in files) {
+            val target = checkedSourcePath(vendor, destination.resolve(relative))
+            check(!target.exists() || (target.isFile && target.sourceHash() == (known[relative] ?: hashes.getValue(relative)))) { "Local generated file edit preserved: $target" }
+        }
+        if (hashes.all { (relative, hash) -> known[relative] == hash && destination.resolve(relative).isFile }) return
+        val pending = known.toMutableMap()
+        for ((relative, hash) in hashes) pending[relative] = listOfNotNull(known[relative], hash).distinct()
+        val inventory = (known.keys + hashes.keys).sorted()
+        writeSource(vendor, record, sourceBytes(previous + mapOf("files" to inventory, "fileHashes" to pending)))
+        for ((relative, file) in files) writeSource(vendor, destination.resolve(relative), file.readBytes())
+        writeSource(vendor, record, sourceBytes(previous + mapOf("files" to inventory, "fileHashes" to (known + hashes))))
+    }
+
     fun <T> locked(directory: File, action: () -> T): T {
         directory.mkdirs()
         checkedSourcePath(vendor, directory.resolve(".prepare.lock"))
