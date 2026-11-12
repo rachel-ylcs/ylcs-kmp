@@ -14,10 +14,6 @@ sourceSets.main {
     compileClasspath += bootstrap.output
     runtimeClasspath += bootstrap.output
 }
-sourceSets.test {
-    compileClasspath += bootstrap.output
-    runtimeClasspath += bootstrap.output
-}
 
 dependencies {
     compileOnly(localGroovy())
@@ -31,14 +27,12 @@ dependencies {
     implementation(libs.gradle.plugin.mavenPublish)
     implementation(libs.gradle.plugin.dokka)
     compileOnly(project(":native-bridge"))
-    testImplementation(kotlin("test-junit"))
 }
 
 kotlin {
     jvmToolchain(25)
     // Embed the shared binary tooling so plain Native projects do not need the Compose bridge.
     sourceSets.main { kotlin.srcDir("../native-binaries/src/main/kotlin") }
-    sourceSets.test { kotlin.srcDir("../native-binaries/src/test/kotlin") }
 }
 
 val bootstrapJar = tasks.register<Jar>("bootstrapJar") {

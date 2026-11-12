@@ -38,7 +38,7 @@ Gradle 版本由根 `gradle/wrapper/gradle-wrapper.properties` 中的 `distribut
 ```text
 ./gradlew -p build-logic :repository-conventions:prepareNativeSources
 ./gradlew -p build-logic --offline :repository-conventions:prepareNativeSources
-./gradlew -p build-logic :repository-conventions:test :native-bridge:test :native-bridge:validatePlugins
+./gradlew -p build-logic :native-bridge:validatePlugins :public-plugin:validatePlugins
 ./gradlew :native-compose:testHost :native-compose:publishHost
 ./gradlew :native-compose:verifyHost
 ```
@@ -198,4 +198,3 @@ DragArea(enabled = !controller.maximize, onDoubleClick = { controller.toggleMaxi
 - [Native 拖动实现](../ylcs-module/compose/ui/src/nativeMain/kotlin/love/yinlin/compose/ui/window/DragArea.native.kt)
 - [Native 应用宿主](../ylcs-module/compose/app/src/nativeMain/kotlin/love/yinlin/compose/PlatformApplication.native.kt)
 - [独立 Native 窗口扩展](../ylcs-module/compose/app/src/nativeMain/kotlin/love/yinlin/compose/ApplicationWindow.native.kt)
-- [桌面打包回归用例](../build-logic/native-bridge/src/test/kotlin/love/yinlin/nativebridge/NativeDesktopPackagingTest.kt)

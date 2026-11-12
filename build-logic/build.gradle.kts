@@ -27,7 +27,6 @@ subprojects {
         extensions.configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
         extensions.configure<AssignmentExtension> { annotation("org.gradle.api.SupportsKotlinAssignmentOverloading") }
         dependencies.add("compileOnly", gradleKotlinDsl())
-        dependencies.add("testImplementation", gradleKotlinDsl())
         extensions.configure<KotlinJvmProjectExtension> {
             compilerOptions {
                 languageVersion.set(kotlinLanguage)

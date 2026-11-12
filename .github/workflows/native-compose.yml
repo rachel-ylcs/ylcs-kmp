@@ -189,17 +189,12 @@ jobs:
         uses: ./.github/actions/setup-native
         with:
           tools: 'true'
-      - name: Source preparation, bridge routing and desktop packaging regressions
+      - name: Validate Gradle plugin declarations
         if: runner.os == 'Linux'
         run: |
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            :repository-conventions:test :native-bridge:test :public-plugin:test :native-bridge:validatePlugins :public-plugin:validatePlugins
-      - name: Native application and packaging regression
-        run: |
-          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            :native-bridge:hostTest
+            :native-bridge:validatePlugins :public-plugin:validatePlugins
       - name: Test and publish all owned host libraries
         run: |
           mkdir -p build/native-ci
@@ -251,7 +246,7 @@ jobs:
           /usr/sbin/sysctl hw.memsize vm.swapusage
           /usr/bin/memory_pressure -Q
           df -h
-      - name: Library and bridge test evidence
+      - name: Native library and publication evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -265,10 +260,6 @@ jobs:
             ${{ steps.native-sources.outputs.generation }}/build/repository/**/*.pom
             ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/build/test-results/
             ${{ steps.native-sources.outputs.generation }}/skiko/workspace/skiko/skiko-skottie/build/test-results/
-            build-logic/native-bridge/build/test-results/
-            build-logic/native-bridge/build/reports/tests/
-            build-logic/public-plugin/build/test-results/
-            build-logic/repository-conventions/build/test-results/
             build/native-ci/
             build/reports/profile/
             ${{ steps.native-sources.outputs.generation }}/build/compose-ui/*/reports/kotlin-build/

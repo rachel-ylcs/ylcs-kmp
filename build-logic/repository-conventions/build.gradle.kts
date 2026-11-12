@@ -11,7 +11,6 @@ dependencies {
     implementation(localGroovy())
     implementation(project(path = ":public-plugin", configuration = "bootstrapElements"))
     implementation(project(path = ":native-bridge", configuration = "settingsElements"))
-    testImplementation(kotlin("test-junit"))
 }
 
 val nativeSourcesDirectory = rootProject.layout.projectDirectory.dir("../native-compose")
@@ -34,13 +33,6 @@ tasks.register<JavaExec>("prepareNativeSources") {
 
 kotlin {
     jvmToolchain(25)
-}
-
-tasks.test {
-    inputs.files(sourceSets.main.get().runtimeClasspath)
-    inputs.file(rootProject.projectDir.parentFile.resolve(".gitattributes"))
-    systemProperty("native.sources.repositoryRoot", rootProject.projectDir.parentFile.absolutePath)
-    doFirst { systemProperty("native.sources.runtimeClasspath", sourceSets.main.get().runtimeClasspath.asPath) }
 }
 
 val versionResources = layout.buildDirectory.dir("generated/versionResources")

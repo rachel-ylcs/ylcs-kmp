@@ -114,7 +114,7 @@ runs {
 
 ## CInterop 与原生依赖
 
-`native { cpp = listOf("shared") }` 为启用的桌面 Native 目标注册共享 CInterop，`windows { cpp = listOf("win32") }` 等块添加平台条目。定义文件位于 `src/nativeInterop/cinterop/<name>.def`。同名条目去重，多次设置采用累积配置；已有用例见 [KotlinNativeCppTest](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/build-logic/public-plugin/src/test/kotlin/love/yinlin/gradle/KotlinNativeCppTest.kt)。
+`native { cpp = listOf("shared") }` 为启用的桌面 Native 目标注册共享 CInterop，`windows { cpp = listOf("win32") }` 等块添加平台条目。定义文件位于 `src/nativeInterop/cinterop/<name>.def`。同名条目去重，多次设置采用累积配置。
 
 CInterop 绑定生成、外部 C/C++ 库构建和最终应用分发属于不同环节。桌面 JNI 的 MMKV、picker、miniaudio 等依赖仍需按对应模块与 CI 动作准备，不能将 Gradle 编译成功视为动态库已正确部署。
 

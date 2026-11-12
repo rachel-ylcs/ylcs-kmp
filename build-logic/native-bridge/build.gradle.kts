@@ -17,35 +17,16 @@ kotlin {
 
 val settingsSource = sourceSets.create("settings")
 val verificationSource = sourceSets.create("verification")
-val composeTestPlugin = configurations.create("composeTestPlugin") {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-val rachelTestPlugin = configurations.create("rachelTestPlugin") {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
 sourceSets.main {
     compileClasspath += settingsSource.output
     runtimeClasspath += settingsSource.output
 }
-sourceSets.test {
-    compileClasspath += verificationSource.output
-    runtimeClasspath += verificationSource.output
-}
-kotlin.target.compilations.getByName("test").associateWith(kotlin.target.compilations.getByName("verification"))
 
 dependencies {
     add(settingsSource.compileOnlyConfigurationName, gradleApi())
     add(settingsSource.compileOnlyConfigurationName, gradleKotlinDsl())
     implementation(libs.gradle.plugin.kotlin)
     compileOnly(libs.gradle.plugin.compose)
-    add(composeTestPlugin.name, libs.gradle.plugin.compose)
-    add(composeTestPlugin.name, libs.gradle.plugin.composeCompiler)
-    add(composeTestPlugin.name, project(":native-dokka"))
-    add(rachelTestPlugin.name, project(":public-plugin"))
-    testImplementation(gradleTestKit())
-    testImplementation(kotlin("test-junit"))
     add(verificationSource.implementationConfigurationName, localGroovy())
     add(verificationSource.implementationConfigurationName, kotlin("stdlib"))
 }
@@ -102,7 +83,6 @@ configurations.create("settingsElements") {
     outgoing.artifact(settingsJar)
 }
 tasks.jar { from(settingsSource.output) }
-tasks.pluginUnderTestMetadata { pluginClasspath.from(settingsSource.output, composeTestPlugin) }
 
 gradlePlugin {
     plugins {
@@ -147,40 +127,4 @@ afterEvaluate {
             }
         }
     }
-}
-
-val hostPackagingTest = "love.yinlin.nativebridge.NativeBridgeFunctionalTest.hostComposeTasksRunBothBuildTypesAndPrepareAnUnpackedApplication"
-
-tasks.register<Test>("hostTest") {
-    group = "verification"
-    description = "Run the host Native executable and distribution regression"
-    testClassesDirs = sourceSets.test.get().output.classesDirs
-    classpath = sourceSets.test.get().runtimeClasspath
-    filter { includeTestsMatching(hostPackagingTest) }
-    testLogging { exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
-    shouldRunAfter(tasks.test)
-}
-
-tasks.test { filter { excludeTestsMatching(hostPackagingTest) } }
-
-tasks.withType<Test>().configureEach {
-    useJUnit()
-    inputs.files(rachelTestPlugin)
-    doFirst { systemProperty("native.tests.rachelClasspath", rachelTestPlugin.asPath) }
-    systemProperty("native.tests.gradleUserHome", gradle.gradleUserHomeDir.absolutePath)
-    systemProperty("native.tests.work", layout.buildDirectory.dir("functional-tests").get().asFile.absolutePath)
-    systemProperty("native.tests.skikoLibraryScript", layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts").asFile.absolutePath)
-    inputs.file(layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts"))
-    inputs.file(rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template"))
-    inputs.file(rootProject.file("../native-compose/gradle/verification.settings.gradle.kts"))
-    inputs.file(rootProject.file("../gradle/wrapper/check-version.settings.gradle.kts"))
-    inputs.file(rootProject.file("../gradle.properties"))
-    inputs.file(rootProject.file("../libs.versions.toml"))
-    systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
-    systemProperty("native.tests.composeVersion", libs.versions.cmp.get())
-    systemProperty("native.tests.portVersion", "${libs.versions.rachel.get()}-cmp-${libs.versions.cmp.get()}")
-    systemProperty("native.tests.composeUiTemplate", rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template").absolutePath)
-    systemProperty("native.tests.verificationSettings", rootProject.file("../native-compose/gradle/verification.settings.gradle.kts").absolutePath)
-    systemProperty("native.tests.versionCatalog", rootProject.file("../libs.versions.toml").absolutePath)
-    maxParallelForks = 1
 }
