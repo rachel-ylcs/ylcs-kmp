@@ -14,6 +14,15 @@ internal class NativeSourceCatalog(private val repository: File, val file: File 
         return text.substring(sections[index].range.last + 1, sections.getOrNull(index + 1)?.range?.first ?: text.length)
     }
     val versions: Map<String, String> = Regex("(?m)^([A-Za-z0-9_.-]+)\\s*=\\s*\"([^\"]+)\"\\s*$").findAll(section("versions")).associate { it.groupValues[1] to it.groupValues[2] }
+
+    /** Source releases select a workspace; compilation dependencies keep their own Gradle identity. */
+    fun upstreamVersions(modules: SourceObject): Map<String, String> = (listOf("kotlin", "cmp", "skiko", "sdl", "icu") +
+        modules.values.map { it.sourceObject()["versionRef"] as? String ?: "cmp" }).distinct().sorted().associateWith { name ->
+        versions.getValue(name).also {
+            check(Regex("[0-9]+(?:[.][0-9]+)+(?:-[A-Za-z0-9.-]+)?").matches(it)) { "Invalid upstream version for $name: $it" }
+        }
+    }
+
     val libraries: Map<String, Pair<String, String>> = Regex("(?m)^([A-Za-z0-9_.-]+)\\s*=\\s*\\{([^\r\n]+)}\\s*$").findAll(section("libraries")).mapNotNull { match ->
         val fields = Regex("([A-Za-z0-9_.-]+)\\s*=\\s*\"([^\"]+)\"").findAll(match.groupValues[2]).associate { it.groupValues[1] to it.groupValues[2] }
         val module = fields["module"] ?: fields["group"]?.let { group -> fields["name"]?.let { "$group:$it" } } ?: return@mapNotNull null

@@ -19,7 +19,7 @@ check(generation.toPath().startsWith(nativeDirectory.toPath()) && state["catalog
     JsonSlurper().parse(generation.resolve("ready.json")) == state) { "Prepare the current Native sources before running verification." }
 val marker = JsonSlurper().parse(generation.resolve(".rachel-generation.json")) as Map<*, *>
 check(marker["sha256"] == hash) { "The Native generation marker does not match the selected workspace." }
-val inputs = (marker["identity"] as Map<*, *>)["inputs"] as Map<*, *>
+val inputs = state["inputs"] as? Map<*, *> ?: error("Native preparation input snapshot is missing. Prepare the current Native sources before running verification.")
 val repository = nativeDirectory.parentFile
 for ((path, expected) in inputs) {
     val input = repository.resolve(path as String).canonicalFile
