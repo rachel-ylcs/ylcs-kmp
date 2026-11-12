@@ -1,7 +1,9 @@
 package love.yinlin.nativebridge
 
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.konan.target.HostManager
+import love.yinlin.nativebridge.verification.digest
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -14,6 +16,37 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class NativeBridgeFunctionalTest {
+    @Test
+    fun mavenVerificationUsesThePreparationSnapshotAndStillRejectsStaleInputs() {
+        val repository = project()
+        repository.resolve("gradle.properties").appendText("rachel.kotlin.compilerArgs=-Xexpect-actual-classes\n")
+        val catalog = repository.resolve("libs.versions.toml").apply {
+            writeText("[versions]\ngradle = \"${GradleVersion.current().version}\"\nkotlin = \"2.5.0-RC\"\n")
+        }
+        val native = repository.resolve("native-compose")
+        val input = native.resolve("upstream/source.json").apply {
+            parentFile.mkdirs()
+            writeText("{}")
+        }
+        val hash = "a".repeat(64)
+        val generation = native.resolve("vendor/g/${hash.take(24)}").apply { mkdirs() }
+        generation.resolve(".rachel-generation.json").writeText("""{"sha256":"$hash","identity":{"kotlin":"2.5.0-RC"}}""")
+        val state = """{"directory":"vendor/g/${hash.take(24)}","sha256":"$hash","catalogSha256":"${catalog.digest("SHA-256")}","inputs":{"native-compose/upstream/source.json":"${input.digest("SHA-256")}"}}"""
+        native.resolve("vendor/current.json").writeText(state)
+        generation.resolve("ready.json").writeText(state)
+        File(System.getProperty("native.tests.verificationSettings")).copyTo(native.resolve("gradle/verification.settings.gradle.kts"))
+        val consumer = native.resolve("verification/consumer").apply { mkdirs() }
+        consumer.resolve("settings.gradle.kts").writeText("apply(from = \"../../gradle/verification.settings.gradle.kts\")\nrootProject.name = \"verification-consumer\"\n")
+        assertContains(runner(consumer, "help", "--offline").build().output, "BUILD SUCCESSFUL")
+        native.resolve("adaptation/fixture/src/nativeMain/kotlin/Local.kt").apply {
+            parentFile.mkdirs()
+            writeText("// changed adaptation source")
+        }
+        assertContains(runner(consumer, "help", "--offline").build().output, "BUILD SUCCESSFUL")
+        input.writeText("{\"changed\":true}")
+        assertContains(runner(consumer, "help", "--offline").buildAndFail().output, "Native input changed: native-compose/upstream/source.json")
+    }
+
     @Test
     fun explicitNativeResourcesGenerateAccessorsAndRespectAnExplicitOptOut() {
         val composeVersion = System.getProperty("native.tests.portVersion")

@@ -127,7 +127,7 @@ class NativeUpstreamSync(directory: File) {
         prepareSkiko(generation, skikoArchive.file, skiko, sdl, sdk)
         ComposeSourceSync(this, generation, compose).prepare(core, resources, maven)
         check(catalog.file.sourceHash() == catalogHash && inputHashes() == inputs) { "Native synchronization inputs changed during preparation; retry synchronization." }
-        val current = mapOf("directory" to generation.relativeTo(nativeDirectory).invariantSeparatorsPath, "sha256" to hash, "catalogSha256" to catalogHash)
+        val current = mapOf("directory" to generation.relativeTo(nativeDirectory).invariantSeparatorsPath, "sha256" to hash, "catalogSha256" to catalogHash, "inputs" to inputs)
         writeSource(vendor, generation.resolve("ready.json"), sourceBytes(current))
         writeSource(vendor, vendor.resolve("current.json"), sourceBytes(current))
         println("Prepared Native Compose $cmpVersion / Skiko $skikoVersion / SDL $sdlVersion: $generation")
