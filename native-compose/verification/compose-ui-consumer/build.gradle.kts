@@ -21,8 +21,6 @@ tasks.configureEach { inputs.property("rachel.native.generation", generation.nam
 layout.buildDirectory.set(generation.resolve("build/compose-ui/maven-consumer"))
 val explicit = providers.gradleProperty("native.explicit").getOrElse("false").toBoolean()
 
-apply(from = "../../gradle/compiler-warnings.gradle.kts")
-
 val kotlinLanguage = KotlinVersion.fromVersion(libs.versions.kotlin.get().split('.').take(2).joinToString("."))
 val compilerProfile = gradle.extensions.extraProperties
 
