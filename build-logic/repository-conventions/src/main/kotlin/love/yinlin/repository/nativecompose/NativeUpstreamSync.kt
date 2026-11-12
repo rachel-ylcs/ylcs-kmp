@@ -229,13 +229,21 @@ class NativeUpstreamSync(directory: File) {
 
     private fun refreshSkikoBuild(destination: File, record: File, skiko: SourceObject, sdl: SourceObject) {
         stage(".skiko-build-") { staging ->
+            val upstreamScripts = record.sourceJson()["fileHashes"].sourceObject().keys.filter { it.endsWith(".gradle.kts") }
             val files = mutableSetOf("dependencies.toml", "skiko/gradle.properties", "skiko/buildSrc/build.gradle.kts", "LICENSE", "NOTICE")
+            files.addAll(upstreamScripts)
             files.addAll(destination.walkTopDown().onEnter { it.name !in setOf("build", ".gradle", ".git", ".kotlin", "dependencies") }.filter {
                 it.name == "gradle-wrapper.properties" && it.parentFile.name == "wrapper" && it.parentFile.parentFile.name == "gradle"
             }.map { it.relativeTo(destination).invariantSeparatorsPath })
             for (relative in files) destination.resolve(relative).copyTo(staging.resolve(relative))
             catalog.alignUpstreamCatalog(staging.resolve("dependencies.toml"))
             updateSkikoProfile(staging, skiko)
+            val suppressWarnings = "@file:Suppress(\"warnings\")\n\n"
+            for (relative in upstreamScripts) {
+                val script = staging.resolve(relative)
+                val source = script.readText()
+                if (!source.startsWith(suppressWarnings)) script.writeText(suppressWarnings + source)
+            }
             catalog.copyWrappers(staging)
             prepareNotices(staging, skiko, sdl)
             workspace.updateGenerated(staging, destination, record)
