@@ -13,17 +13,11 @@ class NativeSourceInputsTest {
     @get:Rule val temporary = TemporaryFolder()
 
     @Test
-    fun offlineArchiveLookupSeparatesVersionsAndRejectsCorruptedBytes() {
+    fun offlineArchiveLookupMigratesReceiptsAndOnlyRequiresBytesOnDemand() {
         val repository = temporary.root
-        repository.resolve("libs.versions.toml").writeText("[versions]\nsdl = \"3.4.20\"\n[libraries]\n")
-        repository.resolve("settings.gradle.kts").writeText("repository { rachel { jvm { version = 25 } } }")
         val nativeDirectory = repository.resolve("native-compose")
-        nativeDirectory.resolve("upstream/patches/manifest.json").apply {
-            parentFile.mkdirs()
-            writeText("{}")
-        }
-        val sync = NativeUpstreamSync(nativeDirectory)
-        val sources = NativeSourceInputs(sync, offline = true)
+        val vendor = nativeDirectory.resolve("vendor").apply { mkdirs() }
+        val sources = NativeSourceInputs(vendor, offline = true, staging = temporary.newFolder("inputs"))
         val oldOutput = nativeDirectory.resolve("vendor/sdl-static/mingw_x64/lib/SDL3-static.lib").apply {
             parentFile.mkdirs()
             writeText("legacy SDK")
@@ -44,11 +38,42 @@ class NativeSourceInputsTest {
         val selected = cached("3.4.20")
         assertNotEquals(old, sources.archive("sdl", "3.4.20", url("3.4.20"), 1024).file)
         selected.writeText("corrupted")
-        val corrupt = assertFailsWith<IllegalStateException> { sources.archive("sdl", "3.4.20", url("3.4.20"), 1024) }
+        val corrupt = assertFailsWith<IllegalStateException> { sources.archive("sdl", "3.4.20", url("3.4.20"), 1024).file }
         assertTrue(corrupt.message.orEmpty().contains("SHA-256 mismatch"))
+        val key = bytesHash(url("3.4.20").toByteArray())
+        assertTrue(vendor.resolve("metadata/sdl/3.4.20/$key.json").isFile)
+        assertTrue(selected.delete())
+        assertTrue(selected.resolveSibling("$key.json").delete())
+        val receiptOnly = sources.archive("sdl", "3.4.20", url("3.4.20"), 1024)
+        assertEquals(sha, receiptOnly.metadata["sha256"])
+        assertFailsWith<IllegalStateException> { receiptOnly.file }
         assertEquals("legacy SDK", oldOutput.readText())
         assertTrue(old.isFile)
         assertFalse(nativeDirectory.resolve("vendor/current.json").exists())
+    }
+
+    @Test
+    fun offlineGitLookupMigratesProvenanceWithoutRequiringTheRawTree() {
+        val vendor = temporary.newFolder("vendor")
+        val inputs = NativeSourceInputs(vendor, offline = true, staging = temporary.newFolder("inputs"))
+        val repository = "JetBrains/compose-multiplatform"
+        val version = "1.13.0-beta02"
+        val ref = "refs/tags/v$version"
+        val paths = listOf("components/resources/library")
+        val selected = listOf("LICENSE.txt") + paths
+        val selector = bytesHash(sourceBytes(listOf("https://github.com/$repository.git", ref, selected)))
+        val legacy = vendor.resolve("git/resources/$version/$selector.json").apply { parentFile.mkdirs() }
+        val files = mapOf("LICENSE.txt" to bytesHash("license".toByteArray()))
+        val metadata = mapOf("repository" to repository, "version" to version, "ref" to ref, "paths" to selected,
+            "commit" to "a".repeat(40), "sha256" to bytesHash(sourceBytes(files)))
+        legacy.writeBytes(sourceBytes(metadata + ("files" to files)))
+
+        assertEquals(metadata, inputs.gitTree("resources", repository, version, paths).metadata)
+        assertEquals(metadata, vendor.resolve("metadata/resources/$version/$selector.json").sourceJson())
+        assertTrue(legacy.delete())
+        val tree = inputs.gitTree("resources", repository, version, paths)
+        assertEquals(metadata, tree.metadata)
+        assertFailsWith<IllegalStateException> { tree.snapshot }
     }
 
     @Test

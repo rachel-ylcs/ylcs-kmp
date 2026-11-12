@@ -58,7 +58,8 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync, private v
         val identity = tree.metadata + ("patch" to sync.patches.manifest[name])
         if (sync.workspace.reusable(destination, record, identity)) return
         sync.stage(".compose-source-") { staging ->
-            for (relative in tree.files.keys) tree.directory.resolve(relative).copyTo(staging.resolve(relative))
+            val snapshot = tree.snapshot
+            for (relative in snapshot.files) snapshot.directory.resolve(relative).copyTo(staging.resolve(relative))
             sync.patches.apply(staging, sync.patches.manifest[name].sourceObject())
             sync.workspace.synchronize(staging, destination, record, identity)
         }

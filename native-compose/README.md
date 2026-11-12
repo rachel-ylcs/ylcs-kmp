@@ -43,11 +43,13 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 ./gradlew :native-compose:verifyHost
 ```
 
-`prepareNativeSources` 按版本目录解析 Git 标签和发布归档，计算 SHA-256，核对上游提供的摘要（如有），并校验本地缓存内容，再应用补丁、生成来源记录和 included builds。根 Gradle Sync 自动执行同一准备过程；准备源码本身不执行 CMake 或库编译。需要使用 Native 库的任务会按需编译。离线模式需要本地已有当前版本的完整、可校验的上游输入。
+`prepareNativeSources` 按版本目录选择 Git 标签和发布归档，按需获取输入、校验 SHA-256、应用补丁并生成 included builds。同步时同时准备并校验已解压的宿主 Skia SDK，Skiko 构建直接读取其中的头文件和库。根 Gradle Sync 自动执行同一准备过程；准备源码本身不执行 CMake 或库编译。离线模式可复用当前版本已准备且通过校验的工作区。切换版本、修改补丁或补齐缺失文件时，若缺少所需原始输入，应联网重新准备。
 
-归档和 Git 源码缓存按版本和 SHA-256 存放在 `vendor/archives/` 和 `vendor/git/`。`vendor/g/<id>/` 只由实际选择上游源码的版本组合决定：`kotlin`、`cmp`、`skiko`、`sdl`、`icu`，以及 `upstream/compose.json` 中模块使用的 `versionRef`（当前为 `navigation3` 和 `material3-adaptive`）；Material3 主族跟随 `cmp`。其中包含 Skiko、Compose、ICU、SDL，以及此组合的 CMake、SDK、Gradle 输出和 Maven 验证仓库。修改 `adaptation` 中的 Kotlin/C++ 源码由 Gradle 按任务输入重新编译，不切换上游目录。框架版本、仅供编译的依赖、构建属性和 Wrapper 变化时，在原目录刷新生成的构建配置，保持未变源码的时间戳和已有构建输出。
+同步结束后，`vendor/metadata/` 保存版本、来源及摘要记录，`vendor/g/<id>/` 保存准备好的源码和 SDK。下载的归档和原始 Git 检出放在本次同步的临时目录内。首次使用新机制时可以复用旧缓存，成功准备后可删除旧的 `vendor/archives/` 和 `vendor/git/`；同步器在成功准备后也会删除当前宿主已校验的旧 Skia SDK ZIP。
 
-上游补丁或源码布局配置变化时，在原目录按组件更新相关文件，复用其他组件及已下载归档。源码记录继续校验 SHA-256，并在覆盖前拒绝未记录的本地修改。`vendor/current.json` 只在整套源码准备成功后更新，供独立验证和 CI 定位产物。切换到新的版本组合键时会首次建立新目录，旧版目录会保留；回滚版本可复用仍完整的对应缓存，同步器只清理自己创建的临时目录。
+`vendor/g/<id>/` 只由实际选择上游源码的版本组合决定：`kotlin`、`cmp`、`skiko`、`sdl`、`icu`，以及 `upstream/compose.json` 中模块使用的 `versionRef`（当前为 `navigation3` 和 `material3-adaptive`）；Material3 主族跟随 `cmp`。其中包含 Skiko、Compose、ICU、SDL，以及此组合的 CMake、SDK、Gradle 输出和 Maven 验证仓库。修改 `adaptation` 中的 Kotlin/C++ 源码由 Gradle 按任务输入重新编译，不切换上游目录。框架版本、仅供编译的依赖、构建属性和 Wrapper 变化时，在原目录刷新生成的构建配置，保持未变源码的时间戳和已有构建输出。
+
+上游补丁或源码布局配置变化时，按需重新获取受影响组件的原始输入，在原目录更新相关文件，复用其他组件。源码记录继续校验 SHA-256，并在覆盖前拒绝未记录的本地修改。`vendor/current.json` 只在整套源码准备成功后更新，供独立验证和 CI 定位产物。切换到新的版本组合键时会首次建立新目录，旧版目录会保留，回滚版本可复用仍完整的对应工作区。
 
 升级时修改版本目录即可触发同步。若新发布改变了补丁上下文、源码布局或 SDK 结构，准备过程会在不兼容的位置报错，此时需要更新对应适配。Windows 构建 SDL 需要 x64 MSVC、Windows SDK 和 Ninja：脚本会检查 Gradle 进程实际可见的编译器，必要时通过 `VS_PATH`、`SKIKO_VSBT_PATH`、`VSINSTALLDIR` 或 `vswhere` 找到安装，再初始化 `vcvars64.bat`。
 
@@ -61,7 +63,7 @@ Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实�
 
 `testHost` 执行当前宿主库测试；`publishHost` 输出到当前代的 `build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
 
-日常 Build/Test 通过共享的 `setup-build`、`setup-native` 动作恢复上游下载与 Kotlin/Native 工具链，再验证并准备当前代源码。桌面 Native 作业按当前代与宿主镜像恢复 SDL SDK。修改 `skikoMain`、`skikoTest` 也会触发三个桌面 Native 平台的框架测试。
+日常 Build/Test 通过共享的 `setup-build`、`setup-native` 动作恢复来源记录、已准备的源码和 Skia SDK，以及 Kotlin/Native 工具链，再验证并准备当前代源码。桌面 Native 作业按当前代与宿主镜像恢复 SDL SDK。修改 `skikoMain`、`skikoTest` 也会触发三个桌面 Native 平台的框架测试。
 
 [native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游配置及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
 

@@ -54,15 +54,14 @@ runs:
         key: native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-${{ inputs.tools }}
         restore-keys: |
           native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-
-    - name: Restore upstream source and SDK downloads
-      uses: actions/cache@v5
+    - name: Restore prepared upstream sources and Skia SDK
+      id: upstream
+      uses: actions/cache/restore@v5
       with:
         path: |
-          native-compose/vendor/archives
-          native-compose/vendor/git
-        key: native-inputs-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.native-inputs }}-${{ hashFiles('native-compose/upstream/*.json') }}
-        restore-keys: |
-          native-inputs-v1-${{ runner.os }}-${{ runner.arch }}-
+          native-compose/vendor/metadata
+          native-compose/vendor/g
+        key: native-upstream-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.native-inputs }}-${{ hashFiles('native-compose/upstream/**') }}
     - name: Linux desktop Native toolchain dependencies
       if: ${{ runner.os == 'Linux' && inputs.tools == 'true' }}
       shell: bash
@@ -103,6 +102,14 @@ runs:
           :repository-conventions:prepareNativeSources
         printf 'generation=native-compose/%s\n' "$(jq -er '.directory' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
         printf 'sha256=%s\n' "$(jq -er '.sha256' native-compose/vendor/current.json)" >> "$GITHUB_OUTPUT"
+    - name: Save prepared upstream sources and Skia SDK
+      if: ${{ steps.upstream.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v5
+      with:
+        path: |
+          native-compose/vendor/metadata
+          native-compose/vendor/g
+        key: ${{ steps.upstream.outputs.cache-primary-key }}
     - name: Restore the static SDL SDK for this generation
       if: ${{ inputs.tools == 'true' }}
       uses: actions/cache@v5

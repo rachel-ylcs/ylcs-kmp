@@ -66,7 +66,7 @@ internal class SourceWorkspace(private val vendor: File) {
         }
     }
 
-    fun synchronize(staging: File, destination: File, record: File, identity: SourceObject, preservedDirectories: Set<String> = emptySet()): Map<String, String> {
+    fun synchronize(staging: File, destination: File, record: File, identity: SourceObject, preservedDirectories: Set<String> = emptySet(), adoptMatchingFiles: Boolean = false): Map<String, String> {
         checkedSourcePath(vendor, destination)
         checkedSourcePath(vendor, record)
         preservedDirectories.forEach { sourceRelativePath(it) }
@@ -81,7 +81,9 @@ internal class SourceWorkspace(private val vendor: File) {
             for (existing in destination.walkTopDown().drop(1)) {
                 checkedSourcePath(vendor, existing)
                 val relative = existing.relativeTo(destination).invariantSeparatorsPath
-                check(preservedDirectories.any { relative == it || relative.startsWith("$it/") || (existing.isDirectory && it.startsWith("$relative/")) }) { "Unrecognized source workspace preserved: $existing" }
+                val managed = preservedDirectories.any { relative == it || relative.startsWith("$it/") || (existing.isDirectory && it.startsWith("$relative/")) }
+                val matching = adoptMatchingFiles && (existing.isDirectory || (relative in hashes && existing.isFile && existing.sourceHash() == hashes[relative]))
+                check(managed || matching) { "Unrecognized source workspace preserved: $existing" }
             }
         }
         val oldFiles = known?.keys ?: legacy?.map { it as String }?.toSet() ?: emptySet()
