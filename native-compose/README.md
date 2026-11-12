@@ -31,7 +31,7 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。
 
-根版本目录指定 Gradle 和 Kotlin 版本。根 Wrapper 的 `distributionUrl` 必须与目录一致，生成的上游工程复用该 Wrapper。Kotlin 源码统一使用目录中的 KGP，语言及 API 级别取该 Kotlin 版本的主次版本，实验参数取根 `gradle.properties`。`.gradle.kts` 脚本自身由当前 Gradle 发行版内嵌的 Kotlin 编译，编写脚本时要使用它支持的语法。
+Gradle 版本由根 `gradle/wrapper/gradle-wrapper.properties` 中的 `distributionUrl` 决定。独立验证从同一链接读取版本，生成的上游工程在源码准备时复制根 Wrapper。Kotlin 源码统一使用根版本目录中的 KGP，语言及 API 级别取该 Kotlin 版本的主次版本，实验参数取根 `gradle.properties`。`.gradle.kts` 脚本自身由当前 Gradle 发行版内嵌的 Kotlin 编译，编写脚本时要使用它支持的语法。
 
 桥插件为本地源码消费单独生成项目结构元数据：保留发布坐标，并为实际选中的源码项目补充其 Gradle group/name 身份，兼容 Kotlin 在同一 build 和跨 included build 时使用的不同匹配方式。该文件仅替换 KGP 的 `kotlinProjectStructureMetadata` secondary variant；Maven publication 和 metadata JAR 继续使用原始发布元数据。通过 `ExportLib`／`api` 传递的依赖可沿模块链导入共享 Native 源码，不需要消费模块重复声明 Compose 子工件。
 
@@ -46,6 +46,8 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 `prepareNativeSources` 按版本目录选择 Git 标签和发布归档，按需获取输入、校验 SHA-256、应用补丁并生成 included builds。同步时同时准备并校验已解压的宿主 Skia SDK，Skiko 构建直接读取其中的头文件和库。根 Gradle Sync 自动执行同一准备过程；准备源码本身不执行 CMake 或库编译。离线模式可复用当前版本已准备且通过校验的工作区。切换版本、修改补丁或补齐缺失文件时，若缺少所需原始输入，应联网重新准备。
 
 同步结束后，`vendor/metadata/` 保存版本、来源及摘要记录，`vendor/g/<id>/` 保存准备好的源码和 SDK。下载的归档和原始 Git 检出放在本次同步的临时目录内。首次使用新机制时可以复用旧缓存，成功准备后可删除旧的 `vendor/archives/` 和 `vendor/git/`；同步器在成功准备后也会删除当前宿主已校验的旧 Skia SDK ZIP。
+
+同步输入未变且工作区校验通过时，直接复用现有源码、SDK 和 Skiko 构建脚本。只有需要下载、检出、解包或更新生成文件时才创建对应的临时目录。Skiko 的 `clean` 保留由源码同步管理的 Skia SDK。
 
 `vendor/g/<id>/` 只由实际选择上游源码的版本组合决定：`kotlin`、`cmp`、`skiko`、`sdl`、`icu`，以及 `upstream/compose.json` 中模块使用的 `versionRef`（当前为 `navigation3` 和 `material3-adaptive`）；Material3 主族跟随 `cmp`。其中包含 Skiko、Compose、ICU、SDL，以及此组合的 CMake、SDK、Gradle 输出和 Maven 验证仓库。修改 `adaptation` 中的 Kotlin/C++ 源码由 Gradle 按任务输入重新编译，不切换上游目录。框架版本、仅供编译的依赖、构建属性和 Wrapper 变化时，在原目录刷新生成的构建配置，保持未变源码的时间戳和已有构建输出。
 

@@ -34,28 +34,30 @@ class NativeUpstreamSync(directory: File) {
             files.addAll(repository.resolve(relative).walkTopDown().filter { it.isFile })
         }
         files.addAll(listOf("native-compose/build.gradle.kts", ".gitattributes", "settings.gradle.kts", "gradle.properties", "gradle/wrapper/gradle-wrapper.properties",
-            "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map(repository::resolve))
+            "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/check-version.settings.gradle.kts", "gradlew", "gradlew.bat").map(repository::resolve))
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
 
     internal fun <T> stage(prefix: String, action: (File) -> T): T {
         val directory = Files.createTempDirectory(vendor.toPath(), prefix).toFile()
         try { return action(directory) }
-        finally {
-            checkedSourcePath(vendor, directory)
-            check(directory.parentFile.canonicalFile == vendor.canonicalFile && directory.name.startsWith(prefix))
-            if (File.separatorChar == '\\') {
-                // Git can mark loose objects and packs read-only on Windows.
-                Files.walk(directory.toPath()).use { paths ->
-                    paths.filter { Files.isRegularFile(it, java.nio.file.LinkOption.NOFOLLOW_LINKS) }.forEach {
-                        val attributes = Files.getFileAttributeView(it, java.nio.file.attribute.DosFileAttributeView::class.java, java.nio.file.LinkOption.NOFOLLOW_LINKS)
-                        if (attributes.readAttributes().isReadOnly) attributes.setReadOnly(false)
-                    }
+        finally { removeStage(directory, prefix) }
+    }
+
+    private fun removeStage(directory: File, prefix: String) {
+        checkedSourcePath(vendor, directory)
+        check(directory.parentFile.canonicalFile == vendor.canonicalFile && directory.name.startsWith(prefix))
+        if (File.separatorChar == '\\') {
+            // Git can mark loose objects and packs read-only on Windows.
+            Files.walk(directory.toPath()).use { paths ->
+                paths.filter { Files.isRegularFile(it, java.nio.file.LinkOption.NOFOLLOW_LINKS) }.forEach {
+                    val attributes = Files.getFileAttributeView(it, java.nio.file.attribute.DosFileAttributeView::class.java, java.nio.file.LinkOption.NOFOLLOW_LINKS)
+                    if (attributes.readAttributes().isReadOnly) attributes.setReadOnly(false)
                 }
             }
-            Files.walk(directory.toPath()).use { paths ->
-                paths.sorted(Comparator.reverseOrder()).forEach { Files.delete(it) }
-            }
+        }
+        Files.walk(directory.toPath()).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { Files.delete(it) }
         }
     }
 
@@ -65,7 +67,12 @@ class NativeUpstreamSync(directory: File) {
 
     /** Returns the exact generation prepared for this Gradle invocation. */
     fun prepare(offline: Boolean = false): File = workspace.locked(vendor) {
-        stage(".inputs-") { staging -> prepare(NativeSourceInputs(vendor, offline, staging)) }
+        val prefix = ".inputs-"
+        val staging = lazy { Files.createTempDirectory(vendor.toPath(), prefix).toFile() }
+        try { prepare(NativeSourceInputs(vendor, offline) { staging.value }) }
+        finally {
+            if (staging.isInitialized()) removeStage(staging.value, prefix)
+        }
     }
 
     private fun prepare(resolver: NativeSourceInputs): File {
@@ -127,6 +134,8 @@ class NativeUpstreamSync(directory: File) {
         if (!owner.isFile) writeSource(vendor, owner, sourceBytes(mapOf("sha256" to hash, "identity" to versions)))
         // This directory is reused across configuration and patch changes; a failed refresh is not ready.
         val ready = checkedSourcePath(vendor, generation.resolve("ready.json"))
+        val previous = if (ready.isFile) ready.sourceJson() else emptyMap()
+        val refreshSkiko = previous["sha256"] != hash || previous["catalogSha256"] != catalogHash || previous["inputs"] != inputs
         check(!ready.exists() || ready.delete()) { "Cannot invalidate Native source readiness: $ready" }
         writeMetadata(generation, "skiko", skiko)
         writeMetadata(generation, "compose", compose)
@@ -135,7 +144,7 @@ class NativeUpstreamSync(directory: File) {
         prepareIcu(generation, icuVersion, icuArchive, sdk.getValue(runtime.getValue("archive") as String), runtime, skia)
         val hostArchive = sdk.getValue(host)
         prepareSkia(generation, host, hostSdk.resolveSibling(hostSdk.nameWithoutExtension), hostArchive)
-        prepareSkiko(generation, skikoArchive, skiko, sdl)
+        prepareSkiko(generation, skikoArchive, skiko, sdl, refreshSkiko)
         ComposeSourceSync(this, generation, compose).prepare(core, resources, maven)
         check(catalog.file.sourceHash() == catalogHash && inputHashes() == inputs) { "Native synchronization inputs changed during preparation; retry synchronization." }
         if (hostSdk.isFile && hostSdk.sourceHash() == hostArchive.metadata["sha256"]) {
@@ -200,11 +209,12 @@ class NativeUpstreamSync(directory: File) {
         }
     }
 
-    private fun prepareSkiko(generation: File, archive: NativeSourceInputs.Archive, skiko: SourceObject, sdl: SourceObject) {
+    private fun prepareSkiko(generation: File, archive: NativeSourceInputs.Archive, skiko: SourceObject, sdl: SourceObject, refreshBuild: Boolean) {
         val destination = generation.resolve("skiko/workspace")
         val record = generation.resolve("skiko/files.json")
         val identity = mapOf("sourceSha256" to skiko["source"].sourceObject()["sha256"], "patch" to patches.manifest["skiko"], "originsSha256" to skikoOrigins.sourceHash())
-        if (!workspace.reusable(destination, record, identity)) stage(".skiko-") { staging ->
+        val reusable = workspace.reusable(destination, record, identity)
+        if (!reusable) stage(".skiko-") { staging ->
             SourceArchive.extract(archive.file, staging, true)
             patches.apply(staging, patches.manifest["skiko"].sourceObject())
             for (module in listOf("skiko", "skiko/skiko-skottie")) {
@@ -224,7 +234,7 @@ class NativeUpstreamSync(directory: File) {
             removeShadows(staging)
             workspace.synchronize(staging, destination, record, identity, setOf("skiko/dependencies/skia"))
         }
-        refreshSkikoBuild(destination, record, skiko, sdl)
+        if (!reusable || refreshBuild) refreshSkikoBuild(destination, record, skiko, sdl)
     }
 
     private fun refreshSkikoBuild(destination: File, record: File, skiko: SourceObject, sdl: SourceObject) {
@@ -244,6 +254,9 @@ class NativeUpstreamSync(directory: File) {
                 val source = script.readText()
                 if (!source.startsWith(suppressWarnings)) script.writeText(suppressWarnings + source)
             }
+            // The SDK is owned by source preparation and must survive Skiko's Gradle clean.
+            val upstreamBuild = staging.resolve("skiko/rachel-upstream.gradle.kts")
+            upstreamBuild.writeText(upstreamBuild.readText().replace(Regex("""(?m)^[ \t]*delete\(skiko\.dependenciesDir\)[ \t]*\r?\n"""), ""))
             catalog.copyWrappers(staging)
             prepareNotices(staging, skiko, sdl)
             workspace.updateGenerated(staging, destination, record)
@@ -270,7 +283,10 @@ class NativeUpstreamSync(directory: File) {
             |    inputs.property("rachel.native.generation", projectDir.resolve("../../../..").canonicalFile.name)
             |}
         """.trimMargin() + "\n"
-        buildSrc.writeText(if (generationInputs in buildScript) buildScript else buildScript + generationInputs)
+        val suppressBuildSrcWarnings = "\nkotlin.compilerOptions.suppressWarnings.set(true)\n"
+        var updatedScript = if (generationInputs in buildScript) buildScript else buildScript + generationInputs
+        if (suppressBuildSrcWarnings !in updatedScript) updatedScript += suppressBuildSrcWarnings
+        buildSrc.writeText(updatedScript)
     }
 
     private fun prepareNotices(directory: File, skiko: SourceObject, sdl: SourceObject) {

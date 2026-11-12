@@ -17,7 +17,7 @@ class NativeSourcesLauncherTest {
             val log = work.resolve("launcher.log")
             val original = File(checkNotNull(System.getProperty("native.sources.repositoryRoot")))
             for (relative in listOf("native-compose/build.gradle.kts", ".gitattributes", "gradle.properties",
-                "gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat")) {
+                "gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/check-version.settings.gradle.kts", "gradlew", "gradlew.bat")) {
                 original.resolve(relative).copyTo(work.resolve(relative))
             }
             work.resolve("libs.versions.toml").writeText("[versions]\nkotlin = \"2.5.0-RC\"\ncmp = \"1.13.0-beta02\"\nskiko = \"0.156.1\"\nsdl = \"3.4.20\"\nicu = \"78.2\"\n[libraries]\n")

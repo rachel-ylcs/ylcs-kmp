@@ -11,7 +11,7 @@ import java.security.MessageDigest
 import java.time.Duration
 
 /** The reference records are local download receipts, never a second source of versions. */
-internal class NativeSourceInputs(private val vendor: File, private val offline: Boolean, private val staging: File) {
+internal class NativeSourceInputs(private val vendor: File, private val offline: Boolean, private val staging: () -> File) {
     private val client by lazy {
         HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).followRedirects(HttpClient.Redirect.NORMAL).build()
     }
@@ -64,7 +64,7 @@ internal class NativeSourceInputs(private val vendor: File, private val offline:
 
     private fun download(uri: URI, version: String, maximum: Long, key: String, expected: String?): Archive {
         check(!offline) { "Offline upstream archive is missing: $uri" }
-        val temporary = staging.resolve("$key.zip")
+        val temporary = staging().resolve("$key.zip")
         val releaseHash = releaseDigest(uri)
         val response = client.send(HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(5)).GET().build(), HttpResponse.BodyHandlers.ofInputStream())
         val advertised = releaseHash ?: response.headers().firstValue("X-Checksum-Sha256").orElse(null)
@@ -154,7 +154,7 @@ internal class NativeSourceInputs(private val vendor: File, private val offline:
 
     private fun fetchGitTree(name: String, repository: String, version: String, url: String, ref: String, paths: List<String>, selected: List<String>, expected: SourceObject?): GitTree {
         check(!offline) { "Offline Git sources are missing: $repository@$ref" }
-        val checkout = staging.resolve("git-${sourceRelativePath(name)}").apply { mkdirs() }
+        val checkout = staging().resolve("git-${sourceRelativePath(name)}").apply { mkdirs() }
         sourceGit(checkout, "init", "-q")
         sourceGit(checkout, "config", "core.autocrlf", "false")
         sourceGit(checkout, "remote", "add", "origin", url)

@@ -21,8 +21,13 @@ class NativeBridgeFunctionalTest {
         val repository = project()
         repository.resolve("gradle.properties").appendText("rachel.kotlin.compilerArgs=-Xexpect-actual-classes\n")
         val catalog = repository.resolve("libs.versions.toml").apply {
-            writeText("[versions]\ngradle = \"${GradleVersion.current().version}\"\nkotlin = \"2.5.0-RC\"\n")
+            writeText("[versions]\nkotlin = \"2.5.0-RC\"\n")
         }
+        val checkVersion = "gradle/wrapper/check-version.settings.gradle.kts"
+        File(System.getProperty("native.tests.versionCatalog")).resolveSibling(checkVersion).copyTo(repository.resolve(checkVersion))
+        val wrapper = repository.resolve("gradle/wrapper/gradle-wrapper.properties")
+        val distributionUrl = "distributionUrl=https\\://services.gradle.org/distributions/gradle-${GradleVersion.current().version}-all.zip\n"
+        wrapper.writeText(distributionUrl)
         val native = repository.resolve("native-compose")
         val input = native.resolve("upstream/source.json").apply {
             parentFile.mkdirs()
@@ -43,6 +48,9 @@ class NativeBridgeFunctionalTest {
             writeText("// changed adaptation source")
         }
         assertContains(runner(consumer, "help", "--offline").build().output, "BUILD SUCCESSFUL")
+        wrapper.writeText("distributionUrl=https://services.gradle.org/distributions/gradle-0.0-bin.zip\n")
+        assertContains(runner(consumer, "help", "--offline").buildAndFail().output, "The Wrapper requires Gradle 0.0")
+        wrapper.writeText(distributionUrl)
         input.writeText("{\"changed\":true}")
         assertContains(runner(consumer, "help", "--offline").buildAndFail().output, "Native input changed: native-compose/upstream/source.json")
     }

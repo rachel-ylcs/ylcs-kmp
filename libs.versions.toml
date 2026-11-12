@@ -13,8 +13,6 @@ rachelMinimumCode = "370"
 # ----- [Plugin] ----- #
 
 kotlin = "2.5.0-RC"
-#noinspection UnusedVersionCatalogEntry
-gradle = "9.8.2"
 agp = "9.3.3"
 cmp = "1.13.0-beta02"
 mavenPublish = "0.37.0"

@@ -17,7 +17,7 @@ class NativeSourceInputsTest {
         val repository = temporary.root
         val nativeDirectory = repository.resolve("native-compose")
         val vendor = nativeDirectory.resolve("vendor").apply { mkdirs() }
-        val sources = NativeSourceInputs(vendor, offline = true, staging = temporary.newFolder("inputs"))
+        val sources = NativeSourceInputs(vendor, offline = true) { throw AssertionError("Offline archive lookup created a download staging directory") }
         val oldOutput = nativeDirectory.resolve("vendor/sdl-static/mingw_x64/lib/SDL3-static.lib").apply {
             parentFile.mkdirs()
             writeText("legacy SDK")
@@ -55,7 +55,7 @@ class NativeSourceInputsTest {
     @Test
     fun offlineGitLookupMigratesProvenanceWithoutRequiringTheRawTree() {
         val vendor = temporary.newFolder("vendor")
-        val inputs = NativeSourceInputs(vendor, offline = true, staging = temporary.newFolder("inputs"))
+        val inputs = NativeSourceInputs(vendor, offline = true) { throw AssertionError("Offline Git lookup created a checkout staging directory") }
         val repository = "JetBrains/compose-multiplatform"
         val version = "1.13.0-beta02"
         val ref = "refs/tags/v$version"

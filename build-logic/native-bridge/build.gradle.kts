@@ -173,6 +173,7 @@ tasks.withType<Test>().configureEach {
     inputs.file(layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts"))
     inputs.file(rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template"))
     inputs.file(rootProject.file("../native-compose/gradle/verification.settings.gradle.kts"))
+    inputs.file(rootProject.file("../gradle/wrapper/check-version.settings.gradle.kts"))
     inputs.file(rootProject.file("../gradle.properties"))
     inputs.file(rootProject.file("../libs.versions.toml"))
     systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
