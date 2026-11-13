@@ -17,10 +17,14 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.container.*
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.input.Filter
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderDpConverter
+import love.yinlin.compose.ui.input.SliderFloatConverter
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.enum
@@ -162,6 +166,52 @@ object ContainerPage : Page() {
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
+                }
+            }
+            Component("Watermark") {
+                var angle by rememberValueState(30f)
+                var alpha by rememberValueState(0.12f)
+                var space by rememberValueState(48.dp)
+                var clicks by rememberValueState(0)
+
+                ExampleRow(maxItemsInEachRow = 3) {
+                    Example("逆时针角度 · ${angle.toInt()}°", Modifier.weight(1f)) {
+                        Slider(angle, SliderFloatConverter(-60f, 60f), { angle = it }, onValueChange = { angle = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("不透明度 · ${(alpha * 100).toInt()}%", Modifier.weight(1f)) {
+                        Slider(alpha, SliderFloatConverter(0f, 0.4f), { alpha = it }, onValueChange = { alpha = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("标志间距 · ${space.value.toInt()}dp", Modifier.weight(1f)) {
+                        Slider(space, SliderDpConverter(8.dp, 96.dp), { space = it }, onValueChange = { space = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+
+                Watermark(
+                    modifier = Modifier.fillMaxWidth().height(Theme.size.cell3)
+                        .clip(Theme.shape.v3).background(Theme.color.backgroundVariant),
+                    mark = {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                            Icon(icon = Icons.VerifiedUser, color = Theme.color.primary)
+                            Text("RACHEL UI", color = Theme.color.primary)
+                        }
+                    },
+                    angle = angle,
+                    alpha = alpha,
+                    space = space,
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(Theme.padding.v8),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                            Text("内容始终清晰且可交互", color = Theme.color.onBackground)
+                            Text("水印只参与绘制，不遮挡下面的内容。", color = Theme.color.onBackgroundVariant)
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                            PrimaryTextButton("点击测试", onClick = { clicks++ })
+                            Text("已点击 ${clicks} 次", color = Theme.color.onBackground)
+                        }
+                    }
                 }
             }
         }
