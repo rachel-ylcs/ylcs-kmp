@@ -90,6 +90,7 @@ internal data class PageItem(
                 ComponentItem("ReplaceableBox", "添加内容后点击替换颜色，长按移除内容。"),
                 ComponentItem("AdderBox", "体验添加、替换与删除，最多展示九个项目。"),
                 ComponentItem("Banner", "四张图片每三秒自动切换，展示轮播中的裁剪与布局。"),
+                ComponentItem("Watermark", "在内容上平铺水印，调节逆时针角度、透明度与间距，测试下方按钮仍可点击。", "水印 叠加 重复 平铺 mark alpha angle space"),
             ]),
             PageItem("layout", Icons.GridOn, "布局", "Layout", "探索二维网格、位置偏移、操作对齐与横向滚动。", LayoutPage, PageGroup.Layout, [
                 ComponentItem("Grid", "对照官方指南，调节轨道尺寸、间距、放置、跨度和对齐，体验响应式命名区域、重叠与内嵌懒列表。", "GridLayoutBuilder GridLayoutScope x y sx sy s t item Fixed Percentage Float Flex Int Fr Auto MinContent MaxContent MinMax minmax 自动放置 隐式轨道 负索引 跨行 跨列 命名区域 响应式 zIndex LazyColumn intrinsic"),
