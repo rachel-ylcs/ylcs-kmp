@@ -25,6 +25,7 @@ permissions:
 jobs:
   changes:
     name: Detect Changes
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.body, 'gallery-preview:') }}
     runs-on: ubuntu-latest
     concurrency:
       group: gradle-distribution-${{ github.ref == 'refs/heads/main' && 'main' || github.run_id }}
