@@ -55,7 +55,7 @@ jobs:
       - name: Install screenshot tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y openbox xdotool scrot
+          sudo apt-get install -y openbox xdotool x11-utils scrot
           python -m pip install --disable-pip-version-check Pillow
 
       - name: Build, launch and capture Gallery
