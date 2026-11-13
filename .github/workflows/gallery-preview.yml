@@ -2,7 +2,7 @@ name: Gallery Preview
 
 on:
   pull_request:
-    branches: [main]
+    branches: [gallery-preview]
     types: [opened, synchronize, reopened, edited]
 
 permissions:
