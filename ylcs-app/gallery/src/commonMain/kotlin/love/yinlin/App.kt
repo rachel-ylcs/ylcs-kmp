@@ -41,6 +41,7 @@ var darkMode: Boolean by mutableStateOf(false)
 var currentPage: Page? by mutableRefStateOf(OverviewPage)
 val mainScope = MainScope()
 internal var galleryPalette: GalleryPalette by mutableStateOf(GalleryPalette.Framework)
+internal var galleryPreviewComponentTitle: String? = null
 
 @Composable
 fun App() {
