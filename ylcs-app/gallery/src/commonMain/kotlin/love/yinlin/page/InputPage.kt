@@ -206,11 +206,11 @@ object InputPage : Page() {
             }
 
             Component("StarBar") {
-                val normalState = rememberStarBarState(3f)
-                val halfState = rememberStarBarState(2.5f)
+                val normalState by rememberState { StarBarState(3) }
+                val halfState by rememberState { StarBarState(2.5) }
 
                 ExampleRow {
-                    Example("整星 · ${normalState.value}") {
+                    Example("整星 · ${normalState.value.toInt()}") {
                         StarBar(state = normalState)
                     }
 
@@ -219,7 +219,7 @@ object InputPage : Page() {
                     }
 
                     Example("7 颗 / 大尺寸") {
-                        StarBar(state = normalState, num = 7, modifier = Modifier.height(Theme.size.input7))
+                        StarBar(state = normalState, num = 7, modifier = Modifier.height(Theme.size.input8))
                     }
 
                     Example("已禁用") {

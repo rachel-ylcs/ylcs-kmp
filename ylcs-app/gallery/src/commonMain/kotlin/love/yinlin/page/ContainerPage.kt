@@ -187,14 +187,13 @@ object ContainerPage : Page() {
                 }
 
                 Watermark(
-                    modifier = Modifier.fillMaxWidth().height(Theme.size.cell3)
-                        .clip(Theme.shape.v3).background(Theme.color.backgroundVariant),
                     mark = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
                             Icon(icon = Icons.VerifiedUser, color = Theme.color.primary)
                             Text("RACHEL UI", color = Theme.color.primary)
                         }
                     },
+                    modifier = Modifier.fillMaxWidth().height(Theme.size.cell3).clip(Theme.shape.v3).background(Theme.color.backgroundVariant),
                     angle = angle,
                     alpha = alpha,
                     space = space,
@@ -209,7 +208,7 @@ object ContainerPage : Page() {
                         }
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
                             PrimaryTextButton("点击测试", onClick = { clicks++ })
-                            Text("已点击 ${clicks} 次", color = Theme.color.onBackground)
+                            Text("已点击 $clicks 次", color = Theme.color.onBackground)
                         }
                     }
                 }

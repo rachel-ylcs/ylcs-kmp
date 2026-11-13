@@ -9,20 +9,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.extension.staticLocalComposition
 import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Text
 
-private val LocalGallerySelectedComponentIndex = staticCompositionLocalOf { -1 }
+private val LocalGallerySelectedComponentIndex = staticLocalComposition { -1 }
 
 @Stable
 abstract class Page {
@@ -33,7 +32,7 @@ abstract class Page {
     protected fun ComponentColumn(alwaysShowTabs: Boolean = false, showTabs: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
         val components = PageItem.forPage(this@Page)?.components.orEmpty()
-        val selectedComponent = rememberSaveable { mutableIntStateOf(components.indexOfFirst { it.title == galleryPreviewComponentTitle }.coerceAtLeast(0)) }
+        val selectedComponent = rememberValueState(components.indexOfFirst { it.title == galleryPreviewComponentTitle }.coerceAtLeast(0))
         val selectedIndex = if (!showTabs || components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             Column(

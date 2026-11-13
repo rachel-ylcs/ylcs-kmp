@@ -28,7 +28,7 @@ private fun GameDetails.checkPlayable(uid: Int) {
 
 fun ServerScope.gameAPI() {
     ApiGameCreateGame.response { token, (val title, val type, val reward, val num, val cost, val info, val question, val answer) ->
-        checker {  // 检查游戏奖励与名额
+        checker { // 检查游戏奖励与名额
             NotEmpty check title
             True check GameConfig.checkReward(reward, num, cost)
         }

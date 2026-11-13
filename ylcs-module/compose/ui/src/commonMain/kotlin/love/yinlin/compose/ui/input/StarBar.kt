@@ -6,8 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -21,30 +19,50 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.progressBarRangeInfo
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.setProgress
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastRoundToInt
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.node.pointerIcon
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val STAR_SPACE_PERCENT = 0.15f
-
 @Stable
 class StarBarState(initialValue: Float = 0f) {
-    var value: Float by mutableFloatStateOf(initialValue)
-}
+    internal companion object {
+        const val SPACE_PERCENT = 0.15f
 
-@Composable
-fun rememberStarBarState(initialValue: Float = 0f): StarBarState = remember(initialValue) { StarBarState(initialValue) }
+        fun ratingAt(x: Float, height: Float, num: Int, half: Boolean): Float {
+            if (height <= 0f) return 0f
+
+            val stride = height * (1f + SPACE_PERCENT)
+            val index = (x.coerceAtLeast(0f) / stride).toInt().coerceIn(0, num - 1)
+            val fraction = ((x - index * stride) / height).coerceIn(0f, 1f)
+            return if (half && fraction < 0.5f) index + 0.5f else index + 1f
+        }
+
+        fun buildPath(height: Float): Path = Path().apply {
+            for (point in 0 ..< 10) {
+                val angle = point * PI / 5 - PI / 2
+                val halfHeight = height / 2
+                val radius = if (point % 2 == 0) halfHeight else height * 0.21f
+                val x = halfHeight + (cos(angle) * radius).toFloat()
+                val y = halfHeight + (sin(angle) * radius).toFloat()
+                if (point == 0) moveTo(x, y)
+                else lineTo(x, y)
+            }
+            close()
+        }
+    }
+
+    constructor(initialValue: Int) : this(initialValue.toFloat())
+    constructor(initialValue: Double) : this(initialValue.toFloat())
+
+    var value: Float by mutableFloatStateOf(initialValue)
+        internal set
+}
 
 /**
  * 星级评分条。点击当前评分对应的位置可清除评分。
@@ -68,36 +86,25 @@ fun StarBar(
 ) {
     require(num > 0) { "StarBar num must be positive" }
 
-    val defaultHeight = Theme.size.input8
+    val defaultHeight = Theme.size.input9
     val currentValue = state.value.coerceIn(0f, num.toFloat())
     val actualActiveColor = if (enable) activeColor else Theme.color.disabledContent
     val actualTrackColor = if (enable) trackColor else Theme.color.disabledContainer
-    var hoveredValue by remember(enable, num, half) { mutableStateOf<Float?>(null) }
+    var hoveredValue by rememberValueState(Float.NaN, enable, num, half)
 
     Layout(
         content = {},
         modifier = modifier
             .height(defaultHeight)
             .pointerIcon(PointerIcon.Hand, enabled = enable)
-            .semantics {
-                stateDescription = "${currentValue} / ${num}"
-                progressBarRangeInfo = ProgressBarRangeInfo(currentValue, 0f .. num.toFloat(), if (half) num * 2 - 1 else num - 1)
-                if (!enable) disabled()
-                else setProgress { target ->
-                    val rounded = (if (half) (target * 2).fastRoundToInt() / 2f else target.fastRoundToInt().toFloat()).coerceIn(0f, num.toFloat())
-                    state.value = if (rounded == state.value) 0f else rounded
-                    true
-                }
-            }
             .pointerInput(state, enable, num, half) {
                 if (enable) {
                     detectTapGestures { offset ->
-                        val rating = starBarRatingAt(offset.x, size.height.toFloat(), num, half)
+                        val rating = StarBarState.ratingAt(offset.x, size.height.toFloat(), num, half)
                         state.value = if (rating == state.value) 0f else rating
                     }
                 }
-            }
-            .pointerInput(enable, num, half) {
+            }.pointerInput(enable, num, half) {
                 if (enable) {
                     awaitPointerEventScope {
                         while (true) {
@@ -105,41 +112,32 @@ fun StarBar(
                             val change = event.changes.firstOrNull() ?: continue
                             if (change.type == PointerType.Mouse) {
                                 when (event.type) {
-                                    PointerEventType.Enter, PointerEventType.Move -> hoveredValue = starBarRatingAt(change.position.x, size.height.toFloat(), num, half)
-                                    PointerEventType.Exit -> hoveredValue = null
+                                    PointerEventType.Enter, PointerEventType.Move -> hoveredValue = StarBarState.ratingAt(change.position.x, size.height.toFloat(), num, half)
+                                    PointerEventType.Exit -> hoveredValue = Float.NaN
                                 }
                             }
                         }
                     }
                 }
-            }
-            .drawWithCache {
+            }.drawWithCache {
                 val height = size.height
-                val gap = height * STAR_SPACE_PERCENT
-                val starPath = Path().apply {
-                    for (point in 0 ..< 10) {
-                        val angle = point * PI / 5 - PI / 2
-                        val radius = if (point % 2 == 0) height / 2 else height * 0.21f
-                        val x = height / 2 + (cos(angle) * radius).toFloat()
-                        val y = height / 2 + (sin(angle) * radius).toFloat()
-                        if (point == 0) moveTo(x, y)
-                        else lineTo(x, y)
-                    }
-                    close()
-                }
+                val gap = height * StarBarState.SPACE_PERCENT
+                val starPath = StarBarState.buildPath(height)
 
                 onDrawBehind {
                     for (index in 0 ..< num) {
                         translate(left = index * (height + gap)) {
                             drawPath(starPath, actualTrackColor)
                             val selected = (currentValue - index).coerceIn(0f, 1f)
-                            val hovered = ((hoveredValue ?: 0f) - index).coerceIn(0f, 1f)
+                            val actualValue = if (hoveredValue.isNaN()) 0f else hoveredValue
+                            val hovered = (actualValue - index).coerceIn(0f, 1f)
 
                             if (hovered > selected && enable) {
                                 clipRect(left = height * selected, right = height * hovered) {
                                     drawPath(starPath, actualActiveColor.copy(alpha = actualActiveColor.alpha * 0.5f))
                                 }
                             }
+
                             if (selected > 0f) {
                                 clipRect(right = height * selected) {
                                     drawPath(starPath, actualActiveColor)
@@ -151,16 +149,8 @@ fun StarBar(
             }
     ) { _, constraints ->
         val height = constraints.constrainHeight(defaultHeight.roundToPx())
-        val width = (num * height + (num - 1) * height * STAR_SPACE_PERCENT).fastRoundToInt()
-        layout(constraints.constrainWidth(width), height) {}
+        val width = (num * height + (num - 1) * height * StarBarState.SPACE_PERCENT).fastRoundToInt()
+
+        layout(constraints.constrainWidth(width), height) { }
     }
-}
-
-private fun starBarRatingAt(x: Float, height: Float, num: Int, half: Boolean): Float {
-    if (height <= 0f) return 0f
-
-    val stride = height * (1f + STAR_SPACE_PERCENT)
-    val index = (x.coerceAtLeast(0f) / stride).toInt().coerceIn(0, num - 1)
-    val fraction = ((x - index * stride) / height).coerceIn(0f, 1f)
-    return if (half && fraction < 0.5f) index + 0.5f else index + 1f
 }
