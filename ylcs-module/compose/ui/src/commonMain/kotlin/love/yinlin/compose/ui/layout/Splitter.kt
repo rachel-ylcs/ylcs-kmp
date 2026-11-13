@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -29,6 +28,8 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastRoundToInt
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.node.pointerIcon
 import kotlin.math.abs
 
@@ -100,8 +101,8 @@ private fun Splitter(
     first: @Composable () -> Unit,
     second: @Composable () -> Unit,
 ) {
-    val splitRatio = remember(horizontal) { mutableStateOf(0.5f) }
-    val dragging = remember(horizontal) { mutableStateOf(false) }
+    var splitRatio by rememberValueState(0.5f, horizontal)
+    var dragging by rememberFalse(horizontal)
     val fallbackSize = Theme.size.cell1
     val dividerSize = Theme.size.box1
     val layoutDirection = LocalLayoutDirection.current
@@ -114,7 +115,7 @@ private fun Splitter(
                 val axisExtent = if (horizontal) size.width else size.height
                 val dividerExtent = dividerSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
                 val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
-                val firstExtent = (availableExtent * splitRatio.value.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
+                val firstExtent = (availableExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
                     .fastRoundToInt()
                     .coerceIn(0, availableExtent)
                 val downAxis = if (horizontal) down.position.x else down.position.y
@@ -122,7 +123,7 @@ private fun Splitter(
 
                 if (abs(downAxis - dividerCenter) > dividerExtent / 2f) return@awaitEachGesture
 
-                dragging.value = true
+                dragging = true
                 try {
                     down.consume()
                     var previous = downAxis
@@ -138,7 +139,7 @@ private fun Splitter(
 
                         if (delta != 0f && currentAvailableExtent > 0) {
                             val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                            splitRatio.value = (splitRatio.value + logicalDelta / currentAvailableExtent)
+                            splitRatio = (splitRatio + logicalDelta / currentAvailableExtent)
                                 .coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
                             change.consume()
                         }
@@ -147,7 +148,7 @@ private fun Splitter(
                         if (!change.pressed) break
                     }
                 } finally {
-                    dragging.value = false
+                    dragging = false
                 }
             }
         },
@@ -172,7 +173,7 @@ private fun Splitter(
         }
         val dividerExtent = dividerSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
         val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
-        val firstExtent = (availableExtent * splitRatio.value.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
+        val firstExtent = (availableExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
             .fastRoundToInt()
             .coerceIn(0, availableExtent)
         val secondExtent = availableExtent - firstExtent
@@ -221,10 +222,9 @@ private fun Splitter(
 @Composable
 private fun SplitterHandle(
     horizontal: Boolean,
-    draggingState: MutableState<Boolean>,
+    dragging: Boolean,
 ) {
-    var hovered by remember(horizontal) { mutableStateOf(false) }
-    val dragging = draggingState.value
+    var hovered by rememberFalse(horizontal)
     val inactiveColor = Theme.color.outline.copy(alpha = 0.4f)
     val activeColor = Theme.color.primary
     val indicatorColor = Theme.color.primaryContainer
