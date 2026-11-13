@@ -97,7 +97,7 @@ jobs:
       - name: Link preview
         env:
           ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
-        run: | 
+        run: |
           echo "## Gallery 组件预览" >> "$GITHUB_STEP_SUMMARY"
           echo "点击下方链接直接在 GitHub 中查看 PNG 图片（无需下载 ZIP）：" >> "$GITHUB_STEP_SUMMARY"
           echo "[直接预览 Gallery 右侧完整截图]($ARTIFACT_URL)" >> "$GITHUB_STEP_SUMMARY"
