@@ -33,7 +33,7 @@ abstract class Page {
     protected fun ComponentColumn(alwaysShowTabs: Boolean = false, showTabs: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
         val components = PageItem.forPage(this@Page)?.components.orEmpty()
-        val selectedComponent = rememberSaveable { mutableIntStateOf(0) }
+        val selectedComponent = rememberSaveable { mutableIntStateOf(components.indexOfFirst { it.title == galleryPreviewComponentTitle }.coerceAtLeast(0)) }
         val selectedIndex = if (!showTabs || components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             Column(
