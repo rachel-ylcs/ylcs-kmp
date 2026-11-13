@@ -24,7 +24,6 @@ permissions:
 jobs:
   ktlint:
     name: Kotlin Style Check
-    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.body, 'gallery-preview:') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
