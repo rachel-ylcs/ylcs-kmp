@@ -2,29 +2,7 @@ name: Native Compose Maintenance
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'native-compose/adaptation/**'
-      - 'native-compose/upstream/**'
-      - 'native-compose/gradle/**'
-      - 'native-compose/verification/**'
-      - 'native-compose/build.gradle.kts'
-      - 'build-logic/native-bridge/**'
-      - 'build-logic/native-binaries/**'
-      - 'build-logic/native-dokka/**'
-      - 'build-logic/repository-conventions/**'
-      - 'build-logic/public-plugin/**'
-      - 'build-logic/settings.gradle.kts'
-      - 'libs.versions.toml'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradlew'
-      - 'gradlew.bat'
-      - '.gitattributes'
-      - 'gradle/wrapper/**'
-      - '.github/workflows/native-compose.yml'
-      - '.github/actions/setup-native/**'
-      - '.github/actions/setup-gradle-wrapper/**'
+  workflow_call:
   push:
     branches: [main]
     paths:

@@ -1,0 +1,132 @@
+name: Pull Request CI
+
+# Only one workflow listens for PRs to main. A preview request runs the Gallery
+# screenshot job; other PRs delegate to Build, Test, Lint and Native workflows.
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  preview:
+    name: Capture JVM Gallery
+    if: contains(github.event.pull_request.body, 'gallery-preview:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Parse requested page and component
+        id: target
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as event_file:
+              body = json.load(event_file)["pull_request"]["body"] or ""
+          match = re.search(r"(?m)^[ \t]*gallery-preview:[ \t]*([a-z][a-z0-9-]*):([^\r\n]+?)[ \t]*$", body)
+          if not match:
+              raise SystemExit("Expected a PR description line such as gallery-preview: input:Button")
+          selection = f"{match.group(1)}:{match.group(2).strip()}"
+          if len(selection) > 120:
+              raise SystemExit("Gallery preview selector is too long")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"selection={selection}", file=output)
+          print(f"Selected Gallery preview: {selection}")
+          PY
+
+      - name: Setup JVM build environment
+        uses: ./.github/actions/setup-build
+        with:
+          gtk: 'true'
+          virtual-display: 'true'
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install screenshot tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openbox xdotool x11-utils scrot
+          python -m pip install --disable-pip-version-check Pillow
+
+      - name: Build, launch and capture Gallery
+        env:
+          GALLERY_PREVIEW: ${{ steps.target.outputs.selection }}
+          SKIKO_RENDER_API: SOFTWARE_FAST
+        run: |
+          mkdir -p build/gallery-preview
+          xvfb-run --auto-servernum --server-args="-screen 0 1440x900x24" bash -c '
+            set -euo pipefail
+            openbox >/dev/null 2>&1 &
+            ./gradlew :ylcs-app:gallery:galleryRun --no-daemon --build-cache --max-workers=2 --console=plain \
+              > build/gallery-preview/gallery.log 2>&1 &
+            gradle_pid=$!
+            trap "kill $gradle_pid 2>/dev/null || true" EXIT
+            python .github/scripts/gallery_preview.py
+          '
+
+      - name: Upload preview
+        id: artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: gallery-preview-pr-${{ github.event.pull_request.number }}
+          path: build/gallery-preview/gallery-preview.png
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Link preview
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          echo "## Gallery 组件预览" >> "$GITHUB_STEP_SUMMARY"
+          echo "点击下方链接直接在 GitHub 中查看 PNG 图片（无需下载 ZIP）：" >> "$GITHUB_STEP_SUMMARY"
+          echo "[直接预览 Gallery 右侧完整截图]($ARTIFACT_URL)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload debug log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gallery-preview-debug-${{ github.run_id }}
+          path: build/gallery-preview/gallery.log
+          if-no-files-found: warn
+          retention-days: 3
+
+  full-build:
+    name: Full Build
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/build.yml
+
+  full-test:
+    name: Full Test
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/test.yml
+
+  full-lint:
+    name: Full Lint
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/lint.yml
+
+  full-native:
+    name: Native Maintenance
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/native-compose.yml
