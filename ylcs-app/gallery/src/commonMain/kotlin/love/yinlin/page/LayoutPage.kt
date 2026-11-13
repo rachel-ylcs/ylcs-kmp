@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -27,11 +28,16 @@ import love.yinlin.GalleryCaption
 import love.yinlin.GalleryParagraph
 import love.yinlin.Page
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.image.data.ImageOptions
+import love.yinlin.compose.ui.image.ResourceFileImage
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.HSV
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.HorizontalComparator
+import love.yinlin.compose.ui.layout.VerticalComparator
 import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.layout.HorizontalSplitter
 import love.yinlin.compose.ui.layout.OffsetBox
@@ -46,6 +52,7 @@ import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.Grid
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.gallery.resources.Res
 
 @Stable
 object LayoutPage : Page() {
@@ -211,6 +218,54 @@ object LayoutPage : Page() {
                             },
                         )
                     }
+                }
+            }
+
+            Component("Comparator") {
+                GalleryParagraph("拖动图片中间的比较线，分别查看同一张图片的不同画质，或将两张不同图片拼接比较。两个内容始终按比较器完整尺寸绘制，只显示分割线各自一侧。")
+                Example("示例 1 · 低画质与原图", Modifier.fillMaxWidth()) {
+                    HorizontalComparator(
+                        modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
+                        left = {
+                            ResourceFileImage(
+                                Res.getUri("drawable/img0.webp"),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "低画质图片",
+                                options = ImageOptions(quality = ImageQuality.Low),
+                            )
+                        },
+                        right = {
+                            ResourceFileImage(
+                                Res.getUri("drawable/img0.webp"),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "原始画质图片",
+                                options = ImageOptions(quality = ImageQuality.Full),
+                            )
+                        },
+                    )
+                }
+                Example("示例 2 · 两张图片拼接", Modifier.fillMaxWidth()) {
+                    VerticalComparator(
+                        modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
+                        top = {
+                            ResourceFileImage(
+                                Res.getUri("drawable/img1.webp"),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "拼接图片上半部分",
+                            )
+                        },
+                        bottom = {
+                            ResourceFileImage(
+                                Res.getUri("drawable/img2.webp"),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "拼接图片下半部分",
+                            )
+                        },
+                    )
                 }
             }
 

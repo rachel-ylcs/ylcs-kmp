@@ -93,12 +93,13 @@ internal data class PageItem(
                 ComponentItem("Banner", "四张图片每三秒自动切换，展示轮播中的裁剪与布局。"),
                 ComponentItem("Watermark", "在内容上平铺水印，调节逆时针角度、透明度与间距，测试下方按钮仍可点击。", "水印 叠加 重复 平铺 mark alpha angle space"),
             ]),
-            PageItem("layout", Icons.GridOn, "布局", "Layout", "探索二维网格、位置偏移、操作对齐、可拖动分隔与横向滚动。", LayoutPage, PageGroup.Layout, [
+            PageItem("layout", Icons.GridOn, "布局", "Layout", "探索二维网格、位置偏移、操作对齐、可拖动分隔与图片比较。", LayoutPage, PageGroup.Layout, [
                 ComponentItem("Grid", "对照官方指南，调节轨道尺寸、间距、放置、跨度和对齐，体验响应式命名区域、重叠与内嵌懒列表。", "GridLayoutBuilder GridLayoutScope x y sx sy s t item Fixed Percentage Float Flex Int Fr Auto MinContent MaxContent MinMax minmax 自动放置 隐式轨道 负索引 跨行 跨列 命名区域 响应式 zIndex LazyColumn intrinsic"),
                 ComponentItem("OffsetBox", "拖动 x / y 控制器，观察内容相对于原始位置的偏移。"),
                 ComponentItem("ActionScope", "将一组操作排列在容器右侧，观察对齐与间距。"),
                 ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
                 ComponentItem("Splitter", "拖动分隔条调整左右或上下区域的大小，并比较两种方向的对齐方式。", "HorizontalSplitter VerticalSplitter 分隔器 拖动 可调节比例"),
+                ComponentItem("Comparator", "拖动比较线，比较同一图片的不同画质，或拼接两张不同图片。", "HorizontalComparator VerticalComparator 图片比较 图片拼接 画质 对比 拖动"),
             ]),
             PageItem("platform-view", Icons.Package, "原生视图", "Platform View", "嵌入平台原生文本组件，检查参数同步、重挂载和 Compose 内容叠放。", PlatformViewPage, PageGroup.Layout, [
                 ComponentItem("原生组件嵌入", "编辑原生文本，更新外部参数，移除后重新挂载，并点击覆盖在原生区域上的 Compose 按钮。Linux Native 暂未支持。", "PlatformViewState PlatformViewHost rememberPlatformViewState attach detach release HWND Win32 EDIT NSTextField Swing JTextArea HTMLTextAreaElement Windows macOS JVM Web 生命周期 焦点 叠放"),
