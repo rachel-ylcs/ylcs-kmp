@@ -21,7 +21,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastRoundToInt
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.node.pointerIcon
+import kotlin.math.abs
 
 private const val SPLITTER_MIN_RATIO = 0.05f
 private const val SPLITTER_MAX_RATIO = 0.95f
@@ -101,17 +101,60 @@ private fun Splitter(
     second: @Composable () -> Unit,
 ) {
     val splitRatio = remember(horizontal) { mutableStateOf(0.5f) }
-    val parentSize = remember(horizontal) { mutableStateOf(IntSize.Zero) }
+    val dragging = remember(horizontal) { mutableStateOf(false) }
     val fallbackSize = Theme.size.cell1
     val dividerSize = Theme.size.box1
+    val layoutDirection = LocalLayoutDirection.current
     val layoutModifier = if (horizontal) modifier.fillMaxWidth() else modifier.fillMaxHeight()
 
     Layout(
-        modifier = layoutModifier.onSizeChanged { parentSize.value = it },
+        modifier = layoutModifier.pointerInput(horizontal, dividerSize, layoutDirection) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val axisExtent = if (horizontal) size.width else size.height
+                val dividerExtent = dividerSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
+                val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
+                val firstExtent = (availableExtent * splitRatio.value.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
+                    .fastRoundToInt()
+                    .coerceIn(0, availableExtent)
+                val downAxis = if (horizontal) down.position.x else down.position.y
+                val dividerCenter = firstExtent + dividerExtent / 2f
+
+                if (abs(downAxis - dividerCenter) > dividerExtent / 2f) return@awaitEachGesture
+
+                dragging.value = true
+                try {
+                    down.consume()
+                    var previous = downAxis
+
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                        val current = if (horizontal) change.position.x else change.position.y
+                        val delta = current - previous
+                        val currentAxisExtent = if (horizontal) size.width else size.height
+                        val currentDividerExtent = dividerSize.roundToPx().coerceAtLeast(0).coerceAtMost(currentAxisExtent)
+                        val currentAvailableExtent = (currentAxisExtent - currentDividerExtent).coerceAtLeast(0)
+
+                        if (delta != 0f && currentAvailableExtent > 0) {
+                            val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
+                            splitRatio.value = (splitRatio.value + logicalDelta / currentAvailableExtent)
+                                .coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
+                            change.consume()
+                        }
+
+                        previous = current
+                        if (!change.pressed) break
+                    }
+                } finally {
+                    dragging.value = false
+                }
+            }
+        },
         content = {
             Box(content = { first() })
             Box(content = { second() })
-            SplitterHandle(horizontal, splitRatio, parentSize)
+            SplitterHandle(horizontal, dragging)
         },
     ) { measurables, constraints ->
         val fallbackExtent = fallbackSize.roundToPx().coerceAtLeast(0)
@@ -178,12 +221,10 @@ private fun Splitter(
 @Composable
 private fun SplitterHandle(
     horizontal: Boolean,
-    splitRatio: MutableState<Float>,
-    parentSize: MutableState<IntSize>,
+    draggingState: MutableState<Boolean>,
 ) {
     var hovered by remember(horizontal) { mutableStateOf(false) }
-    var dragging by remember(horizontal) { mutableStateOf(false) }
-    val layoutDirection = LocalLayoutDirection.current
+    val dragging = draggingState.value
     val inactiveColor = Theme.color.outline.copy(alpha = 0.4f)
     val activeColor = Theme.color.primary
     val indicatorColor = Theme.color.primaryContainer
@@ -194,41 +235,6 @@ private fun SplitterHandle(
     Box(
         modifier = Modifier
             .pointerIcon(PointerIcon.Hand)
-            .pointerInput(horizontal) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    dragging = true
-                    try {
-                        down.consume()
-                        var previous = if (horizontal) down.position.x else down.position.y
-
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                            val current = if (horizontal) change.position.x else change.position.y
-                            val delta = current - previous
-
-                            if (delta != 0f) {
-                                val totalExtent = if (horizontal) parentSize.value.width else parentSize.value.height
-                                val handleExtent = if (horizontal) size.width else size.height
-                                val availableExtent = (totalExtent - handleExtent).coerceAtLeast(0)
-
-                                if (availableExtent > 0) {
-                                    val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                                    splitRatio.value = (splitRatio.value + logicalDelta / availableExtent)
-                                        .coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
-                                    change.consume()
-                                }
-                            }
-
-                            previous = current
-                            if (!change.pressed) break
-                        }
-                    } finally {
-                        dragging = false
-                    }
-                }
-            }
             .pointerInput(horizontal) {
                 awaitPointerEventScope {
                     while (true) {
