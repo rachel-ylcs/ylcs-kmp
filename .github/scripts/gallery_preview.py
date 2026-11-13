@@ -3,8 +3,8 @@
 
 from collections import Counter
 from pathlib import Path
-import subprocess
 import re
+import subprocess
 import tempfile
 import time
 
@@ -32,7 +32,7 @@ def wait_for_window(timeout=900):
 def get_geometry(window):
     # xwininfo reports the X11 client rectangle, excluding Openbox decorations.
     result = command("xwininfo", "-id", window)
-    matches = [re.search(rf"{field}:\\s*(-?\\d+)", result.stdout) for field in (
+    matches = [re.search(rf"{field}:\s*(-?\d+)", result.stdout) for field in (
         "Absolute upper-left X", "Absolute upper-left Y", "Width", "Height"
     )]
     if any(match is None for match in matches):
