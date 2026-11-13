@@ -171,7 +171,7 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     override fun onHostStopped() {
-        releaseResources()
+        stopInvalidationObserver()
     }
 
     override fun onHostStarted() {
