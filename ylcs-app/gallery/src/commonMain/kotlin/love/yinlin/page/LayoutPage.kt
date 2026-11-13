@@ -34,8 +34,8 @@ import love.yinlin.compose.graphics.HSV
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.layout.HorizontalSplitter
-import love.yinlin.compose.ui.layout.VerticalSplitter
 import love.yinlin.compose.ui.layout.OffsetBox
+import love.yinlin.compose.ui.layout.VerticalSplitter
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.Filter
@@ -190,7 +190,7 @@ object LayoutPage : Page() {
                                 }
                             },
                             right = {
-                                Box(Modifier.fillMaxSize().background(Theme.color.secondaryContainer), contentAlignment = Alignment.Center) {
+                                Box(Modifier.fillMaxWidth().height(Theme.size.cell8).background(Theme.color.secondaryContainer), contentAlignment = Alignment.Center) {
                                     Text("RIGHT", color = Theme.color.onContainer)
                                 }
                             },
@@ -200,7 +200,7 @@ object LayoutPage : Page() {
                         VerticalSplitter(
                             modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 + Theme.size.cell4),
                             top = {
-                                Box(Modifier.fillMaxSize().background(Theme.color.primaryContainer), contentAlignment = Alignment.Center) {
+                                Box(Modifier.width(Theme.size.cell6).fillMaxHeight().background(Theme.color.primaryContainer), contentAlignment = Alignment.Center) {
                                     Text("TOP", color = Theme.color.onContainer)
                                 }
                             },
