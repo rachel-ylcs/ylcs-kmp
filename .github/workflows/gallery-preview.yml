@@ -3,7 +3,7 @@ name: Pull Request CI
 # Only one workflow listens for PRs to main. A preview request runs the Gallery
 # screenshot job; other PRs delegate to Build, Test, Lint and Native workflows.
 concurrency:
-  group: pr-ci-${{ github.event.pull_request.number }}
+  group: workflow-gallery-preview
   cancel-in-progress: true
 
 on:
@@ -108,6 +108,7 @@ jobs:
         with:
           name: gallery-preview-debug-${{ github.run_id }}
           path: build/gallery-preview/gallery.log
+          archive: false
           if-no-files-found: warn
           retention-days: 3
 

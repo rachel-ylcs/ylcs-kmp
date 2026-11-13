@@ -43,6 +43,10 @@ on:
         description: Files to upload after building; leave empty to skip uploading.
         type: string
         default: ''
+      artifact-archive:
+        description: Whether to zip uploaded files; set false only for a single file.
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -88,4 +92,5 @@ jobs:
         with:
           name: ${{ inputs.artifact-name }}
           path: ${{ inputs.artifact-path }}
+          archive: ${{ inputs.artifact-archive }}
           if-no-files-found: error

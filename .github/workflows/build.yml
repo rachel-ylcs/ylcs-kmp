@@ -16,6 +16,10 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: workflow-build
+  cancel-in-progress: true
+
 jobs:
   changes:
     name: Detect Changes

@@ -17,6 +17,10 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: workflow-test
+  cancel-in-progress: true
+
 jobs:
   changes:
     name: Detect Test Changes
@@ -231,6 +235,7 @@ jobs:
         with:
           name: unit-test-report
           path: build/test-report/index.html
+          archive: false
           if-no-files-found: error
 
       - name: Link Combined Test Report

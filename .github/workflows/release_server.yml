@@ -5,6 +5,10 @@ on:
     tags:
       - 'server*'
 
+concurrency:
+  group: workflow-release_server
+  cancel-in-progress: true
+
 jobs:
   package-server:
     name: Package Server

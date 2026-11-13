@@ -5,6 +5,10 @@ on:
     tags:
       - 'release*'
 
+concurrency:
+  group: workflow-release
+  cancel-in-progress: true
+
 jobs:
   package-android:
     name: Package Android
@@ -28,6 +32,7 @@ jobs:
         with:
           name: ylcs-android
           path: outputs/*Android*.apk
+          archive: false
           if-no-files-found: error
 
   package-ios:
@@ -61,6 +66,7 @@ jobs:
         with:
           name: ylcs-ios
           path: outputs/*.ipa
+          archive: false
           if-no-files-found: error
 
   package-desktop:
@@ -91,6 +97,7 @@ jobs:
         with:
           name: ylcs-js
           path: outputs/*WebJs*.zip
+          archive: false
           if-no-files-found: error
 
       - name: Upload
@@ -98,6 +105,7 @@ jobs:
         with:
           name: ylcs-wasm
           path: outputs/*WebWasm*.zip
+          archive: false
           if-no-files-found: error
 
   package-server:
@@ -120,6 +128,7 @@ jobs:
         with:
           name: ylcs-server
           path: outputs/server.kexe
+          archive: false
           if-no-files-found: error
 
   package-modManager:
@@ -161,6 +170,7 @@ jobs:
         with:
           name: ylcs-landpage
           path: outputs/landpage.zip
+          archive: false
 
   publish-release:
     name: Publish Release
@@ -227,6 +237,8 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: artifacts
+          merge-multiple: true
+          skip-decompress: true
 
       - name: Create Release
         uses: softprops/action-gh-release@v3
@@ -237,20 +249,6 @@ jobs:
           prerelease: false
           preserve_order: true
           files: |
-            artifacts/ylcs-android/*
-            artifacts/ylcs-ios/*
-            artifacts/ylcs-windows/*
-            artifacts/ylcs-linux/*
-            artifacts/ylcs-macos/*
-            artifacts/ylcs-js/*
-            artifacts/ylcs-wasm/*
-            artifacts/ylcs-server/*
-            artifacts/ylcs-mod-manager-windows-x64/*.zip
-            artifacts/ylcs-mod-manager-linux-x64/*.zip
-            artifacts/ylcs-mod-manager-macos-arm64/*.zip
-            artifacts/ylcs-native-windows-x64/*.zip
-            artifacts/ylcs-native-linux-x64/*.zip
-            artifacts/ylcs-native-macos-arm64/*.zip
-            artifacts/ylcs-landpage/*
+            artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

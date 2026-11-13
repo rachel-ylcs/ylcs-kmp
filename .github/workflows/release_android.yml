@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - 'android*'
+concurrency:
+  group: workflow-release_android
+  cancel-in-progress: true
+
 jobs:
   package-android:
     name: Package Android
@@ -14,3 +18,4 @@ jobs:
       android: true
       artifact-name: ylcs-android
       artifact-path: outputs/ylcs-android.apk
+      artifact-archive: false
