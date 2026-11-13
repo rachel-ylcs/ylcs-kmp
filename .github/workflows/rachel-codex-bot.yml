@@ -18,8 +18,8 @@ on:
         type: string
 
 concurrency:
-  group: rachel-codex-bot-${{ inputs.task_branch || github.ref_name }}
-  cancel-in-progress: false
+  group: workflow-rachel-codex-bot
+  cancel-in-progress: true
 
 permissions:
   contents: read

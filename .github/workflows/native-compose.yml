@@ -35,7 +35,7 @@ permissions:
 # Module changes use Build/Test; this workflow verifies the maintained Native stack.
 # Maven tasks write local verification files only; no public repository is configured.
 concurrency:
-  group: native-compose-${{ github.workflow }}-${{ github.ref }}
+  group: workflow-native-compose
   cancel-in-progress: true
 
 jobs:

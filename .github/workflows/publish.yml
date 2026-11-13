@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: workflow-publish
+  cancel-in-progress: true
+
 jobs:
   native-libraries:
     name: Prepare Native Publications / ${{ matrix.target }}

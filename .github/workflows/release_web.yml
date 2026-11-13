@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - 'web*'
+concurrency:
+  group: workflow-release_web
+  cancel-in-progress: true
+
 jobs:
   package-web:
     name: Package Web
@@ -24,6 +28,7 @@ jobs:
         with:
           name: ylcs-js
           path: outputs/ylcs-js.zip
+          archive: false
           if-no-files-found: error
 
       - name: Upload Wasm Application
@@ -31,4 +36,5 @@ jobs:
         with:
           name: ylcs-wasm
           path: outputs/ylcs-wasm.zip
+          archive: false
           if-no-files-found: error

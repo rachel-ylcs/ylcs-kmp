@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: workflow-release_desktop
+  cancel-in-progress: true
+
 jobs:
   package-desktop:
     name: Package JVM Desktop Artifact

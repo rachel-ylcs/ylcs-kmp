@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: workflow-release_native_desktop
+  cancel-in-progress: true
+
 jobs:
   package-native-desktop:
     name: Package Native Desktop Artifact

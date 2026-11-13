@@ -96,4 +96,5 @@ jobs:
         with:
           name: ${{ format(inputs.artifact-name, inputs.native && matrix.native-platform || matrix.platform) }}
           path: ${{ format(inputs.artifact-path, matrix.platform, inputs.native && matrix.native-platform-label || matrix.platform-label) }}
+          archive: false
           if-no-files-found: error

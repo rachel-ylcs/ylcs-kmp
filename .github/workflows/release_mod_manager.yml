@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: workflow-release_mod_manager
+  cancel-in-progress: true
+
 jobs:
   package-mod-manager:
     name: Package Mod Manager Artifact

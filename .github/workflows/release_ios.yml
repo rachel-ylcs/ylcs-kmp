@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - 'ios*'
+concurrency:
+  group: workflow-release_ios
+  cancel-in-progress: true
+
 jobs:
   package-ios:
     name: Package iOS
@@ -27,4 +31,5 @@ jobs:
         with:
           name: ylcs-ios
           path: ${{ steps.package.outputs.path }}
+          archive: false
           if-no-files-found: error
