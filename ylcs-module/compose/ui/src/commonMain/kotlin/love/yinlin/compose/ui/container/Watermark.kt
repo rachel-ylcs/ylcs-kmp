@@ -29,19 +29,19 @@ import kotlin.math.sin
  *
  * @param modifier 容器修饰符
  * @param mark 单个水印标志的 Composable 内容
- * @param content 水印下方的内容
  * @param angle 逆时针旋转角度，单位为度
  * @param alpha 水印透明度对应的不透明系数，范围 0 ~ 1
  * @param space 相邻水印旋转后包围盒之间的最小间距，必须非负
+ * @param content 水印下方的内容
  */
 @Composable
 fun Watermark(
     modifier: Modifier = Modifier,
     mark: @Composable () -> Unit,
-    content: @Composable () -> Unit,
     angle: Float = 30f,
     alpha: Float = 0.12f,
     space: Dp = 48.dp,
+    content: @Composable () -> Unit,
 ) {
     require(angle.isFinite()) { "Watermark angle must be finite." }
     require(alpha in 0f .. 1f) { "Watermark alpha must be between 0 and 1." }
