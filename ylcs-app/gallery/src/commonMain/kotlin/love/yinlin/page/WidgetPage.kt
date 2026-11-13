@@ -9,10 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.datetime.number
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import love.yinlin.Page
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberTrue
 import love.yinlin.compose.ui.input.TextButton
@@ -101,7 +103,17 @@ object WidgetPage : Page() {
     override fun Content() {
         ComponentColumn {
             Component("Calendar") {
-                Calendar()
+                val state = remember { CalendarState() }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    val currentDate = state.currentDate
+
+                    SimpleEllipsisText(text = "${currentDate.year}年${currentDate.month.number}月", style = Theme.typography.v6.bold)
+                    Calendar(state = state)
+                }
             }
 
             Component("LogOutput") {

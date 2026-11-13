@@ -19,23 +19,17 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
-import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.localComposition
 import love.yinlin.compose.scaleSize
-import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.HorizontalScrollContainer
 import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.compose.ui.text.SimpleClipText
-import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.measureTextHeight
 import love.yinlin.extension.DateEx
-
-@Composable
-fun rememberCalendarState() = remember { CalendarState() }
 
 private val LocalCalendarDayTextStyle = localComposition<TextStyle>()
 private val LocalCalendarDayNumberStyle = localComposition<TextStyle>()
@@ -48,35 +42,6 @@ private fun rememberCalendarSize(): Triple<Dp, Dp, Dp> {
     val cellPadding = cellSize * LocalCalendarCellPaddingRatio.current
     val totalWidth = cellSize * 7 + cellPadding * 14
     return Triple(cellSize, cellPadding, totalWidth)
-}
-
-@Composable
-private fun CalendarHeader(
-    settledPage: Int,
-    actions: @Composable RowScope.() -> Unit = { }
-) {
-    val currentDateText = remember(settledPage) {
-        val date = CalendarState.indexShadowDate(settledPage)
-        "${date.year}年${date.month.number}月"
-    }
-
-    val dayTextStyle = LocalCalendarDayTextStyle.current
-    val headerStyle = dayTextStyle.scaleSize(1.6f, true)
-
-    val [_, _, totalWidth] = rememberCalendarSize()
-
-    Row(
-        modifier = Modifier.width(totalWidth),
-        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h10),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        SimpleEllipsisText(
-            text = currentDateText,
-            modifier = Modifier.weight(1f).padding(start = Theme.padding.h / 2),
-            style = headerStyle,
-        )
-        ActionScope.Right.Container(content = actions)
-    }
 }
 
 @Composable
@@ -174,10 +139,9 @@ private fun CalendarDayGrid(
 
 @Composable
 fun Calendar(
+    state: CalendarState,
     modifier: Modifier = Modifier,
-    state: CalendarState = rememberCalendarState(),
     events: Map<Long, String> = emptyMap(),
-    actions: @Composable RowScope.() -> Unit = {},
     onEventClick: (LocalDate) -> Unit = {},
     style: TextStyle = Theme.typography.v8,
     cellPaddingRatio: Float = 0.1f,
@@ -198,7 +162,6 @@ fun Calendar(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(cellSize * 0.3f),
         ) {
-            CalendarHeader(settledPage = state.settledPage, actions = actions)
             CalendarWeekGrid()
             CalendarDayGrid(state = state, events = events, onEventClick = onEventClick)
         }

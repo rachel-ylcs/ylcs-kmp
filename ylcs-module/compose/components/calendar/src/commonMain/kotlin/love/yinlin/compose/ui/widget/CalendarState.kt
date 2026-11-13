@@ -2,6 +2,8 @@ package love.yinlin.compose.ui.widget
 
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 import love.yinlin.extension.DateEx
@@ -9,6 +11,8 @@ import love.yinlin.extension.DateEx
 @Stable
 class CalendarState : PagerState(currentPage = 5) {
     override val pageCount: Int = 12
+
+    val currentDate: LocalDate by derivedStateOf { indexShadowDate(settledPage) }
 
     companion object {
         internal fun indexShadowDate(index: Int): LocalDate {
