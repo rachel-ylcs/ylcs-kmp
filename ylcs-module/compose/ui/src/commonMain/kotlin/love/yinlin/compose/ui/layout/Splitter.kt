@@ -299,10 +299,10 @@ private fun SplitterHandle(
     dragging: Boolean,
 ) {
     val active = hovered || dragging
-    val primaryColor = primaryColor
+    val primaryColor = Theme.color.primary
     val outlineColor = Theme.color.outline
-    val surfaceColor = surfaceColor
-    val primaryContainerColor = primaryColorContainer
+    val surfaceColor = Theme.color.surface
+    val primaryContainerColor = Theme.color.primaryContainer
     val onContainerColor = Theme.color.onContainer
     val lineThicknessDp = Theme.border.v6
     val handleSizeDp = Theme.size.input9
