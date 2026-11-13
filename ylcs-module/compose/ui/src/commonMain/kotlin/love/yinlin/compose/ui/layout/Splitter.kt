@@ -118,7 +118,7 @@ private fun Splitter(
                     .fastRoundToInt()
                     .coerceIn(0, availableExtent)
                 val downAxis = if (horizontal) down.position.x else down.position.y
-                val dividerCenter = firstExtent + dividerExtent / 2f
+                val dividerCenter = if (horizontal && layoutDirection == LayoutDirection.Rtl) axisExtent - firstExtent - dividerExtent / 2f else firstExtent + dividerExtent / 2f
 
                 if (abs(downAxis - dividerCenter) > dividerExtent / 2f) return@awaitEachGesture
 
