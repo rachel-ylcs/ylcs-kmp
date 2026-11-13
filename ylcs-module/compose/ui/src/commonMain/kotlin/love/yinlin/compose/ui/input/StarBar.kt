@@ -66,6 +66,7 @@ fun StarBar(
 ) {
     require(num > 0) { "StarBar num must be positive" }
 
+    val defaultHeight = Theme.size.input8
     val currentValue = state.value.coerceIn(0f, num.toFloat())
     val actualActiveColor = if (enable) activeColor else Theme.color.disabledContent
     val actualTrackColor = if (enable) trackColor else Theme.color.disabledContainer
@@ -74,7 +75,7 @@ fun StarBar(
     Layout(
         content = {},
         modifier = modifier
-            .height(Theme.size.input8)
+            .height(defaultHeight)
             .pointerIcon(PointerIcon.Hand, enabled = enable)
             .semantics {
                 stateDescription = "${currentValue} / ${num}"
@@ -147,7 +148,7 @@ fun StarBar(
                 }
             }
     ) { _, constraints ->
-        val height = constraints.constrainHeight(Theme.size.input8.roundToPx())
+        val height = constraints.constrainHeight(defaultHeight.roundToPx())
         val width = (num * height + (num - 1) * height * STAR_SPACE_PERCENT).fastRoundToInt()
         layout(constraints.constrainWidth(width), height) {}
     }
