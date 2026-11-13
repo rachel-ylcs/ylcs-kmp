@@ -28,11 +28,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.util.fastRoundToInt
+import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.node.pointerIcon
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import love.yinlin.compose.Theme
-import love.yinlin.compose.ui.node.pointerIcon
 
 private const val STAR_SPACE_PERCENT = 0.15f
 
