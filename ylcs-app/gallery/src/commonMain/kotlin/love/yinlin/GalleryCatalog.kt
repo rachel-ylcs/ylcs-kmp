@@ -98,6 +98,7 @@ internal data class PageItem(
                 ComponentItem("OffsetBox", "拖动 x / y 控制器，观察内容相对于原始位置的偏移。"),
                 ComponentItem("ActionScope", "将一组操作排列在容器右侧，观察对齐与间距。"),
                 ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
+                ComponentItem("Splitter", "拖动分隔条调整左右或上下区域的大小，并比较两种方向的对齐方式。", "HorizontalSplitter VerticalSplitter 分隔器 拖动 可调节比例"),
             ]),
             PageItem("platform-view", Icons.Package, "原生视图", "Platform View", "嵌入平台原生文本组件，检查参数同步、重挂载和 Compose 内容叠放。", PlatformViewPage, PageGroup.Layout, [
                 ComponentItem("原生组件嵌入", "编辑原生文本，更新外部参数，移除后重新挂载，并点击覆盖在原生区域上的 Compose 按钮。Linux Native 暂未支持。", "PlatformViewState PlatformViewHost rememberPlatformViewState attach detach release HWND Win32 EDIT NSTextField Swing JTextArea HTMLTextAreaElement Windows macOS JVM Web 生命周期 焦点 叠放"),

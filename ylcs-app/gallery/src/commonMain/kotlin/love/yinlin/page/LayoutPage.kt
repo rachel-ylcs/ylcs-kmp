@@ -33,6 +33,8 @@ import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.HSV
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.HorizontalScrollContainer
+import love.yinlin.compose.ui.layout.HorizontalSplitter
+import love.yinlin.compose.ui.layout.VerticalSplitter
 import love.yinlin.compose.ui.layout.OffsetBox
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -175,6 +177,43 @@ object LayoutPage : Page() {
                     }
                 }
             }
+
+            Component("Splitter") {
+                GalleryParagraph("拖动中间的分隔条调整区域比例。子内容可以使用 fillMaxWidth 或 fillMaxHeight 填满各自区域，较小的内容按 alignment 对齐。")
+                ExampleRow(maxItemsInEachRow = 2) {
+                    Example("水平分隔", Modifier.weight(1f)) {
+                        HorizontalSplitter(
+                            modifier = Modifier.fillMaxWidth().height(Theme.size.cell4),
+                            left = {
+                                Box(Modifier.fillMaxSize().background(Theme.color.primaryContainer), contentAlignment = Alignment.Center) {
+                                    Text("LEFT", color = Theme.color.onContainer)
+                                }
+                            },
+                            right = {
+                                Box(Modifier.fillMaxSize().background(Theme.color.secondaryContainer), contentAlignment = Alignment.Center) {
+                                    Text("RIGHT", color = Theme.color.onContainer)
+                                }
+                            },
+                        )
+                    }
+                    Example("垂直分隔", Modifier.weight(1f)) {
+                        VerticalSplitter(
+                            modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 + Theme.size.cell4),
+                            top = {
+                                Box(Modifier.fillMaxSize().background(Theme.color.primaryContainer), contentAlignment = Alignment.Center) {
+                                    Text("TOP", color = Theme.color.onContainer)
+                                }
+                            },
+                            bottom = {
+                                Box(Modifier.fillMaxSize().background(Theme.color.secondaryContainer), contentAlignment = Alignment.Center) {
+                                    Text("BOTTOM", color = Theme.color.onContainer)
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+
         }
     }
 
