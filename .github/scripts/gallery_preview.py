@@ -12,6 +12,8 @@ from PIL import Image, ImageChops
 
 WINDOW_TITLE = "Rachel UI Gallery"
 SIDEBAR_WIDTH = 257  # GallerySidebar is 256dp plus the 1dp divider at 1x CI density.
+CONTENT_TOP = 36  # Desktop Gallery draws window controls inside the client area.
+CONTENT_BOTTOM = 8  # Exclude the decorated bottom edge from each stitched frame.
 OUTPUT = Path("build/gallery-preview/gallery-preview.png")
 
 
@@ -88,7 +90,7 @@ def main():
     x, y, width, height = get_geometry(window)
     if width <= SIDEBAR_WIDTH:
         raise RuntimeError(f"Unexpected Gallery window size: {width}x{height}")
-    region = (x + SIDEBAR_WIDTH, y, x + width, y + height)
+    region = (x + SIDEBAR_WIDTH, y + CONTENT_TOP, x + width, y + height - CONTENT_BOTTOM)
 
     # Scroll events go to the right-hand Compose content, not the sidebar.
     command("xdotool", "mousemove", "--sync", str(x + width - 80), str(y + height // 2))
