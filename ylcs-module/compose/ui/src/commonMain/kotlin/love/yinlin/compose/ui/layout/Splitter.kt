@@ -118,6 +118,7 @@ private fun Splitter(
     var dragging by rememberFalse(horizontal)
     val fallbackSize = Theme.size.cell1
     val indicatorSize = Theme.size.box1
+    val hitTargetSize = Theme.size.input9
     val layoutDirection = LocalLayoutDirection.current
     val layoutModifier = if (horizontal) modifier.fillMaxWidth() else modifier.fillMaxHeight()
 
@@ -146,7 +147,7 @@ private fun Splitter(
                                         axisExtent - firstExtent - dividerExtent / 2f
                                     }
                                     else firstExtent + dividerExtent / 2f
-                                    val hitTargetExtent = maxOf(dividerExtent, Theme.size.input9.roundToPx())
+                                    val hitTargetExtent = maxOf(dividerExtent, hitTargetSize.roundToPx())
                                     val pointerAxis = if (horizontal) change.position.x else change.position.y
                                     hovered = axisExtent > 0 && abs(pointerAxis - dividerCenter) <= hitTargetExtent / 2f
                                 }
@@ -174,7 +175,7 @@ private fun Splitter(
                         axisExtent - firstExtent - dividerExtent / 2f
                     }
                     else firstExtent + dividerExtent / 2f
-                    val hitTargetExtent = maxOf(dividerExtent, Theme.size.input9.roundToPx())
+                    val hitTargetExtent = maxOf(dividerExtent, hitTargetSize.roundToPx())
                     val downAxis = if (horizontal) down.position.x else down.position.y
                     if (abs(downAxis - dividerCenter) > hitTargetExtent / 2f) return@awaitEachGesture
 
@@ -298,32 +299,43 @@ private fun SplitterHandle(
     dragging: Boolean,
 ) {
     val active = hovered || dragging
+    val primaryColor = primaryColor
+    val outlineColor = Theme.color.outline
+    val surfaceColor = surfaceColor
+    val primaryContainerColor = primaryColorContainer
+    val onContainerColor = Theme.color.onContainer
+    val lineThicknessDp = Theme.border.v6
+    val handleSizeDp = Theme.size.input9
+    val shadowOffsetDp = Theme.shadow.v7
+    val borderWidthDp = Theme.border.v6
+    val circleSizeDp = Theme.size.box2
+    val circleBorderWidthDp = Theme.border.v7
 
     Box(
         modifier = Modifier.drawWithContent {
             drawContent()
 
-            val lineColor = if (active) Theme.color.primary else Theme.color.outline
-            val lineThickness = Theme.border.v6.toPx().coerceAtLeast(1f)
+            val lineColor = if (active) primaryColor else outlineColor
+            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
             if (horizontal) {
                 val x = size.width / 2f
-                drawLine(Theme.color.surface, Offset(x, 0f), Offset(x, size.height), lineThickness + 3f)
+                drawLine(surfaceColor, Offset(x, 0f), Offset(x, size.height), lineThickness + 3f)
                 drawLine(lineColor, Offset(x, 0f), Offset(x, size.height), lineThickness)
             }
             else {
                 val y = size.height / 2f
-                drawLine(Theme.color.surface, Offset(0f, y), Offset(size.width, y), lineThickness + 3f)
+                drawLine(surfaceColor, Offset(0f, y), Offset(size.width, y), lineThickness + 3f)
                 drawLine(lineColor, Offset(0f, y), Offset(size.width, y), lineThickness)
             }
 
-            val pillWidth = if (horizontal) size.width else Theme.size.input9.toPx().coerceAtMost(size.width)
-            val pillHeight = if (horizontal) Theme.size.input9.toPx().coerceAtMost(size.height) else size.height
+            val pillWidth = if (horizontal) size.width else handleSizeDp.toPx().coerceAtMost(size.width)
+            val pillHeight = if (horizontal) handleSizeDp.toPx().coerceAtMost(size.height) else size.height
             if (pillWidth > 0f && pillHeight > 0f) {
                 val topLeft = Offset((size.width - pillWidth) / 2f, (size.height - pillHeight) / 2f)
                 val pillSize = Size(pillWidth, pillHeight)
                 val cornerRadius = CornerRadius(minOf(pillWidth, pillHeight) / 2f)
-                val shadowOffset = Theme.shadow.v7.toPx()
-                val borderWidth = Theme.border.v6.toPx()
+                val shadowOffset = shadowOffsetDp.toPx()
+                val borderWidth = borderWidthDp.toPx()
 
                 drawRoundRect(
                     color = Color.Black.copy(alpha = 0.2f),
@@ -331,22 +343,22 @@ private fun SplitterHandle(
                     size = pillSize,
                     cornerRadius = cornerRadius,
                 )
-                drawRoundRect(Theme.color.surface, topLeft, pillSize, cornerRadius)
+                drawRoundRect(surfaceColor, topLeft, pillSize, cornerRadius)
                 drawRoundRect(
-                    color = if (active) Theme.color.primary else Theme.color.outline,
+                    color = if (active) primaryColor else outlineColor,
                     topLeft = topLeft,
                     size = pillSize,
                     cornerRadius = cornerRadius,
                     style = Stroke(width = borderWidth),
                 )
 
-                val circleDiameter = minOf(Theme.size.box2.toPx(), pillWidth, pillHeight)
+                val circleDiameter = minOf(circleSizeDp.toPx(), pillWidth, pillHeight)
                 if (circleDiameter > 0f) {
                     val center = Offset(size.width / 2f, size.height / 2f)
                     val radius = circleDiameter / 2f
-                    drawCircle(Theme.color.primaryContainer, radius, center)
-                    drawCircle(Theme.color.primary, radius, center, style = Stroke(width = Theme.border.v7.toPx()))
-                    drawDirectionalArrows(horizontal, center, circleDiameter, Theme.color.onContainer)
+                    drawCircle(primaryContainerColor, radius, center)
+                    drawCircle(primaryColor, radius, center, style = Stroke(width = circleBorderWidthDp.toPx()))
+                    drawDirectionalArrows(horizontal, center, circleDiameter, onContainerColor)
                 }
             }
         },

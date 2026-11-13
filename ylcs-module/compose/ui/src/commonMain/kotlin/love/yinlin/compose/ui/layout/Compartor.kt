@@ -251,6 +251,16 @@ private fun ComparatorHandle(
     dragging: Boolean,
 ) {
     val active = hovered || dragging
+    val primaryColor = Theme.color.primary
+    val outlineColor = Theme.color.outline
+    val surfaceColor = surfaceColor
+    val primaryContainerColor = Theme.color.primaryContainer
+    val onContainerColor = Theme.color.onContainer
+    val lineThicknessDp = Theme.border.v6
+    val handleSizeDp = Theme.size.input8
+    val shadowOffsetDp = Theme.shadow.v5
+    val borderWidthDp = Theme.border.v6
+    val innerBorderWidthDp = Theme.border.v7
 
     Box(
         modifier = Modifier.fillMaxSize().drawWithContent {
@@ -260,38 +270,38 @@ private fun ComparatorHandle(
             else if (horizontal) size.width * splitRatio
             else size.height * splitRatio
 
-            val lineColor = if (active) Theme.color.primary else Theme.color.outline
-            val lineThickness = Theme.border.v6.toPx().coerceAtLeast(1f)
+            val lineColor = if (active) primaryColor else outlineColor
+            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
             if (horizontal) {
-                drawLine(Theme.color.surface, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness + 4f)
+                drawLine(surfaceColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness + 4f)
                 drawLine(lineColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness)
             }
             else {
-                drawLine(Theme.color.surface, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness + 4f)
+                drawLine(surfaceColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness + 4f)
                 drawLine(lineColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness)
             }
 
-            val diameter = Theme.size.input8.toPx().coerceAtMost(minOf(size.width, size.height))
+            val diameter = handleSizeDp.toPx().coerceAtMost(minOf(size.width, size.height))
             if (diameter > 0f) {
                 val center = if (horizontal) Offset(splitPosition, size.height / 2f) else Offset(size.width / 2f, splitPosition)
                 val radius = diameter / 2f
                 drawCircle(
                     color = Color.Black.copy(alpha = 0.28f),
                     radius = radius,
-                    center = center + Offset(0f, Theme.shadow.v5.toPx()),
+                    center = center + Offset(0f, shadowOffsetDp.toPx()),
                 )
-                drawCircle(Theme.color.surface, radius, center)
+                drawCircle(surfaceColor, radius, center)
                 drawCircle(
-                    color = if (active) Theme.color.primary else Theme.color.outline,
+                    color = if (active) primaryColor else outlineColor,
                     radius = radius,
                     center = center,
-                    style = Stroke(width = Theme.border.v6.toPx()),
+                    style = Stroke(width = borderWidthDp.toPx()),
                 )
 
                 val innerRadius = diameter * 0.31f
-                drawCircle(Theme.color.primaryContainer, innerRadius, center)
-                drawCircle(Theme.color.primary, innerRadius, center, style = Stroke(width = Theme.border.v7.toPx()))
-                drawDirectionalArrows(horizontal, center, innerRadius * 2f, Theme.color.onContainer)
+                drawCircle(primaryContainerColor, innerRadius, center)
+                drawCircle(primaryColor, innerRadius, center, style = Stroke(width = innerBorderWidthDp.toPx()))
+                drawDirectionalArrows(horizontal, center, innerRadius * 2f, onContainerColor)
             }
         },
     )
