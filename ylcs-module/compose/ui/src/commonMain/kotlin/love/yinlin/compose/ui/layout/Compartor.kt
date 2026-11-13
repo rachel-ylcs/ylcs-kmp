@@ -11,9 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -31,9 +33,6 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.node.pointerIcon
 import kotlin.math.abs
-
-private const val COMPARATOR_MIN_RATIO = 0.05f
-private const val COMPARATOR_MAX_RATIO = 0.95f
 
 /**
  * 将内容叠放为左右两部分，通过拖动中间的比较线调整两侧的可见范围。
@@ -94,7 +93,7 @@ private fun ComparatorLayout(
     var hovered by rememberFalse(horizontal)
     var dragging by rememberFalse(horizontal)
     val fallbackSize = Theme.size.cell1
-    val hitTargetSize = Theme.size.box1
+    val hitTargetSize = Theme.size.input7
     val layoutDirection = LocalLayoutDirection.current
     val layoutModifier = if (horizontal) modifier.fillMaxWidth() else modifier.fillMaxHeight()
 
@@ -105,10 +104,11 @@ private fun ComparatorLayout(
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Main)
-                        val change = event.changes.firstOrNull() ?: continue
-                        if (change.type == PointerType.Mouse) {
-                            when (event.type) {
-                                PointerEventType.Enter, PointerEventType.Move -> {
+                        when (event.type) {
+                            PointerEventType.Exit -> hovered = false
+                            PointerEventType.Enter, PointerEventType.Move -> {
+                                val change = event.changes.firstOrNull() ?: continue
+                                if (change.type == PointerType.Mouse) {
                                     val axisExtent = if (horizontal) size.width else size.height
                                     val splitPosition = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
                                         axisExtent * (1f - splitRatio)
@@ -117,8 +117,8 @@ private fun ComparatorLayout(
                                     val pointerPosition = if (horizontal) change.position.x else change.position.y
                                     hovered = axisExtent > 0 && abs(pointerPosition - splitPosition) <= hitTargetSize.roundToPx() / 2f
                                 }
-                                PointerEventType.Exit -> hovered = false
                             }
+                            else -> Unit
                         }
                     }
                 }
@@ -144,12 +144,40 @@ private fun ComparatorLayout(
                         while (true) {
                             val event = awaitPointerEvent()
                             val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            if (
+                                event.type == PointerEventType.Exit ||
+                                change.position.x < 0f ||
+                                change.position.x >= size.width.toFloat() ||
+                                change.position.y < 0f ||
+                                change.position.y >= size.height.toFloat()
+                            ) {
+                                hovered = false
+                                return@awaitEachGesture
+                            }
+
                             val currentPosition = if (horizontal) change.position.x else change.position.y
+                            val currentAxisExtent = if (horizontal) size.width else size.height
+                            val edgeThreshold = 1f
+                            val atFirstEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
+                                currentPosition >= currentAxisExtent - edgeThreshold
+                            }
+                            else currentPosition <= edgeThreshold
+                            val atSecondEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
+                                currentPosition <= edgeThreshold
+                            }
+                            else currentPosition >= currentAxisExtent - edgeThreshold
                             val delta = currentPosition - previousPosition
                             val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                            if (logicalDelta != 0f) {
-                                splitRatio = (splitRatio + logicalDelta / axisExtent)
-                                    .coerceIn(COMPARATOR_MIN_RATIO, COMPARATOR_MAX_RATIO)
+                            if (atFirstEdge) {
+                                splitRatio = 0f
+                                change.consume()
+                            }
+                            else if (atSecondEdge) {
+                                splitRatio = 1f
+                                change.consume()
+                            }
+                            else if (logicalDelta != 0f) {
+                                splitRatio = (splitRatio + logicalDelta / currentAxisExtent).coerceIn(0f, 1f)
                                 change.consume()
                             }
 
@@ -222,12 +250,17 @@ private fun ComparatorHandle(
     hovered: Boolean,
     dragging: Boolean,
 ) {
-    val inactiveColor = Theme.color.outline.copy(alpha = 0.4f)
-    val activeColor = Theme.color.primary
-    val indicatorColor = Theme.color.primaryContainer
-    val lineThickness = Theme.border.v7
-    val indicatorThickness = Theme.size.box3
-    val indicatorLength = Theme.size.input9
+    val active = hovered || dragging
+    val primaryColor = Theme.color.primary
+    val outlineColor = Theme.color.outline
+    val surfaceColor = Theme.color.surface
+    val primaryContainerColor = Theme.color.primaryContainer
+    val onContainerColor = Theme.color.onContainer
+    val lineThicknessDp = Theme.border.v6
+    val handleSizeDp = Theme.size.input8
+    val shadowOffsetDp = Theme.shadow.v5
+    val borderWidthDp = Theme.border.v6
+    val innerBorderWidthDp = Theme.border.v7
 
     Box(
         modifier = Modifier.fillMaxSize().drawWithContent {
@@ -237,38 +270,68 @@ private fun ComparatorHandle(
             else if (horizontal) size.width * splitRatio
             else size.height * splitRatio
 
-            val lineColor = if (hovered || dragging) activeColor else inactiveColor
-            val strokeWidth = lineThickness.toPx().coerceAtLeast(0f)
+            val lineColor = if (active) primaryColor else outlineColor
+            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
             if (horizontal) {
-                drawLine(lineColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), strokeWidth)
-                if (hovered || dragging) {
-                    val width = indicatorThickness.toPx().coerceAtLeast(0f).coerceAtMost(size.width)
-                    val height = indicatorLength.toPx().coerceAtLeast(0f).coerceAtMost(size.height)
-                    if (width > 0f && height > 0f) {
-                        drawRoundRect(
-                            color = if (dragging) activeColor else indicatorColor,
-                            topLeft = Offset(splitPosition - width / 2f, (size.height - height) / 2f),
-                            size = Size(width, height),
-                            cornerRadius = CornerRadius(width / 2f),
-                        )
-                    }
-                }
+                drawLine(surfaceColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness + 4f)
+                drawLine(lineColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness)
             }
             else {
-                drawLine(lineColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), strokeWidth)
-                if (hovered || dragging) {
-                    val width = indicatorLength.toPx().coerceAtLeast(0f).coerceAtMost(size.width)
-                    val height = indicatorThickness.toPx().coerceAtLeast(0f).coerceAtMost(size.height)
-                    if (width > 0f && height > 0f) {
-                        drawRoundRect(
-                            color = if (dragging) activeColor else indicatorColor,
-                            topLeft = Offset((size.width - width) / 2f, splitPosition - height / 2f),
-                            size = Size(width, height),
-                            cornerRadius = CornerRadius(height / 2f),
-                        )
-                    }
-                }
+                drawLine(surfaceColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness + 4f)
+                drawLine(lineColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness)
+            }
+
+            val diameter = handleSizeDp.toPx().coerceAtMost(minOf(size.width, size.height))
+            if (diameter > 0f) {
+                val center = if (horizontal) Offset(splitPosition, size.height / 2f) else Offset(size.width / 2f, splitPosition)
+                val radius = diameter / 2f
+                drawCircle(
+                    color = Color.Black.copy(alpha = 0.28f),
+                    radius = radius,
+                    center = center + Offset(0f, shadowOffsetDp.toPx()),
+                )
+                drawCircle(surfaceColor, radius, center)
+                drawCircle(
+                    color = if (active) primaryColor else outlineColor,
+                    radius = radius,
+                    center = center,
+                    style = Stroke(width = borderWidthDp.toPx()),
+                )
+
+                val innerRadius = diameter * 0.31f
+                drawCircle(primaryContainerColor, innerRadius, center)
+                drawCircle(primaryColor, innerRadius, center, style = Stroke(width = innerBorderWidthDp.toPx()))
+                drawDirectionalArrows(horizontal, center, innerRadius * 2f, onContainerColor)
             }
         },
     )
+}
+
+private fun DrawScope.drawDirectionalArrows(
+    horizontal: Boolean,
+    center: Offset,
+    diameter: Float,
+    color: Color,
+) {
+    if (diameter < 8f) return
+
+    val arrowSize = diameter * 0.2f
+    val arrowOffset = diameter * 0.18f
+    val strokeWidth = diameter * 0.08f
+    if (horizontal) {
+        val leftX = center.x - arrowOffset
+        val rightX = center.x + arrowOffset
+        drawLine(color, Offset(leftX + arrowSize, center.y - arrowSize), Offset(leftX, center.y), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(leftX, center.y), Offset(leftX + arrowSize, center.y + arrowSize), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(rightX - arrowSize, center.y - arrowSize), Offset(rightX, center.y), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(rightX, center.y), Offset(rightX - arrowSize, center.y + arrowSize), strokeWidth, cap = StrokeCap.Round)
+    }
+    else {
+        val topY = center.y - arrowOffset
+        val bottomY = center.y + arrowOffset
+        drawLine(color, Offset(center.x - arrowSize, topY + arrowSize), Offset(center.x, topY), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(center.x, topY), Offset(center.x + arrowSize, topY + arrowSize), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(center.x - arrowSize, bottomY - arrowSize), Offset(center.x, bottomY), strokeWidth, cap = StrokeCap.Round)
+        drawLine(color, Offset(center.x, bottomY), Offset(center.x + arrowSize, bottomY - arrowSize), strokeWidth, cap = StrokeCap.Round)
+    }
 }
