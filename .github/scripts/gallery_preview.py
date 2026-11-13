@@ -3,7 +3,6 @@
 
 from collections import Counter
 from pathlib import Path
-import os
 import subprocess
 import tempfile
 import time
@@ -35,13 +34,14 @@ def get_geometry(window):
     return tuple(int(values[key]) for key in ("X", "Y", "WIDTH", "HEIGHT"))
 
 
-def capture(directory, number, region):
+def capture(directory, number, window):
     path = directory / f"frame-{number:03d}.png"
-    command("scrot", "-z", str(path))
+    # By default -w captures the X11 client area without the window-manager frame.
+    command("scrot", "-z", "-w", window, str(path))
     with Image.open(path) as screenshot:
-        if region[0] < 0 or region[1] < 0 or region[2] > screenshot.width or region[3] > screenshot.height:
-            raise RuntimeError(f"Gallery content rectangle {region} is outside the screen {screenshot.size}")
-        return screenshot.crop(region).convert("RGB")
+        if screenshot.width <= SIDEBAR_WIDTH:
+            raise RuntimeError(f"Unexpected Gallery screenshot dimensions: {screenshot.size}")
+        return screenshot.crop((SIDEBAR_WIDTH, 0, screenshot.width, screenshot.height)).convert("RGB")
 
 
 def row_fingerprints(image):
@@ -82,18 +82,17 @@ def main():
     x, y, width, height = get_geometry(window)
     if width <= SIDEBAR_WIDTH:
         raise RuntimeError(f"Unexpected Gallery window size: {width}x{height}")
-    region = (x + SIDEBAR_WIDTH, y, x + width, y + height)
 
     # Scroll events go to the right-hand Compose content, not the sidebar.
     command("xdotool", "mousemove", "--sync", str(x + width - 80), str(y + height // 2))
     with tempfile.TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        previous = capture(directory, 0, region)
+        previous = capture(directory, 0, window)
         segments = [previous]
         for number in range(1, 41):
             command("xdotool", "click", "--repeat", "4", "--delay", "80", "5")
             time.sleep(0.85)
-            current = capture(directory, number, region)
+            current = capture(directory, number, window)
             delta = scroll_delta(previous, current)
             if delta == 0:
                 break
