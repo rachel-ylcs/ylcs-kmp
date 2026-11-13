@@ -1,7 +1,7 @@
 name: Pull Request CI
 
 # Only one workflow listens for PRs to main. A preview request runs the Gallery
-# screenshot job; other PRs delegate to the full Build, Test and Lint workflows.
+# screenshot job; other PRs delegate to Build, Test, Lint and Native workflows.
 concurrency:
   group: pr-ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -121,3 +121,8 @@ jobs:
     name: Full Lint
     if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
     uses: ./.github/workflows/lint.yml
+
+  full-native:
+    name: Native Maintenance
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/native-compose.yml
