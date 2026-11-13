@@ -205,6 +205,29 @@ object InputPage : Page() {
                 }
             }
 
+            Component("StarBar") {
+                val normalState = rememberStarBarState(3f)
+                val halfState = rememberStarBarState(2.5f)
+
+                ExampleRow {
+                    Example("整星 · ${normalState.value}") {
+                        StarBar(state = normalState)
+                    }
+
+                    Example("半星 · ${halfState.value}") {
+                        StarBar(state = halfState, half = true)
+                    }
+
+                    Example("7 颗 / 大尺寸") {
+                        StarBar(state = normalState, num = 7, modifier = Modifier.height(Theme.size.input7))
+                    }
+
+                    Example("已禁用") {
+                        StarBar(state = halfState, half = true, enable = false)
+                    }
+                }
+            }
+
             Component("ComboBox") {
                 ExampleRow {
                     val items = remember { (1 .. 20).map { "Item $it" } }
