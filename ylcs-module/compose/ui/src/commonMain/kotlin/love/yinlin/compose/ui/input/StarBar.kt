@@ -70,7 +70,7 @@ fun StarBar(
     val currentValue = state.value.coerceIn(0f, num.toFloat())
     val actualActiveColor = if (enable) activeColor else Theme.color.disabledContent
     val actualTrackColor = if (enable) trackColor else Theme.color.disabledContainer
-    var hoveredValue by remember { mutableStateOf<Float?>(null) }
+    var hoveredValue by remember(enable, num, half) { mutableStateOf<Float?>(null) }
 
     Layout(
         content = {},
@@ -87,7 +87,7 @@ fun StarBar(
                     true
                 }
             }
-            .pointerInput(enable, num, half) {
+            .pointerInput(state, enable, num, half) {
                 if (enable) {
                     detectTapGestures { offset ->
                         val rating = starBarRatingAt(offset.x, size.height.toFloat(), num, half)
