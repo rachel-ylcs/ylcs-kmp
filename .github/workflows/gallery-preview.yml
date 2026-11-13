@@ -1,15 +1,19 @@
-name: Gallery Preview
+name: Pull Request CI
 
-# Request a preview by targeting the gallery-preview base branch and adding
-# "gallery-preview: input:Button" to the PR body. Retarget to main for full CI.
+# Only one workflow listens for PRs to main. A preview request runs the Gallery
+# screenshot job; other PRs delegate to the full Build, Test and Lint workflows.
 concurrency:
-  group: gallery-preview-${{ github.event.pull_request.number }}
+  group: pr-ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
   pull_request:
-    branches: [gallery-preview]
+    branches: [main]
     types: [opened, synchronize, reopened, edited]
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
 
 permissions:
   contents: read
@@ -102,3 +106,18 @@ jobs:
           path: build/gallery-preview/gallery.log
           if-no-files-found: warn
           retention-days: 3
+
+  full-build:
+    name: Full Build
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/build.yml
+
+  full-test:
+    name: Full Test
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/test.yml
+
+  full-lint:
+    name: Full Lint
+    if: ${{ !contains(github.event.pull_request.body, 'gallery-preview:') }}
+    uses: ./.github/workflows/lint.yml
