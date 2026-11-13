@@ -54,6 +54,7 @@ internal data class PageItem(
                 ComponentItem("Switch", "两个开关共享同一状态，另一个保留禁用状态。"),
                 ComponentItem("Radio / CheckBox", "体验单选、多选和三态选择，并比较禁用选项。", "RadioGroup TriStateCheckBox"),
                 ComponentItem("Slider", "拖动数值滑块，对照无滑块、禁用和字符转换示例。"),
+                ComponentItem("StarBar", "点击星星选择或清除评分，比较整星、半星、七星、大尺寸与禁用状态。", "星级 评分 Rating half StarBarState"),
                 ComponentItem("ComboBox", "从列表中选择项目，比较默认宽度、自适应宽度与禁用状态。"),
                 ComponentItem("Filter", "体验单选与多选筛选，部分项目携带图标或处于禁用状态。"),
                 ComponentItem("ColorPicker", "拖动颜色选择器，观察颜色、透明度与预览的变化。"),
