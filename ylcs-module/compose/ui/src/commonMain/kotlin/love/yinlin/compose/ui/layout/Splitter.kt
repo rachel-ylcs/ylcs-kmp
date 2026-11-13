@@ -128,10 +128,11 @@ private fun Splitter(
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Main)
-                        val change = event.changes.firstOrNull() ?: continue
-                        if (change.type == PointerType.Mouse) {
-                            when (event.type) {
-                                PointerEventType.Enter, PointerEventType.Move -> {
+                        when (event.type) {
+                            PointerEventType.Exit -> hovered = false
+                            PointerEventType.Enter, PointerEventType.Move -> {
+                                val change = event.changes.firstOrNull() ?: continue
+                                if (change.type == PointerType.Mouse) {
                                     val axisExtent = if (horizontal) size.width else size.height
                                     val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
                                     val marginExtent = indicatorMargin.roundToPx().coerceAtLeast(0)
@@ -149,8 +150,8 @@ private fun Splitter(
                                     val pointerAxis = if (horizontal) change.position.x else change.position.y
                                     hovered = axisExtent > 0 && abs(pointerAxis - dividerCenter) <= hitTargetExtent / 2f
                                 }
-                                PointerEventType.Exit -> hovered = false
                             }
+                            else -> Unit
                         }
                     }
                 }

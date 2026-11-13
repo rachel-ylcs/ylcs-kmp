@@ -104,10 +104,11 @@ private fun ComparatorLayout(
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Main)
-                        val change = event.changes.firstOrNull() ?: continue
-                        if (change.type == PointerType.Mouse) {
-                            when (event.type) {
-                                PointerEventType.Enter, PointerEventType.Move -> {
+                        when (event.type) {
+                            PointerEventType.Exit -> hovered = false
+                            PointerEventType.Enter, PointerEventType.Move -> {
+                                val change = event.changes.firstOrNull() ?: continue
+                                if (change.type == PointerType.Mouse) {
                                     val axisExtent = if (horizontal) size.width else size.height
                                     val splitPosition = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
                                         axisExtent * (1f - splitRatio)
@@ -116,8 +117,8 @@ private fun ComparatorLayout(
                                     val pointerPosition = if (horizontal) change.position.x else change.position.y
                                     hovered = axisExtent > 0 && abs(pointerPosition - splitPosition) <= hitTargetSize.roundToPx() / 2f
                                 }
-                                PointerEventType.Exit -> hovered = false
                             }
+                            else -> Unit
                         }
                     }
                 }
@@ -155,10 +156,28 @@ private fun ComparatorLayout(
                             }
 
                             val currentPosition = if (horizontal) change.position.x else change.position.y
+                            val currentAxisExtent = if (horizontal) size.width else size.height
+                            val edgeThreshold = 1f
+                            val atFirstEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
+                                currentPosition >= currentAxisExtent - edgeThreshold
+                            }
+                            else currentPosition <= edgeThreshold
+                            val atSecondEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
+                                currentPosition <= edgeThreshold
+                            }
+                            else currentPosition >= currentAxisExtent - edgeThreshold
                             val delta = currentPosition - previousPosition
                             val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                            if (logicalDelta != 0f) {
-                                splitRatio = (splitRatio + logicalDelta / axisExtent).coerceIn(0f, 1f)
+                            if (atFirstEdge) {
+                                splitRatio = 0f
+                                change.consume()
+                            }
+                            else if (atSecondEdge) {
+                                splitRatio = 1f
+                                change.consume()
+                            }
+                            else if (logicalDelta != 0f) {
+                                splitRatio = (splitRatio + logicalDelta / currentAxisExtent).coerceIn(0f, 1f)
                                 change.consume()
                             }
 
