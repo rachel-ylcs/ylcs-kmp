@@ -90,13 +90,17 @@ jobs:
         with:
           name: gallery-preview-pr-${{ github.event.pull_request.number }}
           path: build/gallery-preview/gallery-preview.png
+          archive: false
           if-no-files-found: error
           retention-days: 14
 
       - name: Link preview
         env:
           ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
-        run: echo "[下载 Gallery 右侧完整截图]($ARTIFACT_URL)" >> "$GITHUB_STEP_SUMMARY"
+        run: | 
+          echo "## Gallery 组件预览" >> "$GITHUB_STEP_SUMMARY"
+          echo "点击下方链接直接在 GitHub 中查看 PNG 图片（无需下载 ZIP）：" >> "$GITHUB_STEP_SUMMARY"
+          echo "[直接预览 Gallery 右侧完整截图]($ARTIFACT_URL)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload debug log on failure
         if: failure()
