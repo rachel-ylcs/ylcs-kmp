@@ -4,6 +4,7 @@
 from collections import Counter
 from pathlib import Path
 import subprocess
+import re
 import tempfile
 import time
 
@@ -29,19 +30,24 @@ def wait_for_window(timeout=900):
 
 
 def get_geometry(window):
-    result = command("xdotool", "getwindowgeometry", "--shell", window)
-    values = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
-    return tuple(int(values[key]) for key in ("X", "Y", "WIDTH", "HEIGHT"))
+    # xwininfo reports the X11 client rectangle, excluding Openbox decorations.
+    result = command("xwininfo", "-id", window)
+    matches = [re.search(rf"{field}:\\s*(-?\\d+)", result.stdout) for field in (
+        "Absolute upper-left X", "Absolute upper-left Y", "Width", "Height"
+    )]
+    if any(match is None for match in matches):
+        raise RuntimeError(f"Cannot read Gallery client geometry: {result.stdout}")
+    return tuple(int(match.group(1)) for match in matches)
 
 
-def capture(directory, number, window):
+def capture(directory, number, region):
     path = directory / f"frame-{number:03d}.png"
-    # By default -w captures the X11 client area without the window-manager frame.
-    command("scrot", "-z", "-w", window, str(path))
+    # Root capture + explicit client coordinates excludes the title bar and frame.
+    command("scrot", "-z", str(path))
     with Image.open(path) as screenshot:
-        if screenshot.width <= SIDEBAR_WIDTH:
-            raise RuntimeError(f"Unexpected Gallery screenshot dimensions: {screenshot.size}")
-        return screenshot.crop((SIDEBAR_WIDTH, 0, screenshot.width, screenshot.height)).convert("RGB")
+        if not (0 <= region[0] < region[2] <= screenshot.width and 0 <= region[1] < region[3] <= screenshot.height):
+            raise RuntimeError(f"Gallery client rectangle {region} outside display {screenshot.size}")
+        return screenshot.crop(region).convert("RGB")
 
 
 def row_fingerprints(image):
@@ -82,17 +88,18 @@ def main():
     x, y, width, height = get_geometry(window)
     if width <= SIDEBAR_WIDTH:
         raise RuntimeError(f"Unexpected Gallery window size: {width}x{height}")
+    region = (x + SIDEBAR_WIDTH, y, x + width, y + height)
 
     # Scroll events go to the right-hand Compose content, not the sidebar.
     command("xdotool", "mousemove", "--sync", str(x + width - 80), str(y + height // 2))
     with tempfile.TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        previous = capture(directory, 0, window)
+        previous = capture(directory, 0, region)
         segments = [previous]
         for number in range(1, 41):
             command("xdotool", "click", "--repeat", "4", "--delay", "80", "5")
             time.sleep(0.85)
-            current = capture(directory, number, window)
+            current = capture(directory, number, region)
             delta = scroll_delta(previous, current)
             if delta == 0:
                 break
