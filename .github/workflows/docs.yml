@@ -2,12 +2,6 @@ name: docs
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - 'ylcs-docs/**'
-      - 'ylcs-module/dokka/**'
-      - '.github/workflows/docs.yml'
     tags:
       - 'docs*'
 permissions:
