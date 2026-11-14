@@ -55,7 +55,15 @@ jobs:
         uses: ./.github/actions/setup-build
         with:
           gtk: 'true'
-          virtual-display: 'true'
+
+      # Compile synchronously before installing or starting any screenshot tools.
+      - name: Compile Gallery
+        shell: bash
+        run: |
+          mkdir -p build/gallery-preview
+          set -o pipefail
+          ./gradlew :ylcs-app:gallery:compileKotlinDesktop --no-daemon --build-cache --max-workers=2 --console=plain \
+            2>&1 | tee build/gallery-preview/compile.log
 
       - name: Setup Python
         uses: actions/setup-python@v7
@@ -65,17 +73,8 @@ jobs:
       - name: Install screenshot tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y openbox xdotool x11-utils scrot
+          sudo apt-get install -y xvfb xauth openbox xdotool x11-utils scrot
           python -m pip install --disable-pip-version-check Pillow
-
-      # Compile synchronously before starting Xvfb, the app or any screenshot tool.
-      - name: Compile Gallery
-        shell: bash
-        run: |
-          mkdir -p build/gallery-preview
-          set -o pipefail
-          ./gradlew :ylcs-app:gallery:compileKotlinDesktop --no-daemon --build-cache --max-workers=2 --console=plain \
-            2>&1 | tee build/gallery-preview/compile.log
 
       - name: Start virtual display
         shell: bash
