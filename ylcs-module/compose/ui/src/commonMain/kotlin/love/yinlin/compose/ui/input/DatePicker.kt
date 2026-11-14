@@ -81,7 +81,7 @@ private fun DatePickerWeekRow(width: Dp, cellSize: Dp, style: TextStyle, measure
 @Composable
 private fun DatePickerDays(
     month: LocalDate,
-    selected: LocalDate,
+    selected: LocalDate?,
     width: Dp,
     cellSize: Dp,
     style: TextStyle,
@@ -94,12 +94,12 @@ private fun DatePickerDays(
     val selectedColor = Theme.color.primary
     val currentCallback by rememberUpdatedState(onDateChanged)
 
-    Canvas(modifier = Modifier.size(width, cellSize * 6).pointerInput(start, selected) {
+    Canvas(modifier = Modifier.size(width, cellSize * 6).pointerInput(start) {
         detectTapGestures { point ->
             val column = (point.x / size.width * 7).toInt().coerceIn(0, 6)
             val row = (point.y / size.height * 6).toInt().coerceIn(0, 5)
             val clicked = start.plus(row * 7 + column, DateTimeUnit.DAY)
-            if (clicked != selected) currentCallback(clicked)
+            currentCallback(clicked)
         }
     }) {
         val cell = size.width / 7f
@@ -172,13 +172,14 @@ private fun DatePickerChoiceGrid(
  *
  * 左右箭头切换年份，横向滑动或鼠标纵向滚轮切换月份。年份、月份选择面板
  * 占用整个组件区域；调整浏览年份或月份不会调用 [onDateChanged]，
- * 只有选择不同的具体日期才会通知调用方。选中日期由 [date] 控制。
+ * 点击任意日期都会调用 [onDateChanged]，即使与当前选中日期相同。
+ * [date] 为空时默认展示当前月份，不高亮任何日期。
  *
  * @param initialView 初始面板；切换年份、月份时不会修改外部选中日期。
  */
 @Composable
 fun DatePicker(
-    date: LocalDate,
+    date: LocalDate? = null,
     onDateChanged: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     style: TextStyle = Theme.typography.v8,
@@ -192,7 +193,10 @@ fun DatePicker(
     val measurer = rememberTextMeasurer(cacheSize = 96)
     val scope = rememberCoroutineScope()
 
-    var anchor by rememberState(date) { LocalDate(date.year, date.month, 1) }
+    var anchor by rememberState(date) {
+        val initial = date ?: DateEx.Today
+        LocalDate(initial.year, initial.month, 1)
+    }
     var view by rememberState(initialView) { initialView }
 
     Box(modifier = modifier.size(gridWidth, totalHeight)) {
