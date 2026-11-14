@@ -186,9 +186,7 @@ private fun SplitterHandle(horizontal: Boolean, hovered: Boolean, dragging: Bool
             drawContent()
             val lineColor = if (active) primaryColor else outlineColor
             val trackPosition = if (horizontal) size.width / 2f else size.height / 2f
-            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
-            if (horizontal) drawLine(lineColor, Offset(trackPosition, 0f), Offset(trackPosition, size.height), lineThickness)
-            else drawLine(lineColor, Offset(0f, trackPosition), Offset(size.width, trackPosition), lineThickness)
+            drawDividerTrack(horizontal, trackPosition, lineColor, surfaceColor, lineThicknessDp.toPx().coerceAtLeast(1f))
 
             val pillWidth = if (horizontal) size.width else handleSizeDp.toPx().coerceAtMost(size.width)
             val pillHeight = if (horizontal) handleSizeDp.toPx().coerceAtMost(size.height) else size.height
