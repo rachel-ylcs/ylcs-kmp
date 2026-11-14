@@ -185,7 +185,8 @@ object LayoutPage : Page() {
                 }
             }
 
-            Component("Splitter") {
+            Component("Splitter & Comparator") {
+                GalleryCaption("Splitter · 调整区域尺寸（指示器与内容留有主题间距）")
                 GalleryParagraph("拖动中间的分隔条调整区域比例。子内容可以使用 fillMaxWidth 或 fillMaxHeight 填满各自区域，较小的内容按 alignment 对齐。")
                 ExampleRow(maxItemsInEachRow = 2) {
                     Example("水平分隔", Modifier.weight(1f)) {
@@ -219,9 +220,8 @@ object LayoutPage : Page() {
                         )
                     }
                 }
-            }
 
-            Component("Comparator") {
+                GalleryCaption("Comparator · 覆盖内容的双向箭头指示器")
                 GalleryParagraph("拖动图片中间的比较线，分别查看同一张图片的不同画质，或将两张不同图片拼接比较。两个内容始终按比较器完整尺寸绘制，只显示分割线各自一侧。")
                 Example("示例 1 · 低画质与原图", Modifier.fillMaxWidth()) {
                     HorizontalComparator(
