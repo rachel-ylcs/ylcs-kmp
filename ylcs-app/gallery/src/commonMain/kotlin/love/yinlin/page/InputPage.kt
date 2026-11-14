@@ -296,6 +296,39 @@ object InputPage : Page() {
                 }
             }
 
+            Component("DatePicker") {
+                val sampleStyle = Theme.typography.v6
+                ExampleRow {
+                    Example("日期 · 点击选择") {
+                        var chosen by rememberState { kotlinx.datetime.LocalDate(2026, 11, 14) }
+                        DatePicker(date = chosen, onDateChanged = { chosen = it }, style = sampleStyle)
+                    }
+
+                    Example("年份 · 横向翻页") {
+                        DatePicker(
+                            date = kotlinx.datetime.LocalDate(2026, 11, 14),
+                            onDateChanged = {},
+                            style = sampleStyle,
+                            initialView = DatePickerView.Years
+                        )
+                    }
+
+                    Example("月份 · 跨年翻页") {
+                        DatePicker(
+                            date = kotlinx.datetime.LocalDate(2026, 11, 14),
+                            onDateChanged = {},
+                            style = sampleStyle,
+                            initialView = DatePickerView.Months
+                        )
+                    }
+
+                    Example("闰年 · 2024 年 2 月") {
+                        var chosen by rememberState { kotlinx.datetime.LocalDate(2024, 2, 29) }
+                        DatePicker(date = chosen, onDateChanged = { chosen = it }, style = sampleStyle)
+                    }
+                }
+            }
+
             Component("ColorPicker") {
                 ColorPicker(onColorChangeFinished = {})
             }
