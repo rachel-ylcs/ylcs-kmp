@@ -186,7 +186,7 @@ object LayoutPage : Page() {
             }
 
             Component("Splitter & Comparator") {
-                GalleryCaption("Splitter · 调整区域尺寸（指示器与内容留有主题间距）")
+                GalleryCaption("Splitter · 默认仅显示分隔线，悬停或拖拽时显示浮动抓手")
                 GalleryParagraph("拖动中间的分隔条调整区域比例。子内容可以使用 fillMaxWidth 或 fillMaxHeight 填满各自区域，较小的内容按 alignment 对齐。")
                 ExampleRow(maxItemsInEachRow = 2) {
                     Example("水平分隔", Modifier.weight(1f)) {
@@ -221,51 +221,53 @@ object LayoutPage : Page() {
                     }
                 }
 
-                GalleryCaption("Comparator · 覆盖内容的双向箭头指示器")
+                GalleryCaption("Comparator · 双向箭头抓手始终可见，激活时切换主题色")
                 GalleryParagraph("拖动图片中间的比较线，分别查看同一张图片的不同画质，或将两张不同图片拼接比较。两个内容始终按比较器完整尺寸绘制，只显示分割线各自一侧。")
-                Example("示例 1 · 低画质与原图", Modifier.fillMaxWidth()) {
-                    HorizontalComparator(
-                        modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
-                        left = {
-                            ResourceFileImage(
-                                Res.getUri("drawable/img0.webp"),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "低画质图片",
-                                options = ImageOptions(quality = ImageQuality.Low),
-                            )
-                        },
-                        right = {
-                            ResourceFileImage(
-                                Res.getUri("drawable/img0.webp"),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "原始画质图片",
-                                options = ImageOptions(quality = ImageQuality.Full),
-                            )
-                        },
-                    )
-                }
-                Example("示例 2 · 两张图片拼接", Modifier.fillMaxWidth()) {
-                    VerticalComparator(
-                        modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
-                        top = {
-                            ResourceFileImage(
-                                Res.getUri("drawable/img1.webp"),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "拼接图片上半部分",
-                            )
-                        },
-                        bottom = {
-                            ResourceFileImage(
-                                Res.getUri("drawable/img2.webp"),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "拼接图片下半部分",
-                            )
-                        },
-                    )
+                ExampleRow(maxItemsInEachRow = 2) {
+                    Example("示例 1 · 低画质与原图", Modifier.weight(1f)) {
+                        HorizontalComparator(
+                            modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
+                            left = {
+                                ResourceFileImage(
+                                    Res.getUri("drawable/img0.webp"),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "低画质图片",
+                                    options = ImageOptions(quality = ImageQuality.Low),
+                                )
+                            },
+                            right = {
+                                ResourceFileImage(
+                                    Res.getUri("drawable/img0.webp"),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "原始画质图片",
+                                    options = ImageOptions(quality = ImageQuality.Full),
+                                )
+                            },
+                        )
+                    }
+                    Example("示例 2 · 两张图片拼接", Modifier.weight(1f)) {
+                        VerticalComparator(
+                            modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
+                            top = {
+                                ResourceFileImage(
+                                    Res.getUri("drawable/img1.webp"),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "拼接图片上半部分",
+                                )
+                            },
+                            bottom = {
+                                ResourceFileImage(
+                                    Res.getUri("drawable/img2.webp"),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "拼接图片下半部分",
+                                )
+                            },
+                        )
+                    }
                 }
             }
 
