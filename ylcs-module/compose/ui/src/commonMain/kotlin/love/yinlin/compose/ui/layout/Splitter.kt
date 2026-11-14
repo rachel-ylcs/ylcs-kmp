@@ -407,7 +407,7 @@ private fun ComparatorHandle(
     val primaryColor = Theme.color.primary
     val outlineColor = Theme.color.outline
     val surfaceColor = Theme.color.surface
-    val onContainerColor = Theme.color.onContainer
+    val onSurfaceColor = Theme.color.onSurface
     val lineThicknessDp = Theme.border.v6
     val handleSizeDp = Theme.size.input8
     val handleThicknessDp = Theme.size.input10
@@ -435,7 +435,7 @@ private fun ComparatorHandle(
                 drawRoundRect(Color.Black.copy(alpha = 0.22f), topLeft + Offset(0f, shadowOffsetDp.toPx()), pillSize, cornerRadius)
                 drawRoundRect(surfaceColor, topLeft, pillSize, cornerRadius)
                 drawRoundRect(lineColor, topLeft, pillSize, cornerRadius, style = Stroke(width = borderWidthDp.toPx()))
-                drawDirectionalArrows(horizontal, center, minOf(pillWidth, pillHeight), if (active) primaryColor else onContainerColor)
+                drawDirectionalArrows(horizontal, center, minOf(pillWidth, pillHeight), if (active) primaryColor else onSurfaceColor)
             }
         },
     )
