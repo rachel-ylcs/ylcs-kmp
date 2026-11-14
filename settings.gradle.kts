@@ -133,6 +133,7 @@ repository {
                         "lottie",
                         "media",
                         "pagination-layout",
+                        "picker",
                         "qrcode",
                         "reordering",
                         "rich-text",

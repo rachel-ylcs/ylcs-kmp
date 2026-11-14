@@ -15,6 +15,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.delay
+import kotlinx.datetime.LocalTime
 import love.yinlin.GalleryActions
 import love.yinlin.GalleryBadge
 import love.yinlin.GalleryCaption
@@ -23,6 +24,7 @@ import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.scaleSize
@@ -297,12 +299,14 @@ object InputPage : Page() {
             }
 
             Component("DatePicker") {
-                var chosen by rememberState<kotlinx.datetime.LocalDate?> { null }
-                DatePicker(date = chosen, onDateChanged = { chosen = it })
+                val state by rememberState { DatePickerState() }
+
+                DatePicker(state)
+                GalleryCaption(state.date?.toString() ?: "尚未选择日期")
             }
 
             Component("TimePicker") {
-                var chosen by rememberState<kotlinx.datetime.LocalTime?> { null }
+                var chosen: LocalTime? by rememberNull()
                 TimePicker(time = chosen, onTimeChanged = { chosen = it })
             }
 

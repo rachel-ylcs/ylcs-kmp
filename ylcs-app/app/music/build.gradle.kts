@@ -26,8 +26,9 @@ rachel {
 
                     projects.ylcsModule.compose.components.blur,
                     projects.ylcsModule.compose.components.dragDrop,
-                    projects.ylcsModule.compose.components.paginationLayout,
                     projects.ylcsModule.compose.components.media,
+                    projects.ylcsModule.compose.components.paginationLayout,
+                    projects.ylcsModule.compose.components.picker,
                     projects.ylcsModule.compose.components.reordering,
                 )
             }

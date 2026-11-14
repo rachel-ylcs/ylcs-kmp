@@ -32,6 +32,7 @@ rachel {
                     projects.ylcsModule.compose.components.dragDrop,
                     projects.ylcsModule.compose.components.hexview,
                     projects.ylcsModule.compose.components.logOutput,
+                    projects.ylcsModule.compose.components.picker,
                     projects.ylcsModule.compose.components.reordering,
                     projects.ylcsModule.compose.components.richText,
                 )
