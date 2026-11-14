@@ -44,6 +44,23 @@ import kotlin.math.abs
 private const val SPLITTER_MIN_RATIO = 0.05f
 private const val SPLITTER_MAX_RATIO = 0.95f
 
+private fun DrawScope.drawDividerTrack(
+    horizontal: Boolean,
+    position: Float,
+    color: Color,
+    surfaceColor: Color,
+    thickness: Float,
+) {
+    if (horizontal) {
+        drawLine(surfaceColor, Offset(position, 0f), Offset(position, size.height), thickness + 3f)
+        drawLine(color, Offset(position, 0f), Offset(position, size.height), thickness)
+    }
+    else {
+        drawLine(surfaceColor, Offset(0f, position), Offset(size.width, position), thickness + 3f)
+        drawLine(color, Offset(0f, position), Offset(size.width, position), thickness)
+    }
+}
+
 private fun DrawScope.drawDirectionalArrows(
     horizontal: Boolean,
     center: Offset,
@@ -59,7 +76,6 @@ private fun DrawScope.drawDirectionalArrows(
     if (horizontal) {
         val leftX = center.x - arrowOffset
         val rightX = center.x + arrowOffset
-
         drawLine(color, Offset(leftX + arrowSize, center.y - arrowSize), Offset(leftX, center.y), strokeWidth, cap = StrokeCap.Round)
         drawLine(color, Offset(leftX, center.y), Offset(leftX + arrowSize, center.y + arrowSize), strokeWidth, cap = StrokeCap.Round)
         drawLine(color, Offset(rightX - arrowSize, center.y - arrowSize), Offset(rightX, center.y), strokeWidth, cap = StrokeCap.Round)
@@ -68,7 +84,6 @@ private fun DrawScope.drawDirectionalArrows(
     else {
         val topY = center.y - arrowOffset
         val bottomY = center.y + arrowOffset
-
         drawLine(color, Offset(center.x - arrowSize, topY + arrowSize), Offset(center.x, topY), strokeWidth, cap = StrokeCap.Round)
         drawLine(color, Offset(center.x, topY), Offset(center.x + arrowSize, topY + arrowSize), strokeWidth, cap = StrokeCap.Round)
         drawLine(color, Offset(center.x - arrowSize, bottomY - arrowSize), Offset(center.x, bottomY), strokeWidth, cap = StrokeCap.Round)
@@ -76,37 +91,120 @@ private fun DrawScope.drawDirectionalArrows(
     }
 }
 
+private fun dividerReservedExtent(
+    axisExtent: Int,
+    indicatorExtent: Int,
+    marginExtent: Int,
+    overlay: Boolean,
+): Int {
+    if (overlay) return 0
+    val handleExtent = indicatorExtent.coerceIn(0, axisExtent)
+    val margin = marginExtent.coerceAtLeast(0).coerceAtMost(((axisExtent - handleExtent) / 2).coerceAtLeast(0))
+    return handleExtent + margin * 2
+}
+
+private fun dividerCenter(
+    axisExtent: Int,
+    reservedExtent: Int,
+    ratio: Float,
+    horizontal: Boolean,
+    layoutDirection: LayoutDirection,
+): Float {
+    val center = (axisExtent - reservedExtent) * ratio + reservedExtent / 2f
+    return if (horizontal && layoutDirection == LayoutDirection.Rtl) axisExtent - center else center
+}
+
+/** Splitter reserves its track; Comparator overlays the track without changing content measurement. */
+private fun Modifier.dividerGestures(
+    horizontal: Boolean,
+    overlay: Boolean,
+    ratio: () -> Float,
+    onRatioChange: (Float) -> Unit,
+    onHoverChange: (Boolean) -> Unit,
+    onDraggingChange: (Boolean) -> Unit,
+    indicatorSize: Dp,
+    indicatorMargin: Dp,
+    hitTargetSize: Dp,
+    layoutDirection: LayoutDirection,
+): Modifier = this
+    .pointerInput(horizontal, overlay, indicatorSize, indicatorMargin, hitTargetSize, layoutDirection) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                when (event.type) {
+                    PointerEventType.Exit -> onHoverChange(false)
+                    PointerEventType.Enter, PointerEventType.Move -> {
+                        val change = event.changes.firstOrNull() ?: continue
+                        val axisExtent = if (horizontal) size.width else size.height
+                        val inside = change.position.x >= 0f && change.position.x < size.width &&
+                            change.position.y >= 0f && change.position.y < size.height
+                        val reservedExtent = dividerReservedExtent(axisExtent, indicatorSize.roundToPx(), indicatorMargin.roundToPx(), overlay)
+                        val center = dividerCenter(axisExtent, reservedExtent, ratio(), horizontal, layoutDirection)
+                        val hitExtent = maxOf(hitTargetSize.roundToPx(), if (overlay) indicatorSize.roundToPx() else reservedExtent)
+                        val pointerAxis = if (horizontal) change.position.x else change.position.y
+                        onHoverChange(change.type == PointerType.Mouse && inside && axisExtent > 0 && abs(pointerAxis - center) <= hitExtent / 2f)
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+    .pointerInput(horizontal, overlay, indicatorSize, indicatorMargin, hitTargetSize, layoutDirection) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val axisExtent = if (horizontal) size.width else size.height
+            if (axisExtent <= 0) return@awaitEachGesture
+
+            val reservedExtent = dividerReservedExtent(axisExtent, indicatorSize.roundToPx(), indicatorMargin.roundToPx(), overlay)
+            val center = dividerCenter(axisExtent, reservedExtent, ratio(), horizontal, layoutDirection)
+            val hitExtent = maxOf(hitTargetSize.roundToPx(), if (overlay) indicatorSize.roundToPx() else reservedExtent)
+            val downAxis = if (horizontal) down.position.x else down.position.y
+            if (abs(downAxis - center) > hitExtent / 2f) return@awaitEachGesture
+
+            val grabOffset = downAxis - center
+            onDraggingChange(true)
+            cleaning({
+                down.consume()
+                while (true) {
+                    val event = awaitPointerEvent()
+                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                    val currentExtent = if (horizontal) size.width else size.height
+                    val currentReservedExtent = dividerReservedExtent(currentExtent, indicatorSize.roundToPx(), indicatorMargin.roundToPx(), overlay)
+                    val availableExtent = currentExtent - currentReservedExtent
+                    if (availableExtent > 0) {
+                        val pointerAxis = if (horizontal) change.position.x else change.position.y
+                        val visualRatio = ((pointerAxis - grabOffset - currentReservedExtent / 2f) / availableExtent).coerceIn(0f, 1f)
+                        val logicalRatio = if (horizontal && layoutDirection == LayoutDirection.Rtl) 1f - visualRatio else visualRatio
+                        val nextRatio = if (overlay) logicalRatio else logicalRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
+                        if (nextRatio != ratio()) {
+                            onRatioChange(nextRatio)
+                            change.consume()
+                        }
+                    }
+                    if (!change.pressed) break
+                }
+            }) {
+                onDraggingChange(false)
+            }
+        }
+    }
+
 @Composable
 private fun SplitterHandle(horizontal: Boolean, hovered: Boolean, dragging: Boolean) {
     val active = hovered || dragging
     val primaryColor = Theme.color.primary
     val outlineColor = Theme.color.outline
     val surfaceColor = Theme.color.surface
-    val primaryContainerColor = Theme.color.primaryContainer
-    val onContainerColor = Theme.color.onContainer
     val lineThicknessDp = Theme.border.v6
     val handleSizeDp = Theme.size.input9
     val shadowOffsetDp = Theme.shadow.v7
-    val borderWidthDp = Theme.border.v6
-    val circleSizeDp = Theme.size.box2
-    val circleBorderWidthDp = Theme.border.v7
+    val borderWidthDp = Theme.border.v7
 
     Box(
         modifier = Modifier.drawWithContent {
             drawContent()
-
             val lineColor = if (active) primaryColor else outlineColor
-            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
-            if (horizontal) {
-                val x = size.width / 2f
-                drawLine(surfaceColor, Offset(x, 0f), Offset(x, size.height), lineThickness + 3f)
-                drawLine(lineColor, Offset(x, 0f), Offset(x, size.height), lineThickness)
-            }
-            else {
-                val y = size.height / 2f
-                drawLine(surfaceColor, Offset(0f, y), Offset(size.width, y), lineThickness + 3f)
-                drawLine(lineColor, Offset(0f, y), Offset(size.width, y), lineThickness)
-            }
+            drawDividerTrack(horizontal, if (horizontal) size.width / 2f else size.height / 2f, lineColor, surfaceColor, lineThicknessDp.toPx().coerceAtLeast(1f))
 
             val pillWidth = if (horizontal) size.width else handleSizeDp.toPx().coerceAtMost(size.width)
             val pillHeight = if (horizontal) handleSizeDp.toPx().coerceAtMost(size.height) else size.height
@@ -114,31 +212,23 @@ private fun SplitterHandle(horizontal: Boolean, hovered: Boolean, dragging: Bool
                 val topLeft = Offset((size.width - pillWidth) / 2f, (size.height - pillHeight) / 2f)
                 val pillSize = Size(pillWidth, pillHeight)
                 val cornerRadius = CornerRadius(minOf(pillWidth, pillHeight) / 2f)
-                val shadowOffset = shadowOffsetDp.toPx()
-                val borderWidth = borderWidthDp.toPx()
-
-                drawRoundRect(
-                    color = Color.Black.copy(alpha = 0.2f),
-                    topLeft = topLeft + Offset(0f, shadowOffset),
-                    size = pillSize,
-                    cornerRadius = cornerRadius,
-                )
+                drawRoundRect(Color.Black.copy(alpha = 0.14f), topLeft + Offset(0f, shadowOffsetDp.toPx()), pillSize, cornerRadius)
                 drawRoundRect(surfaceColor, topLeft, pillSize, cornerRadius)
-                drawRoundRect(
-                    color = if (active) primaryColor else outlineColor,
-                    topLeft = topLeft,
-                    size = pillSize,
-                    cornerRadius = cornerRadius,
-                    style = Stroke(width = borderWidth),
-                )
+                drawRoundRect(lineColor, topLeft, pillSize, cornerRadius, style = Stroke(width = borderWidthDp.toPx()))
 
-                val circleDiameter = minOf(circleSizeDp.toPx(), pillWidth, pillHeight)
-                if (circleDiameter > 0f) {
-                    val center = Offset(size.width / 2f, size.height / 2f)
-                    val radius = circleDiameter / 2f
-                    drawCircle(primaryContainerColor, radius, center)
-                    drawCircle(primaryColor, radius, center, style = Stroke(width = circleBorderWidthDp.toPx()))
-                    drawDirectionalArrows(horizontal, center, circleDiameter, onContainerColor)
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val strokeLength = minOf(pillWidth, pillHeight) * 0.38f
+                val spacing = minOf(pillWidth, pillHeight) * 0.22f
+                val strokeWidth = lineThicknessDp.toPx().coerceAtLeast(1f)
+                for (index in -1 .. 1) {
+                    if (horizontal) {
+                        val y = center.y + spacing * index
+                        drawLine(lineColor, Offset(center.x - strokeLength / 2f, y), Offset(center.x + strokeLength / 2f, y), strokeWidth, cap = StrokeCap.Round)
+                    }
+                    else {
+                        val x = center.x + spacing * index
+                        drawLine(lineColor, Offset(x, center.y - strokeLength / 2f), Offset(x, center.y + strokeLength / 2f), strokeWidth, cap = StrokeCap.Round)
+                    }
                 }
             }
         }
@@ -166,103 +256,19 @@ private fun Splitter(
 
     Layout(
         modifier = layoutModifier
-            .pointerIcon(if (hovered) PointerIcon.Hand else PointerIcon.Default)
-            .pointerInput(horizontal, indicatorSize, indicatorMargin, layoutDirection) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(PointerEventPass.Main)
-                        when (event.type) {
-                            PointerEventType.Exit -> hovered = false
-                            PointerEventType.Enter, PointerEventType.Move -> {
-                                val change = event.changes.firstOrNull() ?: continue
-                                if (change.type == PointerType.Mouse) {
-                                    val axisExtent = if (horizontal) size.width else size.height
-                                    val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
-                                    val marginExtent = indicatorMargin.roundToPx().coerceAtLeast(0)
-                                        .coerceAtMost(((axisExtent - handleExtent) / 2).coerceAtLeast(0))
-                                    val dividerExtent = handleExtent + marginExtent * 2
-                                    val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
-                                    val firstExtent = (availableExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
-                                        .fastRoundToInt()
-                                        .coerceIn(0, availableExtent)
-                                    val dividerCenter = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                                        axisExtent - firstExtent - dividerExtent / 2f
-                                    }
-                                    else firstExtent + dividerExtent / 2f
-                                    val hitTargetExtent = maxOf(dividerExtent, hitTargetSize.roundToPx())
-                                    val pointerAxis = if (horizontal) change.position.x else change.position.y
-                                    hovered = axisExtent > 0 && abs(pointerAxis - dividerCenter) <= hitTargetExtent / 2f
-                                }
-                            }
-                            else -> Unit
-                        }
-                    }
-                }
-            }.pointerInput(horizontal, indicatorSize, indicatorMargin, layoutDirection) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val axisExtent = if (horizontal) size.width else size.height
-                    if (axisExtent <= 0) return@awaitEachGesture
-
-                    val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
-                    val marginExtent = indicatorMargin.roundToPx().coerceAtLeast(0)
-                        .coerceAtMost(((axisExtent - handleExtent) / 2).coerceAtLeast(0))
-                    val dividerExtent = handleExtent + marginExtent * 2
-                    val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
-                    val firstExtent = (availableExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
-                        .fastRoundToInt()
-                        .coerceIn(0, availableExtent)
-                    val dividerCenter = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                        axisExtent - firstExtent - dividerExtent / 2f
-                    }
-                    else firstExtent + dividerExtent / 2f
-                    val hitTargetExtent = maxOf(dividerExtent, hitTargetSize.roundToPx())
-                    val downAxis = if (horizontal) down.position.x else down.position.y
-                    if (abs(downAxis - dividerCenter) > hitTargetExtent / 2f) return@awaitEachGesture
-
-                    dragging = true
-                    cleaning({
-                        down.consume()
-                        var previous = downAxis
-
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                            if (
-                                event.type == PointerEventType.Exit ||
-                                change.position.x < 0f ||
-                                change.position.x >= size.width.toFloat() ||
-                                change.position.y < 0f ||
-                                change.position.y >= size.height.toFloat()
-                            ) {
-                                hovered = false
-                                return@awaitEachGesture
-                            }
-
-                            val current = if (horizontal) change.position.x else change.position.y
-                            val delta = current - previous
-                            val currentAxisExtent = if (horizontal) size.width else size.height
-                            val currentHandleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(currentAxisExtent)
-                            val currentMarginExtent = indicatorMargin.roundToPx().coerceAtLeast(0)
-                                .coerceAtMost(((currentAxisExtent - currentHandleExtent) / 2).coerceAtLeast(0))
-                            val currentDividerExtent = currentHandleExtent + currentMarginExtent * 2
-                            val currentAvailableExtent = (currentAxisExtent - currentDividerExtent).coerceAtLeast(0)
-
-                            if (delta != 0f && currentAvailableExtent > 0) {
-                                val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                                splitRatio = (splitRatio + logicalDelta / currentAvailableExtent)
-                                    .coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
-                                change.consume()
-                            }
-
-                            previous = current
-                            if (!change.pressed) break
-                        }
-                    }) {
-                        dragging = false
-                    }
-                }
-            },
+            .pointerIcon(if (hovered || dragging) PointerIcon.Hand else PointerIcon.Default)
+            .dividerGestures(
+                horizontal = horizontal,
+                overlay = false,
+                ratio = { splitRatio },
+                onRatioChange = { splitRatio = it },
+                onHoverChange = { hovered = it },
+                onDraggingChange = { dragging = it },
+                indicatorSize = indicatorSize,
+                indicatorMargin = indicatorMargin,
+                hitTargetSize = hitTargetSize,
+                layoutDirection = layoutDirection,
+            ),
         content = {
             Box(content = { first() })
             Box(content = { second() })
@@ -340,7 +346,7 @@ private fun Splitter(
  * @param left 起始侧内容，RTL 布局下位于右侧
  * @param right 末尾侧内容，RTL 布局下位于左侧
  * @param alignment 两侧内容的垂直对齐方式
- * @param indicatorMargin 指示器与两侧内容之间的间距，默认为 0
+ * @param indicatorMargin 指示器与两侧内容之间的间距，默认为主题间距
  */
 @Composable
 fun HorizontalSplitter(
@@ -348,7 +354,7 @@ fun HorizontalSplitter(
     left: @Composable () -> Unit,
     right: @Composable () -> Unit,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
-    indicatorMargin: Dp = 0.dp,
+    indicatorMargin: Dp = Theme.padding.e,
 ) {
     Splitter(
         horizontal = true,
@@ -368,7 +374,7 @@ fun HorizontalSplitter(
  * @param top 上方内容
  * @param bottom 下方内容
  * @param alignment 上下内容的水平对齐方式
- * @param indicatorMargin 指示器与两侧内容之间的间距，默认为 0
+ * @param indicatorMargin 指示器与两侧内容之间的间距，默认为主题间距
  */
 @Composable
 fun VerticalSplitter(
@@ -376,7 +382,7 @@ fun VerticalSplitter(
     top: @Composable () -> Unit,
     bottom: @Composable () -> Unit,
     alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    indicatorMargin: Dp = 0.dp,
+    indicatorMargin: Dp = Theme.padding.e,
 ) {
     Splitter(
         horizontal = false,
@@ -401,13 +407,12 @@ private fun ComparatorHandle(
     val primaryColor = Theme.color.primary
     val outlineColor = Theme.color.outline
     val surfaceColor = Theme.color.surface
-    val primaryContainerColor = Theme.color.primaryContainer
     val onContainerColor = Theme.color.onContainer
     val lineThicknessDp = Theme.border.v6
     val handleSizeDp = Theme.size.input8
+    val handleThicknessDp = Theme.size.input10
     val shadowOffsetDp = Theme.shadow.v5
-    val borderWidthDp = Theme.border.v6
-    val innerBorderWidthDp = Theme.border.v7
+    val borderWidthDp = Theme.border.v7
 
     Box(
         modifier = Modifier.fillMaxSize().drawWithContent {
@@ -418,37 +423,19 @@ private fun ComparatorHandle(
             else size.height * splitRatio
 
             val lineColor = if (active) primaryColor else outlineColor
-            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
-            if (horizontal) {
-                drawLine(surfaceColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness + 4f)
-                drawLine(lineColor, Offset(splitPosition, 0f), Offset(splitPosition, size.height), lineThickness)
-            }
-            else {
-                drawLine(surfaceColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness + 4f)
-                drawLine(lineColor, Offset(0f, splitPosition), Offset(size.width, splitPosition), lineThickness)
-            }
+            drawDividerTrack(horizontal, splitPosition, lineColor, surfaceColor, lineThicknessDp.toPx().coerceAtLeast(1f))
 
-            val diameter = handleSizeDp.toPx().coerceAtMost(minOf(size.width, size.height))
-            if (diameter > 0f) {
+            val pillWidth = (if (horizontal) handleSizeDp else handleThicknessDp).toPx().coerceAtMost(size.width)
+            val pillHeight = (if (horizontal) handleThicknessDp else handleSizeDp).toPx().coerceAtMost(size.height)
+            if (pillWidth > 0f && pillHeight > 0f) {
                 val center = if (horizontal) Offset(splitPosition, size.height / 2f) else Offset(size.width / 2f, splitPosition)
-                val radius = diameter / 2f
-                drawCircle(
-                    color = Color.Black.copy(alpha = 0.28f),
-                    radius = radius,
-                    center = center + Offset(0f, shadowOffsetDp.toPx()),
-                )
-                drawCircle(surfaceColor, radius, center)
-                drawCircle(
-                    color = if (active) primaryColor else outlineColor,
-                    radius = radius,
-                    center = center,
-                    style = Stroke(width = borderWidthDp.toPx()),
-                )
-
-                val innerRadius = diameter * 0.31f
-                drawCircle(primaryContainerColor, innerRadius, center)
-                drawCircle(primaryColor, innerRadius, center, style = Stroke(width = innerBorderWidthDp.toPx()))
-                drawDirectionalArrows(horizontal, center, innerRadius * 2f, onContainerColor)
+                val topLeft = center - Offset(pillWidth / 2f, pillHeight / 2f)
+                val pillSize = Size(pillWidth, pillHeight)
+                val cornerRadius = CornerRadius(minOf(pillWidth, pillHeight) / 2f)
+                drawRoundRect(Color.Black.copy(alpha = 0.22f), topLeft + Offset(0f, shadowOffsetDp.toPx()), pillSize, cornerRadius)
+                drawRoundRect(surfaceColor, topLeft, pillSize, cornerRadius)
+                drawRoundRect(lineColor, topLeft, pillSize, cornerRadius, style = Stroke(width = borderWidthDp.toPx()))
+                drawDirectionalArrows(horizontal, center, minOf(pillWidth, pillHeight), if (active) primaryColor else onContainerColor)
             }
         },
     )
@@ -498,96 +485,19 @@ private fun ComparatorLayout(
 
     Layout(
         modifier = layoutModifier
-            .pointerIcon(if (hovered) PointerIcon.Hand else PointerIcon.Default)
-            .pointerInput(horizontal, hitTargetSize, layoutDirection) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(PointerEventPass.Main)
-                        when (event.type) {
-                            PointerEventType.Exit -> hovered = false
-                            PointerEventType.Enter, PointerEventType.Move -> {
-                                val change = event.changes.firstOrNull() ?: continue
-                                if (change.type == PointerType.Mouse) {
-                                    val axisExtent = if (horizontal) size.width else size.height
-                                    val splitPosition = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                                        axisExtent * (1f - splitRatio)
-                                    }
-                                    else axisExtent * splitRatio
-                                    val pointerPosition = if (horizontal) change.position.x else change.position.y
-                                    hovered = axisExtent > 0 && abs(pointerPosition - splitPosition) <= hitTargetSize.roundToPx() / 2f
-                                }
-                            }
-                            else -> Unit
-                        }
-                    }
-                }
-            }
-            .pointerInput(horizontal, hitTargetSize, layoutDirection) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val axisExtent = if (horizontal) size.width else size.height
-                    if (axisExtent <= 0) return@awaitEachGesture
-
-                    val splitPosition = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                        axisExtent * (1f - splitRatio)
-                    }
-                    else axisExtent * splitRatio
-                    val downPosition = if (horizontal) down.position.x else down.position.y
-                    if (abs(downPosition - splitPosition) > hitTargetSize.roundToPx() / 2f) return@awaitEachGesture
-
-                    dragging = true
-                    cleaning({
-                        down.consume()
-                        var previousPosition = downPosition
-
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                            if (
-                                event.type == PointerEventType.Exit ||
-                                change.position.x < 0f ||
-                                change.position.x >= size.width.toFloat() ||
-                                change.position.y < 0f ||
-                                change.position.y >= size.height.toFloat()
-                            ) {
-                                hovered = false
-                                return@awaitEachGesture
-                            }
-
-                            val currentPosition = if (horizontal) change.position.x else change.position.y
-                            val currentAxisExtent = if (horizontal) size.width else size.height
-                            val edgeThreshold = 1f
-                            val atFirstEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                                currentPosition >= currentAxisExtent - edgeThreshold
-                            }
-                            else currentPosition <= edgeThreshold
-                            val atSecondEdge = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                                currentPosition <= edgeThreshold
-                            }
-                            else currentPosition >= currentAxisExtent - edgeThreshold
-                            val delta = currentPosition - previousPosition
-                            val logicalDelta = if (horizontal && layoutDirection == LayoutDirection.Rtl) -delta else delta
-                            if (atFirstEdge) {
-                                splitRatio = 0f
-                                change.consume()
-                            }
-                            else if (atSecondEdge) {
-                                splitRatio = 1f
-                                change.consume()
-                            }
-                            else if (logicalDelta != 0f) {
-                                splitRatio = (splitRatio + logicalDelta / currentAxisExtent).coerceIn(0f, 1f)
-                                change.consume()
-                            }
-
-                            previousPosition = currentPosition
-                            if (!change.pressed) break
-                        }
-                    }) {
-                        dragging = false
-                    }
-                }
-            },
+            .pointerIcon(if (hovered || dragging) PointerIcon.Hand else PointerIcon.Default)
+            .dividerGestures(
+                horizontal = horizontal,
+                overlay = true,
+                ratio = { splitRatio },
+                onRatioChange = { splitRatio = it },
+                onHoverChange = { hovered = it },
+                onDraggingChange = { dragging = it },
+                indicatorSize = Theme.size.input8,
+                indicatorMargin = 0.dp,
+                hitTargetSize = hitTargetSize,
+                layoutDirection = layoutDirection,
+            ),
         content = {
             ComparatorPane(horizontal, true, splitRatio, layoutDirection, first)
             ComparatorPane(horizontal, false, splitRatio, layoutDirection, second)
