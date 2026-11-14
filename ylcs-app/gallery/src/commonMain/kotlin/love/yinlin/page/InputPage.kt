@@ -303,13 +303,7 @@ object InputPage : Page() {
 
             Component("TimePicker") {
                 var chosen by rememberState { kotlinx.datetime.LocalTime(10, 32, 45) }
-                Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)) {
-                    TimePicker(time = chosen, onTimeChanged = { chosen = it })
-                    Text(
-                        text = "已确认时间：${chosen.hour.toString().padStart(2, '0')}:${chosen.minute.toString().padStart(2, '0')}:${chosen.second.toString().padStart(2, '0')}",
-                        style = Theme.typography.v8
-                    )
-                }
+                TimePicker(time = chosen, onTimeChanged = { chosen = it })
             }
 
             Component("ColorPicker") {
