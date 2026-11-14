@@ -47,6 +47,7 @@ import love.yinlin.extension.DateEx
 enum class DatePickerView { Days, Years, Months }
 
 private const val DatePickerCenterPage = Int.MAX_VALUE / 2
+private const val DatePickerCellPaddingRatio = 0.1f
 
 private fun DrawScope.drawDatePickerText(
     measurer: TextMeasurer,
@@ -166,7 +167,8 @@ private fun DatePickerChoiceGrid(
 
 /**
  * 固定六行、周一开始的日期选择器。尺寸由 [style] 的“31”文本高度决定：
- * 日期格为正方形，七列宽度与星期条一致，顶部年份条和星期条各占一行文本高度。
+ * 日期格为正方形，文本四周留出按文本高度 10% 计算的内间距。
+ * 七列宽度与星期条一致，顶部年份条和星期条各占一个带内间距的单元高度。
  *
  * 左右箭头切换年份，横向滑动或鼠标纵向滚轮切换月份。年份、月份选择面板
  * 占用整个组件区域；调整浏览年份或月份不会调用 [onDateChanged]，
@@ -182,7 +184,9 @@ fun DatePicker(
     style: TextStyle = Theme.typography.v8,
     initialView: DatePickerView = DatePickerView.Days
 ) {
-    val cellSize = measureTextHeight("31", style)
+    val textHeight = measureTextHeight("31", style)
+    val cellPadding = textHeight * DatePickerCellPaddingRatio
+    val cellSize = textHeight + cellPadding * 2
     val gridWidth = cellSize * 7
     val totalHeight = cellSize * 8
     val measurer = rememberTextMeasurer(cacheSize = 96)
@@ -207,7 +211,7 @@ fun DatePicker(
                         ) {
                             Icon(
                                 icon = Icons.KeyboardArrowLeft,
-                                modifier = Modifier.size(cellSize),
+                                modifier = Modifier.size(textHeight),
                                 tip = "上一年",
                                 onClick = { scope.launch { pager.animateScrollToPage((pager.currentPage - 12).coerceAtLeast(0)) } }
                             )
@@ -237,7 +241,7 @@ fun DatePicker(
 
                             Icon(
                                 icon = Icons.KeyboardArrowRight,
-                                modifier = Modifier.size(cellSize),
+                                modifier = Modifier.size(textHeight),
                                 tip = "下一年",
                                 onClick = { scope.launch { pager.animateScrollToPage((pager.currentPage + 12).coerceAtMost(pager.pageCount - 1)) } }
                             )
