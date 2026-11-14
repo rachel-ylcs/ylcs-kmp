@@ -13,10 +13,12 @@ import kotlinx.datetime.number
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberTrue
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -28,7 +30,20 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-object WidgetPage : Page() {
+object WidgetPage : Page(
+    id = "widget",
+    icon = Icons.Token,
+    title = "组件",
+    english = "Widgets",
+    description = "用于日历、日志和数据查看的专用组件。",
+    keywords = "日历 日志 表格",
+    group = PageGroup.Layout,
+) {
+    private val demoCalendar = component("Calendar", "浏览月历，也可查看农历、节日和节气。", "日历 月历")
+    private val demoLogOutput = component("LogOutput", "查看不断更新的日志，支持 ANSI 颜色和暂停跟随。", "LogOutputState ANSI")
+    private val demoHexView = component("HexView", "用十六进制和 ASCII 查看字节，可点击或拖选。", "HexViewState ByteArray")
+    private val demoDataTable = component("DataTable", "浏览、编辑和排序表格，支持多种单元格类型。", "DataTableState DataTableCell")
+
     private val HexData = Random.nextBytes(1024 * 1024)
 
     private class StatusCell(index: Int = 0) : DataTableSelectionCell(["Ready", "Review", "Offline"], index) {
@@ -102,7 +117,7 @@ object WidgetPage : Page() {
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Calendar") {
+            Component(demoCalendar) {
                 val state = remember { CalendarState() }
 
                 Column(
@@ -116,7 +131,7 @@ object WidgetPage : Page() {
                 }
             }
 
-            Component("LogOutput") {
+            Component(demoLogOutput) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
@@ -178,7 +193,7 @@ object WidgetPage : Page() {
                 }
             }
 
-            Component("HexView") {
+            Component(demoHexView) {
                 Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
                     val state = remember { HexViewState(HexData) }
                     val selection = state.selectedRange
@@ -195,7 +210,7 @@ object WidgetPage : Page() {
                 }
             }
 
-            Component("DataTable") {
+            Component(demoDataTable) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)

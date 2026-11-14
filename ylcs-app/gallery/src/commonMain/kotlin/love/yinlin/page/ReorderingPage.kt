@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import love.yinlin.GalleryActions
 import love.yinlin.GalleryCaption
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberState
@@ -30,7 +31,21 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.moveItem
 
 @Stable
-object ReorderingPage : Page() {
+object ReorderingPage : Page(
+    id = "reordering",
+    icon = Icons.DragHandle,
+    title = "拖动排序",
+    english = "Reordering",
+    description = "在列表、网格和瀑布流里拖动条目调整顺序。",
+    keywords = "拖柄 ReorderingItem onSettle",
+    group = PageGroup.Layout,
+) {
+    private val demoLazyList = component("列表", "在横向或纵向列表中拖动排序，靠近边缘可继续滚动。", "LazyColumn LazyRow", previewAlias = "LazyColumn / LazyRow")
+    private val demoLazyGrid = component("网格", "在网格中拖动排序，支持跨行或跨列的条目。", "LazyVerticalGrid LazyHorizontalGrid", previewAlias = "LazyVerticalGrid / LazyHorizontalGrid")
+    private val demoStaggeredGrid = component("瀑布流", "在尺寸不一的瀑布流条目之间调整顺序。", "LazyVerticalStaggeredGrid LazyHorizontalStaggeredGrid", previewAlias = "LazyVerticalStaggeredGrid / LazyHorizontalStaggeredGrid")
+    private val demoReorderingColumn = component("纵排", "拖动少量纵向排列的条目，松手后提交新顺序。", "ReorderingColumn", previewAlias = "ReorderingColumn")
+    private val demoReorderingRow = component("横排", "拖动横向排列的条目，可配合外层横向滚动。", "ReorderingRow", previewAlias = "ReorderingRow")
+
     @Composable
     override fun Content() {
         var reverse by rememberFalse()
@@ -49,22 +64,22 @@ object ReorderingPage : Page() {
             }
             CompositionLocalProvider(LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr) {
                 key(reverse, rtl, variable, columns) {
-                    Component("LazyColumn / LazyRow") {
+                    Component(demoLazyList) {
                         LazyDemo(kind = 0, vertical = true, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                         LazyDemo(kind = 0, vertical = false, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                     }
-                    Component("LazyVerticalGrid / LazyHorizontalGrid") {
+                    Component(demoLazyGrid) {
                         LazyDemo(kind = 1, vertical = true, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                         LazyDemo(kind = 1, vertical = false, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                     }
-                    Component("LazyVerticalStaggeredGrid / LazyHorizontalStaggeredGrid") {
+                    Component(demoStaggeredGrid) {
                         LazyDemo(kind = 2, vertical = true, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                         LazyDemo(kind = 2, vertical = false, reverse = reverse, longPress = longPress, variable = variable, columns = columns)
                     }
-                    Component("ReorderingColumn") {
+                    Component(demoReorderingColumn) {
                         PlainDemo(vertical = true, longPress = longPress, variable = variable)
                     }
-                    Component("ReorderingRow") {
+                    Component(demoReorderingRow) {
                         PlainDemo(vertical = false, longPress = longPress, variable = variable)
                     }
                 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import love.yinlin.GalleryActions
 import love.yinlin.GalleryCaption
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.icon.Icons
@@ -35,7 +36,18 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-object PicturePage : Page() {
+object PicturePage : Page(
+    id = "picture",
+    icon = Icons.GridOn,
+    title = "图集",
+    english = "Picture",
+    description = "显示图标，用九宫格整理多张图片。",
+    keywords = "图标 配图 九宫格",
+    group = PageGroup.Layout,
+) {
+    private val demoIcon = component("Icon", "用图标表示操作或状态，支持提示和自定义颜色。", "LoadingIcon ColorIcon")
+    private val demoNineGrid = component("NineGrid", "把照片和视频封面排成九宫格。", "配图 视频")
+
     @Stable
     abstract class TagPicture(val tag: Int) : Picture {
         final override val image: String = tag.toString()
@@ -54,7 +66,7 @@ object PicturePage : Page() {
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Icon") {
+            Component(demoIcon) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .background(Theme.color.backgroundVariant.copy(alpha = 0.45f), Theme.shape.v3)
@@ -105,7 +117,7 @@ object PicturePage : Page() {
                 }
             }
 
-            Component("NineGrid") {
+            Component(demoNineGrid) {
                 val imgRes = [
                     Res.drawable.img0,
                     Res.drawable.img1,

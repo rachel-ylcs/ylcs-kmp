@@ -11,20 +11,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.GalleryActions
 import love.yinlin.GalleryBadge
-import love.yinlin.GalleryParagraph
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberTrue
 import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Text
 
 @Stable
-object PlatformViewPage : Page() {
+object PlatformViewPage : Page(
+    id = "platform-view",
+    icon = Icons.Package,
+    title = "原生视图",
+    english = "Interop",
+    description = "在 Compose 界面中嵌入平台原生组件。",
+    keywords = "Platform View 原生控件",
+    group = PageGroup.Layout,
+) {
+    private val demoPlatformView = component("Interop", "可直接编辑原生文本，也可在上方叠放 Compose 控件。", "PlatformViewState PlatformViewHost", previewAlias = "原生组件嵌入")
+
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("原生组件嵌入") {
+            Component(demoPlatformView) {
                 val name = platformViewName
                 if (name == null) PlatformViewExample("", Modifier.fillMaxWidth())
                 else {
@@ -61,8 +72,6 @@ object PlatformViewPage : Page() {
                         }
                         else Text("原生组件已移除", modifier = Modifier.align(Alignment.Center))
                     }
-                    GalleryParagraph("原生区域可以直接编辑；普通重组保留输入内容，点击“更新原生内容”才会写入新的参数。移除或离开本页会释放原生组件，重新挂载会创建新实例。")
-                    GalleryParagraph("Compose 按钮覆盖在原生组件上，点击时只应增加上方计数。也可以滚动页面或调整窗口大小，检查原生区域的裁剪和位置。")
                 }
             }
         }

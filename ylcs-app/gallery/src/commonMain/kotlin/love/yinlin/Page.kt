@@ -12,6 +12,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import love.yinlin.compose.Theme
@@ -21,26 +22,46 @@ import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Text
 
-private val LocalGallerySelectedComponentIndex = staticLocalComposition { -1 }
+private val LocalGallerySelectedComponent = staticLocalComposition<ComponentItem?> { null }
 
 @Stable
-abstract class Page {
+abstract class Page internal constructor(
+    val id: String,
+    val icon: ImageVector,
+    val title: String,
+    val english: String,
+    val description: String,
+    val keywords: String,
+    internal val group: PageGroup? = null,
+) {
+    internal val components: List<ComponentItem> field = mutableListOf<ComponentItem>()
+
+    internal fun component(title: String, description: String, keywords: String, previewAlias: String? = null): ComponentItem = ComponentItem(title, description, keywords, previewAlias).also { components.add(it) }
+
     @Composable
     abstract fun Content()
 
     @Composable
     protected fun ComponentColumn(alwaysShowTabs: Boolean = false, showTabs: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
-        val components = PageItem.forPage(this@Page)?.components.orEmpty()
-        val selectedComponent = rememberValueState(components.indexOfFirst { it.title == galleryPreviewComponentTitle }.coerceAtLeast(0))
-        val selectedIndex = if (!showTabs || components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val previewIndex = components.indexOfFirst { it === galleryPreviewComponent }
+        val selectedComponent = rememberValueState(previewIndex.coerceAtLeast(0))
+        val selectedIndex = when {
+            previewIndex >= 0 && !showTabs -> previewIndex
+            showTabs && components.isNotEmpty() -> selectedComponent.intValue.coerceIn(0, components.lastIndex)
+            else -> -1
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
+        ) {
             Column(
-                modifier = Modifier.widthIn(max = 1240.dp).fillMaxWidth().fillMaxHeight()
-                    .verticalScroll(rememberScrollState()).padding(if (compact) 16.dp else 32.dp),
+                modifier = Modifier.widthIn(max = 1240.dp).fillMaxWidth().fillMaxHeight().verticalScroll(rememberScrollState()).padding(if (compact) 16.dp else 32.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
-                PageItem.forPage(this@Page)?.takeIf { it.components.isNotEmpty() }?.let { GalleryPageHeader(it) }
+                if (components.isNotEmpty()) GalleryPageHeader(this@Page)
+
                 if (showTabs && (components.size > 1 || (alwaysShowTabs && components.isNotEmpty()))) {
                     TabBar(
                         size = components.size,
@@ -50,9 +71,11 @@ abstract class Page {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                CompositionLocalProvider(LocalGallerySelectedComponentIndex provides selectedIndex) {
+
+                CompositionLocalProvider(LocalGallerySelectedComponent provides components.getOrNull(selectedIndex)) {
                     content()
                 }
+
                 HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
                 GalleryCaption("RACHEL UI GALLERY  /  DESKTOP · WEB")
                 Spacer(Modifier.height(12.dp))
@@ -61,17 +84,12 @@ abstract class Page {
     }
 
     @Composable
-    protected fun ColumnScope.Component(title: String, content: @Composable ColumnScope.() -> Unit) {
-        val item = PageItem.forPage(this@Page)
-        val index = item?.components?.indexOfFirst { it.title == title } ?: -1
-        val selectedIndex = LocalGallerySelectedComponentIndex.current
-        if (selectedIndex < 0 || index < 0 || index == selectedIndex) {
+    internal fun ColumnScope.Component(component: ComponentItem, content: @Composable ColumnScope.() -> Unit) {
+        val selected = LocalGallerySelectedComponent.current
+        if (selected == null || component === selected) {
             GalleryCard {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (index >= 0) GalleryBadge((index + 1).toString().padStart(2, '0'))
-                    Text(title, fontSize = 19.sp, lineHeight = 27.sp)
-                }
-                if (index >= 0) GalleryParagraph(item!!.components[index].description)
+                Text(component.title, fontSize = 19.sp, lineHeight = 27.sp)
+                GalleryParagraph(component.description)
                 content()
             }
         }
@@ -93,7 +111,8 @@ abstract class Page {
     protected fun Example(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
         val shape = RoundedCornerShape(13.dp)
         Column(
-            modifier = modifier.then(if (LocalGalleryCompact.current) Modifier.fillMaxWidth() else Modifier)
+            modifier = modifier
+                .then(if (LocalGalleryCompact.current) Modifier.fillMaxWidth() else Modifier)
                 .widthIn(min = 144.dp)
                 .clip(shape).border(1.dp, Theme.color.outline.copy(alpha = 0.22f), shape)
                 .background(Theme.color.backgroundVariant.copy(alpha = 0.55f)).padding(18.dp),

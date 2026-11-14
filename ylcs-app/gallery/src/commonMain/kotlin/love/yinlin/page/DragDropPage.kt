@@ -14,6 +14,7 @@ import love.yinlin.GalleryBadge
 import love.yinlin.GalleryCaption
 import love.yinlin.GalleryParagraph
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberTrue
@@ -27,19 +28,31 @@ import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.Text
 
 @Stable
-object DragDropPage : Page() {
+object DragDropPage : Page(
+    id = "drag-drop",
+    icon = Icons.DragHandle,
+    title = "拖放",
+    english = "DragDrop",
+    description = "把系统文件或其他应用中的文本拖进界面。",
+    keywords = "Drag & Drop DragFlag",
+    group = PageGroup.Interaction,
+) {
+    private val demoFileDrop = component("文件", "从文件管理器拖入一个或多个文件。", "DragFlag.File DropResult.File", previewAlias = "文件拖放")
+    private val demoTextDrop = component("文本", "把其他应用中选中的文字拖进接收区。", "DragFlag.Text DropResult.Text", previewAlias = "文本拖放")
+    private val demoMixedDrop = component("混合", "在同一区域接收文件和文本，也可限制接收类型。", "DragFlag 文件 文本", previewAlias = "混合接收与开关")
+
     @Composable
     override fun Content() {
         ComponentColumn {
-            GalleryParagraph("在 JVM 或 Native 桌面端，从系统文件管理器拖入文件，或从其他应用拖入选中的文本。Web 端的文件结果仅展示文件名；Android 与 iOS 不接收拖放。")
+            GalleryParagraph("桌面端可拖入文件和文本。Web 端的文件结果只显示文件名，Android 和 iOS 暂不支持拖入。")
 
-            Component("文件拖放") {
+            Component(demoFileDrop) {
                 DropExample(DragFlag.File, "将一个或多个文件拖到这里")
             }
-            Component("文本拖放") {
+            Component(demoTextDrop) {
                 DropExample(DragFlag.Text, "将其他应用中选中的文本拖到这里")
             }
-            Component("混合接收与开关") {
+            Component(demoMixedDrop) {
                 var enabled by rememberTrue()
                 var acceptFile by rememberTrue()
                 var acceptText by rememberTrue()

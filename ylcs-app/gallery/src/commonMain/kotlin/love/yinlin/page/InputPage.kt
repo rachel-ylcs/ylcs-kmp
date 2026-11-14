@@ -19,6 +19,7 @@ import love.yinlin.GalleryActions
 import love.yinlin.GalleryBadge
 import love.yinlin.GalleryCaption
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -32,11 +33,30 @@ import love.yinlin.compose.ui.text.Text
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-object InputPage : Page() {
+object InputPage : Page(
+    id = "input",
+    icon = Icons.CheckBox,
+    title = "输入",
+    english = "Input",
+    description = "用按钮、选择控件和选择器收集用户输入。",
+    keywords = "表单 控件",
+    group = PageGroup.Interaction,
+) {
+    private val demoButton = component("Button", "用填充、描边或文字按钮触发操作，耗时任务可显示加载状态。", "PrimaryButton SecondaryButton TertiaryButton OutlinedButton TextButton IconButton LoadingButton")
+    private val demoSwitch = component("Switch", "用于即时打开或关闭设置。", "开关")
+    private val demoOptions = component("Choice", "从一组选项中单选或多选，复选框也支持部分选中。", "Radio CheckBox RadioGroup TriStateCheckBox", previewAlias = "Radio / CheckBox")
+    private val demoSlider = component("Slider", "拖动滑块调整数值，支持自定义数值显示。", "滑块")
+    private val demoStarBar = component("StarBar", "用整星或半星评分，再点一次可清除评分。", "星级 评分")
+    private val demoComboBox = component("ComboBox", "从下拉列表中选择一项。", "下拉")
+    private val demoFilter = component("Filter", "用标签筛选内容，支持单选和多选。", "筛选")
+    private val demoColorPicker = component("ColorPicker", "选择颜色并调整透明度。", "取色 透明度")
+    private val demoDatePicker = component("DatePicker", "按年、月浏览日历，点击选定日期。", "日期选择器 DatePickerState")
+    private val demoTimePicker = component("TimePicker", "滚动时分秒三列来选择时间。", "时间选择器 TimePickerState")
+
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Button") {
+            Component(demoButton) {
                 val sample = Modifier.widthIn(min = Theme.size.input4)
                 val load: suspend () -> Unit = { delay(2.seconds) }
 
@@ -83,7 +103,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("Switch") {
+            Component(demoSwitch) {
                 ExampleRow {
                     var checked by rememberFalse()
 
@@ -101,7 +121,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("Radio / CheckBox") {
+            Component(demoOptions) {
                 ExampleRow {
                     Example("RadioGroup") {
                         val group = rememberRadioGroup(0)
@@ -125,7 +145,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("Slider") {
+            Component(demoSlider) {
                 ExampleRow {
                     var value by rememberValueState(0f)
 
@@ -205,7 +225,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("StarBar") {
+            Component(demoStarBar) {
                 val normalState by rememberState { StarBarState(3) }
                 val halfState by rememberState { StarBarState(2.5) }
 
@@ -228,7 +248,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("ComboBox") {
+            Component(demoComboBox) {
                 ExampleRow {
                     val items = remember { (1 .. 20).map { "Item $it" } }
                     var current by rememberValueState(-1)
@@ -264,7 +284,7 @@ object InputPage : Page() {
                 }
             }
 
-            Component("Filter") {
+            Component(demoFilter) {
                 ExampleRow {
                     Example("SingleFilter", modifier = Modifier.weight(1f)) {
                         var currentIndex by rememberValueState(1)
@@ -296,21 +316,21 @@ object InputPage : Page() {
                 }
             }
 
-            Component("DatePicker") {
+            Component(demoDatePicker) {
                 val state by rememberState { DatePickerState() }
 
                 DatePicker(state)
                 GalleryCaption(state.date?.toString() ?: "尚未选择日期")
             }
 
-            Component("TimePicker") {
+            Component(demoTimePicker) {
                 val state by rememberState { TimePickerState() }
 
                 TimePicker(state)
                 GalleryCaption(state.time.toString())
             }
 
-            Component("ColorPicker") {
+            Component(demoColorPicker) {
                 ColorPicker(onColorChangeFinished = {})
             }
         }

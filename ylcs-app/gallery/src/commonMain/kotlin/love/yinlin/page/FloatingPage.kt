@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.container.Surface
@@ -26,7 +27,21 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-object FloatingPage : Page() {
+object FloatingPage : Page(
+    id = "floating",
+    icon = Icons.Cloud,
+    title = "浮窗",
+    english = "Floating",
+    description = "在当前页面上打开对话框、抽屉和菜单。",
+    keywords = "弹窗 抽屉 提示",
+    group = PageGroup.Interaction,
+) {
+    private val demoDialog = component("Dialog", "需要确认、输入或选择时，在当前内容上弹出对话框。", "DialogInfo DialogConfirm DialogInput DialogChoice DialogLoading DialogProgress")
+    private val demoSheet = component("Sheet", "用抽屉承载补充内容或可滚动的选项列表。", "SheetContent")
+    private val demoFlyout = component("Flyout", "在触发控件附近显示悬停提示或菜单。", "BalloonTip Menus")
+    private val demoTip = component("Tip", "给出简短的成功、警告或错误反馈。", "消息")
+    private val demoFab = component("FAB", "把常用操作放在悬浮按钮里，也可展开一组快捷操作。", "悬浮按钮")
+
     val tip = Tip(mainScope)
 
     val dialogInfo = DialogInfo()
@@ -113,7 +128,7 @@ object FloatingPage : Page() {
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Dialog") {
+            Component(demoDialog) {
                 ExampleRow {
                     Example("Info") {
                         PrimaryLoadingButton("open", onClick = {
@@ -168,7 +183,7 @@ object FloatingPage : Page() {
                 }
             }
 
-            Component("Sheet") {
+            Component(demoSheet) {
                 ExampleRow {
                     Example("Normal") {
                         PrimaryLoadingButton("open", onClick = {
@@ -196,7 +211,7 @@ object FloatingPage : Page() {
                 }
             }
 
-            Component("Flyout") {
+            Component(demoFlyout) {
                 ExampleRow {
                     Example("BalloonTip") {
                         BalloonTip(enabled = true, text = "Click Me!") {
@@ -247,7 +262,7 @@ object FloatingPage : Page() {
                 }
             }
 
-            Component("Tip") {
+            Component(demoTip) {
                 ExampleRow {
                     Example("Info") {
                         PrimaryLoadingButton("open", onClick = {
@@ -275,7 +290,7 @@ object FloatingPage : Page() {
                 }
             }
 
-            Component("FAB") {
+            Component(demoFab) {
                 ExampleRow {
                     Example("enabled: ${fab.visible}") {
                         PrimaryLoadingButton("toggle", onClick = {

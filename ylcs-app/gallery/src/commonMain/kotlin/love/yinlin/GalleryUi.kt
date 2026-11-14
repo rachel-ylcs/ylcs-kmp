@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,11 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.staticLocalComposition
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.Text
 
-internal val LocalGalleryCompact = staticCompositionLocalOf { false }
+internal val LocalGalleryCompact = staticLocalComposition { false }
 
 internal enum class GalleryPalette(val title: String) {
     Gallery("海盐配色"),
@@ -120,10 +120,8 @@ internal fun GalleryCard(
 }
 
 @Composable
-internal fun GalleryPageHeader(item: PageItem) {
-    val number = (PageItem.entries.indexOf(item) + 1).toString().padStart(2, '0')
+internal fun GalleryPageHeader(item: Page) {
     Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
-        Text("$number / RACHEL UI", fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold, color = Theme.color.primary)
         GalleryActions {
             Text(item.title, fontSize = 34.sp, lineHeight = 42.sp, fontWeight = FontWeight.Bold)
             GalleryBadge(item.english)
@@ -142,11 +140,10 @@ internal fun GallerySectionHeading(title: String, description: String) {
 }
 
 @Composable
-internal fun GalleryMetric(label: String, value: String, detail: String, modifier: Modifier = Modifier) {
+internal fun GalleryMetric(label: String, value: String, modifier: Modifier = Modifier) {
     GalleryCard(modifier = modifier) {
         Text(label, color = Theme.color.onSurfaceVariant, fontSize = 12.sp)
         Text(value, fontSize = 29.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold)
-        GalleryParagraph(detail)
     }
 }
 

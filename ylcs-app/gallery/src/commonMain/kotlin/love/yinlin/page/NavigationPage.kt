@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.GalleryActions
 import love.yinlin.GalleryBadge
 import love.yinlin.compose.extension.rememberState
@@ -16,13 +17,25 @@ import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.navigation.Segment
 
 @Stable
-object NavigationPage : Page() {
+object NavigationPage : Page(
+    id = "navigation",
+    icon = Icons.Anchor,
+    title = "导航",
+    english = "Navigation",
+    description = "切换同级内容，或沿路径返回上一级。",
+    keywords = "标签 面包屑",
+    group = PageGroup.Interaction,
+) {
+    private val demoTabBar = component("TabBar", "用标签切换同级页面。", "标签栏")
+    private val demoSegment = component("Segment", "在几个并排的选项之间切换。", "分段")
+    private val demoBreadcrumb = component("Breadcrumb", "显示当前位置，点击路径可返回上层。", "面包屑")
+
     @Composable
     override fun Content() {
         ComponentColumn {
             var currentIndex by rememberValueState(0)
 
-            Component("TabBar") {
+            Component(demoTabBar) {
                 TabBar(
                     size = 5,
                     index = currentIndex,
@@ -33,7 +46,7 @@ object NavigationPage : Page() {
                 )
             }
 
-            Component("Segment") {
+            Component(demoSegment) {
                 Segment(
                     size = 5,
                     index = currentIndex,
@@ -43,7 +56,7 @@ object NavigationPage : Page() {
                 )
             }
 
-            Component("Breadcrumb") {
+            Component(demoBreadcrumb) {
                 var items by rememberState { ["Home", "Documents", "Code", "Kotlin", "Compose"] }
 
                 GalleryActions {

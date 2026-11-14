@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberValueState
@@ -32,11 +33,26 @@ import love.yinlin.extension.enumSize
 import love.yinlin.gallery.resources.*
 
 @Stable
-object ContainerPage : Page() {
+object ContainerPage : Page(
+    id = "container",
+    icon = Icons.Package,
+    title = "容器",
+    english = "Container",
+    description = "组织内容、呈现加载状态，也可添加轮播和水印。",
+    keywords = "内容 卡片",
+    group = PageGroup.Layout,
+) {
+    private val demoSurface = component("Surface", "为内容提供带圆角、边框或阴影的表面。", "卡片")
+    private val demoStatefulBox = component("StatefulBox", "按加载结果显示内容、空态或错误提示。", "加载 空态")
+    private val demoReplaceableBox = component("ReplaceableBox", "在同一位置添加、替换或删除一个内容。", "替换")
+    private val demoAdderBox = component("AdderBox", "向容器中添加项目，也可替换或删除已有项目。", "添加")
+    private val demoBanner = component("Banner", "自动轮播一组图片，也可以手动切换。", "轮播")
+    private val demoWatermark = component("Watermark", "在内容上平铺水印，仍可操作下方控件。", "平铺 透明度")
+
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Surface") {
+            Component(demoSurface) {
                 var padding by rememberValueState(0.dp)
                 var shape by rememberValueState(0.dp)
                 var shadow by rememberValueState(0.dp)
@@ -88,7 +104,7 @@ object ContainerPage : Page() {
                 }
             }
 
-            Component("StatefulBox") {
+            Component(demoStatefulBox) {
                 val provider = remember { DefaultStatefulProvider() }
 
                 Filter(
@@ -105,7 +121,7 @@ object ContainerPage : Page() {
                 }
             }
 
-            Component("ReplaceableBox") {
+            Component(demoReplaceableBox) {
                 val colorList = [
                     Theme.color.primaryContainer,
                     Theme.color.secondaryContainer,
@@ -127,7 +143,7 @@ object ContainerPage : Page() {
                 }
             }
 
-            Component("AdderBox") {
+            Component(demoAdderBox) {
                 val colorList = [
                     Theme.color.primaryContainer,
                     Theme.color.secondaryContainer,
@@ -148,7 +164,7 @@ object ContainerPage : Page() {
                 }
             }
 
-            Component("Banner") {
+            Component(demoBanner) {
                 val imgRes = [
                     Res.drawable.img0,
                     Res.drawable.img1,
@@ -168,7 +184,7 @@ object ContainerPage : Page() {
                     )
                 }
             }
-            Component("Watermark") {
+            Component(demoWatermark) {
                 var angle by rememberValueState(30f)
                 var alpha by rememberValueState(0.12f)
                 var space by rememberValueState(48.dp)

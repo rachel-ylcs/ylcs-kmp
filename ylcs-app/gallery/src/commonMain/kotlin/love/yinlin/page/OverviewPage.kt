@@ -26,7 +26,14 @@ import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Text
 
 @Stable
-internal object OverviewPage : Page() {
+internal object OverviewPage : Page(
+    id = "overview",
+    icon = Icons.Home,
+    title = "总览",
+    english = "Overview",
+    description = "浏览 Rachel UI 的组件和交互示例。",
+    keywords = "组件库",
+) {
     @Composable
     override fun Content() {
         ComponentColumn {
@@ -36,24 +43,20 @@ internal object OverviewPage : Page() {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 maxItemsInEachRow = if (LocalGalleryCompact.current) 1 else 3,
             ) {
-                GalleryMetric("组件分类", PageItem.entries.size.toString(), "从主题与文本，到容器与浮窗。", Modifier.weight(1f))
-                GalleryMetric("展示分组", PageItem.componentCount.toString(), "每组都保留实际控件与可操作示例。", Modifier.weight(1f))
-                GalleryMetric("外观模式", "Light / Dark", "点击右上角，比较两种外观。", Modifier.weight(1f))
+                GalleryMetric("组件分类", GalleryCatalog.entries.size.toString(), Modifier.weight(1f))
+                GalleryMetric("组件示例", GalleryCatalog.componentCount.toString(), Modifier.weight(1f))
+                GalleryMetric("当前外观", if (darkMode) "深色" else "浅色", Modifier.weight(1f))
             }
             PageGroup.entries.forEach { group ->
-                GallerySectionHeading(group.title, when (group) {
-                    PageGroup.Foundation -> "从颜色角色与文字排版开始，建立一致的界面语言。"
-                    PageGroup.Interaction -> "点击、拖动、切换与打开浮层，感受组件如何响应操作。"
-                    PageGroup.Layout -> "把图片、内容与集合放在合适的位置，让信息自然铺开。"
-                })
+                GallerySectionHeading(group.title, group.description)
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     maxItemsInEachRow = if (LocalGalleryCompact.current) 1 else 2,
                 ) {
-                    PageItem.entries.filter { it.group == group }.forEach { item ->
-                        GalleryCard(modifier = Modifier.weight(1f).heightIn(min = 238.dp), onClick = { currentPage = item.page }) {
+                    GalleryCatalog.entries.filter { it.group == group }.forEach { item ->
+                        GalleryCard(modifier = Modifier.weight(1f).heightIn(min = 238.dp), onClick = { currentPage = item }) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(13.dp)) {
                                 GalleryIconTile(item.icon)
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -71,14 +74,6 @@ internal object OverviewPage : Page() {
                         }
                     }
                 }
-            }
-            GalleryCard(title = "从这里开始", description = "这些页面展示的是实际组件，可以直接输入、点击和拖动。") {
-                GalleryActions {
-                    GalleryBadge("01 · 选择一个分类")
-                    GalleryBadge("02 · 操作真实控件")
-                    GalleryBadge("03 · 比较浅色与深色")
-                }
-                GalleryParagraph("搜索支持中文分类名与组件名，例如 Button、NineGrid、Calendar。主题页还可以在海盐配色与框架默认配色之间切换。")
             }
         }
     }
@@ -102,16 +97,14 @@ internal object OverviewPage : Page() {
                 drawCircle(secondary.copy(alpha = 0.05f), radius = 120.dp.toPx(), center = Offset(size.width * 0.67f, size.height))
             }
             val heading: @Composable ColumnScope.() -> Unit = {
-                GalleryBadge("RACHEL / COMPOSE MULTIPLATFORM")
-                Text("每个组件，\n都值得亲手试试。", fontSize = if (compact) 30.sp else 36.sp,
+                Text("Rachel UI", fontSize = if (compact) 30.sp else 36.sp,
                     lineHeight = if (compact) 41.sp else 48.sp, fontWeight = FontWeight.Bold)
-                Text("用真实的交互认识 Rachel UI。\n在同一套界面里，探索颜色、布局与反馈。",
+                Text(description,
                     fontSize = 14.sp, lineHeight = 24.sp, color = Theme.color.onSurfaceVariant)
                 GalleryActions {
-                    PrimaryButton("从主题开始", icon = Icons.Theme) { currentPage = ThemePage }
-                    SecondaryButton("探索输入", icon = Icons.CheckBox) { currentPage = InputPage }
+                    PrimaryButton(ThemePage.title, icon = ThemePage.icon) { currentPage = ThemePage }
+                    SecondaryButton(InputPage.title, icon = InputPage.icon) { currentPage = InputPage }
                 }
-                GalleryCaption("DESIGNED TO BE EXPLORED  ·  DESKTOP / WEB")
             }
             val preview: @Composable (Modifier) -> Unit = { modifier ->
                 GalleryCard(modifier = modifier) {

@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.GalleryCaption
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalStyle
@@ -20,13 +21,26 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.*
 
 @Stable
-object TextPage : Page() {
+object TextPage : Page(
+    id = "text",
+    icon = Icons.TextFields,
+    title = "文本",
+    english = "Text",
+    description = "输入、排版与显示富文本。",
+    keywords = "排版 字体 富文本",
+    group = PageGroup.Foundation,
+) {
+    private val demoInput = component("Input", "用于单行、多行和密码输入，支持清除和长度限制。", "PasswordInput InputState")
+    private val demoText = component("Text", "为标题和正文选择字号、字重与文字样式。", "Typography")
+    private val demoStrokeText = component("StrokeText", "为文字添加描边，让它在复杂背景上更清楚。", "描边")
+    private val demoRichText = component("RichText", "在同一段文字中放入样式、链接和图标。", "内联图标 链接")
+
     @Composable
     override fun Content() {
         ComponentColumn {
             val text = "一只敏捷的棕色狐狸跳过一只懒惰的狗\nThe quick brown fox jumps over a lazy dog"
 
-            Component("Input") {
+            Component(demoInput) {
                 ExampleRow {
                     Example("Normal", modifier = Modifier.weight(1f)) {
                         Input()
@@ -73,7 +87,7 @@ object TextPage : Page() {
                 }
             }
 
-            Component("Text") {
+            Component(demoText) {
                 var isBold by rememberFalse()
                 var isItalic by rememberFalse()
                 var isUnderline by rememberFalse()
@@ -134,11 +148,11 @@ object TextPage : Page() {
                 }
             }
 
-            Component("StrokeText") {
+            Component(demoStrokeText) {
                 StrokeText(text = text, strokeColor = Theme.color.primary, style = Theme.typography.v2)
             }
 
-            Component("RichText") {
+            Component(demoRichText) {
                 val fontSize = LocalStyle.current.fontSize * 2f
                 val emojiList = [Icons.Home, Icons.Clear, Icons.Token]
 

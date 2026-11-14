@@ -19,11 +19,13 @@ import love.yinlin.GalleryActions
 import love.yinlin.GalleryCaption
 import love.yinlin.GalleryParagraph
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberTrue
 import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.ColorPicker
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
@@ -37,17 +39,29 @@ import love.yinlin.compose.ui.text.Text
 import kotlin.math.roundToInt
 
 @Stable
-object BlurPage : Page() {
+object BlurPage : Page(
+    id = "blur",
+    icon = Icons.Cloud,
+    title = "模糊",
+    english = "Blur",
+    description = "让面板背后的内容呈现磨砂效果。",
+    keywords = "磨砂 BlurState",
+    group = PageGroup.Layout,
+) {
+    private val demoBlurEffect = component("效果", "把背景接到模糊面板上，调整模糊程度和色调。", "BlurParameters blurSource blurTarget", previewAlias = "Source / Target")
+    private val demoPanels = component("面板", "多个面板共用一个背景，各自设置模糊效果。", "blurTarget", previewAlias = "多个 Target")
+    private val demoLive = component("动态", "背景变化时画面会跟着更新，来源断开后可保留上一帧。", "KeepLastFrame", previewAlias = "动态与重挂载")
+
     @Composable
     override fun Content() {
         ComponentColumn {
-            Component("Source / Target") {
+            Component(demoBlurEffect) {
                 ParametersExample()
             }
-            Component("多个 Target") {
+            Component(demoPanels) {
                 MultipleTargetsExample()
             }
-            Component("动态与重挂载") {
+            Component(demoLive) {
                 LifecycleExample()
             }
         }
@@ -162,7 +176,6 @@ object BlurPage : Page() {
                 parameters = parameters,
             )
         }
-        GalleryParagraph("修改 BlurParameters 并通过 copy 调整参数。边缘保留原始背景以便比较；半径可设为零，质量与噪点可拖到 0 或 1，两个颜色选择器均支持透明度。")
     }
 
     @Composable
@@ -176,7 +189,7 @@ object BlurPage : Page() {
             onValueChange = { position = it },
             modifier = Modifier.fillMaxWidth()
         )
-        GalleryCaption("拖动滑块移动右侧面板，调整窗口大小以检查来源与 Target 的对齐。")
+        GalleryCaption("拖动滑块可移动右侧的模糊面板。")
 
         Box(
             Modifier.fillMaxWidth()
@@ -256,7 +269,7 @@ object BlurPage : Page() {
                 )
             }
         }
-        GalleryParagraph("关闭 Source 可检查最后一帧保留，再开启检查恢复；关闭 Target 后来源继续正常绘制。也可以切换页面、替换 State、调整窗口及切换前后台，检查资源与画面恢复。")
+        GalleryParagraph("可关闭背景来源或模糊面板，查看最后一帧是否保留。")
     }
 
     @Composable

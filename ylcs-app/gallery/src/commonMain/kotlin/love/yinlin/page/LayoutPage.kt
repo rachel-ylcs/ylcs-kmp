@@ -27,6 +27,7 @@ import love.yinlin.GalleryActions
 import love.yinlin.GalleryCaption
 import love.yinlin.GalleryParagraph
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.image.data.ImageOptions
@@ -55,14 +56,28 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.gallery.resources.Res
 
 @Stable
-object LayoutPage : Page() {
+object LayoutPage : Page(
+    id = "layout",
+    icon = Icons.GridOn,
+    title = "布局",
+    english = "Layout",
+    description = "安排子项的位置、对齐和可滚动区域。",
+    keywords = "网格 对齐 滚动",
+    group = PageGroup.Layout,
+) {
+    private val demoGrid = component("Grid", "用行列组织内容，支持跨格、命名区域和响应式布局。", "GridLayoutBuilder MinMax Fr")
+    private val demoOffsetBox = component("OffsetBox", "让内容在原位置的基础上水平或垂直偏移。", "偏移")
+    private val demoActionScope = component("ActionScope", "把一组操作按钮对齐到容器末端。", "操作栏")
+    private val demoHorizontalScroll = component("横向滚动", "用鼠标滚轮浏览横向列表或分页内容。", "HorizontalScrollContainer LazyRow HorizontalPager", previewAlias = "HorizontalScrollContainer")
+    private val demoSplitView = component("分隔", "拖动分隔线调整面板大小，或对照两张图片。", "Splitter Comparator HorizontalSplitter VerticalSplitter HorizontalComparator VerticalComparator", previewAlias = "Splitter & Comparator")
+
     @Composable
     override fun Content() {
         ComponentColumn(alwaysShowTabs = true) {
-            Component("Grid") {
-                GalleryParagraph("Grid 用于页面或复杂组件的二维结构布局，所有子项都会参与组合与测量；大量数据请使用懒网格，或参考下方在 Grid 单元格中放置 LazyColumn 的示例。")
+            Component(demoGrid) {
+                GalleryParagraph("Grid 适合搭建页面和卡片。长列表可以放在网格里独立滚动。")
                 GalleryCaption("x → 列 / y → 行 / sx、sy、s → 间距 / t → 命名区域 / Modifier.item → 放置、跨度和对齐")
-                GalleryParagraph("显式坐标从 1 开始；0 表示自动选择，负数相对显式轨道末尾定位。Int 是弹性权重，Float 是 0f .. 1f 的百分比，Dp 是固定尺寸，Fr 是显式弹性单位。")
+                GalleryParagraph("坐标从 1 开始，0 由网格自动安排，负数从末尾数起。")
 
                 FixedGridExample()
                 AutoPlacementExample()
@@ -74,11 +89,9 @@ object LayoutPage : Page() {
                 NamedAreasExample()
                 OverlayExample()
                 LazyListExample()
-
-                GalleryParagraph("以上示例全部使用 Rachel 的 Grid 封装。官方 API 中的 flow 和范围形式的 area 尚未由当前 DSL 暴露；默认按行自动放置，隐式轨道使用 Auto，范围区域可以用 t 的起点与 xs / ys 表达。")
             }
 
-            Component("OffsetBox") {
+            Component(demoOffsetBox) {
                 var x by rememberValueState(0.5f)
                 var y by rememberValueState(0.5f)
                 ExampleRow(maxItemsInEachRow = 2) {
@@ -107,7 +120,7 @@ object LayoutPage : Page() {
                 }
             }
 
-            Component("ActionScope") {
+            Component(demoActionScope) {
                 ActionScope.Right.Container(modifier = Modifier.fillMaxWidth()) {
                     Icon(icon = Icons.Download, onClick = {})
                     Icon(icon = Icons.Upload, onClick = {})
@@ -116,7 +129,7 @@ object LayoutPage : Page() {
                 }
             }
 
-            Component("HorizontalScrollContainer") {
+            Component(demoHorizontalScroll) {
                 val num = 30
                 val colorList = remember(num) {
                     List(num) {
@@ -185,9 +198,9 @@ object LayoutPage : Page() {
                 }
             }
 
-            Component("Splitter & Comparator") {
+            Component(demoSplitView) {
                 GalleryCaption("Splitter · 默认仅显示分隔线，悬停或拖拽时显示浮动抓手")
-                GalleryParagraph("拖动中间的分隔条调整区域比例。子内容可以使用 fillMaxWidth 或 fillMaxHeight 填满各自区域，较小的内容按 alignment 对齐。")
+                GalleryParagraph("拖动分隔条可调整两侧区域的大小。")
                 ExampleRow(maxItemsInEachRow = 2) {
                     Example("水平分隔", Modifier.weight(1f)) {
                         HorizontalSplitter(
@@ -222,7 +235,7 @@ object LayoutPage : Page() {
                 }
 
                 GalleryCaption("Comparator · 双向箭头抓手始终可见，激活时切换主题色")
-                GalleryParagraph("拖动图片中间的比较线，分别查看同一张图片的不同画质，或将两张不同图片拼接比较。两个内容始终按比较器完整尺寸绘制，只显示分割线各自一侧。")
+                GalleryParagraph("拖动分隔线，对比两张图或同一张图的不同画质。")
                 ExampleRow(maxItemsInEachRow = 2) {
                     Example("示例 1 · 低画质与原图", Modifier.weight(1f)) {
                         HorizontalComparator(
@@ -284,7 +297,7 @@ object LayoutPage : Page() {
         val rowHeight = Theme.size.cell9
 
         Example("01 · 固定轨道与横纵间距", Modifier.fillMaxWidth()) {
-            GalleryParagraph("定义两列三行，六个子项默认按行填充。拖动间距，比较 s(x, y) 与分别调用 sx / sy 的相同效果；s(value) 可同时设置两个方向。窄窗口可以横向滚动。")
+            GalleryParagraph("子项按行填入网格。调整行距和列距，看看留白的变化。")
             Filter(size = modes.size, selectedProvider = { gapMode == it }, titleProvider = { modes[it] }, onClick = { index, selected -> if (selected) gapMode = index })
             GalleryCaption("列间距 ${columnGap.value.toInt()} dp")
             Slider(columnGap, SliderDpConverter(0.dp, Theme.padding.h4), { columnGap = it }, onValueChange = { columnGap = it }, modifier = Modifier.fillMaxWidth())
@@ -317,7 +330,7 @@ object LayoutPage : Page() {
         val height = Theme.size.cell10
 
         Example("02 · 自动放置与隐式轨道", Modifier.fillMaxWidth()) {
-            GalleryParagraph("只定义列，不定义行，也不为子项指定坐标。项目填满一行后自动新增 Auto 行；调整列数和项目数，观察隐式行随内容变化。")
+            GalleryParagraph("一行排满后，网格会自动添加新行。")
             Filter(size = 3, selectedProvider = { columns == it + 2 }, titleProvider = { "${it + 2} 列" }, onClick = { index, selected -> if (selected) columns = index + 2 })
             GalleryCaption("项目数 · $count")
             Slider(count, SliderIntConverter(1, 12), { count = it }, onValueChange = { count = it }, modifier = Modifier.fillMaxWidth())
@@ -342,7 +355,7 @@ object LayoutPage : Page() {
         val ratioHeight = Theme.size.cell9
 
         Example("03 · Dp / Float / Int / Fr 混合尺寸", Modifier.fillMaxWidth()) {
-            GalleryParagraph("固定轨道使用指定尺寸；百分比按扣除行间距后的可用高度计算；Auto 行适应内容；弹性轨道在内容最小尺寸的基础上分配剩余空间。这里可以在 10% .. 40% 之间调节百分比。")
+            GalleryParagraph("固定尺寸、百分比、内容尺寸和弹性轨道可以混用。")
             GalleryCaption("百分比行 · ${(percentage * 100).toInt()}%")
             Slider(percentage, SliderFloatConverter(0.1f, 0.4f), { percentage = it }, onValueChange = { percentage = it }, modifier = Modifier.fillMaxWidth())
             GalleryCaption("容器高度 · ${height.value.toInt()} dp")
@@ -379,7 +392,7 @@ object LayoutPage : Page() {
         val text = "Compose Grid layout"
 
         Example("04 · min / max / auto 内容尺寸", Modifier.fillMaxWidth()) {
-            GalleryParagraph("三列使用相同英文文本：min 按最长单词确定最小内容宽度，max 按不换行的完整文本确定最大内容宽度，auto 在可用空间内适应内容。拖动网格宽度观察换行；英文空格让差异更容易辨认。")
+            GalleryParagraph("拖动网格宽度，比较内容尺寸、自动宽度和文字换行。")
             GalleryCaption("网格宽度 · ${width.value.toInt()} dp；窄窗口可横向滚动")
             Slider(width, SliderDpConverter(minWidth, maxWidth), { width = it }, onValueChange = { width = it }, modifier = Modifier.fillMaxWidth())
             Box(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
@@ -405,7 +418,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.v
 
         Example("05 · minmax 为弹性轨道设置下限", Modifier.fillMaxWidth()) {
-            GalleryParagraph("第一行从明确的最小高度起分配，第二行从内容最小高度起分配，第三行固定高度。调整容器高度，观察两个弹性轨道在各自基础尺寸上，按相同权重分配剩余空间。")
+            GalleryParagraph("弹性轨道先满足最小尺寸，再按权重分配剩余空间。")
             GalleryCaption("容器高度 · ${height.value.toInt()} dp；第一行至少 ${minimum.value.toInt()} dp")
             Slider(height, SliderDpConverter(Theme.size.cell1, Theme.size.cell1 + Theme.size.cell3), { height = it }, onValueChange = { height = it }, modifier = Modifier.fillMaxWidth())
             Grid(builder = {
@@ -427,7 +440,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.h
 
         Example("06 · 混合放置、单轴指定与负索引", Modifier.fillMaxWidth()) {
-            GalleryParagraph("中心项同时指定 x / y，末尾项用 -1 定位到最后一条显式行列；只指定 x 或 y 时，另一方向自动寻找空位。其余子项不设置坐标，自动避开已占用的位置。")
+            GalleryParagraph("指定行列可放置子项，其余子项会填入空位。")
             Grid(builder = {
                 x(1, 1, 1)
                 y(height, height, height)
@@ -454,7 +467,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.h
 
         Example("07 · 跨行跨列与区域内对齐", Modifier.fillMaxWidth()) {
-            GalleryParagraph("A 跨两行两列，右侧两个子项自动落位，页脚跨三列。A 保持较小尺寸时可以观察区域内对齐；开启填满区域后，子项填充整个跨度，对齐不再产生可见位移。")
+            GalleryParagraph("一个子项可以跨多行或多列，也可以在所占区域内对齐。")
             Filter(size = titles.size, selectedProvider = { alignmentIndex == it }, titleProvider = { titles[it] }, onClick = { index, selected -> if (selected) alignmentIndex = index })
             GalleryActions {
                 Switch(checked = fillArea, onCheckedChange = { fillArea = it })
@@ -482,7 +495,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.h
 
         Example("08 · 命名区域与响应式经典卡片", Modifier.fillMaxWidth()) {
-            GalleryParagraph("参考官方经典卡片：宽窗口中，封面跨四行，文字放在右侧；窄窗口中，封面和文字改为单列。只改变轨道与 t 的区域映射，子项始终使用相同的 item(label)。")
+            GalleryParagraph("宽窗口并排显示封面和文字，窄窗口改为上下排列。")
             GalleryActions {
                 Switch(checked = forceCompact, onCheckedChange = { forceCompact = it })
                 Text("强制单列预览")
@@ -529,7 +542,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.h
 
         Example("09 · 重叠命名区域与 zIndex", Modifier.fillMaxWidth()) {
-            GalleryParagraph("两个命名区域各跨两列，并共享中间一列。默认后声明的 OVERLAY 绘制在上层；开启开关后，用 zIndex 将先声明的 BASE 提到前面。")
+            GalleryParagraph("区域可以重叠，用绘制顺序控制哪项在上层。")
             GalleryActions {
                 Switch(checked = raiseBase, onCheckedChange = { raiseBase = it })
                 Text("将 BASE 提到前面")
@@ -555,7 +568,7 @@ object LayoutPage : Page() {
         val gap = Theme.padding.v
 
         Example("10 · Grid 中的 LazyColumn", Modifier.fillMaxWidth()) {
-            GalleryParagraph("Grid 负责标题、列表和页脚的结构，LazyColumn 负责大量数据。列表所在的列与行都使用 minmax(0.dp, Fr(1f))，避开普通弹性轨道对 SubcomposeLayout 不支持的固有尺寸查询；Grid 同时提供有限高度，让列表独立滚动。")
+            GalleryParagraph("标题和页脚留在原位，网格中间的列表独立滚动。")
             Grid(builder = {
                 x(minmax(0.dp, Fr(1f)))
                 y(max, minmax(0.dp, Fr(1f)), max)

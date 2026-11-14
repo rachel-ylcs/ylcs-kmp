@@ -15,6 +15,7 @@ import love.yinlin.GalleryBadge
 import love.yinlin.GalleryCaption
 import love.yinlin.GalleryParagraph
 import love.yinlin.Page
+import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageQuality
@@ -26,6 +27,7 @@ import love.yinlin.compose.image.ImageManager
 import love.yinlin.compose.image.data.ImageLoadStatus
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.image.input.ImageSource
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.*
 import love.yinlin.compose.ui.input.CheckBox
 import love.yinlin.compose.ui.input.ComboBox
@@ -43,7 +45,26 @@ import love.yinlin.fs.PlatformFileSystem
 import love.yinlin.gallery.resources.Res
 
 @Stable
-object ImagePage : Page() {
+object ImagePage : Page(
+    id = "image",
+    icon = Icons.Image,
+    title = "图像",
+    english = "Image",
+    description = "加载资源、本地或网络图片，也可播放、缩放和裁剪。",
+    keywords = "图片 ImageSource ImageState",
+    group = PageGroup.Layout,
+) {
+    private val demoResourceImage = component("Resource", "从应用资源读取图片，可离线查看。", "JPEG PNG BMP GIF WebP EXIF")
+    private val demoWebImage = component("Web", "按网址加载图片，支持进度和重试。", "URL HTTP 缓存")
+    private val demoLocalImage = component("Local", "从本地文件或内存字节读取图片。", "LocalFileImage Bytes ByteArrayImageInput", previewAlias = "LocalFileImage / Bytes")
+    private val demoPlaceholder = component("占位", "在图片为空、加载中或失败时显示相应提示。", "ImagePlaceholder loading error retry", previewAlias = "占位与重试")
+    private val demoImageLayout = component("排布", "控制图片在容器中的缩放、对齐和点击范围。", "ContentScale alignment contentRect", previewAlias = "布局与点击")
+    private val demoAppearance = component("外观", "调整裁剪形状、着色和透明度，或设置加载淡入。", "ImageOptions ImageQuality fadeIn", previewAlias = "外观与画质")
+    private val demoAnimatedImage = component("动图", "播放 GIF 和 WebP 动图，支持暂停或只显示首帧。", "GIF WebP isPlaying", previewAlias = "动图与生命周期")
+    private val demoZoom = component("缩放", "放大图片查看细节，缩放时仍可在图集里翻页。", "ImageZoomState HorizontalPager", previewAlias = "图片缩放 / Pager")
+    private val demoCache = component("缓存", "重复使用已加载的图片，内容更新时可用版本号重新读取。", "ImageManager clearCache version", previewAlias = "版本与缓存")
+    private val demoCrop = component("裁剪", "拖动选区裁剪图片，可自由调整或锁定比例。", "cropImageRegion CropImageState CropRegion", previewAlias = "cropImageRegion")
+
     @Stable
     private data class NetworkSample(val format: String, val size: String, val dimensions: String)
 
@@ -73,7 +94,7 @@ object ImagePage : Page() {
 
     @Composable
     private fun ColumnScope.ResourceExamples() {
-        Component("ResourceFileImage") {
+        Component(demoResourceImage) {
             val samples = remember {
                 [
                     "JPEG · EXIF 方向" to "files/image-exif.jpg",
@@ -99,13 +120,13 @@ object ImagePage : Page() {
                     }
                 }
             }
-            GalleryParagraph("这些格式样本随 Gallery 打包，可离线查看。JPEG 样本携带 EXIF 方向；动图、透明叠帧与循环控制在下方演示。")
+            GalleryParagraph("内置样例可离线查看，JPEG 会按 EXIF 方向显示。")
         }
     }
 
     @Composable
     private fun ColumnScope.NetworkExamples() {
-        Component("WebImage") {
+        Component(demoWebImage) {
             val address = rememberInputState()
             var host by rememberValueState(0)
             var source by rememberState { "" }
@@ -154,13 +175,13 @@ object ImagePage : Page() {
             }
             ImageStateDetails(state)
             GalleryCaption("版本 $version · 相同地址和版本复用缓存；更新版本保持 URL 原样。")
-            GalleryParagraph("预设来自 httpbingo.org / httpbin.org 的公开 HTTP 测试样例，体积为本次实测近似值；点击格式按钮即可加载，也可输入自己的地址后点击加载。浏览器需要服务允许跨域访问，且不启用图片磁盘缓存。")
+            GalleryParagraph("可加载公开样例或输入自己的图片网址。浏览器需要图片服务允许跨域访问。")
         }
     }
 
     @Composable
     private fun ColumnScope.LocalExamples() {
-        Component("LocalFileImage / Bytes") {
+        Component(demoLocalImage) {
             val context = if (ImageManager.isReady) ImageManager.context else null
             val sampleFile = remember(context) {
                 context?.let { File(PlatformFileSystem.cachePath(it, "RachelGallery"), "gallery-image-sample.webp") }
@@ -215,13 +236,13 @@ object ImagePage : Page() {
                     ImageStateDetails(state)
                 }
             }
-            GalleryParagraph("准备按钮只写入 Gallery 缓存目录中的专用示例文件。也可读取自己的文件，修改文件后点击重新读取；字节输入使用独立的显示状态。")
+            GalleryParagraph("可读取自己的文件，也可先生成一张本地样图。")
         }
     }
 
     @Composable
     private fun ColumnScope.PlaceholderExamples() {
-        Component("占位与重试") {
+        Component(demoPlaceholder) {
             var mode by rememberValueState(4)
             var version by rememberValueState(0)
             val source = remember(mode) {
@@ -258,13 +279,13 @@ object ImagePage : Page() {
                     }
                 }
             }
-            GalleryParagraph("图片与默认占位均使用透明背景，空内容保留尺寸并显示空态图标。网络加载使用公开 PNG 样例展示真实下载进度，加载时长取决于网络。读取失败使用不存在的资源路径，显示警告色刷新图标，可点击重试；损坏数据使用无法解码的字节，显示不可点击的错误色图标。点击恢复加载内置资源，空内容不会发起读取。下方小图用于检查占位和重试范围是否影响相邻文字。")
+            GalleryParagraph("加载失败时可点刷新重试。损坏的图片会显示错误图标。")
         }
     }
 
     @Composable
     private fun ColumnScope.LayoutExamples() {
-        Component("布局与点击") {
+        Component(demoImageLayout) {
             val scales = remember { [ContentScale.Fit, ContentScale.Crop, ContentScale.Inside, ContentScale.FillWidth,
                 ContentScale.FillHeight, ContentScale.FillBounds, ContentScale.None] }
             val alignments = remember { [Alignment.Center, Alignment.TopStart, Alignment.BottomEnd] }
@@ -285,7 +306,7 @@ object ImagePage : Page() {
                 contentScale = scales[scale], alignment = alignments[alignment], onClick = { clicks++ },
                 modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
             )
-            GalleryParagraph("Fit / Inside 的留白不计入点击。切换窗口宽度观察固定高度的绘制范围；同一请求保持首次解码结果，后续布局变化由 UI 缩放。")
+            GalleryParagraph("点击只在实际绘制的图片范围内生效。")
             ExampleRow {
                 Example("无显式尺寸 · 主题默认占位") {
                     ResourceFileImage(Res.getUri("drawable/img0.webp"), contentDescription = "默认尺寸图片")
@@ -305,7 +326,7 @@ object ImagePage : Page() {
 
     @Composable
     private fun ColumnScope.AppearanceExamples() {
-        Component("外观与画质") {
+        Component(demoAppearance) {
             var quality by rememberValueState(1)
             var circular by rememberFalse()
             var tint by rememberFalse()
@@ -339,13 +360,13 @@ object ImagePage : Page() {
                 )
             )
             ImageStateDetails(state)
-            GalleryParagraph("quality 统一选择平台支持的重采样与绘制滤波，不按画质放大或分档解码尺寸。首次有效布局确定本次请求尺寸，后续布局变化只缩放已有图片；可在布局示例中调整窗口，观察容器变化时解码尺寸保持不变。淡入默认开启，重组、滚出后返回、保留状态重挂载及内存缓存命中均不重播；静态图淡入结束后直接绘制，不保留动画层。")
+            GalleryParagraph("画质影响缩放和绘制时的滤波，容器变化时会缩放已解码的图片。")
         }
     }
 
     @Composable
     private fun ColumnScope.AnimationExamples() {
-        Component("动图与生命周期") {
+        Component(demoAnimatedImage) {
             var mounted by rememberTrue()
             var stress by rememberFalse()
             var replay by rememberValueState(0)
@@ -376,13 +397,13 @@ object ImagePage : Page() {
                 }
             }
             else GalleryParagraph("动图已离开组合。重新挂载后会创建独立的播放状态。")
-            GalleryParagraph("GIF 与 WebP 使用各自的播放状态，并遵循文件循环次数；有限循环结束后可从头重播。向下滚动使图片离屏、切换页面或最小化窗口，可检查暂停与恢复。")
+            GalleryParagraph("动图按文件设置循环，播完后可以重播。")
         }
     }
 
     @Composable
     private fun ColumnScope.ZoomExamples() {
-        Component("图片缩放 / Pager") {
+        Component(demoZoom) {
             val paths = remember { ["drawable/img0.webp", "drawable/img1.webp", "files/image-stress.webp"] }
             val states = remember { List(paths.size) { ImageState() } }
             val pager = rememberPagerState { paths.size }
@@ -410,13 +431,13 @@ object ImagePage : Page() {
                 )
             }
             ImageStateDetails(state)
-            GalleryParagraph("双击、双指、滚轮可缩放，放大后拖动平移；也可使用上方按钮放大、缩小或复位。未缩放或平移到边缘后继续横拖，可切换 Pager；第三页为动图，可观察缩放时的播放。Android WebP 使用独立的系统播放器；停止后再次播放、切页后返回或回到前台会从头播放，可据此检查生命周期。")
+            GalleryParagraph("双击、捏合或用滚轮缩放。放大后可以拖动图片，拖到边缘可继续翻页。")
         }
     }
 
     @Composable
     private fun ColumnScope.CacheExamples() {
-        Component("版本与缓存") {
+        Component(demoCache) {
             var version by rememberValueState(1)
             var useVersion by rememberFalse()
             var mount by rememberValueState(0)
@@ -461,8 +482,7 @@ object ImagePage : Page() {
                     }
                 }
             }
-            GalleryParagraph("三个位置使用相同内置资源和尺寸，各自持有 ImageState。默认 version 为 null，仅按输入源识别内容；勾选附加版本键后，更新版本会重新读取资源。首次加载共享同一请求；保留状态重挂载复用 UI 结果，新状态重挂载可观察 Memory 命中，卸载后重新挂载可查看缓存复用。")
-            GalleryParagraph("清理按钮等待 ImageManager.clearCache() 完成后重新挂载本组。上方 WebImage 保持相同地址和版本时可复用图片磁盘缓存，更新版本后重新下载。")
+            GalleryParagraph("相同图片可共享读取结果。更新版本号可在地址不变时重新加载。")
         }
     }
 
@@ -473,7 +493,7 @@ object ImagePage : Page() {
         val ratios = remember { [0f, 1f, 4f / 3f, 16f / 9f] }
         val state = remember { CropImageState() }
         val imageState = rememberImageState()
-        Component("cropImageRegion") {
+        Component(demoCrop) {
             GalleryActions {
                 ComboBox(["内置资源", "网络图片"], { sample = it }, index = sample,
                     modifier = Modifier.width(Theme.size.input2))
@@ -492,7 +512,7 @@ object ImagePage : Page() {
                     contentDescription = "可裁剪的网络图片", contentScale = ContentScale.Fit, modifier = modifier)
             }
             if (!state.imageRect.isEmpty) CropDetails("当前选区", state.result)
-            GalleryParagraph("在任意图片组件的 Modifier 后附加 cropImageRegion，并传入该图片使用的同一个 ImageState。拖动边角调整选区，拖动内部移动选区；修改比例和重置选区不会重新加载图片。结果为相对于原图的比例坐标。")
+            GalleryParagraph("拖动边角调整选区，拖动内部移动选区。裁剪坐标按原图比例显示。")
         }
     }
 
