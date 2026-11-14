@@ -204,11 +204,14 @@ private fun SplitterHandle(horizontal: Boolean, hovered: Boolean, dragging: Bool
         modifier = Modifier.drawWithContent {
             drawContent()
             val lineColor = if (active) primaryColor else outlineColor
-            drawDividerTrack(horizontal, if (horizontal) size.width / 2f else size.height / 2f, lineColor, surfaceColor, lineThicknessDp.toPx().coerceAtLeast(1f))
+            val trackPosition = if (horizontal) size.width / 2f else size.height / 2f
+            val lineThickness = lineThicknessDp.toPx().coerceAtLeast(1f)
+            if (horizontal) drawLine(lineColor, Offset(trackPosition, 0f), Offset(trackPosition, size.height), lineThickness)
+            else drawLine(lineColor, Offset(0f, trackPosition), Offset(size.width, trackPosition), lineThickness)
 
             val pillWidth = if (horizontal) size.width else handleSizeDp.toPx().coerceAtMost(size.width)
             val pillHeight = if (horizontal) handleSizeDp.toPx().coerceAtMost(size.height) else size.height
-            if (pillWidth > 0f && pillHeight > 0f) {
+            if (active && pillWidth > 0f && pillHeight > 0f) {
                 val topLeft = Offset((size.width - pillWidth) / 2f, (size.height - pillHeight) / 2f)
                 val pillSize = Size(pillWidth, pillHeight)
                 val cornerRadius = CornerRadius(minOf(pillWidth, pillHeight) / 2f)
@@ -264,7 +267,7 @@ private fun Splitter(
                 onRatioChange = { splitRatio = it },
                 onHoverChange = { hovered = it },
                 onDraggingChange = { dragging = it },
-                indicatorSize = indicatorSize,
+                indicatorSize = 0.dp,
                 indicatorMargin = indicatorMargin,
                 hitTargetSize = hitTargetSize,
                 layoutDirection = layoutDirection,
@@ -289,9 +292,8 @@ private fun Splitter(
             else -> maxOf(fallbackExtent, constraints.minWidth)
         }
         val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
-        val marginExtent = indicatorMargin.roundToPx().coerceAtLeast(0)
-            .coerceAtMost(((axisExtent - handleExtent) / 2).coerceAtLeast(0))
-        val dividerExtent = handleExtent + marginExtent * 2
+        val marginExtent = indicatorMargin.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent / 2)
+        val dividerExtent = marginExtent * 2
         val availableExtent = (axisExtent - dividerExtent).coerceAtLeast(0)
         val firstExtent = (availableExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
             .fastRoundToInt()
@@ -321,7 +323,7 @@ private fun Splitter(
 
             layout(width, height) {
                 firstPlaceable.placeRelative(0, verticalAlignment.align(firstPlaceable.height, height))
-                handlePlaceable.placeRelative(firstExtent + marginExtent, 0)
+                handlePlaceable.placeRelative(firstExtent + marginExtent - handleExtent / 2, 0)
                 secondPlaceable.placeRelative(firstExtent + dividerExtent, verticalAlignment.align(secondPlaceable.height, height))
             }
         }
@@ -332,7 +334,7 @@ private fun Splitter(
 
             layout(width, height) {
                 firstPlaceable.place(horizontalAlignment.align(firstPlaceable.width, width, layoutDirection), 0)
-                handlePlaceable.place(0, firstExtent + marginExtent)
+                handlePlaceable.place(0, firstExtent + marginExtent - handleExtent / 2)
                 secondPlaceable.place(horizontalAlignment.align(secondPlaceable.width, width, layoutDirection), firstExtent + dividerExtent)
             }
         }
@@ -346,7 +348,7 @@ private fun Splitter(
  * @param left 起始侧内容，RTL 布局下位于右侧
  * @param right 末尾侧内容，RTL 布局下位于左侧
  * @param alignment 两侧内容的垂直对齐方式
- * @param indicatorMargin 指示器与两侧内容之间的间距，默认为主题间距
+ * @param indicatorMargin 两侧内容在分隔线位置的额外间距，默认为 0；抓手始终浮于内容上方
  */
 @Composable
 fun HorizontalSplitter(
@@ -354,7 +356,7 @@ fun HorizontalSplitter(
     left: @Composable () -> Unit,
     right: @Composable () -> Unit,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
-    indicatorMargin: Dp = Theme.padding.e,
+    indicatorMargin: Dp = 0.dp,
 ) {
     Splitter(
         horizontal = true,
@@ -374,7 +376,7 @@ fun HorizontalSplitter(
  * @param top 上方内容
  * @param bottom 下方内容
  * @param alignment 上下内容的水平对齐方式
- * @param indicatorMargin 指示器与两侧内容之间的间距，默认为主题间距
+ * @param indicatorMargin 两侧内容在分隔线位置的额外间距，默认为 0；抓手始终浮于内容上方
  */
 @Composable
 fun VerticalSplitter(
@@ -382,7 +384,7 @@ fun VerticalSplitter(
     top: @Composable () -> Unit,
     bottom: @Composable () -> Unit,
     alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    indicatorMargin: Dp = Theme.padding.e,
+    indicatorMargin: Dp = 0.dp,
 ) {
     Splitter(
         horizontal = false,
