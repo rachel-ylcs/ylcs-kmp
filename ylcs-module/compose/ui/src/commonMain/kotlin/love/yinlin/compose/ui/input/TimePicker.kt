@@ -1,5 +1,11 @@
 package love.yinlin.compose.ui.input
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,16 +19,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.measureTextHeight
 import love.yinlin.extension.DateEx
@@ -77,11 +88,11 @@ private fun TimePickerWheel(
 }
 
 /**
- * 24 小时制时分秒独立滚轮，包含右下角“确定”按钮，不含输入框或弹窗。
+ * 24 小时制时分秒独立滚轮，在滚轮稳定时于选中行右侧显示行内确认按钮。
  *
  * [time] 为空时以首次显示时的 [DateEx.Current] 为起点。滚动或点击数字
- * 仅修改内部候选值；点击“确定”才调用 [onTimeChanged]。外部 [time] 发生
- * 改变时重新定位三个滚轮，组件尺寸随 [style] 对应的文本高度缩放。
+ * 仅修改内部候选值；点击对号按钮才调用 [onTimeChanged]。任意滚轮开始滚动时
+ * 按钮滑出隐藏，三个滚轮全部稳定后再从右侧滑入。外部 [time] 变化时重新定位滚轮。
  */
 @Composable
 fun TimePicker(
@@ -128,25 +139,40 @@ fun TimePicker(
                     TimePickerWheel(minutes, 60, "分", columnWidth, rowHeight, style)
                     TimePickerWheel(seconds, 60, "秒", columnWidth, rowHeight, style)
                 }
-            }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                PrimaryTextButton(
-                    text = "确定",
-                    style = style,
-                    enabled = canConfirm,
-                    padding = PaddingValues(horizontal = textHeight * 0.65f, vertical = textHeight * 0.2f),
-                    onClick = {
-                        onTimeChanged(LocalTime(
-                            hour = (hours.settledPage - TimeWheelCenterPage).mod(24),
-                            minute = (minutes.settledPage - TimeWheelCenterPage).mod(60),
-                            second = (seconds.settledPage - TimeWheelCenterPage).mod(60)
-                        ))
+                AnimatedVisibility(
+                    visible = canConfirm,
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(rowHeight)
+                        .align(Alignment.CenterEnd)
+                        .zIndex(1f),
+                    enter = fadeIn(tween(180)) + slideInHorizontally(tween(220)) { it },
+                    exit = fadeOut(tween(100)) + slideOutHorizontally(tween(180)) { it }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(Theme.shape.v5)
+                            .background(Theme.color.primaryContainer)
+                            .clickable(role = Role.Button) {
+                                onTimeChanged(LocalTime(
+                                    hour = (hours.settledPage - TimeWheelCenterPage).mod(24),
+                                    minute = (minutes.settledPage - TimeWheelCenterPage).mod(60),
+                                    second = (seconds.settledPage - TimeWheelCenterPage).mod(60)
+                                ))
+                            }
+                            .semantics { contentDescription = "确认所选时间" },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            icon = Icons.Check,
+                            color = Theme.color.onContainer,
+                            tip = "确认时间",
+                            modifier = Modifier.size(rowHeight * 0.82f)
+                        )
                     }
-                )
+                }
             }
         }
     }
