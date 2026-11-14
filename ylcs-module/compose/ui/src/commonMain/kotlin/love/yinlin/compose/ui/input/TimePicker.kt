@@ -1,11 +1,11 @@
 package love.yinlin.compose.ui.input
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -155,7 +155,7 @@ fun TimePicker(
                             .fillMaxSize()
                             .clip(Theme.shape.v5)
                             .background(Theme.color.primaryContainer)
-                            .clickable(role = Role.Button) {
+                            .clickable(enabled = canConfirm, role = Role.Button) {
                                 onTimeChanged(LocalTime(
                                     hour = (hours.settledPage - TimeWheelCenterPage).mod(24),
                                     minute = (minutes.settledPage - TimeWheelCenterPage).mod(60),
