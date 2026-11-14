@@ -37,6 +37,7 @@ fun PlayControlUI(
         color = secondaryColor,
         onClick = onPrevious
     )
+
     Box(
         modifier = Modifier.wrapContentSize()
             .fastClipCircle()
@@ -49,6 +50,7 @@ fun PlayControlUI(
             modifier = Modifier.size(size).fastOffsetX { if (isPlaying) null else 1.5.dp.toPx() }
         )
     }
+
     LoadingIcon(
         modifier = Modifier.size(size),
         icon = Icons.GotoNext,

@@ -8,20 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.withSaveLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.datetime.number
 import love.yinlin.app
 import love.yinlin.app.portal.resources.*
 import love.yinlin.compose.*
@@ -29,6 +24,7 @@ import love.yinlin.compose.ds.DataSourceAccount
 import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
@@ -36,10 +32,15 @@ import love.yinlin.compose.ui.common.PlayControlUI
 import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.floating.Flyout
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
+import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.layout.Grid
+import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.widget.Calendar
 import love.yinlin.compose.ui.widget.CalendarState
@@ -76,48 +77,60 @@ class ScreenMain : BasicScreen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val username = app.config.userProfile?.name
-            val helloText = remember(username) {
-                val time = when (DateEx.Current.hour) {
-                    in 6 .. 10 -> "早上"
-                    in 11 .. 13 -> "中午"
-                    in 14 .. 17 -> "下午"
-                    in 18 .. 23 -> "晚上"
-                    else -> "凌晨"
-                }
-                val name = if (username != null) "，$username" else ""
-                "${time}好$name"
-            }
-
-            SimpleEllipsisText(
-                text = helloText,
-                modifier = Modifier.weight(1f),
-                style = Theme.typography.v5.bold
-            )
-
             val userProfile = app.config.userProfile
 
-            if (userProfile != null) {
+            if (userProfile == null) {
+                SimpleEllipsisText(
+                    text = "登录体验更多内容",
+                    modifier = Modifier.weight(1f),
+                    style = Theme.typography.v5.bold
+                )
+
+                PrimaryButton(
+                    text = "登录",
+                    icon = Icons.VerifiedUser,
+                    onClick = { navigate(::ScreenLogin) }
+                )
+            }
+            else {
+                val helloText = remember(userProfile) {
+                    val time = when (DateEx.Current.hour) {
+                        in 6 .. 10 -> "早上"
+                        in 11 .. 13 -> "中午"
+                        in 14 .. 17 -> "下午"
+                        in 18 .. 23 -> "晚上"
+                        else -> "凌晨"
+                    }
+                    "${time}好，${userProfile.name}"
+                }
+
                 WebImage(
                     source = userProfile.avatarPath.url,
                     version = app.config.cacheUserAvatar.toString(),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(Theme.size.image9),
                     options = ImageOptions.Circular,
-                    onClick = {
-                        navigate(::ScreenUser)
-                    }
+                    onClick = { navigate(::ScreenUser) }
+                )
+
+                SimpleEllipsisText(
+                    text = helloText,
+                    modifier = Modifier.weight(1f).silentClick { navigate(::ScreenUser) },
+                    style = Theme.typography.v5.bold
                 )
             }
-            else {
-                PrimaryButton(
-                    text = "登录",
-                    icon = Icons.VerifiedUser,
-                    onClick = {
-                        navigate(::ScreenLogin)
-                    }
+
+            if (userProfile != null) {
+                Icon(
+                    icon = Icons.Mail,
+                    onClick = { navigate(::ScreenMail) }
                 )
             }
+
+            Icon(
+                icon = Icons.Settings,
+                onClick = { navigate(::ScreenSettings) }
+            )
         }
     }
 
@@ -130,36 +143,104 @@ class ScreenMain : BasicScreen() {
             key = { pics[it].aid },
             interval = 5000L
         ) { index ->
-            val activity = pics[index]
+            (val aid, val photo) = pics[index]
             WebImage(
-                source = activity.photo.coverPath?.url,
+                source = photo.coverPath?.url,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                onClick = {
-                    navigate(::ScreenActivityDetails, activity.aid)
-                }
+                onClick = { navigate(::ScreenActivityDetails, aid) }
             )
         }
     }
 
-    private val calendarState = CalendarState()
-
     private val activityLayout = movableComposable { modifier: Modifier ->
         Surface(
             modifier = modifier,
-            contentPadding = Theme.padding.eValue,
-            shape = Theme.shape.v1,
-            shadowElevation = Theme.shadow.v3
+            shape = Theme.shape.v7,
+            shadowElevation = Theme.shadow.v7,
+            border = BorderStroke(Theme.border.v7, Theme.color.outline)
         ) {
-            Calendar(
-                state = calendarState,
-                events = DataSourceActivity.activityEvents,
-                onEventClick = { date ->
-                    DateEx.Formatter.standardDate.format(date)
-                        ?.findSelf(DataSourceActivity.activities) { it.ts }
-                        ?.then { navigate(::ScreenActivityDetails, it.aid) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var showCalendar by rememberFalse()
+                val [futureActivity, pastActivity] = DataSourceActivity.nearestActivity
+
+                Column(modifier = Modifier.weight(1f)) {
+                    if (futureActivity == null) SimpleEllipsisText(text = ">> 暂无最新活动...", modifier = Modifier.padding(Theme.padding.value9))
+                    else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                navigate(::ScreenActivityDetails, futureActivity.activity.aid)
+                            }.padding(Theme.padding.value9),
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                        ) {
+                            val dayText = if (futureActivity.day == 0) ">> 今天" else ">> 还有${(futureActivity.day)}天"
+
+                            SimpleEllipsisText(text = dayText, color = Theme.color.secondary)
+                            SimpleEllipsisText(text = futureActivity.title)
+                        }
+                    }
+
+                    if (pastActivity != null) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                navigate(::ScreenActivityDetails, pastActivity.activity.aid)
+                            }.padding(Theme.padding.value9),
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                        ) {
+                            val dayText = if (pastActivity.day == 0) "<< 今天" else "<< 已过${pastActivity.day}天"
+
+                            SimpleEllipsisText(text = dayText, color = Theme.color.tertiary)
+                            SimpleEllipsisText(text = pastActivity.title)
+                        }
+                    }
                 }
-            )
+
+                Flyout(
+                    visible = showCalendar,
+                    onClickOutside = { showCalendar = false },
+                    flyout = {
+                        Surface(
+                            contentPadding = Theme.padding.eValue,
+                            shape = Theme.shape.v1,
+                            shadowElevation = Theme.shadow.v3,
+                            border = BorderStroke(Theme.border.v7, Theme.color.outline)
+                        ) {
+                            val calendarState = remember { CalendarState() }
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                            ) {
+                                val currentDate = calendarState.currentDate
+
+                                SimpleEllipsisText(
+                                    text = "${currentDate.year} 年 ${currentDate.month.number} 月",
+                                    style = Theme.typography.v6.bold
+                                )
+
+                                Calendar(
+                                    state = calendarState,
+                                    events = DataSourceActivity.activityEvents,
+                                    onEventClick = { date ->
+                                        DateEx.Formatter.standardDate.format(date)
+                                            ?.findSelf(DataSourceActivity.activities) { it.ts }
+                                            ?.then { navigate(::ScreenActivityDetails, it.aid) }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    PrimaryTextButton(
+                        text = "活动日历",
+                        icon = Icons.Calendar,
+                        onClick = { showCalendar = true }
+                    )
+                }
+            }
         }
     }
 
@@ -248,7 +329,7 @@ class ScreenMain : BasicScreen() {
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         PlayControlUI(
@@ -373,40 +454,32 @@ class ScreenMain : BasicScreen() {
         ) {
             headerLayout(Modifier.fillMaxWidth())
             bannerLayout(Modifier.fillMaxWidth().aspectRatio(1.77778f).clip(Theme.shape.v7))
+            activityLayout(Modifier.fillMaxWidth())
             musicLayout(Modifier.fillMaxWidth())
             cardLayout(Modifier.fillMaxWidth())
-            activityLayout(Modifier.fillMaxWidth())
         }
     }
 
     @Composable
     private fun Landscape() {
-        Column(
+        val space = Theme.padding.e9
+
+        Grid(
+            builder = {
+                x(minmax(), minmax())
+                y(auto, auto, 1, auto)
+                s(space)
+            },
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
                 .padding(Theme.padding.value9)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            headerLayout(Modifier.fillMaxWidth())
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7)
-            ) {
-                bannerLayout(Modifier.weight(1f).aspectRatio(1.77778f).clip(Theme.shape.v7))
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-                ) {
-                    activityLayout(Modifier.fillMaxWidth())
-                    cardLayout(Modifier.fillMaxWidth())
-                }
-            }
-
-            Box(modifier = Modifier.weight(1f))
-            musicLayout(Modifier.fillMaxWidth())
+            headerLayout(Modifier.fillMaxWidth().item(xs = 2))
+            bannerLayout(Modifier.fillMaxWidth().aspectRatio(1.77778f).clip(Theme.shape.v7))
+            cardLayout(Modifier.fillMaxWidth().item(ys = 2))
+            activityLayout(Modifier.fillMaxWidth())
+            musicLayout(Modifier.fillMaxWidth().item(xs = 2))
         }
     }
 

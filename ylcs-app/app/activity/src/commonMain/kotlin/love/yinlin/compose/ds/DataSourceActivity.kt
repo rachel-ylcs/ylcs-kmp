@@ -4,8 +4,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import kotlinx.datetime.minus
 import love.yinlin.app
 import love.yinlin.cs.*
+import love.yinlin.data.activity.NearestActivity
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
@@ -17,6 +19,30 @@ import love.yinlin.fs.File
 object DataSourceActivity {
     // 活动
     val activities: List<Activity> field = mutableStateListOf<Activity>()
+
+    val nearestActivity: NearestActivity by derivedStateOf {
+        val today = DateEx.Today
+        var nearestFuture: NearestActivity.Item? = null
+        var nearestPast: NearestActivity.Item? = null
+
+        for (activity in activities) {
+            val date = activity.ts?.let(DateEx.Formatter.standardDate::parse) ?: continue
+            val title = activity.shortTitle ?: activity.title ?: "未知活动"
+
+            if (date >= today) {
+                if (nearestFuture == null || date < nearestFuture.date) {
+                    nearestFuture = NearestActivity.Item(activity, date, (date - today).days, title)
+                }
+            }
+            else {
+                if (nearestPast == null || date > nearestPast.date) {
+                    nearestPast = NearestActivity.Item(activity, date, (today - date).days, title)
+                }
+            }
+        }
+
+        NearestActivity(nearestFuture, nearestPast)
+    }
 
     // 当前展示活动
     val activityEvents by derivedStateOf {

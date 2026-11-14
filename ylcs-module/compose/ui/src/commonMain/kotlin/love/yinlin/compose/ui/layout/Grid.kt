@@ -11,6 +11,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -34,7 +35,7 @@ value class GridLayoutBuilder(private val raw: GridConfigurationScope) {
     val min get() = Min
     val max get() = Max
 
-    fun minmax(min: Dp, max: Fr): Any = MinMax(min, max)
+    fun minmax(min: Dp = 0.dp, max: Fr = Fr(1f)): Any = MinMax(min, max)
 
     fun buildGridTrackSize(config: Any): GridTrackSize? = when {
         config is Int -> GridTrackSize.Flex(Fr(config.toFloat()))
