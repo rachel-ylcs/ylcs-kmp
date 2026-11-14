@@ -296,6 +296,16 @@ object InputPage : Page() {
                 }
             }
 
+            Component("DatePicker") {
+                var chosen by rememberState<kotlinx.datetime.LocalDate?> { null }
+                DatePicker(date = chosen, onDateChanged = { chosen = it })
+            }
+
+            Component("TimePicker") {
+                var chosen by rememberState<kotlinx.datetime.LocalTime?> { null }
+                TimePicker(time = chosen, onTimeChanged = { chosen = it })
+            }
+
             Component("ColorPicker") {
                 ColorPicker(onColorChangeFinished = {})
             }
