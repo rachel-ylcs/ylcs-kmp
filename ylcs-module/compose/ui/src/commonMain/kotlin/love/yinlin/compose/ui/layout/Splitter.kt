@@ -276,10 +276,11 @@ private fun Splitter(
             else -> maxOf(fallbackExtent, constraints.minWidth)
         }
         val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
-        val firstExtent = (axisExtent * constrainedDividerRatio(splitRatio, axisExtent.toFloat(), handleExtent.toFloat()))
-            .fastRoundToInt()
-            .coerceIn(0, axisExtent)
+        val boundedRatio = constrainedDividerRatio(splitRatio, axisExtent.toFloat(), handleExtent.toFloat())
+        val dividerPosition = axisExtent * boundedRatio
+        val firstExtent = dividerPosition.fastRoundToInt().coerceIn(0, axisExtent)
         val secondExtent = axisExtent - firstExtent
+        val handleStart = (dividerPosition - handleExtent / 2f).fastRoundToInt().coerceIn(0, axisExtent - handleExtent)
 
         val firstConstraints = if (horizontal) {
             Constraints(maxWidth = firstExtent, maxHeight = crossExtent)
@@ -305,7 +306,7 @@ private fun Splitter(
             layout(width, height) {
                 firstPlaceable.placeRelative(0, verticalAlignment.align(firstPlaceable.height, height))
                 secondPlaceable.placeRelative(firstExtent, verticalAlignment.align(secondPlaceable.height, height))
-                handlePlaceable.placeRelative((firstExtent - handleExtent / 2).coerceIn(0, axisExtent - handleExtent), 0)
+                handlePlaceable.placeRelative(handleStart, 0)
             }
         }
         else {
@@ -316,7 +317,7 @@ private fun Splitter(
             layout(width, height) {
                 firstPlaceable.place(horizontalAlignment.align(firstPlaceable.width, width, layoutDirection), 0)
                 secondPlaceable.place(horizontalAlignment.align(secondPlaceable.width, width, layoutDirection), firstExtent)
-                handlePlaceable.place(0, (firstExtent - handleExtent / 2).coerceIn(0, axisExtent - handleExtent))
+                handlePlaceable.place(0, handleStart)
             }
         }
     }
