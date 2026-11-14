@@ -68,21 +68,71 @@ jobs:
           sudo apt-get install -y openbox xdotool x11-utils scrot
           python -m pip install --disable-pip-version-check Pillow
 
-      - name: Build, launch and capture Gallery
+      # Compile synchronously before starting Xvfb, the app or any screenshot tool.
+      - name: Compile Gallery
+        shell: bash
+        run: |
+          mkdir -p build/gallery-preview
+          set -o pipefail
+          ./gradlew :ylcs-app:gallery:compileKotlinDesktop --no-daemon --build-cache --max-workers=2 --console=plain \
+            2>&1 | tee build/gallery-preview/compile.log
+
+      - name: Start virtual display
+        shell: bash
+        run: |
+          Xvfb :99 -screen 0 1440x900x24 -ac > build/gallery-preview/xvfb.log 2>&1 &
+          echo $! > build/gallery-preview/xvfb.pid
+          export DISPLAY=:99
+          for attempt in $(seq 1 30); do
+            if xdpyinfo >/dev/null 2>&1; then
+              break
+            fi
+            if ! kill -0 "$(cat build/gallery-preview/xvfb.pid)" 2>/dev/null; then
+              cat build/gallery-preview/xvfb.log
+              exit 1
+            fi
+            sleep 1
+          done
+          xdpyinfo >/dev/null
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          openbox > build/gallery-preview/openbox.log 2>&1 &
+          echo $! > build/gallery-preview/openbox.pid
+          sleep 1
+
+      # Fail quickly and visibly if the app process exits or never opens its window.
+      - name: Launch Gallery
         env:
           GALLERY_PREVIEW: ${{ steps.target.outputs.selection }}
           SKIKO_RENDER_API: SOFTWARE_FAST
+        shell: bash
         run: |
-          mkdir -p build/gallery-preview
-          xvfb-run --auto-servernum --server-args="-screen 0 1440x900x24" bash -c '
-            set -euo pipefail
-            openbox >/dev/null 2>&1 &
-            ./gradlew :ylcs-app:gallery:galleryRun --no-daemon --build-cache --max-workers=2 --console=plain \
-              > build/gallery-preview/gallery.log 2>&1 &
-            gradle_pid=$!
-            trap "kill $gradle_pid 2>/dev/null || true" EXIT
-            python .github/scripts/gallery_preview.py
-          '
+          set -euo pipefail
+          setsid ./gradlew :ylcs-app:gallery:galleryRun --no-daemon --build-cache --max-workers=2 --console=plain \
+            > build/gallery-preview/gallery.log 2>&1 &
+          echo $! > build/gallery-preview/gallery.pid
+          pid="$(cat build/gallery-preview/gallery.pid)"
+          for attempt in $(seq 1 120); do
+            if xdotool search --onlyvisible --name "Rachel UI Gallery" >/dev/null 2>&1; then
+              echo "Gallery window is ready."
+              exit 0
+            fi
+            if ! kill -0 "$pid" 2>/dev/null; then
+              status=1
+              wait "$pid" || status=$?
+              echo "Gallery process exited before its window appeared (exit code: $status)."
+              tail -n 160 build/gallery-preview/gallery.log || true
+              exit 1
+            fi
+            sleep 1
+          done
+          echo "Gallery window did not appear within 120 seconds."
+          tail -n 160 build/gallery-preview/gallery.log || true
+          exit 1
+
+      - name: Capture Gallery
+        env:
+          GALLERY_PREVIEW: ${{ steps.target.outputs.selection }}
+        run: python .github/scripts/gallery_preview.py
 
       - name: Upload preview
         id: artifact
@@ -102,13 +152,26 @@ jobs:
           echo "点击下方链接直接在 GitHub 中查看 PNG 图片（无需下载 ZIP）：" >> "$GITHUB_STEP_SUMMARY"
           echo "[直接预览 Gallery 右侧完整截图]($ARTIFACT_URL)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload debug log on failure
+      - name: Stop Gallery desktop processes
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f build/gallery-preview/gallery.pid ]]; then
+            pid="$(cat build/gallery-preview/gallery.pid)"
+            kill -- -"$pid" 2>/dev/null || true
+          fi
+          for file in openbox xvfb; do
+            if [[ -f "build/gallery-preview/$file.pid" ]]; then
+              kill "$(cat "build/gallery-preview/$file.pid")" 2>/dev/null || true
+            fi
+          done
+
+      - name: Upload debug logs on failure
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: gallery-preview-debug-${{ github.run_id }}
-          path: build/gallery-preview/gallery.log
-          archive: false
+          path: build/gallery-preview/*.log
           if-no-files-found: warn
           retention-days: 3
 
