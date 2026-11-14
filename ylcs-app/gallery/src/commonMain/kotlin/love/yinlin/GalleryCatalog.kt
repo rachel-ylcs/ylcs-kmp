@@ -58,8 +58,8 @@ internal data class PageItem(
                 ComponentItem("ComboBox", "从列表中选择项目，比较默认宽度、自适应宽度与禁用状态。"),
                 ComponentItem("Filter", "体验单选与多选筛选，部分项目携带图标或处于禁用状态。"),
                 ComponentItem("ColorPicker", "拖动颜色选择器，观察颜色、透明度与预览的变化。"),
-                ComponentItem("DatePicker", "选择日期，切换年份、月份及跨年浏览。", "日期选择器 年月选择 42格 六行七列 横向翻页 Year Month Day"),
-                ComponentItem("TimePicker", "独立的时分秒滚轮，紧凑布局与高对比度选中行，滚动停止后更新选中时间。", "时间选择器 时 分 秒 滚轮 Wheel Hour Minute Second"),
+                ComponentItem("DatePicker", "可从空日期开始选择，点击任意日期即回调，支持年月浏览。", "日期选择器 年月选择 42格 六行七列 横向翻页 Year Month Day"),
+                ComponentItem("TimePicker", "支持空时间初始值的独立时分秒滚轮，仅点击右下角确定按钮才提交时间。", "时间选择器 时 分 秒 滚轮 确认 Wheel Hour Minute Second"),
             ]),
             PageItem("picture", Icons.GridOn, "图片集", "Picture", "比较图标大小、提示、操作反馈与九宫格配图排列。", PicturePage, PageGroup.Layout, [
                 ComponentItem("Icon", "比较图标大小、悬浮提示、点击、异步加载与带底色的图标。", "LoadingIcon ColorIcon"),
