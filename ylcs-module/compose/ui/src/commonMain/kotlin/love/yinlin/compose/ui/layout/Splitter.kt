@@ -41,9 +41,6 @@ import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.extension.cleaning
 import kotlin.math.abs
 
-private const val SPLITTER_MIN_RATIO = 0.05f
-private const val SPLITTER_MAX_RATIO = 0.95f
-
 private fun DrawScope.drawDividerTrack(
     horizontal: Boolean,
     position: Float,
@@ -91,20 +88,29 @@ private fun DrawScope.drawDirectionalArrows(
     }
 }
 
+/** Keep the centered grip inside its container, including when the container is smaller than the grip. */
+private fun constrainedDividerRatio(ratio: Float, axisExtent: Float, gripExtent: Float): Float {
+    if (axisExtent <= 0f) return 0.5f
+    val minRatio = (gripExtent / (axisExtent * 2f)).coerceIn(0f, 0.5f)
+    return ratio.coerceIn(minRatio, 1f - minRatio)
+}
+
 private fun dividerCenter(
     axisExtent: Int,
+    gripExtent: Int,
     ratio: Float,
     horizontal: Boolean,
     layoutDirection: LayoutDirection,
 ): Float {
-    val visualRatio = if (horizontal && layoutDirection == LayoutDirection.Rtl) 1f - ratio else ratio
+    val boundedRatio = constrainedDividerRatio(ratio, axisExtent.toFloat(), gripExtent.toFloat())
+    val visualRatio = if (horizontal && layoutDirection == LayoutDirection.Rtl) 1f - boundedRatio else boundedRatio
     return axisExtent * visualRatio
 }
 
 /** Shared hit testing and drag handling for overlay handles in Splitter and Comparator. */
 private fun Modifier.dividerGestures(
     horizontal: Boolean,
-    allowFullRange: Boolean,
+    gripSize: Dp,
     ratio: () -> Float,
     onRatioChange: (Float) -> Unit,
     onHoverChange: (Boolean) -> Unit,
@@ -112,7 +118,7 @@ private fun Modifier.dividerGestures(
     hitTargetSize: Dp,
     layoutDirection: LayoutDirection,
 ): Modifier = this
-    .pointerInput(horizontal, allowFullRange, hitTargetSize, layoutDirection) {
+    .pointerInput(horizontal, gripSize, hitTargetSize, layoutDirection) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Main)
@@ -123,8 +129,9 @@ private fun Modifier.dividerGestures(
                         val axisExtent = if (horizontal) size.width else size.height
                         val inside = change.position.x >= 0f && change.position.x < size.width &&
                             change.position.y >= 0f && change.position.y < size.height
-                        val center = dividerCenter(axisExtent, ratio(), horizontal, layoutDirection)
-                        val hitExtent = hitTargetSize.roundToPx()
+                        val gripExtent = gripSize.roundToPx()
+                        val center = dividerCenter(axisExtent, gripExtent, ratio(), horizontal, layoutDirection)
+                        val hitExtent = maxOf(hitTargetSize.roundToPx(), gripExtent)
                         val pointerAxis = if (horizontal) change.position.x else change.position.y
                         onHoverChange(change.type == PointerType.Mouse && inside && axisExtent > 0 && abs(pointerAxis - center) <= hitExtent / 2f)
                     }
@@ -133,14 +140,15 @@ private fun Modifier.dividerGestures(
             }
         }
     }
-    .pointerInput(horizontal, allowFullRange, hitTargetSize, layoutDirection) {
+    .pointerInput(horizontal, gripSize, hitTargetSize, layoutDirection) {
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = false)
             val axisExtent = if (horizontal) size.width else size.height
             if (axisExtent <= 0) return@awaitEachGesture
 
-            val center = dividerCenter(axisExtent, ratio(), horizontal, layoutDirection)
-            val hitExtent = hitTargetSize.roundToPx()
+            val gripExtent = gripSize.roundToPx()
+            val center = dividerCenter(axisExtent, gripExtent, ratio(), horizontal, layoutDirection)
+            val hitExtent = maxOf(hitTargetSize.roundToPx(), gripExtent)
             val downAxis = if (horizontal) down.position.x else down.position.y
             if (abs(downAxis - center) > hitExtent / 2f) return@awaitEachGesture
 
@@ -156,7 +164,7 @@ private fun Modifier.dividerGestures(
                         val pointerAxis = if (horizontal) change.position.x else change.position.y
                         val visualRatio = ((pointerAxis - grabOffset) / currentExtent).coerceIn(0f, 1f)
                         val logicalRatio = if (horizontal && layoutDirection == LayoutDirection.Rtl) 1f - visualRatio else visualRatio
-                        val nextRatio = if (allowFullRange) logicalRatio else logicalRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO)
+                        val nextRatio = constrainedDividerRatio(logicalRatio, currentExtent.toFloat(), gripSize.toPx())
                         if (nextRatio != ratio()) {
                             onRatioChange(nextRatio)
                             change.consume()
@@ -240,7 +248,7 @@ private fun Splitter(
             .pointerIcon(if (hovered || dragging) PointerIcon.Hand else PointerIcon.Default)
             .dividerGestures(
                 horizontal = horizontal,
-                allowFullRange = false,
+                gripSize = indicatorSize,
                 ratio = { splitRatio },
                 onRatioChange = { splitRatio = it },
                 onHoverChange = { hovered = it },
@@ -268,7 +276,7 @@ private fun Splitter(
             else -> maxOf(fallbackExtent, constraints.minWidth)
         }
         val handleExtent = indicatorSize.roundToPx().coerceAtLeast(0).coerceAtMost(axisExtent)
-        val firstExtent = (axisExtent * splitRatio.coerceIn(SPLITTER_MIN_RATIO, SPLITTER_MAX_RATIO))
+        val firstExtent = (axisExtent * constrainedDividerRatio(splitRatio, axisExtent.toFloat(), handleExtent.toFloat()))
             .fastRoundToInt()
             .coerceIn(0, axisExtent)
         val secondExtent = axisExtent - firstExtent
@@ -297,7 +305,7 @@ private fun Splitter(
             layout(width, height) {
                 firstPlaceable.placeRelative(0, verticalAlignment.align(firstPlaceable.height, height))
                 secondPlaceable.placeRelative(firstExtent, verticalAlignment.align(secondPlaceable.height, height))
-                handlePlaceable.placeRelative(firstExtent - handleExtent / 2, 0)
+                handlePlaceable.placeRelative((firstExtent - handleExtent / 2).coerceIn(0, axisExtent - handleExtent), 0)
             }
         }
         else {
@@ -308,7 +316,7 @@ private fun Splitter(
             layout(width, height) {
                 firstPlaceable.place(horizontalAlignment.align(firstPlaceable.width, width, layoutDirection), 0)
                 secondPlaceable.place(horizontalAlignment.align(secondPlaceable.width, width, layoutDirection), firstExtent)
-                handlePlaceable.place(0, firstExtent - handleExtent / 2)
+                handlePlaceable.place(0, (firstExtent - handleExtent / 2).coerceIn(0, axisExtent - handleExtent))
             }
         }
     }
@@ -385,11 +393,12 @@ private fun ComparatorHandle(
 
     Box(
         modifier = Modifier.fillMaxSize().drawWithContent {
+            val axisExtent = if (horizontal) size.width else size.height
+            val boundedRatio = constrainedDividerRatio(splitRatio, axisExtent, handleSizeDp.toPx())
             val splitPosition = if (horizontal && layoutDirection == LayoutDirection.Rtl) {
-                size.width * (1f - splitRatio)
+                size.width * (1f - boundedRatio)
             }
-            else if (horizontal) size.width * splitRatio
-            else size.height * splitRatio
+            else axisExtent * boundedRatio
 
             val lineColor = if (active) primaryColor else outlineColor
             drawDividerTrack(horizontal, splitPosition, lineColor, surfaceColor, lineThicknessDp.toPx().coerceAtLeast(1f))
@@ -418,16 +427,20 @@ private fun ComparatorPane(
     layoutDirection: LayoutDirection,
     content: @Composable () -> Unit,
 ) {
+    val gripSizeDp = Theme.size.input8
+
     Box(
         modifier = Modifier.fillMaxSize().drawWithContent {
+            val axisExtent = if (horizontal) size.width else size.height
+            val boundedRatio = constrainedDividerRatio(splitRatio, axisExtent, gripSizeDp.toPx())
             if (horizontal) {
-                val splitPosition = size.width * if (layoutDirection == LayoutDirection.Rtl) 1f - splitRatio else splitRatio
+                val splitPosition = size.width * if (layoutDirection == LayoutDirection.Rtl) 1f - boundedRatio else boundedRatio
                 val showLeftSide = firstPane == (layoutDirection == LayoutDirection.Ltr)
                 if (showLeftSide) clipRect(right = splitPosition) { this@drawWithContent.drawContent() }
                 else clipRect(left = splitPosition) { this@drawWithContent.drawContent() }
             }
             else {
-                val splitPosition = size.height * splitRatio
+                val splitPosition = size.height * boundedRatio
                 if (firstPane) clipRect(bottom = splitPosition) { this@drawWithContent.drawContent() }
                 else clipRect(top = splitPosition) { this@drawWithContent.drawContent() }
             }
@@ -457,7 +470,7 @@ private fun ComparatorLayout(
             .pointerIcon(if (hovered || dragging) PointerIcon.Hand else PointerIcon.Default)
             .dividerGestures(
                 horizontal = horizontal,
-                allowFullRange = true,
+                gripSize = Theme.size.input8,
                 ratio = { splitRatio },
                 onRatioChange = { splitRatio = it },
                 onHoverChange = { hovered = it },
