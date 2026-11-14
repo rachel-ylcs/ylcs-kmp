@@ -88,7 +88,7 @@ private fun TimePickerWheel(
 }
 
 /**
- * 24 小时制时分秒独立滚轮，在滚轮稳定时于选中行右侧显示行内确认按钮。
+ * 24 小时制时分秒独立滚轮，在滚轮稳定时于顶部“时分秒”标题行右侧显示确认按钮。
  *
  * [time] 为空时以首次显示时的 [DateEx.Current] 为起点。滚动或点击数字
  * 仅修改内部候选值；点击对号按钮才调用 [onTimeChanged]。任意滚轮开始滚动时
@@ -122,12 +122,15 @@ fun TimePicker(
         ) {
             val columnScope = this
 
-            Row(modifier = Modifier.fillMaxWidth()) {
-                "时分秒".forEach { unit ->
-                    Box(modifier = Modifier.size(columnWidth, rowHeight), contentAlignment = Alignment.Center) {
-                        SimpleClipText(unit.toString(), style = style, color = LocalColorVariant.current)
+            Box(modifier = Modifier.fillMaxWidth().height(rowHeight)) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    "时分秒".forEach { unit ->
+                        Box(modifier = Modifier.size(columnWidth, rowHeight), contentAlignment = Alignment.Center) {
+                            SimpleClipText(unit.toString(), style = style, color = LocalColorVariant.current)
+                        }
                     }
                 }
+
             }
 
             Box(modifier = Modifier.size(contentWidth, rowHeight * 5)) {
