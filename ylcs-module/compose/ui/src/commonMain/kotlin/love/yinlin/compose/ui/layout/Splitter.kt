@@ -323,8 +323,8 @@ private fun Splitter(
 
             layout(width, height) {
                 firstPlaceable.placeRelative(0, verticalAlignment.align(firstPlaceable.height, height))
-                handlePlaceable.placeRelative(firstExtent + marginExtent - handleExtent / 2, 0)
                 secondPlaceable.placeRelative(firstExtent + dividerExtent, verticalAlignment.align(secondPlaceable.height, height))
+                handlePlaceable.placeRelative(firstExtent + marginExtent - handleExtent / 2, 0)
             }
         }
         else {
@@ -334,8 +334,8 @@ private fun Splitter(
 
             layout(width, height) {
                 firstPlaceable.place(horizontalAlignment.align(firstPlaceable.width, width, layoutDirection), 0)
-                handlePlaceable.place(0, firstExtent + marginExtent - handleExtent / 2)
                 secondPlaceable.place(horizontalAlignment.align(secondPlaceable.width, width, layoutDirection), firstExtent + dividerExtent)
+                handlePlaceable.place(0, firstExtent + marginExtent - handleExtent / 2)
             }
         }
     }
