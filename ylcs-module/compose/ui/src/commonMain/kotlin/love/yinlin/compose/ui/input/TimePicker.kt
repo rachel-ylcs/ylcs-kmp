@@ -131,6 +131,39 @@ fun TimePicker(
                     }
                 }
 
+                                columnScope.AnimatedVisibility(
+                                    visible = canConfirm,
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .height(rowHeight)
+                                        .align(Alignment.CenterEnd)
+                                        .zIndex(1f),
+                                    enter = fadeIn(tween(180)) + slideInHorizontally(tween(220)) { it },
+                                    exit = fadeOut(tween(100)) + slideOutHorizontally(tween(180)) { it }
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(Theme.shape.v5)
+                                            .background(Theme.color.primaryContainer)
+                                            .clickable(enabled = canConfirm, role = Role.Button) {
+                                                onTimeChanged(LocalTime(
+                                                    hour = (hours.settledPage - TimeWheelCenterPage).mod(24),
+                                                    minute = (minutes.settledPage - TimeWheelCenterPage).mod(60),
+                                                    second = (seconds.settledPage - TimeWheelCenterPage).mod(60)
+                                                ))
+                                            }
+                                            .semantics { contentDescription = "确认所选时间" },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            icon = Icons.Check,
+                                            color = Theme.color.onContainer,
+                                            tip = "确认时间",
+                                            modifier = Modifier.size(rowHeight * 0.82f)
+                                        )
+                                    }
+                                }
             }
 
             Box(modifier = Modifier.size(contentWidth, rowHeight * 5)) {
@@ -145,39 +178,6 @@ fun TimePicker(
                     TimePickerWheel(seconds, 60, "秒", columnWidth, rowHeight, style)
                 }
 
-                columnScope.AnimatedVisibility(
-                    visible = canConfirm,
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(rowHeight)
-                        .align(Alignment.CenterEnd)
-                        .zIndex(1f),
-                    enter = fadeIn(tween(180)) + slideInHorizontally(tween(220)) { it },
-                    exit = fadeOut(tween(100)) + slideOutHorizontally(tween(180)) { it }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(Theme.shape.v5)
-                            .background(Theme.color.primaryContainer)
-                            .clickable(enabled = canConfirm, role = Role.Button) {
-                                onTimeChanged(LocalTime(
-                                    hour = (hours.settledPage - TimeWheelCenterPage).mod(24),
-                                    minute = (minutes.settledPage - TimeWheelCenterPage).mod(60),
-                                    second = (seconds.settledPage - TimeWheelCenterPage).mod(60)
-                                ))
-                            }
-                            .semantics { contentDescription = "确认所选时间" },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            icon = Icons.Check,
-                            color = Theme.color.onContainer,
-                            tip = "确认时间",
-                            modifier = Modifier.size(rowHeight * 0.82f)
-                        )
-                    }
-                }
             }
         }
     }
