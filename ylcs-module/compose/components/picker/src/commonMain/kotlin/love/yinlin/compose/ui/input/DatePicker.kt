@@ -32,8 +32,8 @@ import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 
-private const val DatePickerCellPaddingRatio = 0.2f
-private const val DatePickerInitialYearIndex = 4
+private const val DATE_PICKER_CELL_PADDING_RATIO = 0.2f
+private const val DATE_PICKER_INITIAL_YEAR_INDEX = 4
 
 private fun TextLayoutResult.centerInCell(index: Int, columns: Int, cellWidth: Float, cellHeight: Float): Offset = Offset(
     x = index % columns * cellWidth + (cellWidth - size.width) / 2f,
@@ -273,7 +273,7 @@ private fun DatePickerYearsView(
     onMonthChanged: (YearMonth) -> Unit
 ) {
     val pager = rememberPagerState(initialPage = DatePickerState.CENTER_PAGE) { Int.MAX_VALUE }
-    val firstYear = month.year - DatePickerInitialYearIndex
+    val firstYear = month.year - DATE_PICKER_INITIAL_YEAR_INDEX
 
     HorizontalScrollContainer(state = pager, modifier = Modifier.size(width, height)) {
         HorizontalPager(state = pager, beyondViewportPageCount = 1, key = { it }) { page ->
@@ -283,7 +283,7 @@ private fun DatePickerYearsView(
                 width = width,
                 height = height,
                 textLayouts = textLayouts,
-                selectedIndex = if (page == DatePickerState.CENTER_PAGE) DatePickerInitialYearIndex else -1,
+                selectedIndex = if (page == DatePickerState.CENTER_PAGE) DATE_PICKER_INITIAL_YEAR_INDEX else -1,
                 firstYear = year,
                 onChoice = { onMonthChanged(YearMonth(year + it, month.month)) }
             )
@@ -328,7 +328,7 @@ fun DatePicker(
     val density = LocalDensity.current
     val textHeight = with(density) { textLayouts.day(31).size.height.toDp() }
 
-    val cellPadding = textHeight * DatePickerCellPaddingRatio
+    val cellPadding = textHeight * DATE_PICKER_CELL_PADDING_RATIO
     val cellSize = textHeight + cellPadding * 2
     val gridWidth = cellSize * 7
     val totalHeight = cellSize * 8

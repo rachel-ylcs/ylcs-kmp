@@ -34,7 +34,7 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private const val TimeWheelVisibleRows = 5
+private const val TIME_PICKER_WHEEL_VISIBLE_ROWS = 5
 
 @Composable
 private fun TimePickerWheel(
@@ -50,7 +50,7 @@ private fun TimePickerWheel(
     val normalColor = LocalColor.current
     val fadedColor = LocalColorVariant.current.copy(alpha = 0.55f)
     val selectedColor = Theme.color.onBackground
-    val wheelHeight = rowHeight * TimeWheelVisibleRows
+    val wheelHeight = rowHeight * TIME_PICKER_WHEEL_VISIBLE_ROWS
 
     Box(modifier = modifier.height(wheelHeight).clipToBounds().pointerIcon(PointerIcon.Hand).focusRequester(focusRequester).focusable()) {
         VerticalPager(
@@ -76,7 +76,7 @@ private fun TimePickerWheel(
             val offset = state.currentPageOffsetFraction
             val pageSize = state.layoutInfo.pageSize
             val centerY = size.height / 2f
-            val radius = TimeWheelVisibleRows / 2 + 1
+            val radius = TIME_PICKER_WHEEL_VISIBLE_ROWS / 2 + 1
 
             for (delta in -radius .. radius) {
                 val row = page + delta
@@ -131,7 +131,7 @@ fun TimePicker(
             }
         }
 
-        Box(modifier = Modifier.fillMaxWidth().height(rowHeight * TimeWheelVisibleRows)) {
+        Box(modifier = Modifier.fillMaxWidth().height(rowHeight * TIME_PICKER_WHEEL_VISIBLE_ROWS)) {
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .height(rowHeight)
