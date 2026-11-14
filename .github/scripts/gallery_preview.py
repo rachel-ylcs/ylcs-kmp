@@ -21,7 +21,7 @@ def command(*args, check=True):
     return subprocess.run(args, check=check, capture_output=True, text=True)
 
 
-def wait_for_window(timeout=900):
+def wait_for_window(timeout=60):
     start = time.monotonic()
     while time.monotonic() - start < timeout:
         result = command("xdotool", "search", "--onlyvisible", "--name", WINDOW_TITLE, check=False)
