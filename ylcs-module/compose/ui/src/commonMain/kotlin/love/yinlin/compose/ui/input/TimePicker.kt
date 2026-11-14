@@ -120,6 +120,8 @@ fun TimePicker(
             modifier = modifier.width(contentWidth),
             verticalArrangement = Arrangement.spacedBy(headerGap)
         ) {
+            val columnScope = this
+
             Row(modifier = Modifier.fillMaxWidth()) {
                 "时分秒".forEach { unit ->
                     Box(modifier = Modifier.size(columnWidth, rowHeight), contentAlignment = Alignment.Center) {
@@ -140,7 +142,7 @@ fun TimePicker(
                     TimePickerWheel(seconds, 60, "秒", columnWidth, rowHeight, style)
                 }
 
-                AnimatedVisibility(
+                columnScope.AnimatedVisibility(
                     visible = canConfirm,
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
