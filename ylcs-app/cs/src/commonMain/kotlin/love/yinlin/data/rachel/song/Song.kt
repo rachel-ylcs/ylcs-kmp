@@ -9,6 +9,7 @@ data class Song(
     val sid: String,
     val version: String,
     val name: String,
+    val time: String = "1991-12-11",
     val singer: String,
     val lyricist: String,
     val composer: String,

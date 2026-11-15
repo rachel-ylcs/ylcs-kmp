@@ -9,13 +9,13 @@ import love.yinlin.extension.to
 
 fun ServerScope.songAPI() {
     ApiSongGetSongLibrary.response {
-        val songs = mysql.throwQuerySQL("SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment FROM song")
+        val songs = mysql.throwQuerySQL("SELECT sid, version, name, time, singer, lyricist, composer, album, animation, video, rhyme, accompaniment FROM song")
         result(songs.to())
     }
 
     ApiSongGetSong.response { sid ->
         val song = mysql.querySQLSingle("""
-            SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment
+            SELECT sid, version, name, time, singer, lyricist, composer, album, animation, video, rhyme, accompaniment
 			FROM song
             WHERE sid = ?
         """, sid)

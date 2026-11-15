@@ -2,7 +2,10 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,13 +16,13 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.screen.Screen
-import love.yinlin.compose.ui.container.RachelStatefulProvider
-import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.floating.DialogServerModFilter
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -27,100 +30,119 @@ import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongFilter
-import love.yinlin.extension.toJsonString
 
 @Stable
 class ScreenModCenter : Screen() {
-    private val provider = RachelStatefulProvider()
-
     private val gridState = LazyGridState()
 
     private var baseLibrary: List<Song> by mutableStateOf([])
-
-    private val currentLibrary: List<Song> by mutableStateOf([])
-
-    private suspend fun requestFilterData(filter: SongFilter) {
-//        provider.withLoading {
-//            gridState.requestScrollToItem(0)
-//            val result = ApiSongSearchFilter.requestNull(filter)!!.o1
-//            pageSongs.newData(result)
-//            pageSongs.canLoading = false
-//            result.isNotEmpty()
-//        }
-    }
+    private var currentLibrary: List<Song> by mutableStateOf([])
+    private var currentFilter: SongFilter? by mutableStateOf(null)
 
     override val title: String = "工坊"
 
+    private fun searchSongs(filter: SongFilter): List<Song> {
+        return currentLibrary.filter { (val name, val singer, val lyricist, val composer, val album, val animation, val video, val rhyme, val accompaniment) ->
+            (!filter.useAnimation || animation) &&
+                    (!filter.useVideo || video) &&
+                    (!filter.useRhyme || rhyme) &&
+                    (!filter.useAccompaniment || accompaniment) &&
+                    (filter.key?.let { name.contains(it, ignoreCase = true) } ?: true) &&
+                    (filter.singer?.let { singer.contains(it, ignoreCase = true) } ?: true) &&
+                    (filter.lyricist?.let { lyricist.contains(it, ignoreCase = true) } ?: true) &&
+                    (filter.composer?.let { composer.contains(it, ignoreCase = true) } ?: true) &&
+                    (filter.album?.let { album.contains(it, ignoreCase = true) } ?: true)
+        }
+    }
+
     override fun initialize() {
         launch {
-            provider.withLoading {
-                gridState.requestScrollToItem(0)
-                val result = ApiSongGetSongLibrary.requestNull()!!.o1
-                println(result.toJsonString())
-                if (result.isNotEmpty()) baseLibrary = result
-                result.isNotEmpty()
+            val result = ApiSongGetSongLibrary.requestNull()!!.o1
+            if (result.isNotEmpty()) {
+                baseLibrary = result
+                currentLibrary = result
             }
+        }
+    }
+
+    @Composable
+    override fun RowScope.LeftActions() {
+        if (currentFilter != null) {
+            Icon(icon = Icons.Clear, tip = "关闭搜索", onClick = {
+                currentLibrary = baseLibrary
+                currentFilter = null
+            })
         }
     }
 
     @Composable
     override fun RowScope.RightActions() {
         LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = {
-            val result = filterDialog.open()
-            if (result != null) requestFilterData(result)
+            val result = filterDialog.open(currentFilter)
+            if (result != null) {
+                val targetSongs = searchSongs(result)
+                if (targetSongs.isEmpty()) slot.tip.warning("未搜索到满足条件的歌曲")
+                else {
+                    currentLibrary = targetSongs
+                    currentFilter = result
+                }
+            }
         })
     }
 
     @Composable
-    private fun SongCard(song: Song, status: Boolean, onClick: () -> Unit) {
+    private fun SongCard(song: Song, status: Boolean) {
         Row(
-            modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(Theme.padding.value),
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).clickable {
+                navigate(::ScreenMusicDetails, song.sid)
+            }.padding(Theme.padding.value9),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
             WebImage(
                 source = ServerRes.Mod.Song(song.sid).res(ModResourceType.Record.filename).url,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(Theme.size.image8).clip(Theme.shape.v6)
+                modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
             )
+
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 SimpleEllipsisText(text = song.name, style = Theme.typography.v7.bold, color = if (status) Theme.color.primary else LocalColor.current)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SimpleEllipsisText(text = song.sid, color = LocalColorVariant.current)
-                    SimpleEllipsisText(text = song.version, style = Theme.typography.v8, color = LocalColorVariant.current)
-                }
+                SimpleEllipsisText(text = song.singer, style = Theme.typography.v8, color = LocalColorVariant.current)
             }
         }
     }
 
     @Composable
     override fun Content() {
-        StatefulBox(
-            provider = provider,
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
+        Column(
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-//            PaginationGrid(
-//                items = pageSongs.items,
-//                key = { it.sid },
-//                columns = GridCells.Adaptive(Theme.size.cell4),
-//                state = gridState,
-//                canRefresh = true,
-//                canLoading = pageSongs.canLoading,
-//                onRefresh = { requestNewData(false) },
-//                onLoading = ::requestMoreData,
-//                modifier = Modifier.fillMaxSize()
-//            ) { song ->
-//                SongCard(song = song, status = song.sid in DataSourceMusic.library, onClick = {
-//                    navigate(::ScreenMusicDetails, song.sid)
-//                })
-//            }
+            SimpleEllipsisText(
+                text = "新歌速递",
+                style = Theme.typography.v6.bold,
+                modifier = Modifier.padding(Theme.padding.value)
+            )
+
+            SimpleEllipsisText(
+                text = "曲库 / ${baseLibrary.size} 首",
+                style = Theme.typography.v6.bold,
+                modifier = Modifier.padding(Theme.padding.value)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(Theme.size.cell4),
+                state = gridState,
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            ) {
+                items(currentLibrary) { song ->
+                    SongCard(song = song, status = song.sid in DataSourceMusic.library)
+                }
+            }
         }
     }
 

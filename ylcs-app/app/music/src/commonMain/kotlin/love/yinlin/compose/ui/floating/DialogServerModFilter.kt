@@ -27,16 +27,16 @@ internal class DialogServerModFilter : DialogTemplate<SongFilter>() {
     var useRhyme = mutableStateOf(false)
     var useAccompaniment = mutableStateOf(false)
 
-    suspend fun open(): SongFilter? {
-        inputKey.clear()
-        inputSinger.clear()
-        inputLyricist.clear()
-        inputComposer.clear()
-        inputAlbum.clear()
-        useAnimation.value = false
-        useVideo.value = false
-        useRhyme.value = false
-        useAccompaniment.value = false
+    suspend fun open(oldFilter: SongFilter?): SongFilter? {
+        inputKey.text = oldFilter?.key ?: ""
+        inputSinger.text = oldFilter?.singer ?: ""
+        inputLyricist.text = oldFilter?.lyricist ?: ""
+        inputComposer.text = oldFilter?.composer ?: ""
+        inputAlbum.text = oldFilter?.album ?: ""
+        useAnimation.value = oldFilter?.useAnimation ?: false
+        useVideo.value = oldFilter?.useVideo ?: false
+        useRhyme.value = oldFilter?.useRhyme ?: false
+        useAccompaniment.value = oldFilter?.useAccompaniment ?: false
         return awaitResult()
     }
 
