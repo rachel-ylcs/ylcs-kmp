@@ -120,13 +120,6 @@ class ScreenMain : BasicScreen() {
                 )
             }
 
-            if (userProfile != null) {
-                Icon(
-                    icon = Icons.Mail,
-                    onClick = { navigate(::ScreenMail) }
-                )
-            }
-
             Icon(
                 icon = Icons.Settings,
                 onClick = { navigate(::ScreenSettings) }
@@ -178,8 +171,8 @@ class ScreenMain : BasicScreen() {
                         ) {
                             val dayText = if (futureActivity.day == 0) ">> 今天" else ">> 还有${(futureActivity.day)}天"
 
-                            SimpleEllipsisText(text = dayText, color = Theme.color.secondary)
-                            SimpleEllipsisText(text = futureActivity.title)
+                            SimpleEllipsisText(text = dayText, color = Theme.color.secondary, style = Theme.typography.v7.bold)
+                            SimpleEllipsisText(text = futureActivity.title, style = Theme.typography.v7.bold)
                         }
                     }
 
@@ -192,8 +185,8 @@ class ScreenMain : BasicScreen() {
                         ) {
                             val dayText = if (pastActivity.day == 0) "<< 今天" else "<< 已过${pastActivity.day}天"
 
-                            SimpleEllipsisText(text = dayText, color = Theme.color.tertiary)
-                            SimpleEllipsisText(text = pastActivity.title)
+                            SimpleEllipsisText(text = dayText, color = Theme.color.tertiary, style = Theme.typography.v7.bold)
+                            SimpleEllipsisText(text = pastActivity.title, style = Theme.typography.v7.bold)
                         }
                     }
                 }

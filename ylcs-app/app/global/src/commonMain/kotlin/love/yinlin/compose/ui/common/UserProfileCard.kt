@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -56,62 +57,64 @@ fun UserProfileCard(
 ) {
     val isOwner = app.config.userProfile?.uid == profile.uid
 
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        // 背景墙
-        WebImage(
-            source = profile.wallPath.url,
-            version = (if (isOwner) app.config.cacheUserWall else DateEx.TodayLong).toString(),
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(1.77777f)
-                .verticalFade(if (topBar != null) FadeWallImageWithTopBar else FadeWallImage)
-                .zIndex(1f)
-        )
-        // TopBar
-        if (topBar != null) {
-            Box(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).zIndex(2f)) {
-                topBar()
-            }
-        }
-
-        // 信息区
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .padding(Theme.padding.value9).align(Alignment.BottomCenter)
-                .zIndex(2f),
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
+    Theme.ThemeModeWrapper(true) {
+        Box(
+            modifier = modifier.background(Theme.color.background),
+            contentAlignment = Alignment.Center
         ) {
+            // 背景墙
             WebImage(
-                source = profile.avatarPath.url,
-                version = (if (isOwner) app.config.cacheUserAvatar else DateEx.TodayLong).toString(),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxHeight().aspectRatio(1f).border(Theme.border.v5, Colors.White, Theme.shape.circle),
-                onClick = onAvatarClick,
-                options = ImageOptions.Circular
+                source = profile.wallPath.url,
+                version = (if (isOwner) app.config.cacheUserWall else DateEx.TodayLong).toString(),
+                modifier = Modifier.fillMaxWidth()
+                    .aspectRatio(1.77777f)
+                    .verticalFade(if (topBar != null) FadeWallImageWithTopBar else FadeWallImage)
+                    .zIndex(1f)
             )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    SimpleEllipsisText(text = profile.name, style = Theme.typography.v6.bold, modifier = Modifier.weight(1f, fill = false).padding(bottom = Theme.padding.v))
-                    UserLabel(label = profile.label, level = profile.level, onClick = onLevelClick)
+            // TopBar
+            if (topBar != null) {
+                Box(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).zIndex(2f)) {
+                    topBar()
                 }
-                SelectionBox {
-                    Text(
-                        text = profile.signature,
-                        style = Theme.typography.v8,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = Theme.padding.v)
-                    )
+            }
+
+            // 信息区
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .padding(Theme.padding.value9).align(Alignment.BottomCenter)
+                    .zIndex(2f),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
+            ) {
+                WebImage(
+                    source = profile.avatarPath.url,
+                    version = (if (isOwner) app.config.cacheUserAvatar else DateEx.TodayLong).toString(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxHeight().aspectRatio(1f).border(Theme.border.v5, Colors.White, Theme.shape.circle),
+                    onClick = onAvatarClick,
+                    options = ImageOptions.Circular
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        SimpleEllipsisText(text = profile.name, style = Theme.typography.v6.bold, modifier = Modifier.weight(1f, fill = false).padding(bottom = Theme.padding.v))
+                        UserLabel(label = profile.label, level = profile.level, onClick = onLevelClick)
+                    }
+                    SelectionBox {
+                        Text(
+                            text = profile.signature,
+                            style = Theme.typography.v8,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = Theme.padding.v)
+                        )
+                    }
                 }
             }
         }

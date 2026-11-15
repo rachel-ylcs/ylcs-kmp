@@ -22,6 +22,7 @@ import love.yinlin.app.account.resources.img_not_login
 import love.yinlin.app.global.resources.img_logo
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColor
+import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -52,10 +53,13 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
-import love.yinlin.compose.ui.input.SecondaryButton
-import love.yinlin.compose.ui.input.TertiaryButton
+import love.yinlin.compose.ui.input.SecondaryOutlinedButton
+import love.yinlin.compose.ui.layout.MasonryLayout
+import love.yinlin.compose.ui.layout.VerticalDivider
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.shadow
+import love.yinlin.compose.ui.node.silentClick
+import love.yinlin.compose.ui.status.LinearProgress
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
@@ -96,97 +100,223 @@ class ScreenUser : BasicScreen() {
                 modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(Theme.padding.eValue9),
                 left = {
                     Icon(icon = Icons.ArrowBack, onClick = ::onBack)
-                    Icon(icon = Icons.Settings, onClick = { navigate(::ScreenSettings) })
                 },
                 right = {
                     Icon(icon = Icons.CropFree, onClick = { scanSheet.open() })
-                    Icon(icon = Icons.AccountBox, onClick = {
-                        app.config.userProfile?.let(userCardSheet::open) ?: slot.tip.warning("请先登录")
-                    })
+                    Icon(icon = Icons.AccountBox, onClick = { userCardSheet.open(profile) })
                 }
             )
         }
     }
 
-    private val userPropertyCard = movableComposable { profile: UserProfile, modifier: Modifier ->
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            PortraitValue(value = profile.level.toString(), title = "等级", onClick = { onLevelClick(profile) })
-            PortraitValue(value = profile.exp.toString(), title = "经验", onClick = { onLevelClick(profile) })
-            PortraitValue(value = profile.coin.toString(), title = "银币")
-            PortraitValue(value = profile.follows.toString(), title = "关注", onClick = {
-                navigate(::ScreenFollows, FollowTabItem.Follows)
-            })
-            PortraitValue(value = profile.followers.toString(), title = "粉丝", onClick = {
-                navigate(::ScreenFollows, FollowTabItem.Followers)
-            })
-        }
-    }
+    private val userLevelCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+        Box(modifier = modifier) {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = Theme.padding.h9),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).silentClick { onLevelClick(profile) },
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                ) {
+                    val level = profile.level
+                    val totalExp = UserLevel.levelTable[level - 1].second
 
-    private val buttonContainer = movableComposable { ->
-        BoardButtonContainer("个人空间") {
-            val notification = app.config.userProfile?.notification
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        SimpleEllipsisText(
+                            text = "Lv.${level}",
+                            style = Theme.typography.v5.bold
+                        )
+                        SimpleEllipsisText(
+                            text = "${profile.exp} / $totalExp"
+                        )
+                    }
 
-            BoardButton("签到", Icons.EventAvailable, if (notification?.isSignin == false) 1 else 0) {
-                app.config.userProfile?.let(signinSheet::open) ?: slot.tip.warning("请先登录")
-            }
-            BoardButton("主题", Icons.Article) {
-                app.config.userProfile?.let {
-                    navigate(::ScreenUserCard, it.uid)
-                } ?: slot.tip.warning("请先登录")
-            }
-            BoardButton("邮箱", Icons.Mail) {
-                app.config.userProfile?.let {
-                    navigate(::ScreenMail)
-                } ?: slot.tip.warning("请先登录")
-            }
-            BoardButton("徽章", Icons.MilitaryTech) {
-
-            }
-        }
-        BoardButtonContainer("推广") {
-            BoardButton("抽奖", Icons.Gift) {
-                app.config.userProfile?.let {
-                    navigate(::ScreenPrice)
-                } ?: slot.tip.warning("请先登录")
-            }
-            BoardButton("招新", Icons.Campaign) {
-
-            }
-            BoardButton("水群", Icons2.QQ) {
-                launch {
-                    val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
-                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
+                    LinearProgress(
+                        value = (profile.exp.toFloat() / totalExp).coerceIn(0f, 1f),
+                        trackColor = Theme.color.primary.copy(alpha = 0.5f),
+                        activeColor = Theme.color.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-            }
-            BoardButton("店铺", Icons2.Taobao) {
-                launch {
-                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
-                }
-            }
-        }
-        BoardButtonContainer("超管空间") {
-            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-                BoardButton("添加活动", Icons.Gift) {
-                    launch {
-                        val index = addActivityDialog.open() ?: return@launch
-                        DataSourceActivity.addActivity(index == 1).onSuccess {
-                            navigate(::ScreenModifyActivity, it)
-                        }.exceptionOrNull().errorTip
+
+                VerticalDivider()
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                ) {
+                    SimpleEllipsisText(text = "银币", style = Theme.typography.v6.bold)
+                    TextIconAdapter { idIcon, idText ->
+                        Icon(icon = Icons.Paid, modifier = Modifier.idIcon())
+                        SimpleEllipsisText(text = profile.coin.toString(), style = Theme.typography.v6, modifier = Modifier.idText())
                     }
                 }
-                BoardButton("秀动提取", Icons.Link) {
-                    navigate(::ScreenActivityLink)
+            }
+        }
+    }
+
+    private val userTopicCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value9,
+            shape = Theme.shape.v3,
+            shadowElevation = Theme.shadow.v7,
+            onClick = { navigate(::ScreenUserCard, profile.uid) }
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                ) {
+                    Icon(icon = Icons.Article)
+                    SimpleEllipsisText(text = "主题", style = Theme.typography.v7.bold)
                 }
-                BoardButton("测试", Icons.BugReport) {
-                    navigate(::ScreenTest)
+
+                VerticalDivider()
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    TextIconAdapter(modifier = Modifier.silentClick {
+                        navigate(::ScreenFollows, FollowTabItem.Follows)
+                    }) { idIcon, idText ->
+                        Icon(icon = Icons.FavoriteBorder, modifier = Modifier.idIcon())
+                        SimpleEllipsisText(text = "关注 ${profile.follows}", modifier = Modifier.idText())
+                    }
+
+                    TextIconAdapter(modifier = Modifier.silentClick {
+                        navigate(::ScreenFollows, FollowTabItem.Followers)
+                    }) { idIcon, idText ->
+                        Icon(icon = Icons.AccountCircle, modifier = Modifier.idIcon())
+                        SimpleEllipsisText(text = "粉丝 ${profile.followers}", modifier = Modifier.idText())
+                    }
                 }
             }
         }
     }
+
+    private val mailCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value9,
+            shape = Theme.shape.v3,
+            shadowElevation = Theme.shadow.v7,
+            onClick = { navigate(::ScreenMail) }
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                ) {
+                    Icon(icon = Icons.Mail)
+                    SimpleEllipsisText(text = "邮件", style = Theme.typography.v7.bold)
+                }
+
+                VerticalDivider()
+
+                val mailCount = profile.notification.mailCount
+
+                SimpleEllipsisText(
+                    text = if (mailCount > 0) "未读 +$mailCount" else "无新邮件",
+                    color = if (mailCount > 0) Theme.color.error else LocalColorVariant.current,
+                    style = Theme.typography.v7.bold
+                )
+            }
+        }
+    }
+
+    private val signinCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+
+    }
+
+    private val cardGroup = movableComposable { profile: UserProfile, modifier: Modifier ->
+        MasonryLayout(
+            modifier = modifier,
+            horizontalSpacing = Theme.padding.e,
+            verticalSpacing = Theme.padding.e
+        ) {
+            userTopicCard(profile, Modifier.fillMaxWidth())
+            mailCard(profile, Modifier.fillMaxWidth())
+        }
+    }
+
+//    private val buttonContainer = movableComposable { ->
+//        BoardButtonContainer("个人空间") {
+//            val notification = app.config.userProfile?.notification
+//
+//            BoardButton("签到", Icons.EventAvailable, if (notification?.isSignin == false) 1 else 0) {
+//                app.config.userProfile?.let(signinSheet::open) ?: slot.tip.warning("请先登录")
+//            }
+//            BoardButton("主题", Icons.Article) {
+//                app.config.userProfile?.let {
+//                    navigate(::ScreenUserCard, it.uid)
+//                } ?: slot.tip.warning("请先登录")
+//            }
+//            BoardButton("邮箱", Icons.Mail) {
+//                app.config.userProfile?.let {
+//                    navigate(::ScreenMail)
+//                } ?: slot.tip.warning("请先登录")
+//            }
+//            BoardButton("徽章", Icons.MilitaryTech) {
+//
+//            }
+//        }
+//        BoardButtonContainer("推广") {
+//            BoardButton("抽奖", Icons.Gift) {
+//                app.config.userProfile?.let {
+//                    navigate(::ScreenPrice)
+//                } ?: slot.tip.warning("请先登录")
+//            }
+//            BoardButton("招新", Icons.Campaign) {
+//
+//            }
+//            BoardButton("水群", Icons2.QQ) {
+//                launch {
+//                    val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
+//                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
+//                }
+//            }
+//            BoardButton("店铺", Icons2.Taobao) {
+//                launch {
+//                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+//                }
+//            }
+//        }
+//        BoardButtonContainer("超管空间") {
+//            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+//                BoardButton("添加活动", Icons.Gift) {
+//                    launch {
+//                        val index = addActivityDialog.open() ?: return@launch
+//                        DataSourceActivity.addActivity(index == 1).onSuccess {
+//                            navigate(::ScreenModifyActivity, it)
+//                        }.exceptionOrNull().errorTip
+//                    }
+//                }
+//                BoardButton("秀动提取", Icons.Link) {
+//                    navigate(::ScreenActivityLink)
+//                }
+//                BoardButton("测试", Icons.BugReport) {
+//                    navigate(::ScreenTest)
+//                }
+//            }
+//        }
+//    }
 
     @Composable
     private fun Portrait(profile: UserProfile) {
@@ -195,20 +325,20 @@ class ScreenUser : BasicScreen() {
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             userProfileCard(profile, LocalImmersivePadding.current.withoutBottom, Modifier.fillMaxWidth())
-            userPropertyCard(profile, Modifier.fillMaxWidth())
-            buttonContainer()
+            userLevelCard(profile, Modifier.fillMaxWidth())
+            cardGroup(profile, Modifier.fillMaxWidth().padding(Theme.padding.eValue))
         }
     }
 
     @Composable
     private fun Landscape(profile: UserProfile) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            Column(modifier = Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight()) {
+            Column(modifier = Modifier.width(Theme.size.cell1 * 1.5f).fillMaxHeight()) {
                 userProfileCard(profile, PaddingValues.Zero, Modifier.fillMaxWidth())
-                userPropertyCard(profile, Modifier.fillMaxWidth())
+                userLevelCard(profile, Modifier.fillMaxWidth())
             }
             Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                buttonContainer()
+                cardGroup(profile, Modifier.fillMaxWidth().padding(Theme.padding.eValue))
             }
         }
     }
@@ -216,6 +346,7 @@ class ScreenUser : BasicScreen() {
     @Composable
     override fun BasicContent() {
         val profile = app.config.userProfile
+
         if (profile != null) {
             val deviceType by rememberDeviceType()
             when (deviceType) {
@@ -236,10 +367,7 @@ class ScreenUser : BasicScreen() {
                 PrimaryButton(text = "登录", icon = Icons.AccountCircle, onClick = {
                     navigate(::ScreenLogin)
                 })
-                SecondaryButton(text = "设置", icon = Icons.Settings, onClick = {
-                    navigate(::ScreenSettings)
-                })
-                TertiaryButton(text = "返回", icon = Icons.ArrowBack, onClick = ::onBack)
+                SecondaryOutlinedButton(text = "返回", icon = Icons.ArrowBack, onClick = ::onBack)
             }
         }
     }
@@ -369,89 +497,89 @@ class ScreenUser : BasicScreen() {
         }
     }
 
-    private val signinSheet = this land object : SheetContent<UserProfile>() {
-        var signinData by mutableRefStateOf(BooleanArray(8) { false })
-        var todayIndex by mutableIntStateOf(-1)
-        var todaySignin by mutableStateOf(true)
-
-        override suspend fun initialize(args: UserProfile) {
-            signinData = BooleanArray(8) { false }
-            todayIndex = -1
-            todaySignin = true
-            ApiProfileSignin.request(app.config.userToken) { status, value, index ->
-                todaySignin = status
-                todayIndex = index
-                signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
-                if (!todaySignin) app.config.userProfile = args.copy(
-                    coin = args.coin + 1,
-                    exp = args.exp + 1,
-                    notification = args.notification.copy(isSignin = true)
-                )
-            }
-        }
-
-        @Composable
-        override fun Content(args: UserProfile) {
-            val today = remember { DateEx.Today }
-
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-            ) {
-                SimpleEllipsisText(text = "签到记录", style = Theme.typography.v6.bold)
-
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    maxItemsInEachRow = 4,
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9, Alignment.CenterHorizontally),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-                ) {
-                    repeat(8) { index ->
-                        val isToday = index == todayIndex
-                        val checked = signinData[index]
-                        val icon = when {
-                            index > todayIndex -> Icons.QuestionMark
-                            checked -> Icons.Check
-                            isToday -> Icons.IndeterminateCheckBox
-                            else -> Icons.Clear
-                        }
-                        val color = if (index > todayIndex) LocalColor.current else {
-                            if (checked) {
-                                if (isToday) Theme.color.primary else LocalColor.current
-                            }
-                            else {
-                                if (isToday) Theme.color.warning else Theme.color.error
-                            }
-                        }
-                        val border = if (isToday) BorderStroke(Theme.border.v7, color) else null
-
-                        Surface(
-                            shape = Theme.shape.v7,
-                            contentPadding = Theme.padding.eValue,
-                            tonalLevel = 5,
-                            shadowElevation = Theme.shadow.v7,
-                            border = border
-                        ) {
-                            TextIconBinder(modifier = Modifier) { idIcon, idText ->
-                                val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
-                                Icon(
-                                    icon = icon,
-                                    color = color,
-                                    modifier = Modifier.idIcon()
-                                )
-                                SimpleEllipsisText(
-                                    text = "${date.month.number}月${date.day}日",
-                                    color = color,
-                                    modifier = Modifier.idText()
-                                )
-                            }
-                        }
-                    }
-                }
-
-                SimpleEllipsisText(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
-            }
-        }
-    }
+//    private val signinSheet = this land object : SheetContent<UserProfile>() {
+//        var signinData by mutableRefStateOf(BooleanArray(8) { false })
+//        var todayIndex by mutableIntStateOf(-1)
+//        var todaySignin by mutableStateOf(true)
+//
+//        override suspend fun initialize(args: UserProfile) {
+//            signinData = BooleanArray(8) { false }
+//            todayIndex = -1
+//            todaySignin = true
+//            ApiProfileSignin.request(app.config.userToken) { status, value, index ->
+//                todaySignin = status
+//                todayIndex = index
+//                signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
+//                if (!todaySignin) app.config.userProfile = args.copy(
+//                    coin = args.coin + 1,
+//                    exp = args.exp + 1,
+//                    notification = args.notification.copy(isSignin = true)
+//                )
+//            }
+//        }
+//
+//        @Composable
+//        override fun Content(args: UserProfile) {
+//            val today = remember { DateEx.Today }
+//
+//            Column(
+//                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
+//            ) {
+//                SimpleEllipsisText(text = "签到记录", style = Theme.typography.v6.bold)
+//
+//                FlowRow(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    maxItemsInEachRow = 4,
+//                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9, Alignment.CenterHorizontally),
+//                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
+//                ) {
+//                    repeat(8) { index ->
+//                        val isToday = index == todayIndex
+//                        val checked = signinData[index]
+//                        val icon = when {
+//                            index > todayIndex -> Icons.QuestionMark
+//                            checked -> Icons.Check
+//                            isToday -> Icons.IndeterminateCheckBox
+//                            else -> Icons.Clear
+//                        }
+//                        val color = if (index > todayIndex) LocalColor.current else {
+//                            if (checked) {
+//                                if (isToday) Theme.color.primary else LocalColor.current
+//                            }
+//                            else {
+//                                if (isToday) Theme.color.warning else Theme.color.error
+//                            }
+//                        }
+//                        val border = if (isToday) BorderStroke(Theme.border.v7, color) else null
+//
+//                        Surface(
+//                            shape = Theme.shape.v7,
+//                            contentPadding = Theme.padding.eValue,
+//                            tonalLevel = 5,
+//                            shadowElevation = Theme.shadow.v7,
+//                            border = border
+//                        ) {
+//                            TextIconBinder(modifier = Modifier) { idIcon, idText ->
+//                                val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
+//                                Icon(
+//                                    icon = icon,
+//                                    color = color,
+//                                    modifier = Modifier.idIcon()
+//                                )
+//                                SimpleEllipsisText(
+//                                    text = "${date.month.number}月${date.day}日",
+//                                    color = color,
+//                                    modifier = Modifier.idText()
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                SimpleEllipsisText(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
+//            }
+//        }
+//    }
 }

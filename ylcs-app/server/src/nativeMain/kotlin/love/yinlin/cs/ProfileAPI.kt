@@ -4,44 +4,31 @@ import io.github.smyrgeorge.sqlx4k.SQLError
 import love.yinlin.cs.service.throwExecuteSQL
 import love.yinlin.cs.service.throwQuerySQL
 import love.yinlin.cs.service.throwQuerySQLSingle
+import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.data.rachel.profile.UserNotification
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.*
-
-private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> R): R {
-    val currentDate = DateEx.Current.date
-    val dayIndex = currentDate.dayOfYear - 1
-    val byteIndex = dayIndex / 8
-    val bitIndex = dayIndex % 8
-    val byteValue = this[byteIndex].toInt()
-    val isSignin = (byteValue shr bitIndex) and 1 == 1
-    return block(isSignin, byteValue, byteIndex, bitIndex)
-}
 
 fun ServerScope.profileAPI() {
     ApiProfileGetProfile.response { token ->
         val uid = AN.throwExpireToken(token)
         val profile = mysql.throwTransaction { transaction ->
             val user = transaction.throwQuerySQLSingle("""
-                SELECT
-                    u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.follows, u1.followers,
-                    u2.name AS inviterName, d.signin,
-                    JSON_OBJECT(
-                        'mailCount', (SELECT COUNT(*) FROM mail AS m WHERE m.processed = 0 AND m.uid = u1.uid)
-                    ) AS notification
+                SELECT u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.follows, u1.followers, u2.name AS inviterName, d.signin
                 FROM user AS u1
                 JOIN user_data AS d ON d.uid = u1.uid
                 LEFT JOIN user AS u2 ON u2.uid = u1.inviter
                 WHERE u1.uid = ?
             """, uid)
-            val signin = user["signin"]!!.to(ByteArraySerializer)
-            val profile = user.to<UserProfile>()
-            val updatedProfile = signin.checkSignin { isSignin, _, _, _ ->
-                profile.copy(notification = profile.notification.copy(isSignin = isSignin))
-            }
+            val mail = transaction.throwQuerySQLSingle(" SELECT COUNT(*) AS mailCount FROM mail WHERE processed = 0 AND uid = ?", uid)
+            val profile = user.to<UserProfile>().copy(notification = UserNotification(
+                mailCount = mail["mailCount"].Int,
+                signinData = user["signin"]!!.to(SigninData.Serializer)
+            ))
             transaction.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", DateEx.CurrentString, uid)
-            updatedProfile
+            profile
         }
         result(profile)
     }
@@ -134,13 +121,13 @@ fun ServerScope.profileAPI() {
             transaction.throwQuerySQLSingle("SELECT uid FROM user WHERE uid = ? FOR UPDATE", uid)
             val userData = transaction.throwQuerySQLSingle("SELECT signin FROM user_data WHERE uid = ? FOR UPDATE", uid)
             // 查询是否签到 ... 签到记录46字节(368位)
-            val signin = userData["signin"]!!.to(ByteArraySerializer)
-            signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
+            val signinData = userData["signin"]!!.to(SigninData.Serializer)
+            signinData.check { isSignin, byteValue, byteIndex, bitIndex ->
                 if (!isSignin) {
                     // 更新签到值，银币增加
-                    signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
+                    signinData[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
                     transaction.throwExecuteSQL("UPDATE user SET exp = exp + 1, coin = coin + 1 WHERE uid = ?", uid)
-                    transaction.throwExecuteSQL("UPDATE user_data SET signin = ? WHERE uid = ?", signin, uid)
+                    transaction.throwExecuteSQL("UPDATE user_data SET signin = ? WHERE uid = ?", signinData.data, uid)
                 }
                 result(isSignin, byteValue, bitIndex)
             }
