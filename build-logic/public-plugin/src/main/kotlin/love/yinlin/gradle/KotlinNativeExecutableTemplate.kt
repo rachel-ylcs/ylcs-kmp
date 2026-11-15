@@ -19,7 +19,9 @@ open class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
             BuildPlatform.Mac -> "macos"
         }
         val target = owner.extensions.getByType<KotlinMultiplatformExtension>().targets.getByName(targetName) as KotlinNativeTarget
-        return owner.layout.file(target.binaries.getExecutable(NativeBuildType.RELEASE).linkTaskProvider.flatMap { it.outputFile })
+        val linkTask = target.binaries.getExecutable(NativeBuildType.RELEASE).linkTaskProvider
+        // outputFile only provides the path. Map from the task to keep it as the producer.
+        return owner.layout.file(linkTask.map { it.outputFile.get() })
     }
 
     private var executableBlock: Executable.() -> Unit = {}

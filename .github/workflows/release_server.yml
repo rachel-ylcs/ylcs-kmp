@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/setup-build
 
       - name: Build
-        run: ./gradlew ylcs-app:server:serverArtifact
+        run: ./gradlew ylcs-app:server:serverPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7

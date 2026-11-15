@@ -33,7 +33,6 @@ rachel {
 
         artifacts {
             val binary = releaseExecutable(BuildPlatform.Linux)
-            copy("serverArtifact", binary, C.root.outputs, description = "打包服务端工件")
             copy("serverPublish", binary, C.root.outputs, description = "发布服务端")
         }
 
