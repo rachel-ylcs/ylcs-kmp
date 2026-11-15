@@ -468,7 +468,7 @@ class ScreenMain : BasicScreen() {
                             onClick = {
                                 launch {
                                     val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
-                                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
+                                    if (!app.openUri(uri.toString())) slot.tip.warning("未安装QQ")
                                 }
                             }
                         )
@@ -478,7 +478,7 @@ class ScreenMain : BasicScreen() {
                             icon = Icons2.Taobao,
                             onClick = {
                                 launch {
-                                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                                    if (!app.openUri(UriGenerator.taobao("280201975").toString())) slot.tip.warning("未安装淘宝")
                                 }
                             }
                         )

@@ -168,8 +168,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { controller.minimize = true }
 
-    actual suspend fun openUri(uri: Uri): Boolean = Coroutines.mainImmediate {
-        catchingDefault(false) { NativeDesktop.openUri(uri.toString()) }
+    actual suspend fun openUri(uri: String): Boolean = Coroutines.mainImmediate {
+        catchingDefault(false) { NativeDesktop.openUri(uri) }
     }
 
     actual suspend fun copyText(text: String): Boolean = Coroutines.mainImmediate {

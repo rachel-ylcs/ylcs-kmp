@@ -2,8 +2,13 @@ package org.jetbrains.skiko.window
 
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.OsFamily
+import kotlin.native.Platform
 
+@OptIn(ExperimentalNativeApi::class)
 internal class SdlWindowEvents(private val window: COpaquePointer, private val wakeEventType: UInt, private val send: (NativeWindowEvent) -> Unit) {
+    private val invertWheelY = Platform.osFamily != OsFamily.MACOSX
     private var x = 0f
     private var y = 0f
     private var buttons = 0
@@ -50,9 +55,10 @@ internal class SdlWindowEvents(private val window: COpaquePointer, private val w
             SDL_EVENT_MOUSE_WHEEL -> {
                 x = event.wheel.mouse_x * scale
                 y = event.wheel.mouse_y * scale
-                // AppKit has already applied the macOS natural-scrolling preference to x/y.
-                // Do not invert the deltas again based on SDL_MOUSEWHEEL_FLIPPED.
-                send(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, x, y, buttons, scrollX = event.wheel.x, scrollY = event.wheel.y, modifiers = SDL_GetModState().toInt()))
+                // SDL on Windows and Linux reports up as positive, while Compose expects down as positive.
+                // Keep the Cocoa deltas, which already reflect the macOS scrolling preference.
+                val scrollY = if (invertWheelY) -event.wheel.y else event.wheel.y
+                send(NativeWindowEvent.Pointer(NativeWindowEvent.Pointer.Kind.SCROLL, x, y, buttons, scrollX = event.wheel.x, scrollY = scrollY, modifiers = SDL_GetModState().toInt()))
             }
             SDL_EVENT_WINDOW_MOUSE_ENTER -> pointer(NativeWindowEvent.Pointer.Kind.ENTER)
             SDL_EVENT_WINDOW_MOUSE_LEAVE -> pointer(NativeWindowEvent.Pointer.Kind.EXIT)

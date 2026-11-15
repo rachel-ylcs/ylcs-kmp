@@ -161,7 +161,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                             launch {
                                 val uri = Uri.parse(showstart)
                                 if (uri == null) slot.tip.warning("链接已失效")
-                                else if (!app.openUri(uri)) slot.tip.warning("未安装秀动")
+                                else if (!app.openUri(uri.toString())) slot.tip.warning("未安装秀动")
                             }
                         }
                     }
@@ -192,7 +192,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     qqGroupUri?.then { uri ->
                         LinkIcon("官群", rememberVectorPainter(Icons2.QQ)) {
                             launch {
-                                if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
+                                if (!app.openUri(uri.toString())) slot.tip.warning("未安装QQ")
                             }
                         }
                     }

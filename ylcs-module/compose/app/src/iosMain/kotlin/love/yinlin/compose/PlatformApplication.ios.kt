@@ -10,6 +10,7 @@ import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toNSUrl
+import platform.Foundation.NSURL
 import platform.UIKit.*
 
 @Stable
@@ -38,9 +39,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { }
 
-    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
+    actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {
         val application = UIApplication.sharedApplication
-        uri.toNSUrl()?.let { url ->
+        NSURL.URLWithString(uri)?.let { url ->
             application.canOpenURL(url)
             application.openURL(url)
         } ?: false

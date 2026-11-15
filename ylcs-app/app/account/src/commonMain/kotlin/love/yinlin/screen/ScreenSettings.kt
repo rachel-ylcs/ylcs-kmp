@@ -60,8 +60,6 @@ import love.yinlin.extension.enumSize
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.then
 import love.yinlin.fs.File
-import love.yinlin.uri.Scheme
-import love.yinlin.uri.Uri
 
 @Stable
 class ScreenSettings : Screen() {
@@ -515,12 +513,12 @@ class ScreenSettings : Screen() {
                     SecondaryButton(
                         text = "银临茶舍官网",
                         icon = Icons.Home,
-                        onClick = { launch { app.openUri(Uri(scheme = Scheme.Https, host = "yinlin.love")) } }
+                        onClick = { launch { app.openUri("https://yinlin.love") } }
                     )
                     TertiaryButton(
                         text = "Github开源",
                         icon = Icons2.Github,
-                        onClick = { launch { app.openUri(Uri(scheme = Scheme.Https, host = "github.com", path = "/rachel-ylcs/ylcs-kmp")) } }
+                        onClick = { launch { app.openUri("https://github.com/rachel-ylcs/ylcs-kmp") } }
                     )
                 }
 

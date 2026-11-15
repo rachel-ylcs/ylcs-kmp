@@ -58,8 +58,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { }
 
-    actual suspend fun openUri(uri: Uri): Boolean {
-        window.open(uri.toString(), "_blank")
+    actual suspend fun openUri(uri: String): Boolean {
+        window.open(uri, "_blank")
         return true
     }
 

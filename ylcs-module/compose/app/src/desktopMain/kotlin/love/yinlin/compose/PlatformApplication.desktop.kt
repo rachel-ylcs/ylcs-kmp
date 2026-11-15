@@ -28,13 +28,12 @@ import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
-import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
-import love.yinlin.uri.toJvmUri
 import org.jetbrains.compose.resources.DrawableResource
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.net.URI
 import java.nio.file.Path
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.seconds
@@ -233,17 +232,18 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     actual fun backHome() { controller.minimize = true }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
+    actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {
         val desktop = Desktop.getDesktop()
-        if (uri.scheme == Scheme.File) {
+        val target = URI.create(uri)
+        if (target.scheme.equals("file", ignoreCase = true)) {
             if (desktop.isSupported(Desktop.Action.OPEN)) {
-                desktop.open(Path.of(uri.toJvmUri()).toFile())
+                desktop.open(Path.of(target).toFile())
                 true
             }
             else false
         }
         else if (desktop.isSupported(Desktop.Action.BROWSE)) {
-            desktop.browse(uri.toJvmUri())
+            desktop.browse(target)
             true
         }
         else false

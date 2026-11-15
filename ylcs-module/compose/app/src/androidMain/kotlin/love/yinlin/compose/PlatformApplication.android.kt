@@ -19,7 +19,8 @@ import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.Uri
-import love.yinlin.uri.toAndroidUri
+
+import android.net.Uri as AndroidUri
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -52,8 +53,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         rawContext.startActivity(intent)
     }
 
-    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
-        val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
+    actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {
+        val intent = Intent(Intent.ACTION_VIEW, AndroidUri.parse(uri))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         rawContext.startActivity(intent)
         true

@@ -24,7 +24,7 @@ class ScreenWebpage(url: String) : Screen() {
                 *Platform.Desktop, Platform.LinuxNative,
                 ifTrue = {
                     previous.launch {
-                        Uri.parse(arg)?.let { app.openUri(it) }
+                        Uri.parse(arg)?.let { app.openUri(it.toString()) }
                     }
                 },
                 ifFalse = {

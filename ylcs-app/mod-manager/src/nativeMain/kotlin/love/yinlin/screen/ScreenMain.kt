@@ -52,7 +52,6 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
-import love.yinlin.uri.Uri
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -210,7 +209,7 @@ class ScreenMain : BasicScreen() {
             }
             item(text = "打开所在目录", icon = Icons.GotoNext) {
                 launch {
-                    Uri.parse(item.path.path)?.then { app.openUri(it) }
+                    app.openUri(item.path.path)
                 }
             }
             item(text = "音游编辑", icon = Icons.MusicNote) {
