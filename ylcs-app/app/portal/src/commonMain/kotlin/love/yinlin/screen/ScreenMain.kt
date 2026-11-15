@@ -34,14 +34,17 @@ import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.Flyout
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.layout.Grid
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.widget.Calendar
 import love.yinlin.compose.ui.widget.CalendarState
 import love.yinlin.cs.url
@@ -50,7 +53,9 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.then
 import love.yinlin.isAppInitialized
+import love.yinlin.platform.Platform
 import love.yinlin.startup.StartupMusicPlayer
+import love.yinlin.uri.UriGenerator
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -60,11 +65,14 @@ class ScreenMain : BasicScreen() {
 
     override fun initialize() {
         launch {
-            // 更新用户信息
-            if (!DataSourceAccount.updateUserToken()) navigate(::ScreenLogin)
+            val token = app.config.userToken
 
             supervisorScope {
-                this.launch { DataSourceActivity.requestNewActivity() } // 加载轮播图
+                this.launch {
+                    if (!DataSourceAccount.updateUserToken(token)) navigate(::ScreenLogin) // 更新用户信息
+                }
+
+                this.launch { DataSourceActivity.requestNewActivity(token) } // 加载轮播图
             }
         }
     }
@@ -423,14 +431,59 @@ class ScreenMain : BasicScreen() {
     ]
 
     private val cardLayout = movableComposable { modifier: Modifier ->
-        FlowRow(
+        Column(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
-            maxItemsInEachRow = 2
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            for (card in cardList) {
-                card.Content(modifier = Modifier.weight(1f))
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                maxItemsInEachRow = 2
+            ) {
+                for (card in cardList) {
+                    card.Content(modifier = Modifier.weight(1f))
+                }
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = Theme.padding.eValue9,
+                shape = Theme.shape.v7,
+                shadowElevation = Theme.shadow.v7
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    TextIconAdapter { idIcon, idText ->
+                        Icon(icon = Icons.Link, modifier = Modifier.idIcon())
+                        SimpleEllipsisText(text = "友情链接", style = Theme.typography.v6.bold, modifier = Modifier.idText())
+                    }
+
+                    FlowRow(modifier = Modifier.fillMaxWidth()) {
+                        PrimaryTextButton(
+                            text = "茶舍水群",
+                            icon = Icons2.QQ,
+                            onClick = {
+                                launch {
+                                    val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
+                                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
+                                }
+                            }
+                        )
+
+                        SecondaryTextButton(
+                            text = "茶舍小店",
+                            icon = Icons2.Taobao,
+                            onClick = {
+                                launch {
+                                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,7 +10,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
@@ -27,16 +25,12 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceAccount
-import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
-import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.graphics.qrcode.QrcodeShape
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.DeepLink
-import love.yinlin.compose.ui.common.BoardButton
-import love.yinlin.compose.ui.common.BoardButtonContainer
 import love.yinlin.compose.ui.common.PortraitValue
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.common.UserProfileCard
@@ -44,17 +38,16 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.container.itemKey
-import love.yinlin.compose.ui.floating.DialogChoice
 import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.SecondaryOutlinedButton
-import love.yinlin.compose.ui.layout.MasonryLayout
+import love.yinlin.compose.ui.input.SecondaryTextButton
+import love.yinlin.compose.ui.layout.Grid
 import love.yinlin.compose.ui.layout.VerticalDivider
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.shadow
@@ -63,7 +56,6 @@ import love.yinlin.compose.ui.status.LinearProgress
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
-import love.yinlin.compose.ui.text.TextIconBinder
 import love.yinlin.compose.ui.widget.QrcodeBox
 import love.yinlin.compose.ui.widget.QrcodeScanner
 import love.yinlin.cs.ApiProfileSignin
@@ -72,11 +64,8 @@ import love.yinlin.cs.url
 import love.yinlin.data.rachel.follows.FollowTabItem
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
-import love.yinlin.extension.DateEx
-import love.yinlin.platform.Platform
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
-import love.yinlin.uri.UriGenerator
 
 @Stable
 class ScreenUser : BasicScreen() {
@@ -241,82 +230,154 @@ class ScreenUser : BasicScreen() {
         }
     }
 
-    private val signinCard = movableComposable { profile: UserProfile, modifier: Modifier ->
-
-    }
-
-    private val cardGroup = movableComposable { profile: UserProfile, modifier: Modifier ->
-        MasonryLayout(
-            modifier = modifier,
-            horizontalSpacing = Theme.padding.e,
-            verticalSpacing = Theme.padding.e
-        ) {
-            userTopicCard(profile, Modifier.fillMaxWidth())
-            mailCard(profile, Modifier.fillMaxWidth())
+    private suspend fun signin(profile: UserProfile) {
+        ApiProfileSignin.request(app.config.userToken) { status, newData ->
+            if (status) {
+                app.config.userProfile = profile.copy(
+                    coin = profile.coin + 1,
+                    exp = profile.exp + 1,
+                    notification = profile.notification.copy(signinData = newData)
+                )
+                slot.tip.success("签到成功! 经验+1, 银币+1")
+            }
+            else slot.tip.warning("今日已签到过")
         }
     }
 
-//    private val buttonContainer = movableComposable { ->
-//        BoardButtonContainer("个人空间") {
-//            val notification = app.config.userProfile?.notification
-//
-//            BoardButton("签到", Icons.EventAvailable, if (notification?.isSignin == false) 1 else 0) {
-//                app.config.userProfile?.let(signinSheet::open) ?: slot.tip.warning("请先登录")
-//            }
-//            BoardButton("主题", Icons.Article) {
-//                app.config.userProfile?.let {
-//                    navigate(::ScreenUserCard, it.uid)
-//                } ?: slot.tip.warning("请先登录")
-//            }
-//            BoardButton("邮箱", Icons.Mail) {
-//                app.config.userProfile?.let {
-//                    navigate(::ScreenMail)
-//                } ?: slot.tip.warning("请先登录")
-//            }
-//            BoardButton("徽章", Icons.MilitaryTech) {
-//
-//            }
-//        }
-//        BoardButtonContainer("推广") {
-//            BoardButton("抽奖", Icons.Gift) {
-//                app.config.userProfile?.let {
-//                    navigate(::ScreenPrice)
-//                } ?: slot.tip.warning("请先登录")
-//            }
-//            BoardButton("招新", Icons.Campaign) {
-//
-//            }
-//            BoardButton("水群", Icons2.QQ) {
-//                launch {
-//                    val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
-//                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
-//                }
-//            }
-//            BoardButton("店铺", Icons2.Taobao) {
-//                launch {
-//                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
-//                }
-//            }
-//        }
-//        BoardButtonContainer("超管空间") {
-//            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-//                BoardButton("添加活动", Icons.Gift) {
-//                    launch {
-//                        val index = addActivityDialog.open() ?: return@launch
-//                        DataSourceActivity.addActivity(index == 1).onSuccess {
-//                            navigate(::ScreenModifyActivity, it)
-//                        }.exceptionOrNull().errorTip
-//                    }
-//                }
-//                BoardButton("秀动提取", Icons.Link) {
-//                    navigate(::ScreenActivityLink)
-//                }
-//                BoardButton("测试", Icons.BugReport) {
-//                    navigate(::ScreenTest)
-//                }
-//            }
-//        }
-//    }
+    private val signinCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value9,
+            shape = Theme.shape.v3,
+            shadowElevation = Theme.shadow.v7
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            ) {
+                val signinData = profile.notification.signinData
+                val currentDate = signinData.currentDate
+
+                signinData.check { isSignin, byteValue, _, dayIndex ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(icon = Icons.EventAvailable)
+                        SimpleEllipsisText(text = "${currentDate.month.number}月签到", style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
+
+                        if (!isSignin) {
+                            SecondaryTextButton(
+                                text = "立即打卡",
+                                icon = Icons.Upload,
+                                onClick = {
+                                    launch { signin(profile) }
+                                }
+                            )
+                        }
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        repeat(8) { index ->
+                            val isToday = index == dayIndex
+                            val daySignin = ((byteValue shr index) and 1) == 1
+                            val date = signinData.currentDate.minus(dayIndex - index, DateTimeUnit.DAY)
+
+                            val icon = when {
+                                index > dayIndex -> Icons.QuestionMark
+                                daySignin -> Icons.Check
+                                isToday -> Icons.IndeterminateCheckBox
+                                else -> Icons.Clear
+                            }
+
+                            val color = if (index > dayIndex) LocalColor.current else {
+                                if (daySignin) {
+                                    if (isToday) Theme.color.primary else LocalColor.current
+                                }
+                                else {
+                                    if (isToday) Theme.color.warning else Theme.color.error
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                            ) {
+                                SimpleEllipsisText(text = date.day.toString())
+                                Icon(icon = icon, color = color)
+                            }
+                        }
+                    }
+
+                    val [signinDays, totalDays] = remember(profile) { signinData.signinDayOfYear }
+
+                    SimpleEllipsisText(text = "今年累计签到 $signinDays / $totalDays 天", color = Theme.color.tertiary)
+                }
+            }
+        }
+    }
+
+    private val adminCard = movableComposable { _: UserProfile, modifier: Modifier ->
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value9,
+            shape = Theme.shape.v3,
+            shadowElevation = Theme.shadow.v7,
+            onClick = { navigate(::ScreenAdmin) }
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(icon = Icons.Lock)
+                SimpleEllipsisText(text = "超管空间", style = Theme.typography.v7.bold)
+            }
+        }
+    }
+
+    private val testCard = movableComposable { _: UserProfile, modifier: Modifier ->
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value9,
+            shape = Theme.shape.v3,
+            shadowElevation = Theme.shadow.v7,
+            onClick = { navigate(::ScreenTest) }
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(icon = Icons.BugReport)
+                SimpleEllipsisText(text = "测试", style = Theme.typography.v7.bold)
+            }
+        }
+    }
+
+    private val cardGroup = movableComposable { profile: UserProfile, modifier: Modifier ->
+        val padding = Theme.padding.e
+
+        Grid(
+            builder = {
+                x(0.5f, 0.5f)
+                y(auto, auto, auto)
+                s(padding)
+            },
+            modifier = modifier,
+        ) {
+            userTopicCard(profile, Modifier.fillMaxWidth())
+            mailCard(profile, Modifier.fillMaxWidth())
+            signinCard(profile, Modifier.fillMaxWidth().item(xs = 2))
+            if (profile.hasPrivilegeVIPAccount) {
+                adminCard(profile, Modifier.fillMaxWidth())
+                testCard(profile, Modifier.fillMaxWidth())
+            }
+        }
+    }
 
     @Composable
     private fun Portrait(profile: UserProfile) {
@@ -370,12 +431,6 @@ class ScreenUser : BasicScreen() {
                 SecondaryOutlinedButton(text = "返回", icon = Icons.ArrowBack, onClick = ::onBack)
             }
         }
-    }
-
-    private val addActivityDialog = this land object : DialogChoice.ByList() {
-        override val num: Int = 2
-        override fun nameFactory(index: Int): String = if (index == 0) "公开活动" else "私密活动"
-        override fun iconFactory(index: Int): ImageVector = if (index == 0) Icons.Public else Icons.Lock
     }
 
     private val scanSheet = this land object : Sheet() {
@@ -496,90 +551,4 @@ class ScreenUser : BasicScreen() {
             }
         }
     }
-
-//    private val signinSheet = this land object : SheetContent<UserProfile>() {
-//        var signinData by mutableRefStateOf(BooleanArray(8) { false })
-//        var todayIndex by mutableIntStateOf(-1)
-//        var todaySignin by mutableStateOf(true)
-//
-//        override suspend fun initialize(args: UserProfile) {
-//            signinData = BooleanArray(8) { false }
-//            todayIndex = -1
-//            todaySignin = true
-//            ApiProfileSignin.request(app.config.userToken) { status, value, index ->
-//                todaySignin = status
-//                todayIndex = index
-//                signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
-//                if (!todaySignin) app.config.userProfile = args.copy(
-//                    coin = args.coin + 1,
-//                    exp = args.exp + 1,
-//                    notification = args.notification.copy(isSignin = true)
-//                )
-//            }
-//        }
-//
-//        @Composable
-//        override fun Content(args: UserProfile) {
-//            val today = remember { DateEx.Today }
-//
-//            Column(
-//                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-//            ) {
-//                SimpleEllipsisText(text = "签到记录", style = Theme.typography.v6.bold)
-//
-//                FlowRow(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    maxItemsInEachRow = 4,
-//                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9, Alignment.CenterHorizontally),
-//                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-//                ) {
-//                    repeat(8) { index ->
-//                        val isToday = index == todayIndex
-//                        val checked = signinData[index]
-//                        val icon = when {
-//                            index > todayIndex -> Icons.QuestionMark
-//                            checked -> Icons.Check
-//                            isToday -> Icons.IndeterminateCheckBox
-//                            else -> Icons.Clear
-//                        }
-//                        val color = if (index > todayIndex) LocalColor.current else {
-//                            if (checked) {
-//                                if (isToday) Theme.color.primary else LocalColor.current
-//                            }
-//                            else {
-//                                if (isToday) Theme.color.warning else Theme.color.error
-//                            }
-//                        }
-//                        val border = if (isToday) BorderStroke(Theme.border.v7, color) else null
-//
-//                        Surface(
-//                            shape = Theme.shape.v7,
-//                            contentPadding = Theme.padding.eValue,
-//                            tonalLevel = 5,
-//                            shadowElevation = Theme.shadow.v7,
-//                            border = border
-//                        ) {
-//                            TextIconBinder(modifier = Modifier) { idIcon, idText ->
-//                                val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
-//                                Icon(
-//                                    icon = icon,
-//                                    color = color,
-//                                    modifier = Modifier.idIcon()
-//                                )
-//                                SimpleEllipsisText(
-//                                    text = "${date.month.number}月${date.day}日",
-//                                    color = color,
-//                                    modifier = Modifier.idText()
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                SimpleEllipsisText(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
-//            }
-//        }
-//    }
 }

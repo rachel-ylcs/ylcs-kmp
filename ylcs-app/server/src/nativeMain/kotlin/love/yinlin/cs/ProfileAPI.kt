@@ -129,7 +129,7 @@ fun ServerScope.profileAPI() {
                     transaction.throwExecuteSQL("UPDATE user SET exp = exp + 1, coin = coin + 1 WHERE uid = ?", uid)
                     transaction.throwExecuteSQL("UPDATE user_data SET signin = ? WHERE uid = ?", signinData.data, uid)
                 }
-                result(isSignin, byteValue, bitIndex)
+                result(isSignin, signinData)
             }
         }
     }

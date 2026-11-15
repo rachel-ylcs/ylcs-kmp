@@ -3,6 +3,7 @@ package love.yinlin.cs
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.annotation.DeprecatedApi
+import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.concert.Concert
 import love.yinlin.data.rachel.concert.ConcertSong
@@ -291,7 +292,7 @@ val ApiProfileResetPicture by API.post.i<String>().o()
 @APIReturn("status")
 @APIReturn("value")
 @APIReturn("index")
-val ApiProfileSignin by API.post.i<String>().o<Boolean, Int, Int>()
+val ApiProfileSignin by API.post.i<String>().o<Boolean, SigninData>()
 
 // Topic
 

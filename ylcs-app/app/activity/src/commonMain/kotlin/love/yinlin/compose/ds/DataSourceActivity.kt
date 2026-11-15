@@ -53,8 +53,8 @@ object DataSourceActivity {
         }.toMap()
     }
 
-    suspend fun requestNewActivity() {
-        ApiActivityGetActivities.request(app.config.userToken.ifEmpty { null }) {
+    suspend fun requestNewActivity(token: String) {
+        ApiActivityGetActivities.request(token.ifEmpty { null }) {
             activities.replaceAll(it.sorted())
         }
     }
@@ -108,8 +108,9 @@ object DataSourceActivity {
     }
 
     suspend fun addActivity(hide: Boolean): Result<Int> {
-        val result = ApiActivityAddActivity.request(app.config.userToken, hide).map { it.o1 }
-        if (result.isSuccess) requestNewActivity()
+        val token = app.config.userToken
+        val result = ApiActivityAddActivity.request(token, hide).map { it.o1 }
+        if (result.isSuccess) requestNewActivity(token)
         return result
     }
 }

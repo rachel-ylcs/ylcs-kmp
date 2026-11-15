@@ -26,8 +26,7 @@ object DataSourceAccount {
         }
     }
 
-    suspend fun updateUserToken(): Boolean {
-        val token = app.config.userToken
+    suspend fun updateUserToken(token: String): Boolean {
         val needUpdate = token.isNotEmpty() && isUpdateToken.compareAndSet(expect = false, update = true)
 
         return !needUpdate || cleaning({

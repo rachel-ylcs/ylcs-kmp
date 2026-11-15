@@ -27,6 +27,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenUser)
             screen(::ScreenMail)
             screen(::ScreenPrice)
+            screen(::ScreenAdmin)
 
             // activity
             screen(::ScreenActivityDetails)
