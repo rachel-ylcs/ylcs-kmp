@@ -1,6 +1,5 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +12,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.zIndex
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +33,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.download
 import love.yinlin.compose.ui.icon.Icons
@@ -316,74 +315,68 @@ class ScreenRadio : Screen() {
     private fun RadioProgramCard(modifier: Modifier = Modifier, program: Radio) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().height(Theme.size.image6),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .clip(Theme.shape.v8)
-                        .condition(program.id == currentProgram?.id) {
-                            border(Theme.border.v5, Theme.color.primary, Theme.shape.v8)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    WebImage(
-                        source = program.pic,
-                        version = program.id,
-                        modifier = Modifier.fillMaxSize().zIndex(1f)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(Theme.size.image9)
-                            .border(Theme.border.v4, Colors.Black, Theme.shape.circle)
-                            .background(Colors.White, Theme.shape.circle)
-                            .zIndex(2f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val cached = program.id in localMap
-                        Icon(
-                            icon = if (cached) Icons.PlayArrow else Icons.Download,
-                            color = Colors.Dark,
-                            enabled = if (cached) isPlayerReady else canDownload
-                        )
+                WebImage(
+                    source = program.pic,
+                    version = program.id,
+                    modifier = Modifier.size(Theme.size.image7).clip(Theme.shape.v7).condition(program.id == currentProgram?.id) {
+                        border(Theme.border.v5, Theme.color.primary, Theme.shape.v7)
                     }
-                }
+                )
 
                 Column(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
                 ) {
-                    SimpleEllipsisText(
-                        text = program.title,
-                        color = when {
-                            currentProgram?.id == program.id -> Theme.color.primary
-                            program.id in localMap -> Theme.color.secondary
-                            else -> LocalColor.current
-                        },
-                        style = Theme.typography.v7.bold,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val isCurrent = currentProgram?.id == program.id
+                        val isDownloaded = program.id in localMap
+
+                        Text(
+                            text = program.title,
+                            color = when {
+                                isCurrent -> Theme.color.primary
+                                isDownloaded -> Theme.color.secondary
+                                else -> LocalColor.current
+                            },
+                            style = Theme.typography.v7.bold,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        if (isCurrent) WaveLoading.Content(color = Theme.color.primary)
+                        else if (isDownloaded) Icon(icon = Icons.PlayArrow, color = Theme.color.secondary)
+                        else Icon(icon = Icons.Download, color = Theme.color.tertiary)
+                    }
+
                     RadioProgramUserCard(
                         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                         user = program.user,
                         time = DateEx.Formatter.standardDate.format(program.time.date),
                         style = Theme.typography.v8
                     )
-                    Text(
-                        text = program.content,
-                        style = Theme.typography.v8,
-                        color = LocalColorVariant.current,
-                        modifier = Modifier.fillMaxHeight(),
-                        overflow = TextOverflow.Ellipsis
-                    )
                 }
             }
+
+            Text(
+                text = program.content,
+                style = Theme.typography.v8,
+                color = LocalColorVariant.current,
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -397,14 +390,17 @@ class ScreenRadio : Screen() {
                     Icon(icon = Icons.Commit, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = likeNum.toString(), modifier = Modifier.idText())
                 }
+
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Star, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = commentNum.toString(), modifier = Modifier.idText())
                 }
+
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Comment, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = repostNum.toString(), modifier = Modifier.idText())
                 }
+
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Share, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = playNum.toString(), modifier = Modifier.idText())
@@ -415,7 +411,7 @@ class ScreenRadio : Screen() {
 
     private val radioInfoLayout = movableComposable { _: ColumnScope ->
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -485,29 +481,31 @@ class ScreenRadio : Screen() {
             }
         }
 
-        MusicProgressLayout(modifier = Modifier.fillMaxWidth())
+        MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9))
     }
 
     private val radioListLayout = movableComposable { modifier: Modifier ->
         LazyColumn(modifier = modifier) {
             items(items = radioPrograms, key = { it.id }) { program ->
+                val id = program.id
+
                 RadioProgramCard(
                     modifier = Modifier.fillMaxWidth().combinedClickable(
-                        enabled = program.id in localMap || canDownload,
+                        enabled = id in localMap || canDownload,
                         onClick = {
                             launch {
-                                if (program.id in localMap) playProgram(program)
+                                if (id in localMap) playProgram(program)
                                 else if (canDownload) {
                                     if (slot.confirm.open("下载该电台节目吗?", title = "时长: ${program.duration.timeString}")) {
                                         val result = Coroutines.io {
                                             downloadRadioProgram(program)
                                         }
-                                        if (result) localMap += program.id
+                                        if (result) localMap += id
                                     }
                                 }
                             }
                         },
-                        onLongClick = if (program.id in localMap) {
+                        onLongClick = if (id in localMap) {
                             {
                                 launch {
                                     if (slot.confirm.open("删除该电台节目吗?")) deleteRadioProgram(program)
@@ -515,7 +513,7 @@ class ScreenRadio : Screen() {
                             }
                         }
                         else null
-                    ).padding(Theme.padding.value),
+                    ).padding(Theme.padding.value9),
                     program = program
                 )
             }
@@ -524,27 +522,21 @@ class ScreenRadio : Screen() {
 
     @Composable
     override fun Content() {
-        Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().padding(Theme.padding.eValue9)) {
+        Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             val deviceType by rememberDeviceType()
 
             when (deviceType) {
                 Device.Type.PORTRAIT, Device.Type.SQUARE -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
-                    ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         radioInfoLayout(this)
                         Divider()
                         radioListLayout(Modifier.fillMaxWidth().weight(1f))
                     }
                 }
                 Device.Type.LANDSCAPE -> {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
-                    ) {
+                    Row(modifier = Modifier.fillMaxSize()) {
                         Column(
-                            modifier = Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight(),
+                            modifier = Modifier.width(Theme.size.cell1 * 1.5f).fillMaxHeight(),
                             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
                         ) {
                             radioInfoLayout(this)
