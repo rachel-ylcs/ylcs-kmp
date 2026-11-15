@@ -399,8 +399,7 @@ val ApiTopicDeleteSubComment by API.post.i<String, Int, Int, Int, Int>().o()
 
 // Song
 
-@APIParam("sid")
-val ApiSongGetSongLibrary by API.post.i<String>().o<List<Song>>()
+val ApiSongGetSongLibrary by API.post.i().o<List<Song>>()
 
 @APIParam("sid")
 val ApiSongGetSong by API.post.i<String>().o<Song>()

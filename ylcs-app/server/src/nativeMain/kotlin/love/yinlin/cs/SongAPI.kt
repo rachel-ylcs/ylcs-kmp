@@ -8,8 +8,8 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.to
 
 fun ServerScope.songAPI() {
-    ApiSongGetSongLibrary.response { sid ->
-        val songs = mysql.throwQuerySQL("SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment FROM song", sid)
+    ApiSongGetSongLibrary.response {
+        val songs = mysql.throwQuerySQL("SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment FROM song")
         result(songs.to())
     }
 

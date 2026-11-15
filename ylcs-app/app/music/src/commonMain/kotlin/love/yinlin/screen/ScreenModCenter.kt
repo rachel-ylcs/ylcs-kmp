@@ -22,33 +22,22 @@ import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongFilter
+import love.yinlin.extension.toJsonString
 
 @Stable
 class ScreenModCenter : Screen() {
     private val provider = RachelStatefulProvider()
 
-    private val pageSongs = object : Pagination<Song, String, String>(
-        default = "0",
-        pageNum = APIConfig.MAX_PAGE_NUM
-    ) {
-        override fun distinctValue(item: Song): String = item.sid
-        override fun offset(item: Song): String = item.sid
-    }
-
     private val gridState = LazyGridState()
 
-    private suspend fun requestNewData(loading: Boolean) {
-//        provider.withLoading(loading) {
-//            gridState.requestScrollToItem(0)
-//            pageSongs.newData(ApiSongGetSongs.requestNull(pageSongs.default, pageSongs.pageNum)!!.o1.also { println(it.toJsonString()) })
-//        }
-    }
+    private var baseLibrary: List<Song> by mutableStateOf([])
+
+    private val currentLibrary: List<Song> by mutableStateOf([])
 
     private suspend fun requestFilterData(filter: SongFilter) {
 //        provider.withLoading {
@@ -64,15 +53,14 @@ class ScreenModCenter : Screen() {
 
     override fun initialize() {
         launch {
-            requestNewData(true)
+            provider.withLoading {
+                gridState.requestScrollToItem(0)
+                val result = ApiSongGetSongLibrary.requestNull()!!.o1
+                println(result.toJsonString())
+                if (result.isNotEmpty()) baseLibrary = result
+                result.isNotEmpty()
+            }
         }
-    }
-
-    @Composable
-    override fun RowScope.LeftActions() {
-        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = {
-            requestNewData(true)
-        })
     }
 
     @Composable
