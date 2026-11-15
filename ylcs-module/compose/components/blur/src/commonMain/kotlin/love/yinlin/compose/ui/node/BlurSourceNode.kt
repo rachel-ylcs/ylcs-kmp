@@ -37,7 +37,9 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
         private set
 
     private var captureDemand = false
+    private var needsNewCaptureLayer = false
     private var refreshJob: Job? = null
+    private var windowObservationJob: Job? = null
     private var snapshotObserver: ObserverHandle? = null
 
     internal fun update(newState: BlurState) {
@@ -57,6 +59,7 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     override fun detachBlur() {
+        stopWindowObservation()
         stopInvalidationObserver()
         state.detachSource(this)
     }
@@ -69,7 +72,20 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
             invalidatePlacement()
             invalidateDraw()
         }
+        if (newDemand && windowObservationJob == null) windowObservationJob = observeBlurWindow()
+        else if (!newDemand) stopWindowObservation()
         updateInvalidationObserver()
+    }
+
+    internal fun invalidateCapture() {
+        if (!isAttached || !captureDemand || hostStopped) return
+        needsNewCaptureLayer = true
+        invalidateDraw()
+    }
+
+    private fun stopWindowObservation() {
+        windowObservationJob?.cancel()
+        windowObservationJob = null
     }
 
     private fun updateInvalidationObserver() {
@@ -124,7 +140,12 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     override fun ContentDrawScope.draw() {
-        if (!captureDemand || !supportsBlur() || size.minDimension.roundToInt() < 1) {
+        if (captureDemand && !supportsBlur()) {
+            drawContent()
+            return
+        }
+
+        if (!captureDemand || size.minDimension.roundToInt() < 1) {
             releaseCapture()
             drawContent()
             return
@@ -134,6 +155,10 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
         if (context == null) {
             drawContent()
             return
+        }
+        if (needsNewCaptureLayer) {
+            needsNewCaptureLayer = false
+            releaseCapture()
         }
         val layer = contentLayer?.takeUnless { it.isReleased } ?: context.createGraphicsLayer().also { contentLayer = it }
 
@@ -161,6 +186,7 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     override fun releaseResources() {
+        needsNewCaptureLayer = false
         releaseCapture()
         if (hostStopped) stopInvalidationObserver()
     }
@@ -177,6 +203,11 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     override fun onHostStarted() {
         resetBlur()
         updateInvalidationObserver()
+        onHostWindowStateChanged()
         state.invalidateTargets()
+    }
+
+    override fun onHostWindowStateChanged() {
+        if (windowObservationJob != null) invalidateCapture()
     }
 }

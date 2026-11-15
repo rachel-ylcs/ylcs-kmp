@@ -39,6 +39,7 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
                 onHostStarted()
                 invalidateDraw()
             }
+            Lifecycle.Event.ON_RESUME, Lifecycle.Event.ON_PAUSE -> onHostWindowStateChanged()
             else -> Unit
         }
     }
@@ -106,4 +107,5 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
     protected open fun resetBlur() = Unit
     protected open fun onHostStopped() = Unit
     protected open fun onHostStarted() = Unit
+    protected open fun onHostWindowStateChanged() = Unit
 }

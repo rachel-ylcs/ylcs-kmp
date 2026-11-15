@@ -82,16 +82,15 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
     }
 
     override fun ContentDrawScope.draw() {
-        if (size.width <= 0f || size.height <= 0f) {
-            releaseResources()
+        val source = state.source
+        if (!supportsBlur()) {
+            if (source != null) drawRect(parameters.fallbackTint)
             drawContent()
             return
         }
 
-        val source = state.source
-        if (!supportsBlur()) {
+        if (size.width <= 0f || size.height <= 0f) {
             releaseResources()
-            if (source != null) drawRect(parameters.fallbackTint)
             drawContent()
             return
         }
@@ -162,6 +161,7 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
         }
 
         val context = graphicsContext ?: return
+        if (capturedSource != null && capturedSource !== sourceLayer) releaseCapture()
         val layer = contentLayer?.takeUnless { it.isReleased } ?: context.createGraphicsLayer().also {
             contentLayer = it
             hasCapture = false
@@ -215,20 +215,14 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
         }
     }
 
-    override fun releaseResources() {
+    private fun releaseCapture() {
         val layer = contentLayer
         contentLayer = null
         if (layer != null && !layer.isReleased) {
             layer.renderEffect = null
             graphicsContext?.releaseGraphicsLayer(layer)
         }
-        renderer?.release()
-        renderer = null
         renderEffect = null
-        effectRadius = Float.NaN
-        effectTint = Color.Unspecified
-        effectNoise = Float.NaN
-        effectScale = Float.NaN
         capturedSource = null
         capturedVersion = -1L
         capturedBounds = null
@@ -236,5 +230,11 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
         capturedScale = Float.NaN
         capturedBackground = Color.Unspecified
         hasCapture = false
+    }
+
+    override fun releaseResources() {
+        releaseCapture()
+        renderer?.release()
+        renderer = null
     }
 }

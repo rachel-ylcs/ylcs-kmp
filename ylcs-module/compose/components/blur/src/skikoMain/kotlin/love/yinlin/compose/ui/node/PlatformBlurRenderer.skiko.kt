@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
+import kotlinx.coroutines.Job
 import org.jetbrains.skia.BlendMode
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -22,6 +23,8 @@ internal actual fun createBlurRenderer(node: CompositionLocalConsumerModifierNod
 internal actual fun DrawScope.supportsBlur(): Boolean = true
 
 internal actual fun needsBlurInvalidationWorkaround(): Boolean = false
+
+internal actual fun BlurSourceNode.observeBlurWindow(): Job? = null
 
 internal class SkiaBlurRenderer : BlurRenderer {
     private var currentFilter: ImageFilter? = null

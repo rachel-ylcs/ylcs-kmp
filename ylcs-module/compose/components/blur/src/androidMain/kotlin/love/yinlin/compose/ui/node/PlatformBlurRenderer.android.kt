@@ -19,6 +19,7 @@ import android.graphics.RenderEffect as AndroidRenderEffect
 import android.graphics.Shader
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.asComposeRenderEffect
@@ -28,12 +29,15 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import love.yinlin.compose.components.blur.R
 import kotlin.math.abs
 
-
-@RequiresApi(31)
+@RequiresApi(Build.VERSION_CODES.S)
 internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer {
     private var noiseTexture: Bitmap? = null
     private var noiseShader: BitmapShader? = null
@@ -48,7 +52,7 @@ internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer 
 
         if (noiseFactor > 0f) {
             val noise = createNoiseShader(inputScale)
-            if (Build.VERSION.SDK_INT >= 33 && tintColor.alpha >= 0.005f) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && tintColor.alpha >= 0.005f) {
                 val shader = combinedShader ?: AndroidBlurShader().also { combinedShader = it }
                 return shader.create(effect, noise, noiseFactor, tintColor.toArgb()).asComposeRenderEffect()
             }
@@ -99,21 +103,32 @@ internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer 
     }
 }
 
-internal actual fun createBlurRenderer(node: CompositionLocalConsumerModifierNode): BlurRenderer =
-    if (Build.VERSION.SDK_INT >= 31) AndroidBlurRenderer(node.currentValueOf(LocalContext).applicationContext) else error("The Android blur renderer requires API 31.")
+internal actual fun createBlurRenderer(node: CompositionLocalConsumerModifierNode): BlurRenderer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) AndroidBlurRenderer(node.currentValueOf(LocalContext).applicationContext) else error("The Android blur renderer requires API 31.")
 
-internal actual fun DrawScope.supportsBlur(): Boolean = Build.VERSION.SDK_INT >= 31 && drawContext.canvas.nativeCanvas.isHardwareAccelerated
+internal actual fun DrawScope.supportsBlur(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && drawContext.canvas.nativeCanvas.isHardwareAccelerated
 
-internal actual fun needsBlurInvalidationWorkaround(): Boolean = Build.VERSION.SDK_INT == 31
+internal actual fun needsBlurInvalidationWorkaround(): Boolean = Build.VERSION.SDK_INT == Build.VERSION_CODES.S
 
-@Suppress("OVERRIDE_DEPRECATION")
+internal actual fun BlurSourceNode.observeBlurWindow(): Job? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
+
+    val window = currentValueOf(LocalWindowInfo)
+    return coroutineScope.launch {
+        snapshotFlow { window.isWindowFocused to window.containerSize }.drop(1).collect { invalidateCapture() }
+    }
+}
+
 internal actual fun registerBlurMemoryCallback(node: CompositionLocalConsumerModifierNode, onTrim: () -> Unit): DisposableHandle {
     val context = node.currentValueOf(LocalContext).applicationContext
     val callback = object : ComponentCallbacks2 {
         override fun onConfigurationChanged(newConfig: Configuration) = Unit
+        @Suppress("OVERRIDE_DEPRECATION")
         override fun onLowMemory() = onTrim()
-        override fun onTrimMemory(level: Int) = onTrim()
+        override fun onTrimMemory(level: Int) {
+            if (level < ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN || level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) onTrim()
+        }
     }
     context.registerComponentCallbacks(callback)
+
     return DisposableHandle { context.unregisterComponentCallbacks(callback) }
 }
