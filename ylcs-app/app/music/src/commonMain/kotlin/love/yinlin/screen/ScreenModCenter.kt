@@ -2,7 +2,6 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +13,6 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
@@ -25,46 +23,41 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.Pagination
-import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongFilter
-import love.yinlin.data.rachel.song.SongPreview
 
 @Stable
 class ScreenModCenter : Screen() {
     private val provider = RachelStatefulProvider()
 
-    private val pageSongs = object : Pagination<SongPreview, String, String>(
+    private val pageSongs = object : Pagination<Song, String, String>(
         default = "0",
         pageNum = APIConfig.MAX_PAGE_NUM
     ) {
-        override fun distinctValue(item: SongPreview): String = item.sid
-        override fun offset(item: SongPreview): String = item.sid
+        override fun distinctValue(item: Song): String = item.sid
+        override fun offset(item: Song): String = item.sid
     }
 
     private val gridState = LazyGridState()
 
     private suspend fun requestNewData(loading: Boolean) {
-        provider.withLoading(loading) {
-            gridState.requestScrollToItem(0)
-            pageSongs.newData(ApiSongGetSongs.requestNull(pageSongs.default, pageSongs.pageNum)!!.o1)
-        }
-    }
-
-    private suspend fun requestMoreData() {
-        ApiSongGetSongs.request(pageSongs.offset, pageSongs.pageNum) { pageSongs.moreData(it) }
+//        provider.withLoading(loading) {
+//            gridState.requestScrollToItem(0)
+//            pageSongs.newData(ApiSongGetSongs.requestNull(pageSongs.default, pageSongs.pageNum)!!.o1.also { println(it.toJsonString()) })
+//        }
     }
 
     private suspend fun requestFilterData(filter: SongFilter) {
-        provider.withLoading {
-            gridState.requestScrollToItem(0)
-            val result = ApiSongSearchFilter.requestNull(filter)!!.o1
-            pageSongs.newData(result)
-            pageSongs.canLoading = false
-            result.isNotEmpty()
-        }
+//        provider.withLoading {
+//            gridState.requestScrollToItem(0)
+//            val result = ApiSongSearchFilter.requestNull(filter)!!.o1
+//            pageSongs.newData(result)
+//            pageSongs.canLoading = false
+//            result.isNotEmpty()
+//        }
     }
 
     override val title: String = "工坊"
@@ -91,7 +84,7 @@ class ScreenModCenter : Screen() {
     }
 
     @Composable
-    private fun SongCard(song: SongPreview, status: Boolean, onClick: () -> Unit) {
+    private fun SongCard(song: Song, status: Boolean, onClick: () -> Unit) {
         Row(
             modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(Theme.padding.value),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
@@ -125,21 +118,21 @@ class ScreenModCenter : Screen() {
             provider = provider,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            PaginationGrid(
-                items = pageSongs.items,
-                key = { it.sid },
-                columns = GridCells.Adaptive(Theme.size.cell4),
-                state = gridState,
-                canRefresh = true,
-                canLoading = pageSongs.canLoading,
-                onRefresh = { requestNewData(false) },
-                onLoading = ::requestMoreData,
-                modifier = Modifier.fillMaxSize()
-            ) { song ->
-                SongCard(song = song, status = song.sid in DataSourceMusic.library, onClick = {
-                    navigate(::ScreenMusicDetails, song.sid)
-                })
-            }
+//            PaginationGrid(
+//                items = pageSongs.items,
+//                key = { it.sid },
+//                columns = GridCells.Adaptive(Theme.size.cell4),
+//                state = gridState,
+//                canRefresh = true,
+//                canLoading = pageSongs.canLoading,
+//                onRefresh = { requestNewData(false) },
+//                onLoading = ::requestMoreData,
+//                modifier = Modifier.fillMaxSize()
+//            ) { song ->
+//                SongCard(song = song, status = song.sid in DataSourceMusic.library, onClick = {
+//                    navigate(::ScreenMusicDetails, song.sid)
+//                })
+//            }
         }
     }
 

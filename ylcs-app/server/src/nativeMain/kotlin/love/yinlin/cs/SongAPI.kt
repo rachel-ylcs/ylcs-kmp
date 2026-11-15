@@ -5,18 +5,11 @@ import love.yinlin.cs.service.throwExecuteSQL
 import love.yinlin.cs.service.throwQuerySQL
 import love.yinlin.cs.service.values
 import love.yinlin.data.rachel.profile.UserPrivilege
-import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.extension.to
 
 fun ServerScope.songAPI() {
-    ApiSongGetSongs.response { sid, num ->
-        val songs = mysql.throwQuerySQL("""
-			SELECT sid, version, name
-			FROM song
-            WHERE sid > ?
-			ORDER BY sid
-			LIMIT ?
-		""", sid, num.coercePageNum)
+    ApiSongGetSongLibrary.response { sid ->
+        val songs = mysql.throwQuerySQL("SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment FROM song", sid)
         result(songs.to())
     }
 
@@ -27,74 +20,6 @@ fun ServerScope.songAPI() {
             WHERE sid = ?
         """, sid)
         if (song == null) failure("此歌曲未收录") else result(song.to())
-    }
-
-    ApiSongSearchSongs.response { key ->
-        val songs = mysql.throwQuerySQL("""
-			SELECT sid, version, name
-			FROM song
-            WHERE name LIKE ?
-			ORDER BY sid
-		""", "%${key}%")
-        result(songs.to())
-    }
-
-    ApiSongSearchSongsByAlbum.response { album ->
-        val songs = mysql.throwQuerySQL("""
-            SELECT sid, version, name
-            FROM song
-            WHERE album = ?
-            ORDER BY sid
-        """, album)
-        result(songs.to())
-    }
-
-    ApiSongSearchFilter.response { filter ->
-        val args: MutableList<Any> = []
-        val sql = buildString {
-            append("SELECT sid, version, name FROM song WHERE 1=1")
-
-            val key = filter.key
-            if (key != null) {
-                append(" AND name LIKE ?")
-                args.add("%$key%")
-            }
-
-            val singer = filter.singer
-            if (singer != null) {
-                append(" AND FIND_IN_SET(?, singer) > 0")
-                args.add(singer)
-            }
-
-            val lyricist = filter.lyricist
-            if (lyricist != null) {
-                append(" AND FIND_IN_SET(?, lyricist) > 0")
-                args.add(lyricist)
-            }
-
-            val composer = filter.composer
-            if (composer != null) {
-                append(" AND FIND_IN_SET(?, composer) > 0")
-                args.add(composer)
-            }
-
-            val album = filter.album
-            if (album != null) {
-                append(" AND album = ?")
-                args.add(album)
-            }
-
-            if (filter.useAnimation) append(" AND animation = 1")
-            if (filter.useVideo) append(" AND video = 1")
-            if (filter.useRhyme) append(" AND rhyme = 1")
-            if (filter.useAccompaniment) append(" AND accompaniment = 1")
-
-            append(" ORDER BY sid ASC")
-        }
-
-        val songs: List<SongPreview> = if (args.isEmpty() && !filter.useAnimation && !filter.useVideo && !filter.useRhyme && !filter.useAccompaniment) [] else mysql.throwQuerySQL(sql, *args.toTypedArray()).to()
-
-        result(songs)
     }
 
     ApiSongGetSongComments.response { sid, cid, num ->

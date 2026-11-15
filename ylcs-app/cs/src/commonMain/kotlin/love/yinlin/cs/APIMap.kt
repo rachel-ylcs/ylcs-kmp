@@ -2,7 +2,6 @@ package love.yinlin.cs
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.annotation.DeprecatedApi
 import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.concert.Concert
@@ -25,7 +24,6 @@ import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
-import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.Topic
@@ -37,7 +35,6 @@ import love.yinlin.data.rachel.prize.Prizedata
 import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.data.rachel.rhyme.RhymeUploadResult
-import love.yinlin.data.rachel.song.SongFilter
 
 // Common
 
@@ -402,23 +399,11 @@ val ApiTopicDeleteSubComment by API.post.i<String, Int, Int, Int, Int>().o()
 
 // Song
 
-@APIParam("sid", default = "0")
-@APIParam("num", default = "APIConfig.MAX_PAGE_NUM")
-val ApiSongGetSongs by API.post.i<String, Int>().o<List<SongPreview>>()
+@APIParam("sid")
+val ApiSongGetSongLibrary by API.post.i<String>().o<List<Song>>()
 
 @APIParam("sid")
 val ApiSongGetSong by API.post.i<String>().o<Song>()
-
-@DeprecatedApi("3.7.0")
-@APIParam("key")
-val ApiSongSearchSongs by API.post.i<String>().o<List<SongPreview>>()
-
-@DeprecatedApi("3.7.0")
-@APIParam("album")
-val ApiSongSearchSongsByAlbum by API.post.i<String>().o<List<SongPreview>>()
-
-@APIParam("filter")
-val ApiSongSearchFilter by API.post.i<SongFilter>().o<List<SongPreview>>()
 
 @APIParam("sid")
 @APIParam("cid", default = "0L")
@@ -435,7 +420,7 @@ val ApiSongSendSongComment by API.post.i<String, String, String>().o<Long>()
 @APIParam("cid")
 val ApiSongDeleteSongComment by API.post.i<String, Long>().o()
 
-// prize
+// Prize
 @APIParam("pid")
 @APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
 val ApiPrizeGetPrize by API.post.i<Int, Int>().o<List<Prize>>()
