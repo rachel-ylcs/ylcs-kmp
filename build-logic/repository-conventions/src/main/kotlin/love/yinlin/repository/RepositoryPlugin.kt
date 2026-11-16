@@ -36,6 +36,7 @@ class RepositoryPlugin @Inject constructor(private val objects: ObjectFactory) :
                 descriptors.addAll(descriptor.children)
             }
             target.gradle.lifecycle.beforeProject(ConfigureRepository(bytes, target.settingsDir.absolutePath, modulePaths, localProperties))
+            target.gradle.lifecycle.afterProject(ConfigureCommonizerDiagnostics())
         }
     }
 

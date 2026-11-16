@@ -17,6 +17,7 @@ plugins {
     signing
     id("org.gradle.crypto.checksum")
     id("love.yinlin.native-dokka") apply false
+    id("love.yinlin.native-vendor-diagnostics") apply false
 }
 
 val adaptationDirectory = buildFile.parentFile.canonicalFile
@@ -26,6 +27,9 @@ val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
 if (dokkaBuild) layout.buildDirectory.set(generation.resolve("build/dokka/skiko"))
 allprojects {
     tasks.configureEach { inputs.property("rachel.native.generation", generation.name) }
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        apply(plugin = "love.yinlin.native-vendor-diagnostics")
+    }
 }
 
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->

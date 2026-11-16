@@ -254,6 +254,11 @@ class NativeUpstreamSync(directory: File) {
                 val source = script.readText()
                 if (!source.startsWith(suppressWarnings)) script.writeText(suppressWarnings + source)
             }
+            val buildSrcSettings = staging.resolve("skiko/buildSrc/settings.gradle.kts")
+            val settings = buildSrcSettings.readText()
+            if (!Regex("(?m)^rootProject[.]name\\s*=").containsMatchIn(settings)) {
+                buildSrcSettings.writeText(settings + "\nrootProject.name = \"buildSrc\"\n")
+            }
             // The SDK is owned by source preparation and must survive Skiko's Gradle clean.
             val upstreamBuild = staging.resolve("skiko/rachel-upstream.gradle.kts")
             upstreamBuild.writeText(upstreamBuild.readText().replace(Regex("""(?m)^[ \t]*delete\(skiko\.dependenciesDir\)[ \t]*\r?\n"""), ""))

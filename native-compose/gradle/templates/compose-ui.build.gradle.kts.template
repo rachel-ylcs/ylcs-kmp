@@ -19,6 +19,7 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform") apply false
     alias(libs.plugins.composeCompiler) apply false
     id("love.yinlin.native-dokka") apply false
+    id("love.yinlin.native-vendor-diagnostics") apply false
 }
 
 val generation = rootDir.resolve("../../..").canonicalFile
@@ -58,6 +59,7 @@ subprojects {
     }
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        apply(plugin = "love.yinlin.native-vendor-diagnostics")
         extensions.configure<KotlinMultiplatformExtension> {
             jvmToolchain(__JAVA_VERSION__)
             compilerOptions {

@@ -35,6 +35,10 @@ kotlin {
     jvmToolchain(25)
 }
 
+tasks.jar {
+    manifest.attributes["Premain-Class"] = "love.yinlin.repository.CommonizerWarningFilter"
+}
+
 val versionResources = layout.buildDirectory.dir("generated/versionResources")
 val repositoryVersions = tasks.register<WriteProperties>("repositoryVersions") {
     description = "生成仓库版本号信息"

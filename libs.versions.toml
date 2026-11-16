@@ -73,7 +73,9 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
 # ----- [Gradle] ----- #
 
+gradle-plugin-kotlin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradle-plugin-kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 gradle-plugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradle-plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "cmp" }
 gradle-plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }

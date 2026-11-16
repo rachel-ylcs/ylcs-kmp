@@ -30,5 +30,6 @@ include(
     "repository-conventions",
     "native-bridge",
     "native-dokka",
+    "native-vendor-diagnostics",
     "native-publications"
 )
