@@ -23,28 +23,39 @@ private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatf
  * 应用 Compose Compiler 的模块则从自身及传递项目依赖中收集这些配置。
  */
 internal fun Project.configureComposeStability() {
-    val stabilityFiles = files({
-        layout.projectDirectory.dir("config").asFile
-    }).asFileTree.matching {
-        include("*.conf")
-    }
+    val stabilityDirectory = layout.projectDirectory.dir("config")
+    val stabilityFiles = stabilityDirectory.asFile.listFiles {
+        it.isFile && it.extension == "conf"
+    }?.map {
+        stabilityDirectory.file(it.name)
+    }.orEmpty()
+    val ownStabilityFiles = files(stabilityFiles)
 
     configurations.create(ComposeStabilityElements) {
         isCanBeConsumed = true
         isCanBeResolved = false
         attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(ComposeStabilityUsage))
-        outgoing.artifacts(stabilityFiles.elements)
+        outgoing.artifacts(ownStabilityFiles.elements)
     }
 
     pluginManager.withPlugin(ComposeCompilerPluginId) {
         val composeCompiler = extensions.getByType<ComposeCompilerGradlePluginExtension>()
-        composeCompiler.stabilityConfigurationFiles.from(stabilityFiles)
+        val allStabilityFiles = files(ownStabilityFiles)
+
+        // Compose Compiler 使用 ListProperty<RegularFile>，通过 Provider 保持依赖工件延迟解析。
+        composeCompiler.stabilityConfigurationFiles.addAll(
+            allStabilityFiles.elements.map { locations ->
+                locations.map { location ->
+                    layout.file(providers.provider { location.asFile }).get()
+                }
+            }
+        )
 
         // Android / Kotlin JVM 等非 KMP 模块的编译 classpath。
         if (!pluginManager.hasPlugin(KotlinMultiplatformPluginId)) {
             configurations.configureEach {
                 if (isCanBeResolved && name.endsWith("compileClasspath", ignoreCase = true)) {
-                    composeCompiler.stabilityConfigurationFiles.from(
+                    allStabilityFiles.from(
                         this@configureComposeStability.composeStabilityFiles(this)
                     )
                 }
@@ -61,7 +72,7 @@ internal fun Project.configureComposeStability() {
                         it.name == compileConfigurationName
                     }.configureEach {
                         if (isCanBeResolved) {
-                            composeCompiler.stabilityConfigurationFiles.from(
+                            allStabilityFiles.from(
                                 this@configureComposeStability.composeStabilityFiles(this)
                             )
                         }
