@@ -10,6 +10,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 private const val ComposeStabilityUsage = "rachel-compose-stability"
 private const val ComposeStabilityElements = "rachelComposeStabilityElements"
@@ -43,9 +44,14 @@ internal fun Project.configureComposeStability() {
             stabilityFiles.from(ownStabilityFiles)
         }
 
-        // The compiler receives only the task output provider. Project artifact views are resolved
-        // by the task at execution time, after every project has completed configuration.
-        composeCompiler.stabilityConfigurationFiles.add(collectTask.flatMap { it.outputFile })
+        // Pass only the output location to the compiler plugin. Its option mapper reads this
+        // provider while configuring compile tasks, so it must not carry the producer task dependency.
+        composeCompiler.stabilityConfigurationFiles.add(collectTask.flatMap { it.outputFile.locationOnly })
+
+        // Preserve the producer/consumer ordering explicitly instead of through the compiler option.
+        tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
+            dependsOn(collectTask)
+        }
 
         if (pluginManager.hasPlugin(KotlinMultiplatformPluginId)) {
             val kotlin = extensions.getByType<KotlinMultiplatformExtension>()
