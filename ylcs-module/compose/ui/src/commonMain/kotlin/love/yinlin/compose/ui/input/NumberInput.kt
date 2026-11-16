@@ -58,6 +58,7 @@ import love.yinlin.compose.ui.text.Text
  *
  * @param padding 数字与方格边框之间的内部留白
  * @param gap 相邻方格之间的距离
+ * @param mask 非空时用该字符显示已输入的数字，并切换为数字密码键盘；状态仍保存真实数字
  * @param onImeClick 与普通 Input 相同，返回 true 时执行 IME 默认动作
  */
 @Composable
@@ -70,6 +71,7 @@ fun NumberInput(
     gap: Dp = Theme.padding.e,
     activeColor: Color = Theme.color.primary,
     fullColor: Color = Theme.color.warning,
+    mask: Char? = null,
     onImeClick: (() -> Boolean)? = null,
 ) {
     require(maxNum in 2 .. 8) { "NumberInput maxNum must be between 2 and 8" }
@@ -138,7 +140,7 @@ fun NumberInput(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = value.getOrNull(index)?.toString() ?: "",
+                        text = value.getOrNull(index)?.let { (mask ?: it).toString() } ?: "",
                         style = style,
                         color = if (style.color == Color.Unspecified) Theme.color.onBackground else style.color,
                         maxLines = 1
@@ -182,9 +184,9 @@ fun NumberInput(
                 },
             textStyle = style.copy(color = Color.Transparent),
             inputTransformation = transformation,
-            keyboardOptions = remember(state.imeAction) {
+            keyboardOptions = remember(state.imeAction, mask) {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.NumberPassword,
+                    keyboardType = if (mask == null) KeyboardType.Number else KeyboardType.NumberPassword,
                     autoCorrectEnabled = false,
                     imeAction = state.imeAction
                 )
