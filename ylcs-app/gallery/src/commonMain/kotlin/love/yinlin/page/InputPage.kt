@@ -123,7 +123,7 @@ object InputPage : Page(
 
                     Example("4 位 · 内部留白与格间距") {
                         val state = rememberNumberInputState("42")
-                        NumberInput(state = state, maxNum = 4, padding = Theme.padding.h, gap = Theme.padding.h)
+                        NumberInput(state = state, maxNum = 4, padding = Theme.padding.h, gap = Theme.padding.e)
                     }
 
                     Example("8 位 · 前导零") {
