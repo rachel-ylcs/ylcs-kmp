@@ -50,6 +50,7 @@ open class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     internal fun KotlinWebpackConfig.webpack() { webpackBlock(this) }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
+        configureComposeStability()
         with(extension) {
             js {
                 outputModuleName.set(uniqueModuleName)
