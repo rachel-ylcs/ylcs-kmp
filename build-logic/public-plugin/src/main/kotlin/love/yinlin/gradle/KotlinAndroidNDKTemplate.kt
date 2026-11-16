@@ -28,6 +28,7 @@ open class KotlinAndroidNDKTemplate : KotlinTemplate<KotlinAndroidExtension>() {
     internal fun LibraryExtension.android() { androidBlock(this) }
 
     final override fun Project.build(extension: KotlinAndroidExtension) {
+        configureComposeStability()
         with(extension) {
             compilerOptions {
                 useLanguageFeature()
