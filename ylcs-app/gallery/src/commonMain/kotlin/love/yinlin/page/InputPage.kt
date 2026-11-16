@@ -43,7 +43,7 @@ object InputPage : Page(
     group = PageGroup.Interaction,
 ) {
     private val demoButton = component("Button", "用填充、描边或文字按钮触发操作，耗时任务可显示加载状态。", "PrimaryButton SecondaryButton TertiaryButton OutlinedButton TextButton IconButton LoadingButton")
-    private val demoNumberInput = component("NumberInput", "每个格子输入一位数字，支持 2-8 位、末尾退格、焦点及满格提示。", "数字输入 验证码 NumberInputState 0-9 OTP")
+    private val demoNumberInput = component("NumberInput", "每个格子输入一位数字，支持 2-8 位、末尾退格、掩码显示、焦点及满格提示。", "数字输入 验证码 密码 掩码 NumberInputState 0-9 OTP")
     private val demoSwitch = component("Switch", "用于即时打开或关闭设置。", "开关")
     private val demoOptions = component("Choice", "从一组选项中单选或多选，复选框也支持部分选中。", "Radio CheckBox RadioGroup TriStateCheckBox", previewAlias = "Radio / CheckBox")
     private val demoSlider = component("Slider", "拖动滑块调整数值，支持自定义数值显示。", "滑块")
@@ -127,6 +127,12 @@ object InputPage : Page(
                         val state = rememberNumberInputState("0012")
                         NumberInput(state = state, maxNum = 8)
                         GalleryCaption("value: ${state.value}   number: ${state.number}")
+                    }
+
+                    Example("6 位 · 掩码") {
+                        val state = rememberNumberInputState("4829")
+                        NumberInput(state = state, mask = '●')
+                        GalleryCaption("真实 value: ${state.value}")
                     }
                 }
             }
