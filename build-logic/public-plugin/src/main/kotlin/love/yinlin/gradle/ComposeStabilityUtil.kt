@@ -23,13 +23,11 @@ private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatf
  * 应用 Compose Compiler 的模块则从自身及传递项目依赖中收集这些配置。
  */
 internal fun Project.configureComposeStability() {
-    val stabilityDirectory = layout.projectDirectory.dir("config")
-    val stabilityFiles = stabilityDirectory.asFile.listFiles {
-        it.isFile && it.extension == "conf"
-    }?.map {
-        stabilityDirectory.file(it.name)
-    }.orEmpty()
-    val ownStabilityFiles = files(stabilityFiles)
+    val ownStabilityFiles = files({
+        layout.projectDirectory.dir("config").asFile
+    }).asFileTree.matching {
+        include("*.conf")
+    }
 
     configurations.create(ComposeStabilityElements) {
         isCanBeConsumed = true
