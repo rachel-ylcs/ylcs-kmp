@@ -38,7 +38,7 @@ object InputPage : Page(
     icon = Icons.CheckBox,
     title = "输入",
     english = "Input",
-    description = "用按钮、选择控件和选择器收集用户输入。",
+    description = "用按钮、输入和选项控件收集用户输入。",
     keywords = "表单 控件",
     group = PageGroup.Interaction,
 ) {
