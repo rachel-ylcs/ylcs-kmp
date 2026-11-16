@@ -121,9 +121,9 @@ object InputPage : Page(
                         NumberInput(maxNum = 2)
                     }
 
-                    Example("4 位 · 自定义间距") {
+                    Example("4 位 · 内部留白与格间距") {
                         val state = rememberNumberInputState("42")
-                        NumberInput(state = state, maxNum = 4, padding = Theme.padding.h)
+                        NumberInput(state = state, maxNum = 4, padding = Theme.padding.h, gap = Theme.padding.h)
                     }
 
                     Example("8 位 · 前导零") {
