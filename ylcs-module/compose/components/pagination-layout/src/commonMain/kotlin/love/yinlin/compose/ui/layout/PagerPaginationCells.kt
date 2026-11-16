@@ -2,6 +2,7 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * PagerPagination 的列规格。
