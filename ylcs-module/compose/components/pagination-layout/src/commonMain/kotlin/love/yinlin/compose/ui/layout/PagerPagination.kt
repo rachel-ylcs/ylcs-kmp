@@ -49,7 +49,7 @@ import love.yinlin.compose.ui.text.Text
  * @param columns 固定列数或按最小单元宽度自适应列数。
  * @param maxRow 每页最多显示的行数。
  * @param state 分页状态，可读取当前页并通过 [PagerPaginationState.goToPage] 切换页面。
- * @param maxCount 页码条最多显示的页码项数量，包含省略号，最小为 5。
+ * @param maxCount 页码条最多显示的页码项数量，包含省略号，默认 10，最小为 5。
  * @param enable 是否允许切换页码；禁用时页码和左右箭头均不可操作。
  * @param contentPadding 数据网格内容区域的内边距，不作用于页码条。
  * @param horizontalPadding 同一行单元格之间的水平间距。
@@ -64,7 +64,7 @@ fun <T> PagerPagination(
     maxRow: Int,
     state: PagerPaginationState = rememberPagerPaginationState(),
     modifier: Modifier = Modifier,
-    maxCount: Int = 8,
+    maxCount: Int = 10,
     enable: Boolean = true,
     contentPadding: PaddingValues = PaddingValues.Zero,
     horizontalPadding: Dp = Theme.padding.h,

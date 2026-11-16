@@ -334,7 +334,6 @@ private fun PagerPaginationDemo() {
         columns = if (columnsMode == 0) PagerPaginationCells.Adaptive(Theme.size.cell3) else PagerPaginationCells.Fixed(3),
         maxRow = maxRow,
         state = state,
-        maxCount = 8,
         enable = enabled,
         contentPadding = Theme.padding.value10,
         horizontalPadding = Theme.padding.h,
