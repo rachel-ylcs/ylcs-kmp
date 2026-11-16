@@ -41,11 +41,13 @@ internal fun Project.configureComposeStability() {
         composeCompiler.stabilityConfigurationFiles.from(stabilityFiles)
 
         // Android / Kotlin JVM 等非 KMP 模块的编译 classpath。
-        configurations.configureEach {
-            if (isCanBeResolved && name.endsWith("compileClasspath", ignoreCase = true)) {
-                composeCompiler.stabilityConfigurationFiles.from(
-                    this@configureComposeStability.composeStabilityFiles(this)
-                )
+        if (!pluginManager.hasPlugin(KotlinMultiplatformPluginId)) {
+            configurations.configureEach {
+                if (isCanBeResolved && name.endsWith("compileClasspath", ignoreCase = true)) {
+                    composeCompiler.stabilityConfigurationFiles.from(
+                        this@configureComposeStability.composeStabilityFiles(this)
+                    )
+                }
             }
         }
 
