@@ -42,8 +42,8 @@ import love.yinlin.compose.ui.text.Text
 /**
  * 基于页码的分页网格。
  *
- * 该组件使用普通 Column/Row 组合当前页的有限数据，不创建内部滚动容器；
- * 单元格等宽，行高由该行内容的实际测量高度决定。
+ * 该组件使用 Grid 自动放置当前页的有限数据，不创建内部滚动容器；
+ * 显式定义等宽列轨道，行轨道按内容隐式生成。
  *
  * @param items 全部数据，组件根据其长度计算总页数。
  * @param columns 固定列数或按最小单元宽度自适应列数。
@@ -111,30 +111,20 @@ fun <T> PagerPagination(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
         ) {
-            Column(
+            Grid(
+                builder = {
+                    repeat(columnCount) { x(minmax(0.dp)) }
+                    s(horizontalPadding, verticalPadding)
+                },
                 modifier = Modifier.fillMaxWidth().padding(contentPadding),
-                verticalArrangement = Arrangement.spacedBy(verticalPadding),
             ) {
-                for ((rowIndex, rowItems) in pageItems.chunked(columnCount).withIndex()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(horizontalPadding),
-                        verticalAlignment = Alignment.Top,
-                    ) {
-                        for ((columnIndex, item) in rowItems.withIndex()) {
-                            val itemIndex = startIndex + rowIndex * columnCount + columnIndex
-                            composeKey(key?.invoke(item) ?: itemIndex) {
-                                Box(
-                                    modifier = Modifier.weight(1f),
-                                    propagateMinConstraints = true,
-                                ) {
-                                    itemContent(item)
-                                }
-                            }
-                        }
-
-                        repeat(columnCount - rowItems.size) {
-                            Spacer(Modifier.weight(1f))
+                for ((index, item) in pageItems.withIndex()) {
+                    composeKey(key?.invoke(item) ?: startIndex + index) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            propagateMinConstraints = true,
+                        ) {
+                            itemContent(item)
                         }
                     }
                 }
