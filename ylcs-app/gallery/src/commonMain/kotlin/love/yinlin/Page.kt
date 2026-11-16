@@ -34,9 +34,15 @@ abstract class Page internal constructor(
     val keywords: String,
     internal val group: PageGroup? = null,
 ) {
-    internal val components: List<ComponentItem> field = mutableListOf<ComponentItem>()
+    private val componentItems = mutableListOf<ComponentItem>()
+    internal val components: List<ComponentItem> get() = componentItems
 
-    internal fun component(title: String, description: String, keywords: String, previewAlias: String? = null): ComponentItem = ComponentItem(title, description, keywords, previewAlias).also { components.add(it) }
+    internal fun component(title: String, description: String, keywords: String, previewAlias: String? = null): ComponentItem {
+        val item = ComponentItem(title, description, keywords, previewAlias)
+        componentItems.add(item)
+        componentItems.sortBy { it.title.lowercase() }
+        return item
+    }
 
     @Composable
     abstract fun Content()

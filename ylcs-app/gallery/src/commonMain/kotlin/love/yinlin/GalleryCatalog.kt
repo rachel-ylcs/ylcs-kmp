@@ -5,27 +5,29 @@ import love.yinlin.page.*
 
 internal enum class PageGroup(val title: String, val description: String) {
     Foundation("设计基础", "界面配色、排版和文字样式。"),
-    Interaction("操作与反馈", "输入控件、导航和操作反馈。"),
+    Interaction("操作与反馈", "输入控件、选择器、导航和操作反馈。"),
     Layout("内容与布局", "布局容器、图片和数据展示。"),
 }
 
 internal object GalleryCatalog {
+    // 按基础程度组织侧边栏：主题与文字在前，交互和布局逐步深入，综合组件放在最后。
     val entries: List<Page> = [
         ThemePage,
         TextPage,
         InputPage,
+        PickerPage,
+        NavigationPage,
+        AnimationPage,
+        FloatingPage,
+        DragDropPage,
         PicturePage,
         ImagePage,
-        BlurPage,
-        AnimationPage,
         ContainerPage,
         LayoutPage,
-        PlatformViewPage,
         CollectionPage,
+        BlurPage,
         ReorderingPage,
-        DragDropPage,
-        NavigationPage,
-        FloatingPage,
+        PlatformViewPage,
         WidgetPage,
     ]
 

@@ -38,20 +38,18 @@ object InputPage : Page(
     icon = Icons.CheckBox,
     title = "输入",
     english = "Input",
-    description = "用按钮、选择控件和选择器收集用户输入。",
+    description = "用按钮、输入和选项控件收集用户输入。",
     keywords = "表单 控件",
     group = PageGroup.Interaction,
 ) {
     private val demoButton = component("Button", "用填充、描边或文字按钮触发操作，耗时任务可显示加载状态。", "PrimaryButton SecondaryButton TertiaryButton OutlinedButton TextButton IconButton LoadingButton")
+    private val demoNumberInput = component("NumberInput", "每个格子输入一位数字，支持 2-8 位、末尾退格、掩码显示、焦点及满格提示。", "数字输入 验证码 密码 掩码 NumberInputState 0-9 OTP")
     private val demoSwitch = component("Switch", "用于即时打开或关闭设置。", "开关")
     private val demoOptions = component("Choice", "从一组选项中单选或多选，复选框也支持部分选中。", "Radio CheckBox RadioGroup TriStateCheckBox", previewAlias = "Radio / CheckBox")
     private val demoSlider = component("Slider", "拖动滑块调整数值，支持自定义数值显示。", "滑块")
     private val demoStarBar = component("StarBar", "用整星或半星评分，再点一次可清除评分。", "星级 评分")
     private val demoComboBox = component("ComboBox", "从下拉列表中选择一项。", "下拉")
     private val demoFilter = component("Filter", "用标签筛选内容，支持单选和多选。", "筛选")
-    private val demoColorPicker = component("ColorPicker", "选择颜色并调整透明度。", "取色 透明度")
-    private val demoDatePicker = component("DatePicker", "按年、月浏览日历，点击选定日期。", "日期选择器 DatePickerState")
-    private val demoTimePicker = component("TimePicker", "滚动时分秒三列来选择时间。", "时间选择器 TimePickerState")
 
     @Composable
     override fun Content() {
@@ -100,6 +98,42 @@ object InputPage : Page(
                     TertiaryLoadingTextButton("辅助", modifier = sample, onClick = load)
                     PrimaryLoadingTextButton("带图标", icon = Icons.Home, modifier = sample, onClick = load)
                     PrimaryLoadingTextButton("已禁用", icon = Icons.Home, enabled = false, modifier = sample, onClick = {})
+                }
+            }
+
+            Component(demoNumberInput) {
+                ExampleRow {
+                    Example("6 位 · 输入中") {
+                        val state = rememberNumberInputState("12")
+                        NumberInput(state = state)
+                        GalleryCaption("value: ${state.value}   number: ${state.number}")
+                    }
+
+                    Example("6 位 · 已填满") {
+                        val state = rememberNumberInputState("482913")
+                        NumberInput(state = state)
+                    }
+
+                    Example("2 位 · 空") {
+                        NumberInput(maxNum = 2)
+                    }
+
+                    Example("4 位 · 内部留白与格间距") {
+                        val state = rememberNumberInputState("42")
+                        NumberInput(state = state, maxNum = 4, padding = Theme.padding.h, gap = Theme.padding.e)
+                    }
+
+                    Example("8 位 · 前导零") {
+                        val state = rememberNumberInputState("0012")
+                        NumberInput(state = state, maxNum = 8)
+                        GalleryCaption("value: ${state.value}   number: ${state.number}")
+                    }
+
+                    Example("6 位 · 掩码") {
+                        val state = rememberNumberInputState("4829")
+                        NumberInput(state = state, mask = '●')
+                        GalleryCaption("真实 value: ${state.value}")
+                    }
                 }
             }
 
@@ -314,24 +348,6 @@ object InputPage : Page(
                         )
                     }
                 }
-            }
-
-            Component(demoDatePicker) {
-                val state by rememberState { DatePickerState() }
-
-                DatePicker(state)
-                GalleryCaption(state.date?.toString() ?: "尚未选择日期")
-            }
-
-            Component(demoTimePicker) {
-                val state by rememberState { TimePickerState() }
-
-                TimePicker(state)
-                GalleryCaption(state.time.toString())
-            }
-
-            Component(demoColorPicker) {
-                ColorPicker(onColorChangeFinished = {})
             }
         }
     }
