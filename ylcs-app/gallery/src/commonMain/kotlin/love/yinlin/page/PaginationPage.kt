@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -35,6 +36,9 @@ import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationColumn
 import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.layout.PagerPagination
+import love.yinlin.compose.ui.layout.PagerPaginationCells
+import love.yinlin.compose.ui.layout.rememberPagerPaginationState
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Text
 
@@ -56,8 +60,8 @@ object PaginationPage : Page(
     )
     private val demoPagerPagination = component(
         title = "PagerPagination",
-        description = "预留给后续新增的基于页码的分页组件。",
-        keywords = "PagerPagination 页码分页",
+        description = "根据列数与最大行数计算每页容量，使用页码条切换数据页。",
+        keywords = "PagerPagination 页码分页 Fixed Adaptive maxRow maxCount",
         tabOrder = 1,
     )
 
@@ -69,8 +73,7 @@ object PaginationPage : Page(
             }
 
             Component(demoPagerPagination) {
-                GalleryBadge("待实现", Theme.color.secondary)
-                GalleryParagraph("这里预留给基于页码的分页组件 PagerPagination。下一阶段再补充组件 API、状态管理和交互示例。")
+                PagerPaginationDemo()
             }
         }
     }
@@ -266,5 +269,90 @@ private fun PaginationGridItem(item: PaginationDemoItem) {
         }
         Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         GalleryParagraph(item.summary)
+    }
+}
+
+
+@Stable
+private data class PagerPaginationDemoItem(
+    val id: Int,
+    val title: String,
+    val summary: String,
+)
+
+private val pagerPaginationDemoItems = List(137) { index ->
+    val id = index + 1
+    PagerPaginationDemoItem(
+        id = id,
+        title = ["布局与测量", "跨平台组件", "状态管理", "交互设计", "数据分页"][index % 5],
+        summary = when (index % 4) {
+            0 -> "等宽单元格，内容高度由自身决定。"
+            1 -> "当前页只组合有限数量的元素，不创建内部滚动容器。"
+            2 -> "固定列数或根据最小单元宽度自动计算列数。"
+            else -> "通过页码状态快速跳转到指定数据页。"
+        },
+    )
+}
+
+@Composable
+private fun PagerPaginationDemo() {
+    val state = rememberPagerPaginationState(initialPage = 7)
+    var columnsMode by remember { mutableIntStateOf(0) }
+    var maxRow by remember { mutableIntStateOf(2) }
+    var enabled by remember { mutableStateOf(true) }
+
+    GalleryParagraph("PagerPagination 根据列数和最大行数计算每页容量。单元格宽度始终相等，行高由该行内容决定；组件内部使用普通布局，不会与外层可滚动 Column 争夺滚动事件。")
+
+    GalleryActions {
+        GalleryBadge("第 ${state.currentPage} 页 / 共 ${state.pageCount} 页")
+        GalleryBadge(if (enabled) "允许切换" else "已禁用", if (enabled) Theme.color.primary else Theme.color.secondary)
+        TextButton("回到第一页", icon = Icons.Refresh) {
+            state.goToPage(1)
+        }
+        TextButton(if (enabled) "禁用分页" else "启用分页") {
+            enabled = !enabled
+        }
+    }
+
+    TabBar(
+        size = 2,
+        index = columnsMode,
+        onNavigate = { columnsMode = it },
+        titleProvider = { if (it == 0) "Adaptive" else "Fixed(3)" },
+        modifier = Modifier.fillMaxWidth(),
+    )
+
+    GalleryActions {
+        TextButton("最多 1 行") { maxRow = 1 }
+        TextButton("最多 2 行") { maxRow = 2 }
+        TextButton("最多 3 行") { maxRow = 3 }
+        GalleryBadge("maxRow = $maxRow", Theme.color.secondary)
+    }
+
+    PagerPagination(
+        items = pagerPaginationDemoItems,
+        columns = if (columnsMode == 0) PagerPaginationCells.Adaptive(Theme.size.cell3) else PagerPaginationCells.Fixed(3),
+        maxRow = maxRow,
+        state = state,
+        maxCount = 8,
+        enable = enabled,
+        contentPadding = Theme.padding.value10,
+        horizontalPadding = Theme.padding.h,
+        verticalPadding = Theme.padding.v,
+    ) { item ->
+        Column(
+            modifier = Modifier.fillMaxWidth().background(Theme.color.surface, Theme.shape.v8).padding(Theme.padding.value),
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.g),
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth().height((48 + item.id % 4 * 14).dp)
+                    .background(Theme.color.primaryContainer, Theme.shape.v8),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("ITEM ${item.id}", color = Theme.color.onContainer, fontWeight = FontWeight.SemiBold)
+            }
+            Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            GalleryParagraph(item.summary)
+        }
     }
 }
