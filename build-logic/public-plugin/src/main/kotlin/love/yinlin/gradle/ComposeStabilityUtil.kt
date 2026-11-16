@@ -18,10 +18,10 @@ private const val ComposeCompilerPluginId = "org.jetbrains.kotlin.plugin.compose
 private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatform"
 
 /**
- * 将模块自己的 Compose 稳定性配置发布为项目工件。
+ * 为 Compose Compiler 模块注册稳定性配置收集。
  *
- * 普通模块只发布 config 目录中的 .conf 文件，不需要应用 Compose Compiler；
- * 应用 Compose Compiler 的模块则通过独立任务收集自身及传递项目依赖中的配置。
+ * 普通模块无需应用 Compose Compiler；上层模块会沿项目依赖图读取其 config/*.conf；
+ * Compose Compiler 模块将自身及传递项目依赖中的配置合并后交给编译器。
  */
 internal fun Project.configureComposeStability() {
     val ownStabilityFiles = files({
@@ -88,7 +88,7 @@ private fun Project.composeStabilityFiles(configuration: Configuration): Provide
         configuration.incoming.resolutionResult.allComponents
             .asSequence()
             .mapNotNull { it.id as? ProjectComponentIdentifier }
-            .filter { it.build.isCurrentBuild && it.projectPath != currentProjectPath }
+            .filter { it.projectPath != currentProjectPath && it.projectPath in configDirectories }
             .flatMap { component ->
                 val directory = configDirectories[component.projectPath]
                 directory?.listFiles { file ->
