@@ -38,6 +38,8 @@ rachel {
 
         runs {
             nativeExecutable {
+                debug("serverRunDebug", "运行Debug服务端")
+                release("serverRunRelease", "运行Release服务端")
                 arguments = listOf("--cd=${C.root.work.server.asFile}")
             }
         }

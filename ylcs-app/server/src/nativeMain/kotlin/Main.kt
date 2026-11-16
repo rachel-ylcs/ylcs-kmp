@@ -4,13 +4,15 @@ import love.yinlin.cs.*
 import love.yinlin.cs.plugin.JsonPlugin
 import love.yinlin.cs.plugin.WebSocketPlugin
 import love.yinlin.cs.sockets.LyricsSocketsManager
+import love.yinlin.extension.IntNull
+import love.yinlin.extension.ObjectNull
 import love.yinlin.fs.File
 import kotlin.Long
 import kotlin.time.Duration.Companion.seconds
 
 fun main(args: Array<String>) = runBlocking {
     object : ServerEngine(args) {
-        override val port: Int = 1211
+        override val port: Int get() = config["server"].ObjectNull?.get("port")?.IntNull ?: 1211
 
         override val public: String = ServerRes.toString()
 

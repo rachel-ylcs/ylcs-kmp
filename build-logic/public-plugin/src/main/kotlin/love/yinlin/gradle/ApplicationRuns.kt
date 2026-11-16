@@ -49,7 +49,7 @@ class ApplicationRuns internal constructor(private val project: Project) {
     fun jvm(block: JvmRun.() -> Unit) {
         val run = JvmRun().apply(block)
         val nativeLibraries = if (run.buildDesktopNativeLibraries) project.providers.provider { project.desktopNativeLibraries() } else null
-        for ((mode, alias) in run.modes.ifEmpty { mapOf(RunMode.Debug to null) }) {
+        for ([mode, alias] in run.modes.ifEmpty { mapOf(RunMode.Debug to null) }) {
             val producer = project.tasks.named<JavaExec>(if (mode == RunMode.Debug) "run" else "runRelease")
             producer.configure {
                 if (nativeLibraries != null) dependsOn(nativeLibraries)
@@ -69,7 +69,7 @@ class ApplicationRuns internal constructor(private val project: Project) {
     fun nativeDesktop(block: ProcessRun.() -> Unit) {
         val run = ProcessRun().apply(block)
         val application = project.extensions.getByType<NativeApplicationExtension>()
-        for ((mode, alias) in run.modes.ifEmpty { RunMode.entries.associateWith { null } }) {
+        for ([mode, alias] in run.modes.ifEmpty { RunMode.entries.associateWith { null } }) {
             application.findHostRunTask(mode.nativeBuildType)?.configure {
                 arguments.addAll(run.arguments)
                 run.workingDirectory?.let { workingDirectory.fileValue(it) }
@@ -86,7 +86,7 @@ class ApplicationRuns internal constructor(private val project: Project) {
     fun nativeExecutable(block: ProcessRun.() -> Unit) {
         val run = ProcessRun().apply(block)
         val targets = project.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>()
-        for ((mode, alias) in run.modes.ifEmpty { RunMode.entries.associateWith { null } }) {
+        for ([mode, alias] in run.modes.ifEmpty { RunMode.entries.associateWith { null } }) {
             for (target in targets) {
                 val producer = target.binaries.findExecutable(mode.nativeBuildType)?.runTaskProvider ?: continue
                 producer.configure { configureNativeExecutable(run) }

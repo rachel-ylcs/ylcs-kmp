@@ -86,11 +86,16 @@ override val logger = ServerLogger(
 
 ## 构建任务
 
+在 IDEA 的 `Server` 运行配置组选择 `serverRunDebug` 或 `serverRunRelease`，也可从仓库根目录执行对应的 Gradle 任务：
+
 ```powershell
-.\gradlew.bat :ylcs-app:server:tasks --all
+.\gradlew.bat :ylcs-app:server:serverRunDebug
+.\gradlew.bat :ylcs-app:server:serverRunRelease
 ```
 
-`serverPublish` 明确依赖 Linux Release 链接任务 `linkReleaseExecutableLinux`，用于生成部署产物。开发任务的参数由 `ylcs-app/server/build.gradle.kts` 设置，当前会在非发布场景追加 `--cd`。
+两个任务启动当前宿主平台的对应构建版本，并通过 `runs.nativeExecutable` 传入 `--cd`，指向仓库的 `work/server`。使用 `./gradlew :ylcs-app:server:tasks --all` 可查看任务列表。
+
+`serverPublish` 复制 Linux Release 链接任务 `linkReleaseExecutableLinux` 的输出，用于部署。
 
 可执行文件需与目标操作系统及架构匹配。数据库、Redis、静态资源和外部代理属于部署依赖，不包含在单个可执行文件中。
 
