@@ -7,5 +7,6 @@ internal data class ComponentItem(
     val title: String,
     val description: String,
     val keywords: String,
-    val previewAlias: String? = null
+    val previewAlias: String? = null,
+    val tabOrder: Int? = null,
 )

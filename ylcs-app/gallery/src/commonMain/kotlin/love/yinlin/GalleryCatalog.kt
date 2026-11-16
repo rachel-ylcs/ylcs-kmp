@@ -7,6 +7,7 @@ internal enum class PageGroup(val title: String, val description: String) {
     Foundation("设计基础", "界面配色、排版和文字样式。"),
     Interaction("操作与反馈", "输入控件、选择器、导航和操作反馈。"),
     Layout("内容与布局", "布局容器、图片和数据展示。"),
+    Pagination("Pagination", "分页数据管理、下拉刷新与加载布局。"),
 }
 
 internal object GalleryCatalog {
@@ -29,6 +30,7 @@ internal object GalleryCatalog {
         ReorderingPage,
         PlatformViewPage,
         WidgetPage,
+        PaginationPage,
     ]
 
     private val allEntries: List<Page> = [OverviewPage] + entries
