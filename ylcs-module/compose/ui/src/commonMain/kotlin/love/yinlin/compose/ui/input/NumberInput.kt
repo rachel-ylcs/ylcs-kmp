@@ -43,6 +43,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.isSpecified
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.text.Text
 
