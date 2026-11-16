@@ -11,7 +11,6 @@ internal enum class PageGroup(val title: String, val description: String) {
 }
 
 internal object GalleryCatalog {
-    // 按基础程度组织侧边栏：主题与文字在前，交互和布局逐步深入，综合组件放在最后。
     val entries: List<Page> = [
         ThemePage,
         TextPage,

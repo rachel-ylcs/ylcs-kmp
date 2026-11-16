@@ -104,33 +104,33 @@ object InputPage : Page(
             Component(demoNumberInput) {
                 ExampleRow {
                     Example("6 位 · 输入中") {
-                        val state = rememberNumberInputState("12")
+                        val state = remember { NumberInputState("12") }
                         NumberInput(state = state)
                         GalleryCaption("value: ${state.value}   number: ${state.number}")
                     }
 
                     Example("6 位 · 已填满") {
-                        val state = rememberNumberInputState("482913")
+                        val state = remember { NumberInputState("482913") }
                         NumberInput(state = state)
                     }
 
                     Example("2 位 · 空") {
-                        NumberInput(maxNum = 2)
+                        NumberInput(state = remember { NumberInputState () }, maxNum = 2)
                     }
 
                     Example("4 位 · 内部留白与格间距") {
-                        val state = rememberNumberInputState("42")
+                        val state = remember { NumberInputState("42") }
                         NumberInput(state = state, maxNum = 4, padding = Theme.padding.h, gap = Theme.padding.e)
                     }
 
                     Example("8 位 · 前导零") {
-                        val state = rememberNumberInputState("0012")
+                        val state = remember { NumberInputState("0012") }
                         NumberInput(state = state, maxNum = 8)
                         GalleryCaption("value: ${state.value}   number: ${state.number}")
                     }
 
                     Example("6 位 · 掩码") {
-                        val state = rememberNumberInputState("4829")
+                        val state = remember { NumberInputState("4829") }
                         NumberInput(state = state, mask = '●')
                         GalleryCaption("真实 value: ${state.value}")
                     }

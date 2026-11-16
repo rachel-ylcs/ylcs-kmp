@@ -36,9 +36,6 @@ abstract class CollectComposeStabilityTask : DefaultTask() {
 
         val output = outputFile.get().asFile
         output.parentFile.mkdirs()
-        output.writeText(
-            if (lines.isEmpty()) "" else lines.joinToString(separator = "\n", postfix = "\n"),
-            Charsets.UTF_8
-        )
+        output.writeText(if (lines.isEmpty()) "" else lines.joinToString(separator = "\n", postfix = "\n"), Charsets.UTF_8)
     }
 }

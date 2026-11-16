@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -18,10 +17,7 @@ private const val ComposeCompilerPluginId = "org.jetbrains.kotlin.plugin.compose
 private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatform"
 
 /**
- * 为 Compose Compiler 模块注册稳定性配置收集。
- *
- * 普通模块无需应用 Compose Compiler；上层模块会沿项目依赖图读取其 config 目录中的 .conf 文件；
- * Compose Compiler 模块将自身及传递项目依赖中的配置合并后交给编译器。
+ * 为 Compose Compiler 模块注册稳定性配置收集
  */
 internal fun Project.configureComposeStability() {
     val ownStabilityFiles = files({
@@ -36,11 +32,8 @@ internal fun Project.configureComposeStability() {
             stabilityFiles.from(ownStabilityFiles)
         }
 
-        // Pass only the output location to the compiler plugin. Its option mapper reads this
-        // provider while configuring compile tasks, so it must not carry the producer task dependency.
         composeCompiler.stabilityConfigurationFiles.add(collectTask.flatMap { it.outputFile.locationOnly })
 
-        // Preserve the producer/consumer ordering explicitly instead of through the compiler option.
         tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
             dependsOn(collectTask)
         }
@@ -63,7 +56,6 @@ internal fun Project.configureComposeStability() {
                 }
             }
         } else {
-            // Android / Kotlin JVM modules expose their compile dependencies through compileClasspath.
             configurations.configureEach {
                 if (isCanBeResolved && name.endsWith("compileClasspath", ignoreCase = true)) {
                     val dependencyFiles = this@configureComposeStability.composeStabilityFiles(this)
@@ -77,8 +69,6 @@ internal fun Project.configureComposeStability() {
 }
 
 private fun Project.composeStabilityFiles(configuration: Configuration): Provider<Set<File>> {
-    // Capture only source directories here. Resolve the dependency graph lazily when the collector
-    // reads its inputs, then return plain files so Gradle does not add dependency compile tasks.
     val configDirectories = rootProject.allprojects.associate {
         it.path to it.layout.projectDirectory.dir("config").asFile
     }
