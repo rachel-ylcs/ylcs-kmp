@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
-import java.io.File
 
 class KotlinMultiplatformSourceSetsScope(
     p: Project,
@@ -473,11 +472,6 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 reportsDestination.set(composeCompilerOutput)
                 metricsDestination.set(composeCompilerOutput)
             }
-            val stabilityFileDir = layout.projectDirectory.dir("config")
-            val stabilityFiles = (stabilityFileDir.asFile.listFiles { it.extension == "conf" } ?: emptyArray<File>()).map {
-                stabilityFileDir.file(it.name)
-            }
-            if (stabilityFiles.isNotEmpty()) stabilityConfigurationFiles.addAll(stabilityFiles)
         }
 
         if (desktopTarget) registerDesktopProguard(extension.targets.getByName("desktop").compilations.getByName("main"))
