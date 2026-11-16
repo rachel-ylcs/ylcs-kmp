@@ -50,9 +50,6 @@ object InputPage : Page(
     private val demoStarBar = component("StarBar", "用整星或半星评分，再点一次可清除评分。", "星级 评分")
     private val demoComboBox = component("ComboBox", "从下拉列表中选择一项。", "下拉")
     private val demoFilter = component("Filter", "用标签筛选内容，支持单选和多选。", "筛选")
-    private val demoColorPicker = component("ColorPicker", "选择颜色并调整透明度。", "取色 透明度")
-    private val demoDatePicker = component("DatePicker", "按年、月浏览日历，点击选定日期。", "日期选择器 DatePickerState")
-    private val demoTimePicker = component("TimePicker", "滚动时分秒三列来选择时间。", "时间选择器 TimePickerState")
 
     @Composable
     override fun Content() {
@@ -347,23 +344,6 @@ object InputPage : Page(
                 }
             }
 
-            Component(demoDatePicker) {
-                val state by rememberState { DatePickerState() }
-
-                DatePicker(state)
-                GalleryCaption(state.date?.toString() ?: "尚未选择日期")
-            }
-
-            Component(demoTimePicker) {
-                val state by rememberState { TimePickerState() }
-
-                TimePicker(state)
-                GalleryCaption(state.time.toString())
-            }
-
-            Component(demoColorPicker) {
-                ColorPicker(onColorChangeFinished = {})
-            }
         }
     }
 
