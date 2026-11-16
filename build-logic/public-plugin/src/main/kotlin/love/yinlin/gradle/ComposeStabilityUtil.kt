@@ -20,7 +20,7 @@ private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatf
 /**
  * 为 Compose Compiler 模块注册稳定性配置收集。
  *
- * 普通模块无需应用 Compose Compiler；上层模块会沿项目依赖图读取其 config/*.conf；
+ * 普通模块无需应用 Compose Compiler；上层模块会沿项目依赖图读取其 config 目录中的 .conf 文件；
  * Compose Compiler 模块将自身及传递项目依赖中的配置合并后交给编译器。
  */
 internal fun Project.configureComposeStability() {
