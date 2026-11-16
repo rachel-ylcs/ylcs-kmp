@@ -343,7 +343,6 @@ object InputPage : Page(
                     }
                 }
             }
-
         }
     }
 
