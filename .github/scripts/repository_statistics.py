@@ -657,7 +657,8 @@ def fmt_bytes(value: int) -> str:
 
 
 def markdown_report(data: dict) -> str:
-    summary, lines = data["summary"], [
+    summary = data["summary"]
+    lines = [
         "# Repository Statistics", "", f"> Generated: {data['generated_at']}  ",
         f"> Revision: {data['revision'][:12]} · Branch: {data['branch']}", "",
         "## Overview", "", "| Metric | Value |", "|---|---:|",
