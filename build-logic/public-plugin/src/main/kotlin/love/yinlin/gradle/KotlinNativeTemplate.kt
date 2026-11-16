@@ -93,7 +93,6 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
     open fun KotlinNativeTarget.baseNative() { native() }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
-        configureComposeStability()
         with(extension) {
             compilerOptions {
                 useLanguageFeature()
