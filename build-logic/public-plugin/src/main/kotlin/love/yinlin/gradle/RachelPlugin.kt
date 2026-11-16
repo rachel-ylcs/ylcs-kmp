@@ -11,6 +11,5 @@ class RachelPlugin : Plugin<Project> {
             target.extensions.add("rachelDefaults", BuildDefaults())
         }
         target.extensions.add("rachel", RachelExtension(target))
-        target.configureComposeStability()
     }
 }
