@@ -1,0 +1,75 @@
+name: Repository Statistics
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ylcs-app/**'
+      - 'ylcs-module/**'
+      - 'build-logic/**'
+      - 'ylcs-docs/**'
+      - 'native-compose/adaptation/**'
+      - '.github/scripts/repository_statistics.py'
+      - '.github/workflows/statistics.yml'
+      - '.gitmodules'
+      - '.gitignore'
+      - 'settings.gradle.kts'
+      - 'libs.versions.toml'
+      - 'gradle.properties'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ylcs-app/**'
+      - 'ylcs-module/**'
+      - 'build-logic/**'
+      - 'ylcs-docs/**'
+      - 'native-compose/adaptation/**'
+      - '.github/scripts/repository_statistics.py'
+      - '.github/workflows/statistics.yml'
+      - '.gitmodules'
+      - '.gitignore'
+      - 'settings.gradle.kts'
+      - 'libs.versions.toml'
+      - 'gradle.properties'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-statistics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  statistics:
+    name: Generate repository reports
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Generate Markdown, JSON and HTML reports
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python .github/scripts/repository_statistics.py \
+            --output-dir build/statistic \
+            --step-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: repository-statistics
+          path: build/statistic/
+          if-no-files-found: error
+          retention-days: 30
