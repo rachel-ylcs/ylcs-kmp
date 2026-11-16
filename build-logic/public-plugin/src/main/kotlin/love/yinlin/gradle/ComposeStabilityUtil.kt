@@ -8,6 +8,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
