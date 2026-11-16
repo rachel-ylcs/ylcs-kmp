@@ -264,6 +264,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     internal fun KotlinNativeTarget.native() { nativeBlock(this) }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
+        configureComposeStability()
         val exportResources = hasKMPResources
 
         composeDesktopPackageBlock?.let { block ->
