@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
@@ -109,6 +110,19 @@ fun NumberInput(
         }
     }
 
+    val keyboardOptions = remember(state.imeAction, mask) {
+        KeyboardOptions(
+            keyboardType = if (mask == null) KeyboardType.Number else KeyboardType.NumberPassword,
+            autoCorrectEnabled = false,
+            imeAction = state.imeAction
+        )
+    }
+    val keyboardActionHandler = remember(onImeClick) {
+        KeyboardActionHandler { perform ->
+            if (onImeClick?.invoke() == true) perform()
+        }
+    }
+
     Box(
         modifier = modifier
             .hoverable(state.interactionSource)
@@ -150,55 +164,62 @@ fun NumberInput(
         }
 
         // IME 通道只有一个不可见的触点，既不会绘制文字，也无法被拖拽选中。
-        BasicSecureTextField(
-            state = state.rawState,
-            modifier = Modifier.align(Alignment.BottomEnd)
-                .size(Theme.border.v7)
-                .alpha(0f)
-                .pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent(PointerEventPass.Initial)
-                            event.changes.forEach { it.consume() }
-                        }
+        val inputModifier = Modifier.align(Alignment.BottomEnd)
+            .size(Theme.border.v7)
+            .alpha(0f)
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        event.changes.forEach { it.consume() }
                     }
                 }
-                .focusRequester(focusRequester)
-                .onFocusChanged { if (it.isFocused) keyboard?.show() }
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+            }
+            .focusRequester(focusRequester)
+            .onFocusChanged { if (it.isFocused) keyboard?.show() }
+            .onPreviewKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
 
-                    when {
-                        event.isCtrlPressed || event.isMetaPressed -> true
-                        event.key == Key.Insert || (event.isShiftPressed && event.key == Key.F10) -> true
-                        event.isShiftPressed && event.key == Key.Delete -> true
-                        event.key == Key.DirectionLeft || event.key == Key.DirectionRight ||
-                            event.key == Key.DirectionUp || event.key == Key.DirectionDown ||
-                            event.key == Key.MoveHome || event.key == Key.MoveEnd -> true
-                        event.key == Key.Delete -> {
-                            state.deleteLast()
-                            true
-                        }
-                        else -> false
+                when {
+                    event.isCtrlPressed || event.isMetaPressed -> true
+                    event.key == Key.Insert || (event.isShiftPressed && event.key == Key.F10) -> true
+                    event.isShiftPressed && event.key == Key.Delete -> true
+                    event.key == Key.DirectionLeft || event.key == Key.DirectionRight ||
+                        event.key == Key.DirectionUp || event.key == Key.DirectionDown ||
+                        event.key == Key.MoveHome || event.key == Key.MoveEnd -> true
+                    event.key == Key.Delete -> {
+                        state.deleteLast()
+                        true
                     }
-                },
-            textStyle = style.copy(color = Color.Transparent),
-            inputTransformation = transformation,
-            keyboardOptions = remember(state.imeAction, mask) {
-                KeyboardOptions(
-                    keyboardType = if (mask == null) KeyboardType.Number else KeyboardType.NumberPassword,
-                    autoCorrectEnabled = false,
-                    imeAction = state.imeAction
-                )
-            },
-            onKeyboardAction = remember(onImeClick) {
-                KeyboardActionHandler { perform ->
-                    if (onImeClick?.invoke() == true) perform()
+                    else -> false
                 }
-            },
-            interactionSource = state.interactionSource,
-            cursorBrush = SolidColor(Color.Transparent),
-            textObfuscationMode = TextObfuscationMode.Hidden,
-        )
+            }
+
+        val inputTextStyle = style.copy(color = Color.Transparent)
+        if (mask == null) {
+            BasicTextField(
+                state = state.rawState,
+                modifier = inputModifier,
+                textStyle = inputTextStyle,
+                inputTransformation = transformation,
+                keyboardOptions = keyboardOptions,
+                onKeyboardAction = keyboardActionHandler,
+                interactionSource = state.interactionSource,
+                cursorBrush = SolidColor(Color.Transparent),
+            )
+        } else {
+            BasicSecureTextField(
+                state = state.rawState,
+                modifier = inputModifier,
+                textStyle = inputTextStyle,
+                inputTransformation = transformation,
+                keyboardOptions = keyboardOptions,
+                onKeyboardAction = keyboardActionHandler,
+                interactionSource = state.interactionSource,
+                cursorBrush = SolidColor(Color.Transparent),
+                textObfuscationMode = TextObfuscationMode.Hidden,
+                textObfuscationCharacter = mask,
+            )
+        }
     }
 }
