@@ -56,7 +56,8 @@ import love.yinlin.compose.ui.text.Text
  * 点击任意格子都聚焦整组输入；仅接受末尾单个数字的追加以及末尾单字符删除。
  * [state] 的初始内容不得超过 [maxNum]，可通过 [NumberInputState.value] 从外部重置。
  *
- * @param padding 相邻格子之间的距离
+ * @param padding 数字与方格边框之间的内部留白
+ * @param gap 相邻方格之间的距离
  * @param onImeClick 与普通 Input 相同，返回 true 时执行 IME 默认动作
  */
 @Composable
@@ -66,6 +67,7 @@ fun NumberInput(
     maxNum: Int = 6,
     style: TextStyle = Theme.typography.v5,
     padding: Dp = Theme.padding.e,
+    gap: Dp = Theme.padding.e,
     activeColor: Color = Theme.color.primary,
     fullColor: Color = Theme.color.warning,
     onImeClick: (() -> Boolean)? = null,
@@ -79,7 +81,7 @@ fun NumberInput(
     val lineHeight = if (style.lineHeight.isSpecified) style.lineHeight else {
         if (style.fontSize.isSpecified) style.fontSize else Theme.typography.v5.fontSize
     }
-    val cellSize = with(density) { lineHeight.toDp() } + Theme.padding.e * 2
+    val cellSize = with(density) { lineHeight.toDp() } + padding * 2
 
     val focusRequester = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -126,7 +128,7 @@ fun NumberInput(
         contentAlignment = Alignment.Center
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(padding),
+            horizontalArrangement = Arrangement.spacedBy(gap),
             verticalAlignment = Alignment.CenterVertically
         ) {
             for (index in 0 ..< maxNum) {
