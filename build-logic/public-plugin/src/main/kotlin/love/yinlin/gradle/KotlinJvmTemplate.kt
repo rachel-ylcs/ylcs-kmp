@@ -57,6 +57,7 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
     internal fun JavaApplication.application() { applicationBlock(this) }
 
     final override fun Project.build(extension: KotlinJvmExtension) {
+        configureComposeStability()
         extensions.configure<JavaPluginExtension> {
             sourceCompatibility = buildDefaults.jvm.compatibility
             targetCompatibility = buildDefaults.jvm.compatibility
