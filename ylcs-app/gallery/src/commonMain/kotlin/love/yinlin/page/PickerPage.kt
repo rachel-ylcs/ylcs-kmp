@@ -1,6 +1,7 @@
 package love.yinlin.page
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Stable
 import love.yinlin.GalleryCaption
 import love.yinlin.Page
