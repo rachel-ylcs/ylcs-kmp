@@ -4,17 +4,15 @@ import love.yinlin.gradle.task.CollectComposeStabilityTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
-import org.gradle.api.attributes.Usage
-import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
+import java.io.File
 
-private const val ComposeStabilityUsage = "rachel-compose-stability"
-private const val ComposeStabilityElements = "rachelComposeStabilityElements"
 private const val ComposeStabilityTaskName = "collectComposeStabilityConfigurations"
 private const val ComposeCompilerPluginId = "org.jetbrains.kotlin.plugin.compose"
 private const val KotlinMultiplatformPluginId = "org.jetbrains.kotlin.multiplatform"
@@ -30,13 +28,6 @@ internal fun Project.configureComposeStability() {
         layout.projectDirectory.dir("config").asFile
     }).asFileTree.matching {
         include("*.conf")
-    }
-
-    configurations.create(ComposeStabilityElements) {
-        isCanBeConsumed = true
-        isCanBeResolved = false
-        attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(ComposeStabilityUsage))
-        outgoing.artifacts(ownStabilityFiles.elements)
     }
 
     pluginManager.withPlugin(ComposeCompilerPluginId) {
@@ -85,11 +76,25 @@ internal fun Project.configureComposeStability() {
     }
 }
 
-@Suppress("UnstableApiUsage")
-private fun Project.composeStabilityFiles(configuration: Configuration): FileCollection =
-    configuration.incoming.artifactView {
-        isLenient = true
-        componentFilter { it is ProjectComponentIdentifier }
-        withVariantReselection()
-        attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(ComposeStabilityUsage))
-    }.files
+private fun Project.composeStabilityFiles(configuration: Configuration): Provider<Set<File>> {
+    // Capture only source directories here. Resolve the dependency graph lazily when the collector
+    // reads its inputs, then return plain files so Gradle does not add dependency compile tasks.
+    val configDirectories = rootProject.allprojects.associate {
+        it.path to it.layout.projectDirectory.dir("config").asFile
+    }
+    val currentProjectPath = path
+
+    return providers.provider {
+        configuration.incoming.resolutionResult.allComponents
+            .asSequence()
+            .mapNotNull { it.id as? ProjectComponentIdentifier }
+            .filter { it.build.isCurrentBuild && it.projectPath != currentProjectPath }
+            .flatMap { component ->
+                val directory = configDirectories[component.projectPath]
+                directory?.listFiles { file ->
+                    file.isFile && file.extension.equals("conf", ignoreCase = true)
+                }?.asSequence() ?: emptySequence()
+            }
+            .toSet()
+    }
+}
