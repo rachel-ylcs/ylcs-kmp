@@ -35,6 +35,7 @@ rachel {
                     projects.ylcsModule.compose.components.picker,
                     projects.ylcsModule.compose.components.reordering,
                     projects.ylcsModule.compose.components.richText,
+                    projects.ylcsModule.compose.components.paginationLayout,
                 )
             }
 

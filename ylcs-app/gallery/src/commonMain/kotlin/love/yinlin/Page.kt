@@ -37,10 +37,10 @@ abstract class Page internal constructor(
     private val componentItems = mutableListOf<ComponentItem>()
     internal val components: List<ComponentItem> get() = componentItems
 
-    internal fun component(title: String, description: String, keywords: String, previewAlias: String? = null): ComponentItem {
-        val item = ComponentItem(title, description, keywords, previewAlias)
+    internal fun component(title: String, description: String, keywords: String, previewAlias: String? = null, tabOrder: Int? = null): ComponentItem {
+        val item = ComponentItem(title, description, keywords, previewAlias, tabOrder)
         componentItems.add(item)
-        componentItems.sortBy { it.title.lowercase() }
+        componentItems.sortWith(compareBy<ComponentItem> { it.tabOrder ?: Int.MAX_VALUE }.thenBy { it.title.lowercase() })
         return item
     }
 
