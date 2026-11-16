@@ -72,6 +72,7 @@ open class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
         selectReleaseApk(layout.buildDirectory.get().dir("outputs/apk/release").asFile, name)
 
     final override fun Project.build(extension: KotlinAndroidExtension) {
+        configureComposeStability()
         with(extension) {
             compilerOptions {
                 useLanguageFeature()
