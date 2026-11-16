@@ -26,6 +26,7 @@ class RachelExtension(private val project: Project) {
         check(!configured) { "Only one Rachel module template can be declared in ${project.path}." }
         configured = true
         project.pluginManager.apply(plugin)
+        project.configureComposeStability()
         val defaults = project.buildDefaults
         val namespace = defaults.namespace.ifEmpty { project.group.toString().takeUnless { it.isEmpty() || it == "unspecified" } ?: "project" }
         template.owner = project
