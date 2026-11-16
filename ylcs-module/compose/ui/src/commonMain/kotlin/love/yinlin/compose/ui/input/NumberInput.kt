@@ -29,9 +29,11 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -149,6 +151,14 @@ fun NumberInput(
             modifier = Modifier.align(Alignment.BottomEnd)
                 .size(Theme.border.v7)
                 .alpha(0f)
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                            event.changes.forEach { it.consume() }
+                        }
+                    }
+                }
                 .focusRequester(focusRequester)
                 .onFocusChanged { if (it.isFocused) keyboard?.show() }
                 .onPreviewKeyEvent { event ->
@@ -156,6 +166,8 @@ fun NumberInput(
 
                     when {
                         event.isCtrlPressed || event.isMetaPressed -> true
+                        event.key == Key.Insert || (event.isShiftPressed && event.key == Key.F10) -> true
+                        event.isShiftPressed && event.key == Key.Delete -> true
                         event.key == Key.DirectionLeft || event.key == Key.DirectionRight ||
                             event.key == Key.DirectionUp || event.key == Key.DirectionDown ||
                             event.key == Key.MoveHome || event.key == Key.MoveEnd -> true
