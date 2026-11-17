@@ -1,17 +1,23 @@
 package love.yinlin.screen
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,22 +26,30 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
-import love.yinlin.common.SleepTimer
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.ds.DataSourceMusic
@@ -43,34 +57,24 @@ import love.yinlin.compose.extension.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.floating.DialogModFactory
-import love.yinlin.compose.ui.floating.Menus
 import love.yinlin.compose.ui.floating.Sheet
-import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.compose.ui.input.LoadingTextButton
-import love.yinlin.compose.ui.input.PrimaryTextButton
-import love.yinlin.compose.ui.input.Slider
-import love.yinlin.compose.ui.input.SliderIntConverter
-import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.window.rememberFocusWindowState
+import love.yinlin.compose.ui.text.Text
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.startup.StartupMusicPlayer
-import kotlin.math.abs
 
 @Stable
 class ScreenMusic : BasicScreen() {
@@ -84,155 +88,111 @@ class ScreenMusic : BasicScreen() {
 
     private val blurState = BlurState()
 
+    private var sleepHour by mutableIntStateOf(0)
+    private var sleepMinutes by mutableIntStateOf(0)
+
     @Composable
-    private fun ToolLayout(player: StartupMusicPlayer, musicInfo: MusicInfo?, modifier: Modifier = Modifier) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
-        ) {
-            AnimationContent(
-                state = musicInfo?.name,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                SimpleEllipsisText(text = it ?: "无音源", color = Colors.Green4, style = Theme.typography.v4.bold)
+    private fun ResourceControl(text: String, icon: ImageVector, color: Color, horizontal: Boolean, onClick: () -> Unit) {
+        val modifier = Modifier.width(if (horizontal) Theme.size.image7 else Theme.size.input8).clip(Theme.shape.v7).clickable(onClick = onClick).padding(vertical = Theme.padding.v)
+
+        if (horizontal) {
+            Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(Theme.padding.v, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon = icon, color = color)
+                SimpleEllipsisText(text = text, style = Theme.typography.v8, color = color)
             }
-
-            ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth(),
-                left = {
-                    AnimationContent(musicInfo?.singer) {
-                        SimpleEllipsisText(text = it ?: "未知歌手", color = Colors.Green1, style = Theme.typography.v6)
-                    }
-                },
-                right = {
-                    Icon(
-                        icon = Icons.GifBox,
-                        tip = "动画",
-                        color = when {
-                            player.currentUseAnimationBackground -> Theme.color.primary
-                            player.currentHasAnimation -> Theme.color.secondary
-                            else -> LocalColor.current
-                        },
-                        onClick = {
-                            if (player.currentHasAnimation) player.currentUseAnimationBackground = !player.currentUseAnimationBackground
-                            else slot.tip.warning("未安装动画资源")
-                        }
-                    )
-                    Icon(
-                        icon = Icons.MusicNote,
-                        tip = "伴奏",
-                        color = if (player.currentHasAccompaniment) Theme.color.secondary else LocalColor.current,
-                        onClick = {
-                            if (musicInfo != null) {
-                                if (player.currentHasAccompaniment) {
-                                    launch {
-                                        player.pause()
-                                        navigate(::ScreenAccompaniment, musicInfo, player.engine.type)
-                                    }
-                                }
-                                else slot.tip.warning("未安装伴奏资源")
-                            }
-                        }
-                    )
-                    Icon(
-                        icon = Icons.MusicVideo,
-                        tip = "视频",
-                        color = if (player.currentHasVideo) Theme.color.secondary else LocalColor.current,
-                        onClick = {
-                            if (musicInfo != null) {
-                                if (player.currentHasVideo) {
-                                    launch {
-                                        player.pause()
-                                        navigate(::ScreenVideo, musicInfo.path(app.modPath, ModResourceType.Video).path)
-                                    }
-                                }
-                                else slot.tip.warning("未安装视频资源")
-                            }
-                        }
-                    )
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                var showMenu by rememberFalse()
-
-                TextButton(icon = Icons.LibraryMusic, text = "曲库", onClick = {
-                    navigate(::ScreenMusicLibrary)
-                })
-                TextButton(icon = Icons.QueueMusic, text = "歌单", onClick = {
-                    navigate(::ScreenPlaylistLibrary)
-                })
-                LoadingTextButton(icon = Icons.Token, text = "工坊", onClick = {
-                    when (modFactoryDialog.open()) {
-                        null -> {}
-                        DialogModFactory.ModResult.FromCenter -> navigate(::ScreenModCenter)
-                        DialogModFactory.ModResult.FromCreate -> navigate(::ScreenCreateMusic)
-                        DialogModFactory.ModResult.FromImport -> navigate(::ScreenImportMusic, null)
-                        DialogModFactory.ModResult.FromPlatform -> navigate(::ScreenPlatformMusic, null, null)
-                    }
-                })
-
-                Box(modifier = Modifier.weight(1f))
-
-                Menus(
-                    visible = showMenu,
-                    onClose = { showMenu = false },
-                    menus = {
-                        Menu(text = "歌词设置", icon = Icons.Lyrics, onClick = {
-                            navigate(::ScreenLyricsSettings)
-                        })
-                        Menu(text = "睡眠模式", icon = Icons.AlarmOn, onClick = {
-                            if (!player.isReady) slot.tip.warning("未启动播放器")
-                            else sleepModeSheet.open(player.sleepTimer)
-                        })
-                    }
-                ) {
-                    TextButton(text = "更多", icon = Icons.Add, onClick = { showMenu = true })
-                }
+        }
+        else {
+            Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                Icon(icon = icon, color = color)
+                SimpleEllipsisText(text = text, style = Theme.typography.v9, color = color)
             }
         }
     }
 
     @Composable
-    private fun MusicCover(player: StartupMusicPlayer, musicInfo: MusicInfo, modifier: Modifier = Modifier) {
-        var animationRecord by rememberRefState { Animatable(0f) }
-        var lastDegree by rememberValueState(0f)
-        val isFocus by rememberFocusWindowState()
-
-        LaunchedEffect(player.isPlaying, isFocus) {
-            if (player.isPlaying && isFocus) {
-                animationRecord.animateTo(
-                    targetValue = 360f + lastDegree,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(durationMillis = 15000, easing = LinearEasing),
-                        repeatMode = RepeatMode.Restart
-                    )
-                ) {
-                    lastDegree = this.value
+    private fun ToolLayout(player: StartupMusicPlayer, musicInfo: MusicInfo?, deviceType: Device.Type, modifier: Modifier = Modifier) {
+        Row(
+            modifier = modifier.clip(Theme.shape.circle)
+                .background(Theme.color.onSurface.copy(alpha = 0.06f))
+                .border(Theme.border.v10, Theme.color.onSurface.copy(alpha = 0.12f), Theme.shape.circle)
+                .clickable(enabled = musicInfo != null) { musicInfo?.then { navigate(::ScreenMusicDetails, it.id) } }
+                .padding(Theme.padding.value),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MusicCoverLayout(musicInfo, modifier = Modifier.size(Theme.size.image7))
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                AnimationContent(state = musicInfo?.name, modifier = Modifier.fillMaxWidth()) {
+                    SimpleEllipsisText(text = it ?: "无音源", color = Theme.color.onSurface, style = if (deviceType == Device.Type.LANDSCAPE) Theme.typography.v5.bold else Theme.typography.v6.bold)
+                }
+                AnimationContent(state = musicInfo?.singer, modifier = Modifier.fillMaxWidth()) {
+                    SimpleEllipsisText(text = it ?: "未知歌手", color = Theme.color.onSurfaceVariant, style = Theme.typography.v8)
                 }
             }
-            else {
-                animationRecord.snapTo(lastDegree)
-                animationRecord.stop()
-            }
+            Box(modifier = Modifier.width(Theme.border.v10).height(Theme.size.image8).background(Theme.color.outline.copy(alpha = 0.35f)))
+            ResourceControl(
+                text = "动画",
+                icon = Icons.GifBox,
+                horizontal = deviceType != Device.Type.PORTRAIT,
+                color = when {
+                    player.currentUseAnimationBackground -> Theme.color.secondary
+                    player.currentHasAnimation -> Theme.color.primary
+                    else -> Theme.color.onSurfaceVariant
+                },
+                onClick = {
+                    if (player.currentHasAnimation) player.currentUseAnimationBackground = !player.currentUseAnimationBackground
+                    else slot.tip.warning("未安装动画资源")
+                }
+            )
+            ResourceControl(
+                text = "伴奏",
+                icon = Icons.MusicNote,
+                horizontal = deviceType != Device.Type.PORTRAIT,
+                color = if (player.currentHasAccompaniment) Theme.color.secondary else Theme.color.onSurfaceVariant,
+                onClick = {
+                    if (musicInfo != null) {
+                        if (player.currentHasAccompaniment) {
+                            launch {
+                                player.pause()
+                                navigate(::ScreenAccompaniment, musicInfo, player.engine.type)
+                            }
+                        }
+                        else slot.tip.warning("未安装伴奏资源")
+                    }
+                }
+            )
+            ResourceControl(
+                text = "视频",
+                icon = Icons.MusicVideo,
+                horizontal = deviceType != Device.Type.PORTRAIT,
+                color = if (player.currentHasVideo) Theme.color.secondary else Theme.color.onSurfaceVariant,
+                onClick = {
+                    if (musicInfo != null) {
+                        if (player.currentHasVideo) {
+                            launch {
+                                player.pause()
+                                navigate(::ScreenVideo, musicInfo.path(app.modPath, ModResourceType.Video).path)
+                            }
+                        }
+                        else slot.tip.warning("未安装视频资源")
+                    }
+                }
+            )
         }
+    }
 
+    @Composable
+    private fun MusicCover(musicInfo: MusicInfo, modifier: Modifier = Modifier) {
         LocalFileImage(
             source = musicInfo.path(app.modPath, ModResourceType.Record),
             version = "${musicInfo.id}-${musicInfo.modification}",
             contentScale = ContentScale.Crop,
-            modifier = modifier.fastRotate(animationRecord),
-            onClick = {
-                navigate(::ScreenMusicDetails, musicInfo.id)
-            }
+            modifier = modifier
         )
     }
 
     @Composable
-    private fun MusicCoverLayout(player: StartupMusicPlayer, musicInfo: MusicInfo?, modifier: Modifier) {
+    private fun MusicCoverLayout(musicInfo: MusicInfo?, modifier: Modifier) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
             AnimationContent(
@@ -242,13 +202,204 @@ class ScreenMusic : BasicScreen() {
                 exit = { fadeOut(animationSpec = tween(it, delayMillis = it / 2)) },
                 modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().zIndex(2f)
             ) { info ->
-                if (info != null) {
-                    MusicCover(player, info, modifier = Modifier.fillMaxSize().border(
-                        width = Theme.border.v10,
-                        color = Theme.color.outline,
-                        shape = Theme.shape.circle
-                    ))
+                if (info != null) MusicCover(info, modifier = Modifier.fillMaxSize())
+            }
+        }
+    }
+
+    @Composable
+    private fun NavigationTile(text: String, modifier: Modifier = Modifier, icon: ImageVector, onClick: () -> Unit) {
+        Row(
+            modifier = modifier.clip(Theme.shape.v5)
+                .background(Theme.color.onSurface.copy(alpha = 0.06f))
+                .border(Theme.border.v10, Theme.color.onSurface.copy(alpha = 0.12f), Theme.shape.v5)
+                .clickable(onClick = onClick).padding(horizontal = Theme.padding.v, vertical = Theme.padding.v),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.v),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon = icon, color = Theme.color.primary)
+            SimpleEllipsisText(text = text, color = Theme.color.onSurface, style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
+        }
+    }
+
+    @Composable
+    private fun WorkshopEntry(text: String, icon: ImageVector, modifier: Modifier = Modifier, onClick: () -> Unit) {
+        Column(
+            modifier = modifier.clip(Theme.shape.v7)
+                .background(Theme.color.onSurface.copy(alpha = 0.06f))
+                .clickable(onClick = onClick).padding(horizontal = Theme.padding.g2, vertical = Theme.padding.g),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.g, Alignment.CenterVertically)
+        ) {
+            Icon(icon = icon, color = Theme.color.primary, modifier = Modifier.size(Theme.size.smallIcon))
+            Text(text = text, style = Theme.typography.v7.bold, color = Theme.color.onSurface, textAlign = TextAlign.Center, maxLines = 1)
+        }
+    }
+
+    @Composable
+    private fun NavigationLayout(deviceType: Device.Type, modifier: Modifier = Modifier) {
+        val covers = DataSourceMusic.library.values.take(4)
+
+        Row(
+            modifier = modifier.height(Theme.size.image5),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
+        ) {
+            Box(
+                modifier = Modifier.width(if (deviceType == Device.Type.LANDSCAPE) Theme.size.image3 else Theme.size.image4).fillMaxHeight().clip(Theme.shape.v5)
+                    .background(Theme.color.onSurface.copy(alpha = 0.06f))
+                    .border(Theme.border.v10, Theme.color.onSurface.copy(alpha = 0.12f), Theme.shape.v5)
+                    .clickable { navigate(::ScreenMusicLibrary) }.padding(Theme.padding.value)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(Theme.padding.v), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(icon = Icons.LibraryMusic, color = Theme.color.primary, modifier = Modifier.size(Theme.size.smallIcon))
+                    SimpleEllipsisText(text = "曲库", style = Theme.typography.v7.bold, color = Theme.color.onSurface)
                 }
+                if (covers.isNotEmpty()) {
+                    Box(modifier = Modifier.fillMaxWidth().height(if (deviceType == Device.Type.LANDSCAPE) Theme.size.image7 else Theme.size.image8).align(Alignment.BottomStart)) {
+                        for (index in covers.indices.reversed()) {
+                            val music = covers[index]
+                            LocalFileImage(
+                                source = music.path(app.modPath, ModResourceType.Record),
+                                version = music.modification.toString(),
+                                contentScale = ContentScale.Crop,
+                                alpha = 0.75f,
+                                modifier = Modifier.offset(x = Theme.padding.h10 * index).fillMaxHeight().aspectRatio(1f)
+                                    .clip(Theme.shape.v7).border(Theme.border.v10, Theme.color.onSurface.copy(alpha = 0.2f), Theme.shape.v7)
+                            )
+                        }
+                    }
+                }
+            }
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)) {
+                Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(Theme.padding.h10), verticalAlignment = Alignment.CenterVertically) {
+                    NavigationTile(text = "歌单", icon = Icons.QueueMusic, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenPlaylistLibrary) })
+                    NavigationTile(text = "歌词", icon = Icons.Lyrics, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenLyricsSettings) })
+                }
+
+                var workshopExpanded by rememberFalse()
+
+                AnimationContent(
+                    state = workshopExpanded,
+                    modifier = Modifier.fillMaxWidth().weight(1.5f).clip(Theme.shape.v7),
+                    enter = { duration -> slideInHorizontally(tween(duration)) { it } + fadeIn(tween(duration)) },
+                    exit = { duration -> slideOutHorizontally(tween(duration)) { -it } + fadeOut(tween(duration)) }
+                ) { expanded ->
+                    if (expanded) {
+                        Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(Theme.padding.e)) {
+                            WorkshopEntry(text = "银临", icon = Icons.Token, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenModCenter) })
+                            WorkshopEntry(text = "平台", icon = Icons.CloudDownload, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenPlatformMusic, null, null) })
+                            WorkshopEntry(text = "导入", icon = Icons.Upload, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenImportMusic, null) })
+                            WorkshopEntry(text = "创建", icon = Icons.DesignServices, modifier = Modifier.weight(1f).fillMaxHeight(), onClick = { navigate(::ScreenCreateMusic) })
+                        }
+                    }
+                    else NavigationTile(text = "工坊", icon = Icons.Token, modifier = Modifier.fillMaxSize(), onClick = { workshopExpanded = true })
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun TimeStepButton(icon: ImageVector, enabled: Boolean, onStep: () -> Unit) {
+        val currentOnStep by rememberUpdatedState(onStep)
+
+        Box(
+            modifier = Modifier.size(width = Theme.size.icon, height = Theme.size.input9).clip(Theme.shape.v7)
+                .pointerIcon(PointerIcon.Hand, enabled)
+                .pointerInput(enabled) {
+                    if (enabled) {
+                        detectTapGestures(onPress = {
+                            coroutineScope {
+                                var repeated = false
+                                val repeatJob = launch {
+                                    delay(viewConfiguration.longPressTimeoutMillis.milliseconds)
+                                    while (isActive) {
+                                        repeated = true
+                                        currentOnStep()
+                                        delay(100.milliseconds)
+                                    }
+                                }
+                                try {
+                                    if (tryAwaitRelease() && !repeated) currentOnStep()
+                                }
+                                finally { repeatJob.cancel() }
+                            }
+                        })
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon = icon, color = if (enabled) Theme.color.primary else Theme.color.disabledContent)
+        }
+    }
+
+    @Composable
+    private fun SleepTimeAdjuster(value: Int, range: IntRange, unit: String, enabled: Boolean, modifier: Modifier = Modifier, onValueChange: (Int) -> Unit) {
+        Row(
+            modifier = modifier.clip(Theme.shape.v7).background(Theme.color.onSurface.copy(alpha = 0.06f)).padding(horizontal = Theme.padding.v, vertical = Theme.padding.g),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.v),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TimeStepButton(icon = Icons.Remove, enabled = enabled && value > range.first, onStep = { onValueChange((value - 1).coerceIn(range)) })
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                SimpleEllipsisText(text = value.toString().padStart(2, '0'), style = Theme.typography.v7.bold, color = Theme.color.onSurface)
+                SimpleEllipsisText(text = unit, style = Theme.typography.v9, color = Theme.color.onSurfaceVariant)
+            }
+            TimeStepButton(icon = Icons.Add, enabled = enabled && value < range.last, onStep = { onValueChange((value + 1).coerceIn(range)) })
+        }
+    }
+
+    @Composable
+    private fun SleepLayout(player: StartupMusicPlayer, modifier: Modifier = Modifier) {
+        val timer = player.sleepTimer
+
+        Row(
+            modifier = modifier.clip(Theme.shape.v5)
+                .background(Theme.color.onSurface.copy(alpha = 0.06f))
+                .border(Theme.border.v10, Theme.color.onSurface.copy(alpha = 0.12f), Theme.shape.v5)
+                .padding(horizontal = Theme.padding.h, vertical = Theme.padding.v),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.v),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SimpleEllipsisText(text = "睡眠", style = Theme.typography.v7.bold, color = Theme.color.onSurface)
+            Icon(
+                icon = if (timer.isRunning) Icons.AlarmOff else Icons.AlarmOn,
+                tip = if (timer.isRunning) "停止睡眠定时" else "启动睡眠定时",
+                color = if (timer.isRunning) Theme.color.warning else Theme.color.primary,
+                enabled = player.isReady,
+                onClick = {
+                    if (timer.isRunning) timer.stop()
+                    else {
+                        val sleepTime = sleepHour * 3600 + sleepMinutes * 60
+                        if (sleepTime > 0) timer.start(sleepTime)
+                        else slot.tip.warning("未设定时间")
+                    }
+                }
+            )
+            if (timer.isRunning) {
+                SimpleEllipsisText(text = (timer.remainSeconds * 1000L).timeString, style = Theme.typography.v6.bold, color = Theme.color.secondary, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+            }
+            else {
+                Spacer(modifier = Modifier.weight(1f))
+                SleepTimeAdjuster(value = sleepHour, range = 0 .. 11, unit = "小时", enabled = player.isReady, onValueChange = { sleepHour = it })
+                SleepTimeAdjuster(value = sleepMinutes, range = 0 .. 59, unit = "分钟", enabled = player.isReady, onValueChange = { sleepMinutes = it })
+            }
+        }
+    }
+
+    @Composable
+    private fun FeatureLayout(player: StartupMusicPlayer, deviceType: Device.Type, scrollState: ScrollState, modifier: Modifier = Modifier) {
+        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)) {
+            NavigationLayout(deviceType = deviceType, modifier = Modifier.fillMaxWidth().weight(1f, false).verticalScroll(scrollState))
+            SleepLayout(player, modifier = Modifier.fillMaxWidth())
+        }
+    }
+
+    @Composable
+    private fun LyricsPanel(player: StartupMusicPlayer, modifier: Modifier = Modifier) {
+        if (player.isReady) LyricsLayout(player, modifier = modifier)
+        else {
+            Box(modifier = modifier, contentAlignment = Alignment.Center) {
+                SimpleEllipsisText(text = "从曲库选择一首歌", color = Theme.color.onSurfaceVariant)
             }
         }
     }
@@ -360,13 +511,15 @@ class ScreenMusic : BasicScreen() {
                     MediaPlayMode.Random -> Icons.ShuffleMode
                     else -> Icons.OrderMode
                 },
+                tip = "播放模式",
                 onClick = { player.switchPlayMode() }
             )
-            LoadingIcon(icon = Icons.GotoPrevious, color = Colors.Green1, onClick = { player.gotoPrevious() })
+            LoadingIcon(icon = Icons.GotoPrevious, color = Theme.color.primary, tip = "上一首", onClick = { player.gotoPrevious() })
             Box(
                 modifier = Modifier.wrapContentSize()
                     .fastClipCircle()
-                    .background(Colors.Green5).clickable {
+                    .background(Theme.color.secondaryContainer)
+                    .clickable {
                         launch {
                             if (player.isPlaying) player.pause()
                             else player.play()
@@ -376,19 +529,41 @@ class ScreenMusic : BasicScreen() {
             ) {
                 Icon(
                     icon = if (player.isPlaying) Icons.Pause else Icons.Play,
+                    color = Theme.color.onContainer,
                     modifier = Modifier.fastOffsetX { if (player.isPlaying) null else 1.5.dp.toPx() }
                 )
             }
-            LoadingIcon(icon = Icons.GotoNext, color = Colors.Green1, onClick = { player.gotoNext() })
-            Icon(icon = Icons.Playlist, onClick = {
+            LoadingIcon(icon = Icons.GotoNext, color = Theme.color.primary, tip = "下一首", onClick = { player.gotoNext() })
+            Icon(icon = Icons.Playlist, tip = "当前播放列表", onClick = {
                 if (player.isReady) currentPlaylistSheet.open()
             })
         }
     }
 
     @Composable
+    private fun PlaybackLayout(player: StartupMusicPlayer, musicInfo: MusicInfo?, horizontal: Boolean, modifier: Modifier = Modifier) {
+        if (horizontal) {
+            Row(
+                modifier = modifier.clip(Theme.shape.v4).background(Theme.color.onSurface.copy(alpha = 0.06f)).padding(Theme.padding.value),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MusicControlLayout(player, modifier = Modifier.width(Theme.size.cell1 * 1.5f))
+                MusicProgressLayout(player, musicInfo, modifier = Modifier.weight(1f))
+            }
+        }
+        else {
+            Column(modifier = modifier.padding(Theme.padding.value), verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                MusicProgressLayout(player, musicInfo, modifier = Modifier.fillMaxWidth())
+                MusicControlLayout(player, modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+
+    @Composable
     override fun BasicContent() {
         val player = requirePlayer() ?: return
+        val deviceType by rememberDeviceType()
 
         Theme.ThemeModeWrapper(true) {
             Box(modifier = Modifier.fillMaxSize().background(Theme.color.background)) {
@@ -402,6 +577,7 @@ class ScreenMusic : BasicScreen() {
                     if (musicInfo != null) {
                         val infoType = if (player.currentUseAnimationBackground) ModResourceType.Animation else ModResourceType.Background
                         val path = musicInfo.path(app.modPath, infoType)
+
                         LocalFileImage(
                             source = path,
                             version = path.path,
@@ -411,70 +587,49 @@ class ScreenMusic : BasicScreen() {
                     }
                 }
 
-                Column(
-                    modifier = Modifier.fillMaxSize().blurTarget(blurState, MusicBlurParameters).padding(LocalImmersivePadding.current).zIndex(2f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxSize().blurTarget(blurState, MusicBlurParameters).padding(LocalImmersivePadding.current).zIndex(2f)
                 ) {
-                    val deviceType by rememberDeviceType()
+                    val landscape = deviceType != Device.Type.PORTRAIT
+                    val minLyricsHeight = with(LocalDensity.current) { Theme.typography.v6.lineHeight.toDp() * 7 + Theme.typography.v5.lineHeight.toDp() } + Theme.padding.v * 16
+                    val horizontalPadding = if (deviceType == Device.Type.LANDSCAPE) Theme.padding.e9 else Theme.padding.h
+                    val maxFeatureWidth = (maxWidth - horizontalPadding * 2 - Theme.padding.h7 - Theme.size.cell2).coerceAtLeast(Theme.size.cell3)
+                    val featureWidth = (maxWidth * 0.5f).coerceIn(Theme.size.cell1 * 1.2f, Theme.size.cell1 * 1.8f).coerceAtMost(maxFeatureWidth)
+                    val featureScrollState = rememberScrollState()
+                    val spacing = if (deviceType == Device.Type.LANDSCAPE) Theme.padding.v5 else Theme.padding.v7
 
-                    ToolLayout(player, musicInfo, modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue7))
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(if (deviceType == Device.Type.LANDSCAPE) Theme.padding.eValue9 else Theme.padding.value),
+                        verticalArrangement = Arrangement.spacedBy(spacing)
+                    ) {
+                        ToolLayout(player, musicInfo, deviceType = deviceType, modifier = Modifier.fillMaxWidth())
 
-                    if (player.isReady) {
-                        if (deviceType == Device.Type.PORTRAIT) {
-                            MusicCoverLayout(player, musicInfo, modifier = Modifier
-                                .padding(Theme.padding.value5)
-                                .heightIn(max = Theme.size.image2)
-                                .aspectRatio(1f, matchHeightConstraintsFirst = true)
-                                .shadow(Theme.shape.circle, Theme.shadow.v3)
-                            )
-                            LyricsLayout(player, modifier = Modifier.fillMaxWidth().weight(1f))
-                        }
-                        else {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().weight(1f),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val isLandscape = deviceType == Device.Type.LANDSCAPE
-                                val padding = if (isLandscape) Theme.padding.eValue5 else Theme.padding.eValue7
-
-                                MusicCoverLayout(player, musicInfo, modifier = Modifier
-                                    .padding(padding)
-                                    .widthIn(max = if (isLandscape) Theme.size.image1 else Theme.size.image2)
-                                    .aspectRatio(1f)
-                                    .shadow(Theme.shape.circle, Theme.shadow.v3)
-                                )
-
-                                LyricsLayout(player, modifier = Modifier
-                                    .padding(padding)
-                                    .widthIn(max = if (isLandscape) Theme.size.cell1 * 1.5f else Theme.size.cell1)
+                        if (landscape) {
+                            Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7)) {
+                                FeatureLayout(player, deviceType = deviceType, scrollState = featureScrollState, modifier = Modifier
+                                    .width(featureWidth)
                                     .fillMaxHeight()
                                 )
+                                LyricsPanel(player, modifier = Modifier.weight(1f).fillMaxHeight())
                             }
                         }
-                    }
-                    else Box(modifier = Modifier.weight(1f))
+                        else {
+                            BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                                val featureMaxHeight = (maxHeight - minLyricsHeight - spacing).coerceAtLeast(Theme.size.input7)
 
-                    if (deviceType == Device.Type.LANDSCAPE) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue5),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            MusicControlLayout(player, modifier = Modifier.widthIn(min = Theme.size.cell1 * 1.5f).weight(1f))
-                            MusicProgressLayout(player, musicInfo, modifier = Modifier.weight(3f))
+                                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(spacing)) {
+                                    FeatureLayout(player, deviceType = deviceType, scrollState = featureScrollState, modifier = Modifier.fillMaxWidth().heightIn(max = featureMaxHeight))
+                                    LyricsPanel(player, modifier = Modifier.fillMaxWidth().weight(1f))
+                                }
+                            }
                         }
-                    }
-                    else {
-                        MusicProgressLayout(player, musicInfo, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
-                        MusicControlLayout(player, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value6))
+
+                        PlaybackLayout(player, musicInfo, horizontal = deviceType == Device.Type.LANDSCAPE, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
         }
     }
-
-    private val modFactoryDialog = this land DialogModFactory()
 
     private val currentPlaylistSheet = this land object : Sheet() {
         override val scrollable: Boolean = false
@@ -553,84 +708,6 @@ class ScreenMusic : BasicScreen() {
                                 }
                             }
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    private val sleepModeSheet = this land object : SheetContent<SleepTimer>() {
-        @Composable
-        override fun Content(args: SleepTimer) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-            ) {
-                var sleepHour by rememberValueState(0)
-                var sleepMinutes by rememberValueState(0)
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SimpleEllipsisText(text = "睡眠模式", style = Theme.typography.v6.bold, color = Theme.color.primary)
-                    PrimaryTextButton(
-                        text = if (args.isRunning) "停止" else "启动",
-                        icon = if (args.isRunning) Icons.AlarmOff else Icons.AlarmOn,
-                        onClick = {
-                            if (args.isRunning) args.stop()
-                            else {
-                                val sleepTime = sleepHour * 3600 + sleepMinutes * 60
-                                if (sleepTime > 0) args.start(sleepTime)
-                                else slot.tip.warning("未设定时间")
-                            }
-                        }
-                    )
-                }
-                if (args.isRunning) {
-                    SimpleEllipsisText(text = "关闭播放器倒计时")
-                    SimpleEllipsisText(
-                        text = (args.remainSeconds * 1000L).timeString,
-                        style = Theme.typography.v4.bold,
-                        color = Theme.color.secondary
-                    )
-                }
-                else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SimpleEllipsisText(
-                            text = "${sleepHour}小时",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Slider(
-                            value = sleepHour,
-                            converter = remember { SliderIntConverter(0, 11) },
-                            onValueChangeFinished = { sleepHour = it },
-                            modifier = Modifier.weight(3f)
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SimpleEllipsisText(
-                            text = "${sleepMinutes}分钟",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Slider(
-                            value = sleepMinutes,
-                            converter = remember { SliderIntConverter(0, 59) },
-                            onValueChangeFinished = { sleepMinutes = it },
-                            modifier = Modifier.weight(3f)
-                        )
                     }
                 }
             }
