@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.jvm.JvmInline
 
 @JvmInline
 @Stable
-value class GridLayoutBuilder(private val raw: GridConfigurationScope) {
+value class GridLayoutBuilder(private val raw: GridConfigurationScope) : Density by raw {
     private companion object {
         val Auto = Any()
         val Min = Any()
@@ -30,6 +31,10 @@ value class GridLayoutBuilder(private val raw: GridConfigurationScope) {
     val maxWidth get() = raw.constraints.maxWidth
     val minHeight get() = raw.constraints.minHeight
     val maxHeight get() = raw.constraints.maxHeight
+    val hasBoundedWidth get() = raw.constraints.hasBoundedWidth
+    val hasBoundedHeight get() = raw.constraints.hasBoundedHeight
+    val hasFixedWidth get() = raw.constraints.hasFixedWidth
+    val hasFixedHeight get() = raw.constraints.hasFixedHeight
 
     val auto get() = Auto
     val min get() = Min

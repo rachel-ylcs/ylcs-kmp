@@ -3,13 +3,17 @@ package love.yinlin.compose.ds
 import androidx.compose.runtime.*
 import androidx.compose.ui.util.fastFilter
 import love.yinlin.app
+import love.yinlin.common.DataBin
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.fs.File
+import love.yinlin.startup.StartupMusicPlayer
+import love.yinlin.tpl.music.PlatformMusicManager
 
 @Stable
 object DataSourceMusic {
@@ -36,20 +40,14 @@ object DataSourceMusic {
     // 更新歌单
     fun updatePlaylist(newPlaylist: Playlist) { playlist = newPlaylist }
 
-    /**
-     * 提取当前播放列表的媒体
-     *
-     * 可能会随着媒体变动从而更新与当前播放的列表不一致的结果
-     */
+    // 提取当前播放列表的媒体，可能会随着媒体变动从而更新与当前播放的列表不一致的结果
     fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
         is Playlist.None -> []
         is Playlist.Default -> library.values.map { it.id }
         is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: []
     }
 
-    /**
-     * 载入指定媒体的配置 并更新修改标记
-     */
+    // 载入指定媒体的配置 并更新修改标记
     suspend fun reloadMusicInfo(id: String): MusicInfo? {
         val modification = library[id]?.modification ?: 0
         val configPath = File(modPath, id, ModResourceType.Config.filename)
@@ -57,9 +55,7 @@ object DataSourceMusic {
         return info?.copy(modification = modification + 1)
     }
 
-    /**
-     * 载入所有指定媒体的配置 并更新修改标记
-     */
+    // 载入所有指定媒体的配置并更新修改标记
     suspend fun reloadMusicInfoMap(ids: Iterable<String>): Map<String, MusicInfo> = Coroutines.io {
         buildMap {
             for (id in ids) {
@@ -67,5 +63,15 @@ object DataSourceMusic {
                 if (info != null) put(id, info)
             }
         }
+    }
+
+    suspend fun importPlatformTrack(manager: PlatformMusicManager, track: PlatformMusicInfo) {
+        val id = manager.modId(track)
+        if (id in library) return
+        val info = manager.importTrack(track, app.cachePath, modPath, DataBin.BlackBackgroundPicture) ?: reloadMusicInfo(id) ?: return
+        val player = app.requireClassOrNull<StartupMusicPlayer>()
+        val reload = player?.checkReloadPlaylistByAdd(id)
+        library[id] = info
+        if (player != null && reload != null) player.reloadPlaylistByAdd(id, reload)
     }
 }

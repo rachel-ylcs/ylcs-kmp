@@ -201,6 +201,7 @@ class ScreenMusicLibrary : Screen() {
                 removeItem?.path(app.modPath)?.deleteRecursively()
             }
             resetLibrary()
+            slot.tip.success("成功删除${deleteItems.size}首歌曲")
         }
     }
 
@@ -295,8 +296,7 @@ class ScreenMusicLibrary : Screen() {
                     .fillMaxWidth()
                     .condition(musicInfo.selected) {
                         border(Theme.border.v4, Colors.Yellow4, Theme.shape.v5)
-                    }
-                    .shadow(Theme.shape.v5, Theme.shadow.v7)
+                    }.shadow(Theme.shape.v5, Theme.shadow.v7)
                     .clip(Theme.shape.v5)
                     .background(Theme.color.surface)
                     .combinedClickable(onClick = onClick, onLongClick = if (enableLongClick) onLongClick else null)
@@ -308,6 +308,7 @@ class ScreenMusicLibrary : Screen() {
                     alpha = 0.3f,
                     modifier = Modifier.matchParentSize().zIndex(1f)
                 )
+
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue).zIndex(2f),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)

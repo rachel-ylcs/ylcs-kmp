@@ -21,15 +21,8 @@ import love.yinlin.compose.ui.text.SimpleClipText
 
 class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
     @Stable
-    sealed interface ModResult {
-        @Stable
-        data object FromCenter : ModResult
-        @Stable
-        data object FromImport : ModResult
-        @Stable
-        data object FromCreate : ModResult
-        @Stable
-        data object FromPlatform : ModResult
+    enum class ModResult {
+        FromCenter, FromImport, FromCreate, FromPlatform;
     }
 
     @Composable

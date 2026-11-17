@@ -1,3 +1,5 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -22,6 +24,9 @@ rachel {
                     projects.ylcsModule.foundation.network,
 
                     libs.compose.runtime,
+
+                    ExportLib,
+                    projects.ylcsApp.mod,
                 )
             }
 

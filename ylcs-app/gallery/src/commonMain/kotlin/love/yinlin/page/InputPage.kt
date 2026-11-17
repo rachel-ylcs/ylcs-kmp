@@ -115,7 +115,7 @@ object InputPage : Page(
                     }
 
                     Example("2 位 · 空") {
-                        NumberInput(state = remember { NumberInputState () }, maxNum = 2)
+                        NumberInput(state = remember { NumberInputState() }, maxNum = 2)
                     }
 
                     Example("4 位 · 内部留白与格间距") {
