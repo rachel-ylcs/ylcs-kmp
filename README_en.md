@@ -4,18 +4,25 @@
     <h5></h5>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt=""/>
-        <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-iOS-lightgrey.svg?logo=apple" alt=""/>
         <img src="https://img.shields.io/badge/Platform-Windows-blue.svg?logo=esotericsoftware" alt=""/>
         <img src="https://img.shields.io/badge/Platform-Linux-red.svg?logo=linux" alt=""/>
-        <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-macOS-lightgrey.svg?logo=apple" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-JS-yellow.svg?logo=javascript" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-WASM-yellow.svg?logo=javascript" alt=""/>
         <img src="https://img.shields.io/badge/Platform-Server-orange.svg?logo=openjdk" alt=""/>
     </div>
     <h5></h5>
     <div>
         <img src="https://img.shields.io/github/v/tag/rachel-ylcs/ylcs-kmp" alt=""/>
         <img src="https://img.shields.io/github/v/release/rachel-ylcs/ylcs-kmp" alt=""/>
+        <br>
         <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg" alt=""/>
-        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/main.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/release.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/docs.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/publish.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/lint.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/statistics.yml/badge.svg" alt=""/>
     </div>
     <h5></h5>
 </div>
