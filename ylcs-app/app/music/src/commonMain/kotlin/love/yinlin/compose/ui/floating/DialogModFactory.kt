@@ -22,7 +22,7 @@ import love.yinlin.compose.ui.text.SimpleClipText
 class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
     @Stable
     enum class ModResult {
-        FromCenter, FromImport, FromCreate, FromPlatform;
+        FromCenter, FromImport, FromCreate, FromPlatform
     }
 
     @Composable

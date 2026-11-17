@@ -1,7 +1,6 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -11,11 +10,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import love.yinlin.annotation.LooseTyped
@@ -27,16 +24,16 @@ import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.UserBar
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.container.ThemeContainer
+import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.DialogCrop
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.DialogInput
@@ -48,28 +45,27 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.PrimaryLoadingButton
 import love.yinlin.compose.ui.input.PrimaryLoadingTextButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
-import love.yinlin.compose.ui.node.fastClipCircle
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.SelectionBox
-import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
-import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
-import love.yinlin.encoding.convert
 import love.yinlin.extension.*
-import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
@@ -91,7 +87,6 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
     private var clientSong: Song? by mutableRefStateOf(null)
     private var remoteSong: Song? by mutableRefStateOf(null)
-    private var lyrics: String? by mutableRefStateOf(null)
 
     private var modifyFlag by mutableLongStateOf(0L)
 
@@ -209,16 +204,16 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    private suspend fun onSendComment(content: String): Boolean = app.config.userProfile?.let { user ->
+    private suspend fun onSendComment(content: String): Boolean = app.config.userProfile?.let { (val uid, val name, val label, val exp) ->
         val err = ApiSongSendSongComment.request(app.config.userToken, sid, content) {
             pageComments.items += SongComment(
                 cid = it,
-                uid = user.uid,
+                uid = uid,
                 ts = DateEx.CurrentString,
                 content = content,
-                name = user.name,
-                label = user.label,
-                exp = user.exp
+                name = name,
+                label = label,
+                exp = exp
             )
         }.errorTip
         listState.requestScrollToItem(pageComments.items.size - 1)
@@ -243,35 +238,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             supervisorScope {
                 this.launch { remoteSong = requestRemoteSong() }
                 this.launch { requestNewSongComments() }
-                this.launch {
-                    lyrics = catchingNull {
-                        Coroutines.io {
-                            val lyricsText = if (currentClientSong == null) {
-                                NetClient.File.download(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.convert()
-                            }
-                            else {
-                                currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!
-                            }
-                            Lrc.parse(lyricsText).plainText
-                        }
-                    }
-                }
             }
         }
-    }
-
-    val resBrush = enumAssociateWith { type: ModResourceType ->
-        Brush.linearGradient(colors = when (type) {
-            ModResourceType.Config -> [Colors.Yellow5, Colors.Yellow6]
-            ModResourceType.Audio -> [Colors.Pink4, Colors.Pink5]
-            ModResourceType.Record -> [Colors.Purple4, Colors.Purple5]
-            ModResourceType.Background -> [Colors.Blue5, Colors.Blue6]
-            ModResourceType.LineLyrics -> [Colors.Green7, Colors.Green8]
-            ModResourceType.Animation -> [Colors.Orange5, Colors.Orange6]
-            ModResourceType.Video -> [Colors.Green5, Colors.Green6]
-            ModResourceType.Rhyme -> [Colors.Cyan5, Colors.Cyan6]
-            ModResourceType.Accompaniment -> [Colors.Red4, Colors.Red5]
-        })
     }
 
     val resIcon = enumAssociateWith { type: ModResourceType ->
@@ -283,15 +251,18 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             ModResourceType.LineLyrics -> Icons.Lyrics
             ModResourceType.Animation -> Icons.GifBox
             ModResourceType.Video -> Icons.Movie
-            ModResourceType.Rhyme -> Icons.MusicNote
+            ModResourceType.Rhyme -> Icons.Lyrics
             ModResourceType.Accompaniment -> Icons.MusicNote
         }
     }
 
     @Stable
-    private data class ResourceAction(val text: String, val icon: ImageVector, val action: (ResourceItem) -> Unit)
+    private data class ResourceButton(val text: String, val icon: ImageVector, val destructive: Boolean = false, val action: (ResourceItem) -> Unit)
 
-    private val resActionDelete = ResourceAction("删除", Icons.Delete) { item ->
+    @Stable
+    private data class ResourceAction(val buttons: List<ResourceButton> = [], val content: (@Composable (ResourceItem) -> Unit)? = null)
+
+    private val resActionDelete = ResourceButton("删除", Icons.Delete, destructive = true) { item ->
         launch {
             if (slot.confirm.open(content = "删除${item.type.description}资源")) {
                 clientResources.remove(item)
@@ -301,7 +272,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    private fun resActionReplaceImage(aspectRatio: Float) = ResourceAction("替换", Icons.Replace) { item ->
+    private fun resActionReplaceImage(aspectRatio: Float) = ResourceButton("替换", Icons.Replace) { item ->
         clientSong?.then { song ->
             launch {
                 app.picker.pickPicture()?.use { source ->
@@ -326,151 +297,211 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    private val resActionConfigEditor = ResourceAction("修改", Icons.Edit) {
+    private val resActionConfigEditor = ResourceButton("修改", Icons.Edit) {
         DataSourceMusic.library[sid]?.let(configSheet::open)
     }
 
-    private val resActionLyricsEditor = ResourceAction("编辑", Icons.Edit) {
+    private val resActionLyricsEditor = ResourceButton("编辑", Icons.Edit) {
         DataSourceMusic.library[sid]?.then { info ->
             launch { musicPlayer?.pause() }
             navigate(::ScreenLyricsEditor, info)
         }
     }
 
+    @Composable
+    private fun ResourceImagePreview(item: ResourceItem) {
+        LocalFileImage(
+            source = clientSong?.clientPath(item.type),
+            version = modifyFlag.toString(),
+            modifier = Modifier.fillMaxWidth().height(Theme.size.cell1 * 1.5f),
+            contentScale = ContentScale.Fit,
+            contentDescription = item.type.description,
+            options = ImageOptions.Zoom
+        )
+    }
+
+    @Composable
+    private fun ResourceLyricsPreview(item: ResourceItem) {
+        var text by rememberState(item, modifyFlag) { "正在读取歌词..." }
+
+        LaunchedEffect(item, modifyFlag) {
+            text = catchingNull {
+                Coroutines.io {
+                    val source = clientSong?.clientPath(item.type)?.readText() ?: error("歌词资源不存在")
+                    Lrc.parse(source).plainText
+                }
+            }?.ifBlank { "暂无歌词" } ?: "歌词读取失败"
+        }
+
+        SelectionBox {
+            Text(
+                text = text,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+            )
+        }
+    }
+
     private val resAction = enumAssociateWith { type: ModResourceType ->
         when (type) {
-            ModResourceType.Config -> [resActionConfigEditor]
-            ModResourceType.Audio -> []
-            ModResourceType.Record -> [resActionReplaceImage(1f)]
-            ModResourceType.Background -> [resActionReplaceImage(0.5625f)]
-            ModResourceType.LineLyrics -> [resActionLyricsEditor]
-            ModResourceType.Animation -> [resActionDelete]
-            ModResourceType.Video -> [resActionDelete]
-            ModResourceType.Rhyme -> [resActionDelete]
-            ModResourceType.Accompaniment -> [resActionDelete]
+            ModResourceType.Config -> ResourceAction(buttons = [resActionConfigEditor])
+            ModResourceType.Audio -> ResourceAction()
+            ModResourceType.Record -> ResourceAction(buttons = [resActionReplaceImage(1f)], content = { ResourceImagePreview(it) })
+            ModResourceType.Background -> ResourceAction(buttons = [resActionReplaceImage(0.5625f)], content = { ResourceImagePreview(it) })
+            ModResourceType.LineLyrics -> ResourceAction(buttons = [resActionLyricsEditor], content = { ResourceLyricsPreview(it) })
+            ModResourceType.Animation -> ResourceAction(buttons = [resActionDelete], content = { ResourceImagePreview(it) })
+            ModResourceType.Video -> ResourceAction(buttons = [resActionDelete])
+            ModResourceType.Rhyme -> ResourceAction(buttons = [resActionDelete])
+            ModResourceType.Accompaniment -> ResourceAction(buttons = [resActionDelete])
         }
     }
 
     @Composable
     override fun RowScope.RightActions() {
-        if (clientResources.isEmpty() && remoteSong != null) {
-            LoadingIcon(icon = Icons.Download, tip = "下载", onClick = {
-                if (app.config.userProfile == null) slot.tip.warning("请先登录")
-                else if (slot.confirm.open(content = "下载该MOD?")) launch { downloadMod() }
-            })
-        }
         Icon(icon = Icons.Share, tip = "分享", onClick = {
             slot.tip.info("敬请期待")
         })
     }
 
     private val detailsLayout = movableComposable { modifier: Modifier ->
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            val song = clientSong ?: remoteSong
+        val song = clientSong ?: remoteSong
 
-            clientSong?.let {
-                LocalFileImage(
-                    source = it.clientPath(ModResourceType.Background),
-                    version = modifyFlag.toString(),
-                    modifier = Modifier.matchParentSize().zIndex(1f),
-                    contentScale = ContentScale.Crop
-                )
-            } ?: remoteSong?.let {
-                WebImage(
-                    source = it.remotePath(ModResourceType.Background),
-                    modifier = Modifier.matchParentSize().zIndex(1f),
-                    contentScale = ContentScale.Crop
-                )
-            } ?: Box(modifier = Modifier.matchParentSize().background(Colors.Black).zIndex(1f))
-
-            Box(
-                modifier = Modifier.zIndex(2f),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Box(Modifier
-                    .size(Theme.size.image5)
-                    .fastClipCircle()
-                    .border(Theme.border.v5, Theme.color.secondary, Theme.shape.circle)
-                    .zIndex(2f)
-                ) {
-                    clientSong?.let {
-                        LocalFileImage(
-                            source = it.clientPath(ModResourceType.Record),
-                            version = modifyFlag.toString(),
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } ?: remoteSong?.let {
-                        WebImage(
-                            source = it.remotePath(ModResourceType.Record),
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } ?: Box(modifier = Modifier.fillMaxSize().background(Colors.Black))
+        Column(modifier = modifier.background(Theme.color.surface)) {
+            Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(Theme.color.backgroundVariant)) {
+                clientSong?.let {
+                    LocalFileImage(
+                        source = it.clientPath(ModResourceType.Record),
+                        version = modifyFlag.toString(),
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } ?: remoteSong?.let {
+                    WebImage(
+                        source = it.remotePath(ModResourceType.Record),
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
                 }
+            }
 
-                Surface(
-                    modifier = Modifier.padding(
-                        horizontal = Theme.padding.h9,
-                        vertical = Theme.size.image5 / 2
-                    ).fillMaxWidth().zIndex(1f),
-                    shape = Theme.shape.v3,
-                    contentPadding = Theme.padding.eValue9,
-                    shadowElevation = Theme.shadow.v3
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.padding(bottom = Theme.size.image5 / 4).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            TextIconAdapter { idIcon, idText ->
-                                Icon(icon = Icons.Loyalty, modifier = Modifier.idIcon())
-                                SimpleClipText(text = song?.sid ?: "0", style = Theme.typography.v7.bold, modifier = Modifier.idText())
-                            }
-                            TextIconAdapter { idIcon, idText ->
-                                Icon(icon = Icons.Commit, modifier = Modifier.idIcon())
-                                SimpleClipText(text = "v${song?.version ?: "?.?"}", style = Theme.typography.v7.bold, modifier = Modifier.idText())
-                            }
-                        }
+                        SimpleEllipsisText(
+                            text = "ID: ${song?.sid ?: sid}",
+                            color = Theme.color.onContainer,
+                            modifier = Modifier.weight(1f, false).background(Theme.color.primaryContainer, Theme.shape.v7).padding(Theme.padding.value)
+                        )
+                        SimpleEllipsisText(
+                            text = song?.version ?: "1.0",
+                            color = Theme.color.onContainer,
+                            modifier = Modifier.weight(1f, false).background(Theme.color.secondaryContainer, Theme.shape.v7).padding(Theme.padding.value)
+                        )
+                    }
+
+                    if (song != null) {
+                        val modeColor = if (clientSong != null) Theme.color.tertiaryContainer else Theme.color.warning
 
                         SimpleEllipsisText(
-                            text = song?.name ?: "未知歌曲",
-                            style = Theme.typography.v6.bold,
-                            color = Theme.color.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            text = if (clientSong != null) "本地 MOD" else "远程 MOD",
+                            style = Theme.typography.v7.bold,
+                            color = if (clientSong != null) Theme.color.onContainer else Theme.color.onWarning,
+                            modifier = Modifier.background(modeColor, Theme.shape.v7).padding(Theme.padding.value)
                         )
+                    }
+                }
 
-                        TextIconAdapter { idIcon, idText ->
-                            Icon(icon = Icons.Artist, modifier = Modifier.idIcon())
-                            SimpleEllipsisText(text = "演唱: ${song?.singer ?: "未知"}", modifier = Modifier.idText())
-                        }
-                        TextIconAdapter { idIcon, idText ->
-                            Icon(icon = Icons.Lyrics, modifier = Modifier.idIcon())
-                            SimpleEllipsisText(text = "作词: ${song?.lyricist ?: "未知"}", modifier = Modifier.idText())
-                        }
-                        TextIconAdapter { idIcon, idText ->
-                            Icon(icon = Icons.Lyrics, modifier = Modifier.idIcon())
-                            SimpleEllipsisText(text = "作曲: ${song?.composer ?: "未知"}", modifier = Modifier.idText())
-                        }
-                        TextIconAdapter { idIcon, idText ->
-                            Icon(icon = Icons.Album, modifier = Modifier.idIcon())
-                            SimpleEllipsisText(text = "专辑: ${song?.album ?: "未知"}", modifier = Modifier.idText())
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                ) {
+                    SimpleEllipsisText(
+                        text = "专辑: ${song?.album ?: "未知"}",
+                        style = Theme.typography.v8,
+                        color = Theme.color.onSurfaceVariant,
+                        modifier = Modifier.weight(1f, false).background(Theme.color.backgroundVariant, Theme.shape.v7).padding(Theme.padding.value)
+                    )
+                    SimpleEllipsisText(
+                        text = "演唱: ${song?.singer ?: "未知"}",
+                        style = Theme.typography.v8,
+                        color = Theme.color.onSurfaceVariant,
+                        modifier = Modifier.weight(1f, false).background(Theme.color.backgroundVariant, Theme.shape.v7).padding(Theme.padding.value)
+                    )
+                }
 
-                        Divider()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                ) {
+                    SimpleEllipsisText(
+                        text = "作词：${song?.lyricist ?: "未知"}",
+                        style = Theme.typography.v8,
+                        color = Theme.color.onSurfaceVariant,
+                        modifier = Modifier.weight(1f, false).background(Theme.color.backgroundVariant, Theme.shape.v7).padding(Theme.padding.value)
+                    )
+                    SimpleEllipsisText(
+                        text = "作曲：${song?.composer ?: "未知"}",
+                        style = Theme.typography.v8,
+                        color = Theme.color.onSurfaceVariant,
+                        modifier = Modifier.weight(1f, false).background(Theme.color.backgroundVariant, Theme.shape.v7).padding(Theme.padding.value)
+                    )
+                }
+            }
+        }
+    }
 
-                        SelectionBox {
-                            Text(
-                                text = lyrics ?: "",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth().aspectRatio(1.5f).verticalScroll(rememberScrollState())
+    @Composable
+    private fun ResourceItemLayout(item: ResourceItem, remote: Boolean) {
+        val (buttons, content) = resAction[item.type]!!
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .condition(!remote && content != null) {
+                    clickable {
+                        launch { resourceDialog.open(item) }
+                    }
+                }.padding(Theme.padding.value),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon = resIcon[item.type]!!, color = Theme.color.onSurfaceVariant)
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.g7)
+            ) {
+                SimpleEllipsisText(text = item.type.description, style = Theme.typography.v7.bold, color = Theme.color.onSurface)
+                item.size?.let {
+                    SimpleEllipsisText(text = it.fileSizeString, style = Theme.typography.v8, color = Theme.color.onSurfaceVariant)
+                }
+            }
+
+            if (remote) {
+                LoadingIcon(icon = Icons.Download, color = Theme.color.primary, onClick = {
+                    if (app.config.userProfile == null) slot.tip.warning("请先登录")
+                    else launch { remoteSong?.then { downloadModResource(item, it) } }
+                })
+            }
+            else {
+                ActionScope.Right.Container {
+                    for (action in buttons) {
+                        key(action.text) {
+                            Icon(
+                                icon = action.icon,
+                                color = if (action.destructive) Theme.color.error else Theme.color.secondary,
+                                onClick = { action.action(item) }
                             )
                         }
                     }
@@ -479,45 +510,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    @Composable
-    private fun ResourceItemLayout(item: ResourceItem, remote: Boolean) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(resBrush[item.type]!!, alpha = if (remote) 0.5f else 1f)
-                .clickable {
-                    if (remote) {
-                        if (app.config.userProfile == null) slot.tip.warning("请先登录")
-                        else launch { remoteSong?.then { downloadModResource(item, it) } }
-                    }
-                }.padding(Theme.padding.eValue),
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ThemeContainer(
-                color = if (remote) Theme.color.disabledContent else Theme.color.onContainer,
-                variantColor = if (remote) Theme.color.disabledContent else Theme.color.onContainerVariant
-            ) {
-                val resSize = item.size?.fileSizeString?.let { "($it)" } ?: ""
-
-                Icon(icon = if (remote) Icons.Download else resIcon[item.type]!!)
-                SimpleEllipsisText(text = "${item.type.description}$resSize", style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
-                if (remote) SimpleEllipsisText(text = "下载", style = Theme.typography.v7.bold)
-                else {
-                    ActionScope.Right.Container {
-                        for (action in resAction[item.type]!!) {
-                            key(action.text) {
-                                Icon(icon = action.icon, tip = action.text, onClick = { action.action(item) })
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private val resourceLayout = movableComposable { modifier: Modifier ->
-        Column(modifier = modifier) {
+        Column(modifier = modifier.background(Theme.color.surface)) {
             if (clientResources.isNotEmpty()) {
                 val downloadResources by rememberDerivedState {
                     remoteResources.filter { item -> clientResources.find { it.type == item.type } == null }
@@ -526,24 +520,46 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 for (item in clientResources) {
                     key(item.type) {
                         ResourceItemLayout(item = item, remote = false)
+                        HorizontalDivider()
                     }
                 }
+
                 for (item in downloadResources) {
                     key(item.type) {
                         ResourceItemLayout(item = item, remote = true)
+                        HorizontalDivider()
                     }
                 }
+            }
+            else if (clientSong == null && remoteSong != null) {
+                PrimaryLoadingButton(
+                    text = "下载 MOD",
+                    icon = Icons.Download,
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
+                    onClick = {
+                        if (app.config.userProfile == null) slot.tip.warning("请先登录")
+                        else if (slot.confirm.open(content = "下载该MOD?")) launch { downloadMod() }
+                    }
+                )
             }
         }
     }
 
     private val songCommentHeader = movableComposable { modifier: Modifier ->
-        Row(modifier = modifier) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon = Icons.VerifiedUser)
+            SimpleEllipsisText(text = "歌评", style = Theme.typography.v6.bold, color = Theme.color.onSurface, modifier = Modifier.weight(1f))
             PrimaryLoadingTextButton(
                 text = "写歌评",
                 icon = Icons.Comment,
                 enabled = app.config.userProfile != null,
-                onClick = { commentDialog.open()?.then { onSendComment(it) } }
+                onClick = {
+                    commentDialog.open()?.then { onSendComment(it) }
+                }
             )
         }
     }
@@ -552,27 +568,27 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private fun SongCommentLayout(comment: SongComment, modifier: Modifier = Modifier) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            UserBar(
-                avatar = comment.avatarPath.url,
-                name = comment.name,
-                time = comment.ts,
-                label = comment.label,
-                level = comment.level,
-                onAvatarClick = {
-                    @OptIn(LooseTyped::class)
-                    navigate("ScreenUserCard", comment.uid)
-                }
-            )
-            SelectionBox {
-                Text(text = comment.content, modifier = Modifier.fillMaxWidth())
-            }
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    UserBar(
+                        avatar = comment.avatarPath.url,
+                        name = comment.name,
+                        time = comment.ts,
+                        label = comment.label,
+                        level = comment.level,
+                        onAvatarClick = {
+                            @OptIn(LooseTyped::class)
+                            navigate("ScreenUserCard", comment.uid)
+                        }
+                    )
+                }
+
                 var menuVisible by rememberFalse()
 
                 Menus(
@@ -581,15 +597,19 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     menus = {
                         app.config.userProfile?.then { user ->
                             if (user.uid == comment.uid || user.hasPrivilegeVIPTopic) {
-                                Menu(text = "删除", icon = Icons.Send, onClick = {
+                                Menu(text = "删除", icon = Icons.Delete, onClick = {
                                     launch { onDeleteComment(comment.cid) }
                                 })
                             }
                         }
                     }
                 ) {
-                    Icon(icon = Icons.MoreHorizontal, onClick = { menuVisible = true })
+                    Icon(icon = Icons.MoreHorizontal, color = Theme.color.onSurfaceVariant, tip = "更多", onClick = { menuVisible = true })
                 }
+            }
+
+            SelectionBox {
+                Text(text = comment.content, color = Theme.color.onSurface, modifier = Modifier.fillMaxWidth())
             }
         }
     }
@@ -603,42 +623,57 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             canLoading = pageComments.canLoading,
             onLoading = ::requestMoreSongComments,
             modifier = modifier,
-            header = header
+            header = header,
+            itemDivider = { HorizontalDivider() }
         ) {
-            SongCommentLayout(comment = it, modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h))
+            SongCommentLayout(comment = it, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
         }
     }
 
     @Composable
     private fun Portrait() {
-        commentListLayout(Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+        commentListLayout(Modifier.padding(LocalImmersivePadding.current).fillMaxSize().background(Theme.color.surface)) {
             detailsLayout(Modifier.fillMaxWidth())
+            HorizontalDivider()
             resourceLayout(Modifier.fillMaxWidth())
-            songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value))
+            songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value9))
         }
     }
 
     @Composable
     private fun Landscape() {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxSize().background(Theme.color.surface)) {
             val immersivePadding = LocalImmersivePadding.current
 
-            detailsLayout(Modifier
-                .padding(immersivePadding.withoutEnd)
-                .weight(1f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-            )
-            Divider()
-            resourceLayout(Modifier
-                .padding(immersivePadding.withoutHorizontal)
-                .weight(1f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-            )
+            if (clientSong != null) {
+                detailsLayout(Modifier
+                    .padding(immersivePadding.withoutEnd)
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+                )
+                Divider()
+                resourceLayout(Modifier
+                    .padding(immersivePadding.withoutHorizontal)
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+                )
+            }
+            else {
+                Column(modifier = Modifier
+                    .padding(immersivePadding.withoutEnd)
+                    .width(Theme.size.cell1 * 1.5f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+                ) {
+                    detailsLayout(Modifier.fillMaxWidth())
+                    resourceLayout(Modifier.fillMaxWidth())
+                }
+            }
             Divider()
             commentListLayout(Modifier.padding(immersivePadding.withoutStart).weight(1f).fillMaxHeight()) {
-                songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value))
+                songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value9))
             }
         }
     }
@@ -649,6 +684,43 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         when (deviceType) {
             Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait()
             Device.Type.LANDSCAPE -> Landscape()
+        }
+    }
+
+    private val resourceDialog = this land object : Dialog<Unit>() {
+        private var item: ResourceItem? by mutableRefStateOf(null)
+
+        suspend fun open(item: ResourceItem) {
+            this.item = item
+            awaitResult()
+        }
+
+        @Composable
+        override fun Land() {
+            LandDialog {
+                item?.let { resource ->
+                    Column(
+                        modifier = Modifier.width(Theme.size.cell1 * 2f).heightIn(max = Theme.size.cell1 * 2f).padding(Theme.padding.eValue7),
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            resIcon[resource.type]?.then { Icon(icon = it) }
+                            SimpleEllipsisText(text = resource.type.description, style = Theme.typography.v6.bold, modifier = Modifier.weight(1f))
+                            Icon(icon = Icons.Clear, onClick = ::close)
+                        }
+
+                        Box(modifier = Modifier.fillMaxWidth().weight(1f, false)) {
+                            key(resource.type, modifyFlag) {
+                                resAction[resource.type]?.content?.invoke(resource)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
