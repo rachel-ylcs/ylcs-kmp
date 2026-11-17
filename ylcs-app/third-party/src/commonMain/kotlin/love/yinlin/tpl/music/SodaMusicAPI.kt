@@ -2,10 +2,12 @@ package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
 import io.ktor.http.HttpHeaders
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.music.PlatformMusicInfo
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
@@ -14,12 +16,11 @@ import love.yinlin.uri.Uri
 
 @Stable
 object SodaMusicAPI : PlatformMusicAPI {
-
     private const val SEARCH_API = "https://api.qishui.com/luna/pc/search/track"
-    private const val PLAYLIST_API = "https://api.qishui.com/luna/pc/playlist/detail"
+    private const val PLAYLIST_SHARE_PAGE = "https://music.douyin.com/qishui/share/playlist"
+    private const val TRACK_PUBLIC_API = "https://beta-luna.douyin.com/luna/h5/seo_track"
     private const val TRACK_SHARE_PAGE = "https://music.douyin.com/qishui/share/track"
 
-    // 统一请求头，模拟真实浏览器，解决手机端无法解析的问题
     private val defaultHeaders: NetHeader = [
         HttpHeaders.UserAgent to NetHeader.UserAgentDesktop,
         HttpHeaders.Accept to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -28,173 +29,130 @@ object SodaMusicAPI : PlatformMusicAPI {
         HttpHeaders.Referrer to "https://music.douyin.com/",
     ]
 
-    // ---------- 短链接解析 ----------
-    private suspend fun extractPlaylistIdFromShortLink(shortUrl: String): String? {
-        // 获取重定向后的最终 URL（不再解析 HTML）
-        val finalUrl: String = NetClient.Common.request<String, String>({
-            this.url = shortUrl
-            headers = defaultHeaders
-        }) {
-            url
-        } ?: return null
+    private val routerData = Regex("""(?s)_ROUTER_DATA\s*=\s*(\{.*?\});""")
+    private val lyricLine = Regex("""\[(\d+),(\d+)](.*)""")
+    private val lyricTag = Regex("""<[^>]+>""")
 
-        // 直接从最终 URL 的参数中提取 playlist_id
-        return Uri.parse(finalUrl)?.params?.get("playlist_id")
+    override val type = PlatformMusicType.Soda
+    override fun matchesTrackId(id: String): Boolean = id.length == 19 && numericTrackId.matches(id)
+    override fun matchesLink(uri: Uri): Boolean = uri.isMusicLinkOn("qishui.com") ||
+        uri.isMusicLinkOn("qishui.douyin.com") || uri.isMusicLinkOn("music.douyin.com")
+
+    private fun summary(track: JsonObject, id: String): PlatformMusicInfo? {
+        val name = track["name"].StringNull ?: return null
+        val singer = track["artists"].ArrayNull.orEmpty().mapNotNull { it.ObjectNull?.get("name").StringNull }.joinToString("、")
+        val cover = track["album"].ObjectNull?.get("url_cover").ObjectEmpty
+        val url = cover["urls"].ArrayNull?.firstOrNull().StringNull
+        val uri = cover["uri"].StringNull
+        val pic = if (url != null && uri != null) "$url$uri~c5_375x375.jpg" else ""
+        return PlatformMusicInfo(id, name, singer, pic)
     }
 
-    // ---------- 歌单 API ----------
-    private suspend fun getPlaylistTrackIds(playlistId: String): List<String>? {
-        val json: JsonObject = NetClient.Common.request<JsonObject>({
-            url = "$PLAYLIST_API?playlist_id=$playlistId"
-            headers = defaultHeaders
-        }) { json: JsonObject -> json } ?: return null
-        return json.arr("media_resources").mapNotNull { it.Object["id"]?.String }.ifEmpty { null }
+    private suspend fun requestTrack(id: String): JsonObject? = NetClient.Common.request({
+        url = "$TRACK_PUBLIC_API?track_id=$id&device_platform=web"
+        headers = defaultHeaders
+    }) { json: JsonObject -> json }
+
+    private suspend fun requestSharePage(address: String, page: String): JsonObject? = NetClient.Common.request({
+        url = address
+        headers = defaultHeaders
+    }) { html: String ->
+        val data = routerData.find(html)?.groupValues?.get(1) ?: error("分享页缺少歌曲信息")
+        Json.decodeFromString<JsonObject>(data).obj("loaderData").obj(page)
     }
 
-    // ---------- 封面 URL 构建 ----------
-    private fun buildCoverUrl(albumInfo: JsonObject): String? {
-        val urls = albumInfo.arr("urls").mapNotNull { it.String }
-        val uri = albumInfo["uri"]?.String
-        return if (urls.isNotEmpty() && uri != null) urls.first() + uri + "~c5_375x375.jpg" else null
-    }
+    private fun publicTrack(data: JsonObject?): JsonObject? = data?.get("seo_track").ObjectNull?.get("track").ObjectNull
 
-    // ---------- KRC 转 LRC ----------
-    private fun convertKrcToLrc(content: String): String {
-        val lines = content.split("\n")
-        val lrcLines: MutableList<String> = []
-        val lineRegex = Regex("""\[(\d+),(\d+)](.*)""")
-        val tagRegex = Regex("""<[^>]+>""")
-        for (line in lines) {
-            val match = lineRegex.find(line) ?: continue
-            val startMs = match.groupValues[1].toLong()
-            val textPart = match.groupValues[3]
-            val pureText = tagRegex.replace(textPart, "")
-            if (pureText.isNotBlank()) {
-                val minutes = startMs / 60000
-                val seconds = (startMs % 60000) / 1000
-                val centi = (startMs % 1000) / 10
-                val timeStr = "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}"
-                lrcLines.add("[$timeStr]$pureText")
-            }
+    // 有摘要的条目先显示，缺失摘要的条目再逐首补查。
+    private suspend fun FlowCollector<List<PlatformMusicInfo>>.emitTracks(rows: List<JsonObject>) {
+        val ready: MutableList<PlatformMusicInfo> = []
+        val pending: MutableSet<String> = mutableSetOf()
+        for (row in rows) {
+            val entity = row["entity"].ObjectNull ?: row
+            val track = entity["track"].ObjectNull ?: entity["track_wrapper"].ObjectNull?.get("track").ObjectNull ?: entity
+            val id = (track["id"].StringNull ?: row["id"].StringNull)?.takeIf(numericTrackId::matches) ?: continue
+            val info = summary(track, id)
+            if (info != null) ready += info
+            else pending += id
         }
-        return lrcLines.joinToString("\n")
-    }
-
-    // ---------- 获取完整歌单（单首歌失败不影响其他）----------
-    private suspend fun fetchPlaylist(playlistId: String): List<PlatformMusicInfo>? {
-        val trackIds = getPlaylistTrackIds(playlistId) ?: return null
-        val result: MutableList<PlatformMusicInfo> = []
-        for (trackId in trackIds) {
-            catching {
-                fetchTrackInfo(trackId)?.then { result += it }
-            }
-        }
-        return result.ifEmpty { null }
-    }
-
-    // ---------- 获取单曲信息（最外层捕获所有异常，返回 null）----------
-    private suspend fun fetchTrackInfo(trackId: String): PlatformMusicInfo? = catchingNull {
-        // 1. 获取音频链接（从分享页）
-        var audioUrl = ""
-        val html = NetClient.Common.request<String>({
-            url = "$TRACK_SHARE_PAGE?track_id=$trackId"
-            headers = defaultHeaders
-        }) { text: String -> text }
-        if (html != null) {
-            val regex = Regex("""(?s)_ROUTER_DATA\s*=\s*(\{.*?\});""")
-            regex.find(html)?.then { match ->
-                val jsonString = match.groupValues[1].replace("\\u002F", "/")
-                val routerData = Json.decodeFromString<JsonObject>(jsonString)
-                val rawUrl = routerData.obj("loaderData")
-                    .obj("track_page")
-                    .obj("audioWithLyricsOption")["url"]?.String
-                if (rawUrl != null) {
-                    audioUrl = rawUrl.replace("\\u002F", "/")
-                }
-            }
+        if (ready.isNotEmpty()) {
+            pending.removeAll(ready.map { it.id }.toSet())
+            emit(ready)
         }
 
-        // 2. 音频格式过滤：仅丢弃 .mp4 视频，其他所有格式都保留
-        if (audioUrl.isNotEmpty() && audioUrl.lowercase().endsWith(".mp4")) {
-            return null // 丢弃整首视频歌曲
+        var failures = 0
+        for (id in pending) {
+            val info = publicTrack(requestTrack(id))?.let { summary(it, id) }
+            if (info != null) emit([info])
+            else failures++
         }
-
-        // 3. 元数据 API
-        val apiData: JsonObject = NetClient.Common.request<JsonObject>({
-            url = "https://api.qishui.com/luna/pc/track_v2?track_id=$trackId&media_type=track"
-            headers = defaultHeaders
-        }) { json: JsonObject -> json } ?: return null
-
-        val trackObj = apiData.obj("track")
-        val name = trackObj["name"]?.String ?: ""
-        val artists = trackObj.arr("artists").mapNotNull { it.Object["name"]?.String }
-        val singer = artists.joinToString("、")
-        val durationMs = trackObj["duration"]?.Long ?: 0L
-        val cover = buildCoverUrl(trackObj.obj("album").obj("url_cover")) ?: ""
-
-        val krcContent = apiData.obj("lyric")["content"]?.String ?: ""
-        val lyrics = if (krcContent.isNotBlank()) {
-            val lrcText = convertKrcToLrc(krcContent)
-            Lrc.parse(lrcText).toString()
-        } else ""
-
-        PlatformMusicInfo(
-            id = trackId,
-            name = name,
-            singer = singer,
-            time = durationMs.timeString,
-            pic = cover,
-            audioUrl = audioUrl,
-            lyrics = lyrics
-        )
+        check(failures == 0) { if (ready.isEmpty() && failures == pending.size) "读取汽水音乐歌曲失败" else "部分汽水音乐歌曲读取失败" }
     }
 
-    // ---------- 搜索 ----------
-    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
-        val json: JsonObject = NetClient.Common.request<JsonObject>({
+    override fun search(keyword: String) = flow {
+        val tracks = NetClient.Common.request({
             url = "$SEARCH_API?aid=386088&q=${Uri.encodeUri(keyword)}"
             headers = defaultHeaders
-        }) { json: JsonObject -> json } ?: return null
-
-        val trackIds = json.arr("result_groups").firstOrNull()?.Object
-            ?.arr("data")?.mapNotNull { item ->
-                item.Object.obj("entity").obj("track")["id"]?.String
-            } ?: []
-
-        if (trackIds.isEmpty()) return null
-        val result: MutableList<PlatformMusicInfo> = []
-        for (tid in trackIds) {
-            catching {
-                fetchTrackInfo(tid)?.then { result += it }
+        }) { json: JsonObject ->
+            json.arr("result_groups").flatMap { group ->
+                group.Object.arr("data").mapNotNull { it.ObjectNull }
             }
         }
-        return result.ifEmpty { null }
+        emitTracks(checkNotNull(tracks) { "汽水音乐关键词搜索暂不可用，请粘贴单曲或歌单分享链接" })
     }
 
-    // ---------- 解析链接 ----------
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
-        when {
-            // 短链接（歌单）-> 例如 https://qishui.douyin.com/s/ix7xxWf3/
-            link.contains("qishui.douyin.com/s/") -> {
-                val id = extractPlaylistIdFromShortLink(link)
-                if (id != null) fetchPlaylist(id) else null
-            }
-            // 长链接 playlist_id -> 例如 https://music.douyin.com/qishui/share/playlist?playlist_id=7635277649740922923&...
-            link.contains("playlist_id=") -> {
-                val id = Regex("""playlist_id=(\d+)""").find(link)?.groupValues?.get(1)
-                if (id != null) fetchPlaylist(id) else null
-            }
-            // 长链接 track_id -> 例如 https://music.douyin.com/qishui/share/track?track_id=7145746290255595521
-            link.contains("track_id=") -> {
-                val id = Regex("""track_id=(\d+)""").find(link)?.groupValues?.get(1)
-                if (id != null) fetchTrackInfo(id)?.let(::listOf) else null
-            }
-            // 纯数字作为单曲 ID -> 例如 7145746290255595521
-            link.matches(Regex("\\d+")) -> {
-                fetchTrackInfo(link)?.let(::listOf)
-            }
-            // 默认按搜索处理
-            else -> search(link)
+    override fun findTrack(id: String) = flow {
+        require(numericTrackId.matches(id)) { "汽水歌曲 ID 无效" }
+        val track = publicTrack(requestTrack(id))?.let { summary(it, id) }
+        emit([checkNotNull(track) { "未找到汽水音乐歌曲" }])
+    }
+
+    override fun parseLink(uri: Uri) = flow {
+        require(matchesLink(uri)) { "请输入汽水音乐链接" }
+        val target = if (uri.isMusicLinkOn("qishui.douyin.com") && uri.path.orEmpty().startsWith("/s/")) {
+            val redirected = NetClient.Common.request<String, String>({
+                url = uri.toString()
+                headers = defaultHeaders
+            }) { url }
+            redirected?.let(Uri::parse)?.takeIf(::matchesLink) ?: error("无法解析汽水音乐短链接")
+        } else uri
+        val playlist = target.parameterId("playlist_id")?.takeIf(numericTrackId::matches)
+        if (playlist != null) {
+            val tracks = requestSharePage("$PLAYLIST_SHARE_PAGE?playlist_id=$playlist", "playlist_page")
+                ?.get("medias").ArrayNull?.mapNotNull { it.ObjectNull }
+            emitTracks(checkNotNull(tracks) { "读取汽水音乐歌单失败" })
         }
+        else {
+            val id = target.parameterId("track_id") ?: error("链接缺少有效单曲或歌单 ID")
+            findTrack(id).collect { emit(it) }
+        }
+    }
+
+    private fun convertLyrics(content: String): String = content.lineSequence().mapNotNull { line ->
+        val match = lyricLine.find(line) ?: return@mapNotNull null
+        val time = match.groupValues[1].toLongOrNull() ?: return@mapNotNull null
+        val text = lyricTag.replace(match.groupValues[3], "")
+        if (text.isBlank()) return@mapNotNull null
+        val minutes = (time / 60000).toString().padStart(2, '0')
+        val seconds = (time / 1000 % 60).toString().padStart(2, '0')
+        val hundredths = (time / 10 % 100).toString().padStart(2, '0')
+        "[$minutes:$seconds.$hundredths]$text"
+    }.joinToString("\n")
+
+    override suspend fun resolveDownload(track: PlatformMusicInfo): PlatformMusicResources? {
+        if (!numericTrackId.matches(track.id)) return null
+        val audio = requestSharePage("$TRACK_SHARE_PAGE?track_id=${track.id}", "track_page")
+            ?.get("audioWithLyricsOption").ObjectNull ?: return null
+        val audioUrl = audio["url"].StringNull
+            ?.takeIf { it.isNotBlank() && !it.substringBefore('?').endsWith(".mp4", ignoreCase = true) } ?: return null
+        val duration = audio["trackInfo"].ObjectNull?.get("duration").StringNull?.toLongOrNull()
+        val previewStart = audio["previewStart"].StringNull?.toDoubleOrNull() ?: 0.0
+        val previewEnd = audio["previewEnd"].StringNull?.toDoubleOrNull()
+        if (previewStart > 0.0 || (duration != null && previewEnd != null && previewEnd > 0.0 && previewEnd * 1000 < duration - 1000)) return null
+
+        val data = requestTrack(track.id)
+        val cover = track.pic.ifEmpty { audio["coverURL"].StringNull.orEmpty() }
+        val lyric = data?.get("lyric").ObjectNull?.get("content").StringNull.orEmpty()
+        return PlatformMusicResources(audioUrl, cover, Lrc.parse(convertLyrics(lyric)).toString())
     }
 }

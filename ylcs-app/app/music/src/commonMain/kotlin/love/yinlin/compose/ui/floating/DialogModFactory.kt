@@ -13,15 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
-import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleClipText
-import love.yinlin.data.music.PlatformMusicType
-import love.yinlin.extension.enumForEach
 
 class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
     @Stable
@@ -33,7 +29,7 @@ class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
         @Stable
         data object FromCreate : ModResult
         @Stable
-        data class FromPlatform(val type: PlatformMusicType) : ModResult
+        data object FromPlatform : ModResult
     }
 
     @Composable
@@ -90,41 +86,28 @@ class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
                         icon = Icons.DesignServices,
                         iconColor = Theme.color.tertiary
                     )
-                    enumForEach<PlatformMusicType> { type ->
-                        ModFactoryItem(
-                            result = ModResult.FromPlatform(type),
-                            text = type.description,
-                            textColor = when (type) {
-                                PlatformMusicType.QQMusic -> Colors.Yellow4
-                                PlatformMusicType.NetEaseCloud -> Colors.Red4
-                                PlatformMusicType.Kugou -> Colors.Blue4
-                                PlatformMusicType.Soda -> Colors.Green4
-                                PlatformMusicType.Migu -> Colors.Pink4
-                            },
-                            icon = when (type) {
-                                PlatformMusicType.QQMusic -> Icons2.QQMusic
-                                PlatformMusicType.NetEaseCloud -> Icons2.NetEaseCloudMusic
-                                PlatformMusicType.Kugou -> Icons2.KugouMusic
-                                PlatformMusicType.Soda -> Icons2.SodaMusic
-                                PlatformMusicType.Migu -> Icons2.MiguMusic
-                            },
-                            iconColor = Colors.Unspecified
-                        )
-                    }
+                    ModFactoryItem(
+                        result = ModResult.FromPlatform,
+                        text = "平台音乐",
+                        textColor = Theme.color.primary,
+                        icon = Icons.CloudDownload,
+                        iconColor = Theme.color.primary,
+                    )
                 }
             ) { measurables, constraints ->
                 val maxRequestedWidth = measurables.maxOf { it.maxIntrinsicWidth(constraints.maxHeight) }
-                val slotWidth = if (constraints.hasBoundedWidth) maxRequestedWidth.coerceAtMost(constraints.maxWidth / 3) else maxRequestedWidth
-                val totalWidth = slotWidth * 3
+                val columns = 2
+                val slotWidth = if (constraints.hasBoundedWidth) maxRequestedWidth.coerceAtMost(constraints.maxWidth / columns) else maxRequestedWidth
+                val totalWidth = slotWidth * columns
                 val exactConstraints = Constraints(minWidth = slotWidth, maxWidth = slotWidth, minHeight = 0, maxHeight = constraints.maxHeight)
                 val placeables = measurables.map { it.measure(exactConstraints) }
                 val childHeight = placeables.first().height
-                val rowCount = (placeables.size + 2) / 3
+                val rowCount = (placeables.size + columns - 1) / columns
                 val totalHeight = rowCount * childHeight
                 layout(totalWidth, totalHeight) {
                     placeables.forEachIndexed { index, placeable ->
-                        val row = index / 3
-                        val column = index % 3
+                        val row = index / columns
+                        val column = index % columns
                         placeable.placeRelative(x = column * slotWidth, y = row * childHeight)
                     }
                 }

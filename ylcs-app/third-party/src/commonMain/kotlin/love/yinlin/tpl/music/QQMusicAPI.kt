@@ -1,121 +1,78 @@
 package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.coroutines.Coroutines
-import love.yinlin.uri.Uri
 import love.yinlin.data.music.PlatformMusicInfo
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.encoding.convert
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.parser.lrc.Lrc
+import love.yinlin.uri.Uri
 import kotlin.io.encoding.Base64
 
 @Stable
 object QQMusicAPI : PlatformMusicAPI {
+    private val songMid = Regex("[A-Za-z0-9]{14}")
+
+    override val type = PlatformMusicType.QQMusic
+    override fun matchesLink(uri: Uri): Boolean = uri.isMusicLinkOn("y.qq.com")
+    override fun matchesTrackId(id: String): Boolean = songMid.matches(id) && id.any(Char::isLetter) && id.any(Char::isDigit)
+
     private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String =
         "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
-    private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
-        val arr: MutableList<JsonObject> = []
-        repeat(num) {
-            arr += json.obj("req_$it").obj("data")
-        }
-        return arr
-    }
-    // 解析专辑
-    suspend fun requestAlbum(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
-        url = buildUrl {
-            obj("req_0") {
-                "module" with "music.musichallAlbum.AlbumSongList"
-                "method" with "GetAlbumSongList"
-                obj("param") {
-                    "albumId" with (id.toLongOrNull() ?: 0L)
-                    "begin" with 0
-                    "num" with 1000
-                }
-            }
-        }
-    }) { body: JsonObject ->
-        val [json] = decodeData(1, body)
-        json.arr("songList").map { it.Object.obj("songInfo")["mid"].String }
-    }?.let { list ->
-        val items: MutableList<PlatformMusicInfo> = []
-        for (mid in list) requestMusic(mid)?.then { items += it }
-        items.ifEmpty { null }
-    }
-    // 解析短链
-    // 处理分支
-    private suspend fun resolveQQShortLink(shortUrl: String): List<PlatformMusicInfo>? {
-        val finalUrl: String = NetClient.Common.request<String, String>({
-            url = shortUrl
-        }) {
-            url
-        } ?: return null
-
-        return when {
-            finalUrl.contains("playlist") -> {
-                val id = finalUrl.substringAfterLast("/").substringBefore("?")
-                requestPlaylist(id)
-            }
-            finalUrl.contains("albumDetail") -> {
-                val id = finalUrl.substringAfterLast("/").substringBefore("?")
-                requestAlbum(id) // 专辑有专用接口了
-            }
-            finalUrl.contains("songDetail") -> {
-                val id = finalUrl.substringAfterLast("/").substringBefore("?")
-                requestMusic(id)?.let(::listOf)
-            }
-            else -> null
-        }
+    private fun cover(track: JsonObject): String {
+        val album = track["album"].ObjectEmpty
+        val mid = album["pmid"].StringNull?.takeIf(String::isNotBlank) ?: album["mid"].StringNull
+        return mid?.takeIf(String::isNotBlank)?.let { "https://y.qq.com/music/photo_new/T002R300x300M000${Uri.encodeUri(it)}.jpg?max_age=2592000" }.orEmpty()
     }
 
-    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
+    private fun summary(track: JsonObject): PlatformMusicInfo? {
+        val id = track["mid"].StringNull?.takeIf(songMid::matches) ?: return null
+        val name = track["name"].StringNull ?: track["title"].StringNull ?: return null
+        val singer = track["singer"].ArrayNull.orEmpty().mapNotNull { it.ObjectNull?.get("name").StringNull }.joinToString("、")
+        return PlatformMusicInfo(id, name, singer, cover(track))
+    }
+
+    private suspend fun requestTrack(id: String): PlatformMusicInfo? = NetClient.Common.request({
         url = buildUrl {
             obj("req_0") {
                 "module" with "music.pf_song_detail_svr"
                 "method" with "get_song_detail_yqq"
                 obj("param") { "song_mid" with id }
             }
-            obj("req_1") {
-                "module" with "music.musichallSong.PlayLyricInfo"
-                "method" with "GetPlayLyricInfo"
-                obj("param") { "songMID" with id }
-            }
-            obj("req_2") {
-                "module" with "vkey.GetVkeyServer"
-                "method" with "CgiGetVkey"
+        }
+    }) { body: JsonObject ->
+        summary(body.obj("req_0").obj("data").obj("track_info")) ?: error("未找到歌曲")
+    }
+
+    private suspend fun requestAlbum(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+        url = buildUrl {
+            obj("req_0") {
+                "module" with "music.musichallAlbum.AlbumSongList"
+                "method" with "GetAlbumSongList"
                 obj("param") {
-                    arr("filename") { add("C400$id$id.m4a") }
-                    arr("songmid") { add(id) }
-                    arr("songtype") { add(0) }
-                    "guid" with "19911211"
+                    val numericId = id.toLongOrNull()
+                    if (numericId != null) "albumId" with numericId
+                    else "albumMid" with id
+                    "begin" with 0
+                    "num" with 1000
                 }
             }
         }
     }) { body: JsonObject ->
-        val [json1, json2, json3] = decodeData(3, body)
-        val trackInfo = json1.obj("track_info")
-        val lyricsBase64 = json2["lyric"].String
-        val midUrlInfo = json3.arr("midurlinfo")[0].Object
-        PlatformMusicInfo(
-            id = trackInfo["mid"].String,
-            name = trackInfo["name"].String,
-            singer = trackInfo.arr("singer").joinToString(",") { it.Object["name"].String },
-            time = (trackInfo["interval"].Long * 1000).timeString,
-            pic = "https://y.qq.com/music/photo_new/T002R300x300M000${trackInfo.obj("album")["pmid"].String}.jpg?max_age=2592000",
-            audioUrl = "https://ws.stream.qqmusic.qq.com/${midUrlInfo["purl"].String}",
-            lyrics = Lrc.parse(Base64.decode(lyricsBase64).convert()).toString()
-        )
+        body.obj("req_0").obj("data").arr("songList").mapNotNull { it.ObjectNull?.get("songInfo").ObjectNull?.let(::summary) }
     }
 
-    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+    private suspend fun requestPlaylist(id: Long): List<PlatformMusicInfo>? = NetClient.Common.request({
         url = buildUrl {
             obj("req_0") {
                 "module" with "music.srfDissInfo.aiDissInfo"
                 "method" with "uniform_get_Dissinfo"
                 obj("param") {
-                    "disstid" with (id.toLongOrNull() ?: 0L)
+                    "disstid" with id
                     "orderlist" with 1
                     "song_begin" with 0
                     "song_num" with 1000
@@ -123,52 +80,83 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val [json] = decodeData(1, body)
-        json.arr("songlist").map { it.Object["mid"].String }
-    }?.let { list ->
-        val items: MutableList<PlatformMusicInfo> = []
-        for (mid in list) requestMusic(mid)?.then { items += it }
-        items.ifEmpty { null }
+        body.obj("req_0").obj("data").arr("songlist").mapNotNull { it.ObjectNull?.let(::summary) }
     }
 
-    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
-        val url = buildUrl {
-            obj("req_0") {
-                "module" with "music.search.SearchCgiService"
-                "method" with "DoSearchForQQMusicMobile"
-                obj("param") {
-                    "query" with keyword
-                    "num_per_page" with 50
-                    "grp" with true
+    override fun search(keyword: String) = flow {
+        val tracks = NetClient.Common.request({
+            url = buildUrl {
+                obj("req_0") {
+                    "module" with "music.search.SearchCgiService"
+                    "method" with "DoSearchForQQMusicMobile"
+                    obj("param") {
+                        "query" with keyword
+                        "num_per_page" with 50
+                        "grp" with true
+                    }
                 }
             }
+        }) { body: JsonObject ->
+            body.obj("req_0").obj("data").obj("body").arr("item_song").mapNotNull { it.ObjectNull?.let(::summary) }
         }
-
-        val songMids = NetClient.Common.request({
-            this.url = url
-        }) { json: JsonObject ->
-            json.obj("req_0").obj("data").obj("body").arr("item_song").map {
-                it.Object["mid"].String
-            }
-        } ?: return null
-
-        return songMids.mapNotNull { mid -> requestMusic(mid) }.ifEmpty { null }
+        emit(checkNotNull(tracks) { "QQ音乐搜索失败" })
     }
 
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
+    override fun findTrack(id: String) = flow {
+        require(songMid.matches(id)) { "QQ音乐歌曲 ID 无效" }
+        emit([checkNotNull(requestTrack(id)) { "未找到 QQ音乐歌曲" }])
+    }
+
+    override fun parseLink(uri: Uri) = flow {
+        require(matchesLink(uri)) { "请输入 QQ音乐链接" }
+        val target = if (uri.isMusicLinkOn("c6.y.qq.com")) {
+            val redirected = NetClient.Common.request<String, String>({ url = uri.toString() }) { url }
+            redirected?.let(Uri::parse)?.takeIf { it.isMusicLinkOn("y.qq.com") } ?: error("无法解析 QQ音乐短链接")
+        } else uri
+        val path = target.path.orEmpty()
+        val id = target.parameterId("id") ?: target.lastPathSegment().orEmpty()
         when {
-            // 修改为调用统一的短链解析
-            link.contains("c6.y.qq.com") -> resolveQQShortLink(link)
-            // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
-            link.contains("y.qq.com") && link.contains("songDetail") -> requestMusic(link.substringAfterLast("/"))?.let(::listOf)
-            // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
-            link.contains("i2.y.qq.com") && link.contains("playlist") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
-            // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
-            link.contains("i.y.qq.com") && link.contains("taoge") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
-            // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
-            link.contains("y.qq.com") && link.contains("playlist") -> requestPlaylist(link.substringAfterLast("/"))
-            // 歌曲 003yJ3Ba1bDVJc
-            else -> requestMusic(link)?.let(::listOf)
+            path.contains("songDetail") -> findTrack(target.parameterId("songmid") ?: id).collect { emit(it) }
+            path.contains("playlist") || path.contains("taoge") -> {
+                val playlistId = (target.parameterId("disstid") ?: id).toLongOrNull() ?: error("链接缺少有效歌单 ID")
+                emit(checkNotNull(requestPlaylist(playlistId)) { "读取 QQ音乐歌单失败" })
+            }
+            path.contains("albumDetail") -> {
+                require(id.toLongOrNull() != null || songMid.matches(id)) { "链接缺少有效专辑 ID" }
+                emit(checkNotNull(requestAlbum(id)) { "读取 QQ音乐专辑失败" })
+            }
+            else -> error("此 QQ音乐链接不包含可解析的单曲、歌单或专辑")
+        }
+    }
+
+    override suspend fun resolveDownload(track: PlatformMusicInfo): PlatformMusicResources? {
+        val id = track.id
+        if (!songMid.matches(id)) return null
+        val coverUrl = track.pic.ifEmpty { requestTrack(id)?.pic.orEmpty() }
+        return NetClient.Common.request({
+            url = buildUrl {
+                obj("req_0") {
+                    "module" with "music.musichallSong.PlayLyricInfo"
+                    "method" with "GetPlayLyricInfo"
+                    obj("param") { "songMID" with id }
+                }
+                obj("req_1") {
+                    "module" with "vkey.GetVkeyServer"
+                    "method" with "CgiGetVkey"
+                    obj("param") {
+                        arr("filename") { add("C400$id$id.m4a") }
+                        arr("songmid") { add(id) }
+                        arr("songtype") { add(0) }
+                        "guid" with "19911211"
+                    }
+                }
+            }
+        }) { body: JsonObject ->
+            val file = body.obj("req_1").obj("data").arr("midurlinfo").firstOrNull()?.ObjectNull
+                ?.get("purl").StringNull?.takeIf(String::isNotBlank) ?: error("QQ音乐未返回可下载的音频")
+            val lyrics = body["req_0"].ObjectNull?.get("data").ObjectNull?.get("lyric").StringNull.orEmpty()
+            val lrc = catchingNull { Lrc.parse(Base64.decode(lyrics).convert()).toString() }.orEmpty()
+            PlatformMusicResources("https://ws.stream.qqmusic.qq.com/$file", coverUrl, lrc)
         }
     }
 }

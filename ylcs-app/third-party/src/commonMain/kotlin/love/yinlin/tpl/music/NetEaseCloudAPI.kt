@@ -1,9 +1,10 @@
 package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.music.PlatformMusicInfo
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.parser.lrc.Lrc
@@ -11,83 +12,76 @@ import love.yinlin.uri.Uri
 
 @Stable
 object NetEaseCloudAPI : PlatformMusicAPI {
-    private const val NETEASECLOUD_HOST: String = "music.163.com"
-    private const val SEARCH_API = "http://$NETEASECLOUD_HOST/api/cloudsearch/pc"
+    private const val HOST = "music.163.com"
+    private const val SHORT_HOST = "163cn.tv"
 
-    private object Container {
-        fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"
-        fun playlist(id: String) = "api/playlist/detail?id=$id&offset=0&limit=1000"
-        fun lyrics(id: String) = "api/song/lyric?id=${id}&lv=1"
-        fun mp3(id: String) = "song/media/outer/url?id=${id}"
+    override val type = PlatformMusicType.NetEaseCloud
+
+    override fun matchesLink(uri: Uri): Boolean = uri.isMusicLinkOn(HOST) || uri.isMusicLinkOn(SHORT_HOST)
+    override fun matchesTrackId(id: String): Boolean = id.length <= 18 && numericTrackId.matches(id)
+
+    private fun summary(json: JsonObject): PlatformMusicInfo? {
+        val id = json["id"].StringNull?.takeIf(numericTrackId::matches) ?: return null
+        val name = json["name"].StringNull ?: return null
+        val artists = json["ar"].ArrayNull ?: json["artists"].ArrayNull.orEmpty()
+        val album = json["al"].ObjectNull ?: json["album"].ObjectEmpty
+        return PlatformMusicInfo(id, name, artists.mapNotNull { it.ObjectNull?.get("name").StringNull }.joinToString("、"), album["picUrl"].StringNull.orEmpty())
     }
 
-    suspend fun requestMusicId(url: String): String? = NetClient.Common.request({
-        this.url = url
-    }) { text: String ->
-        Regex("https://music\\.163\\.com/song\\?id=(\\d+)").find(text)!!.groupValues[1]
-    }
-
-    private fun getCloudMusic(json: JsonObject): PlatformMusicInfo = PlatformMusicInfo(
-        id = json["id"].String,
-        name = json["name"].String,
-        singer = json.arr("artists").joinToString(",") { it.Object["name"].String },
-        time = json["duration"].Long.timeString,
-        pic = json.obj("album")["picUrl"].String,
-        audioUrl = "https://$NETEASECLOUD_HOST/${Container.mp3(json["id"].String)}",
-        lyrics = ""
-    )
-
-    private suspend fun requestLyrics(id: String): String? = NetClient.Common.request({
-        url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
+    private suspend fun requestTrack(id: String): PlatformMusicInfo? = NetClient.Common.request({
+        url = "https://$HOST/api/song/detail?id=$id&ids=[$id]"
     }) { json: JsonObject ->
-        val text = json.obj("lrc")["lyric"].String
-        Lrc.parse(text).toString()
+        json.arr("songs").firstOrNull()?.ObjectNull?.let(::summary) ?: error("未找到歌曲")
     }
 
-    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
-        url = "https://$NETEASECLOUD_HOST/${Container.detail(id)}"
+    private suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+        url = "https://$HOST/api/playlist/detail?id=$id&offset=0&limit=1000"
     }) { json: JsonObject ->
-        getCloudMusic(json.arr("songs")[0].Object)
-    }?.let { musicInfo ->
-        requestLyrics(id)?.let { musicInfo.copy(lyrics = it) }
+        json.obj("result").arr("tracks").mapNotNull { it.ObjectNull?.let(::summary) }
     }
 
-    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
-        url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
-    }) { json: JsonObject ->
-        json.obj("result").arr("tracks").map {
-            getCloudMusic(it.Object)
-        }.toMutableList()
-    }?.let { musicInfos ->
-        musicInfos.forEachIndexed { i, info ->
-            requestLyrics(info.id)?.then { musicInfos[i] = info.copy(lyrics = it) }
-        }
-        musicInfos.removeAll { it.lyrics.isEmpty() }
-        musicInfos.ifEmpty { null }
-    }
-
-    // 新增搜索功能
-    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
-        val url = "$SEARCH_API?s=$keyword&type=1&limit=50&offset=0"
-        return NetClient.Common.request({
-            this.url = url
+    override fun search(keyword: String) = flow {
+        val tracks = NetClient.Common.request({
+            url = "https://$HOST/api/cloudsearch/pc?s=${Uri.encodeUri(keyword)}&type=1&limit=50&offset=0"
         }) { json: JsonObject ->
-            json.obj("result").arr("songs").map { it.Object["id"].String }
-        }?.let { ids ->
-            ids.mapNotNull { id -> requestMusic(id) }.ifEmpty { null }
+            val result = json.obj("result")
+            val songs = result["songs"].ArrayNull
+            if (songs == null) check(result["songCount"].Long == 0L)
+            songs.orEmpty().mapNotNull { it.ObjectNull?.let(::summary) }
         }
+        emit(checkNotNull(tracks) { "网易云音乐搜索失败" })
     }
 
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
-        when {
-            // 歌曲 http://163cn.tv/EElG0jr
-            link.contains("163cn.tv") -> requestMusicId(link)?.let { requestMusic(it) }?.let(::listOf)
-            // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
-            link.contains("music.163.com") && link.contains("playlist") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
-            // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
-            link.contains("music.163.com") && link.contains("song") -> Uri.parse(link)?.params["id"]?.let { requestMusic(it) }?.let(::listOf)
-            // 歌曲 504686858
-            else -> requestMusic(link)?.let(::listOf)
-        }
+    override fun findTrack(id: String) = flow {
+        require(numericTrackId.matches(id)) { "歌曲 ID 无效" }
+        emit([checkNotNull(requestTrack(id)) { "未找到网易云音乐歌曲" }])
     }
+
+    override fun parseLink(uri: Uri) = flow {
+        require(matchesLink(uri)) { "请输入网易云音乐链接" }
+        val target = if (uri.isMusicLinkOn(SHORT_HOST)) {
+            NetClient.Common.request<String, Uri>({
+                url = uri.toString()
+            }) {
+                Uri.parse(url)?.takeIf { it.isMusicLinkOn(HOST) && it.parameterId("id") != null }
+                    ?: shortTrack.find(bodyString)?.value?.let(Uri::parse) ?: error("无法解析短链接")
+            } ?: error("无法解析网易云音乐短链接")
+        } else uri
+        val id = target.parameterId("id")?.takeIf(numericTrackId::matches) ?: error("链接缺少有效 ID")
+        if (target.path.orEmpty().contains("playlist")) emit(checkNotNull(requestPlaylist(id)) { "读取网易云音乐歌单失败" })
+        else findTrack(id).collect { emit(it) }
+    }
+
+    override suspend fun resolveDownload(track: PlatformMusicInfo): PlatformMusicResources? {
+        if (!numericTrackId.matches(track.id)) return null
+        val cover = track.pic.ifEmpty { requestTrack(track.id)?.pic.orEmpty() }
+        val lyrics = NetClient.Common.request({
+            url = "https://$HOST/api/song/lyric?id=${track.id}&lv=1"
+        }) { json: JsonObject ->
+            json["lrc"].ObjectNull?.get("lyric").StringNull?.let { Lrc.parse(it).toString() }.orEmpty()
+        }
+        return PlatformMusicResources("https://$HOST/song/media/outer/url?id=${track.id}", cover, lyrics.orEmpty())
+    }
+
+    private val shortTrack = Regex("""https://music\.163\.com/song\?id=(\d+)""")
 }

@@ -166,12 +166,12 @@ class ScreenMusic : BasicScreen() {
                     navigate(::ScreenPlaylistLibrary)
                 })
                 LoadingTextButton(icon = Icons.Token, text = "工坊", onClick = {
-                    when (val result = modFactoryDialog.open()) {
+                    when (modFactoryDialog.open()) {
                         null -> {}
-                        is DialogModFactory.ModResult.FromCenter -> navigate(::ScreenModCenter)
-                        is DialogModFactory.ModResult.FromCreate -> navigate(::ScreenCreateMusic)
-                        is DialogModFactory.ModResult.FromImport -> navigate(::ScreenImportMusic, null)
-                        is DialogModFactory.ModResult.FromPlatform -> navigate(::ScreenPlatformMusic, null, result.type)
+                        DialogModFactory.ModResult.FromCenter -> navigate(::ScreenModCenter)
+                        DialogModFactory.ModResult.FromCreate -> navigate(::ScreenCreateMusic)
+                        DialogModFactory.ModResult.FromImport -> navigate(::ScreenImportMusic, null)
+                        DialogModFactory.ModResult.FromPlatform -> navigate(::ScreenPlatformMusic, null, null)
                     }
                 })
 

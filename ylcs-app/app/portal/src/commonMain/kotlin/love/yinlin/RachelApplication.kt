@@ -55,7 +55,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenMusic)
             screen(::ScreenMusicDetails, key = "ScreenMusicDetails")
             screen(::ScreenMusicLibrary)
-            screen(::ScreenPlatformMusic)
+            screen<ScreenPlatformMusic, Uri?, PlatformMusicType?>(::ScreenPlatformMusic)
             screen(::ScreenPlaylistLibrary)
 
             // photo
