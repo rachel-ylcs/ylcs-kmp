@@ -23,6 +23,14 @@ class PagerPaginationTest {
     }
 
     @Test
+    fun pageTokensUseTheMinimumBudgetAtTheEllipsisBoundaries() {
+        assertEquals([1, 2, 3, null, 20], calculatePagerPageTokens(currentPage = 3, pageCount = 20, maxCount = 5))
+        assertEquals([1, null, 4, null, 20], calculatePagerPageTokens(currentPage = 4, pageCount = 20, maxCount = 5))
+        assertEquals([1, null, 17, null, 20], calculatePagerPageTokens(currentPage = 17, pageCount = 20, maxCount = 5))
+        assertEquals([1, null, 18, 19, 20], calculatePagerPageTokens(currentPage = 18, pageCount = 20, maxCount = 5))
+    }
+
+    @Test
     fun stateClampsPageWhenPageCountChanges() {
         val state = PagerPaginationState(initialPage = 7)
 
@@ -42,5 +50,15 @@ class PagerPaginationTest {
         state.updatePageCount(0)
         assertEquals(0, state.pageCount)
         assertEquals(4, state.currentPage)
+    }
+
+    @Test
+    fun nextPageStaysOnTheLastPageAtTheIntegerLimit() {
+        val state = PagerPaginationState(initialPage = Int.MAX_VALUE)
+        state.updatePageCount(Int.MAX_VALUE)
+
+        state.nextPage()
+
+        assertEquals(Int.MAX_VALUE, state.currentPage)
     }
 }

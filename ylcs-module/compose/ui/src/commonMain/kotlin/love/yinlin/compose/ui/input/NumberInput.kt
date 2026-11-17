@@ -38,17 +38,15 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.isSpecified
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
-import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.extension.forever
 
 /**
  * 数字输入器
@@ -63,9 +61,9 @@ fun NumberInput(
     state: NumberInputState,
     modifier: Modifier = Modifier,
     maxNum: Int = 6,
-    style: TextStyle = Theme.typography.v5,
-    padding: Dp = Theme.padding.e,
-    gap: Dp = Theme.padding.e,
+    style: TextStyle = Theme.typography.v6,
+    padding: Dp = Theme.padding.g1,
+    gap: Dp = Theme.padding.g1,
     activeColor: Color = Theme.color.primary,
     fullColor: Color = Theme.color.warning,
     mask: Char? = null,
@@ -78,7 +76,7 @@ fun NumberInput(
 
     val density = LocalDensity.current
     val lineHeight = if (style.lineHeight.isSpecified) style.lineHeight else {
-        if (style.fontSize.isSpecified) style.fontSize else Theme.typography.v5.fontSize
+        if (style.fontSize.isSpecified) style.fontSize else Theme.typography.v6.fontSize
     }
     val cellSize = with(density) { lineHeight.toDp() } + padding * 2
 
@@ -97,8 +95,7 @@ fun NumberInput(
         InputTransformation {
             val previous = originalText.toString()
             val updated = asCharSequence().toString()
-            val appended = updated.length == previous.length + 1 &&
-                updated.startsWith(previous) && updated.last() in '0' .. '9' && updated.length <= maxNum
+            val appended = updated.length == previous.length + 1 && updated.startsWith(previous) && updated.last() in '0' .. '9' && updated.length <= maxNum
             val deleted = previous.length == updated.length + 1 && previous.startsWith(updated)
 
             if (updated != previous && !appended && !deleted) revertAllChanges()
@@ -127,15 +124,6 @@ fun NumberInput(
                     focusRequester.requestFocus()
                     keyboard?.show()
                 }
-            }
-            .clearAndSetSemantics {
-                contentDescription = "数字输入器"
-                stateDescription = "${value.length} / $maxNum 位"
-                onClick(label = "输入数字") {
-                    focusRequester.requestFocus()
-                    keyboard?.show()
-                    true
-                }
             },
         contentAlignment = Alignment.Center
     ) {
@@ -145,33 +133,30 @@ fun NumberInput(
         ) {
             for (index in 0 ..< maxNum) {
                 Box(
-                    modifier = Modifier.size(cellSize)
-                        .border(Theme.border.v7, borderColor, Theme.shape.v7),
+                    modifier = Modifier.size(cellSize).border(Theme.border.v7, borderColor, Theme.shape.v7),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    SimpleEllipsisText(
                         text = value.getOrNull(index)?.let { (mask ?: it).toString() } ?: "",
                         style = style,
-                        color = if (style.color == Color.Unspecified) Theme.color.onBackground else style.color,
-                        maxLines = 1
+                        color = if (style.color == Color.Unspecified) Theme.color.onBackground else style.color
                     )
                 }
             }
         }
 
-        // IME 通道只有一个不可见的触点，既不会绘制文字，也无法被拖拽选中。
+        // IME 通道只有一个不可见的触点，既不会绘制文字，也无法被拖拽选中
         val inputModifier = Modifier.align(Alignment.BottomEnd)
             .size(Theme.border.v7)
             .alpha(0f)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
-                    while (true) {
+                    forever {
                         val event = awaitPointerEvent(PointerEventPass.Initial)
                         event.changes.forEach { it.consume() }
                     }
                 }
-            }
-            .focusRequester(focusRequester)
+            }.focusRequester(focusRequester)
             .onFocusChanged { if (it.isFocused) keyboard?.show() }
             .onPreviewKeyEvent { event ->
                 if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
@@ -180,9 +165,6 @@ fun NumberInput(
                     event.isCtrlPressed || event.isMetaPressed -> true
                     event.key == Key.Insert || (event.isShiftPressed && event.key == Key.F10) -> true
                     event.isShiftPressed && event.key == Key.Delete -> true
-                    event.key == Key.DirectionLeft || event.key == Key.DirectionRight ||
-                        event.key == Key.DirectionUp || event.key == Key.DirectionDown ||
-                        event.key == Key.MoveHome || event.key == Key.MoveEnd -> true
                     event.key == Key.Delete -> {
                         state.deleteLast()
                         true
@@ -191,7 +173,7 @@ fun NumberInput(
                 }
             }
 
-        val inputTextStyle = style.copy(color = Color.Transparent)
+        val inputTextStyle = style.copy(color = Colors.Transparent)
         if (mask == null) {
             BasicTextField(
                 state = state.rawState,
@@ -201,7 +183,7 @@ fun NumberInput(
                 keyboardOptions = keyboardOptions,
                 onKeyboardAction = keyboardActionHandler,
                 interactionSource = state.interactionSource,
-                cursorBrush = SolidColor(Color.Transparent),
+                cursorBrush = SolidColor(Colors.Transparent),
             )
         } else {
             BasicSecureTextField(
@@ -212,7 +194,7 @@ fun NumberInput(
                 keyboardOptions = keyboardOptions,
                 onKeyboardAction = keyboardActionHandler,
                 interactionSource = state.interactionSource,
-                cursorBrush = SolidColor(Color.Transparent),
+                cursorBrush = SolidColor(Colors.Transparent),
                 textObfuscationMode = TextObfuscationMode.Hidden,
                 textObfuscationCharacter = mask,
             )

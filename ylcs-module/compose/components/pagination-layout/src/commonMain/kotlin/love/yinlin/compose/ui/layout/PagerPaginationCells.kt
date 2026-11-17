@@ -4,11 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * PagerPagination 的列规格。
- *
- * Fixed 固定列数；Adaptive 根据可用宽度和最小单元宽度计算列数。
- */
 @Stable
 sealed interface PagerPaginationCells {
     /** 固定显示 [count] 列。 */

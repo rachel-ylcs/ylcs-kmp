@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -30,6 +29,9 @@ import love.yinlin.GalleryParagraph
 import love.yinlin.Page
 import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
+import love.yinlin.compose.extension.rememberTrue
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.PaginationArgs
@@ -38,9 +40,10 @@ import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.layout.PagerPagination
 import love.yinlin.compose.ui.layout.PagerPaginationCells
-import love.yinlin.compose.ui.layout.rememberPagerPaginationState
+import love.yinlin.compose.ui.layout.PagerPaginationState
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Text
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 object PaginationPage : Page(
@@ -112,8 +115,7 @@ private val paginationDemoItems = List(27) { index ->
     )
 }
 
-private fun fetchPaginationDemoItems(offset: Int, cursor: Int, pageNum: Int): List<PaginationDemoItem> =
-    paginationDemoItems.filter { it.score > offset || (it.score == offset && it.id > cursor) }.take(pageNum)
+private fun fetchPaginationDemoItems(offset: Int, cursor: Int, pageNum: Int): List<PaginationDemoItem> = paginationDemoItems.filter { it.score > offset || (it.score == offset && it.id > cursor) }.take(pageNum)
 
 @Composable
 private fun PaginationDemo() {
@@ -125,12 +127,12 @@ private fun PaginationDemo() {
     var layout by remember { mutableIntStateOf(0) }
 
     val refresh: suspend () -> Unit = {
-        delay(300)
+        delay(300.milliseconds)
         page.newData(fetchPaginationDemoItems(page.default, page.default1, page.pageNum))
     }
     val loadMore: suspend () -> Unit = {
         if (page.canLoading) {
-            delay(300)
+            delay(300.milliseconds)
             page.moreData(fetchPaginationDemoItems(page.offset, page.arg1, page.pageNum))
         }
     }
@@ -165,11 +167,13 @@ private fun PaginationDemo() {
         size = 3,
         index = layout,
         onNavigate = { layout = it },
-        titleProvider = { when (it) {
-            0 -> "PaginationColumn"
-            1 -> "PaginationGrid"
-            else -> "PaginationStaggeredGrid"
-        } },
+        titleProvider = {
+            when (it) {
+                0 -> "PaginationColumn"
+                1 -> "PaginationGrid"
+                else -> "PaginationStaggeredGrid"
+           }
+        },
         modifier = Modifier.fillMaxWidth(),
     )
 
@@ -191,7 +195,6 @@ private fun PaginationDemo() {
         ) { item ->
             PaginationListItem(item)
         }
-
         1 -> PaginationGrid(
             items = page.items,
             modifier = Modifier.fillMaxWidth().height(420.dp),
@@ -211,7 +214,6 @@ private fun PaginationDemo() {
         ) { item ->
             PaginationGridItem(item)
         }
-
         else -> PaginationStaggeredGrid(
             items = page.items,
             modifier = Modifier.fillMaxWidth().height(420.dp),
@@ -296,10 +298,10 @@ private val pagerPaginationDemoItems = List(137) { index ->
 
 @Composable
 private fun PagerPaginationDemo() {
-    val state = rememberPagerPaginationState(initialPage = 7)
-    var columnsMode by remember { mutableIntStateOf(0) }
-    var maxRow by remember { mutableIntStateOf(2) }
-    var enabled by remember { mutableStateOf(true) }
+    val state = remember { PagerPaginationState(initialPage = 7) }
+    var columnsMode by rememberValueState(0)
+    var maxRow by rememberValueState(2)
+    var enabled by rememberTrue()
 
     GalleryParagraph("PagerPagination 根据列数和最大行数计算每页容量。单元格宽度始终相等，行高由该行内容决定；组件内部使用普通布局，不会与外层可滚动 Column 争夺滚动事件。")
 
@@ -339,18 +341,25 @@ private fun PagerPaginationDemo() {
         horizontalPadding = Theme.padding.h,
         verticalPadding = Theme.padding.v,
     ) { item ->
+        val previewHeight = when (item.id % 4) {
+            0 -> Theme.size.image8
+            1 -> Theme.size.image7
+            2 -> Theme.size.image6
+            else -> Theme.size.image5
+        }
+
         Column(
             modifier = Modifier.fillMaxWidth().background(Theme.color.surface, Theme.shape.v8).padding(Theme.padding.value),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.g),
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().height((48 + item.id % 4 * 14).dp)
+                modifier = Modifier.fillMaxWidth().height(previewHeight)
                     .background(Theme.color.primaryContainer, Theme.shape.v8),
                 contentAlignment = Alignment.Center,
             ) {
                 Text("ITEM ${item.id}", color = Theme.color.onContainer, fontWeight = FontWeight.SemiBold)
             }
-            Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text(item.title, style = Theme.typography.v7.bold)
             GalleryParagraph(item.summary)
         }
     }
