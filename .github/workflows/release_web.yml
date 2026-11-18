@@ -23,18 +23,10 @@ jobs:
       - name: Build
         run: ./gradlew :ylcs-app:web-app:webArtifact
 
-      - name: Upload JS Application
+      - name: Upload Web Application
         uses: actions/upload-artifact@v7
         with:
-          name: ylcs-js
-          path: outputs/ylcs-js.zip
-          archive: false
-          if-no-files-found: error
-
-      - name: Upload Wasm Application
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-wasm
-          path: outputs/ylcs-wasm.zip
+          name: ylcs-web
+          path: outputs/ylcs-web.zip
           archive: false
           if-no-files-found: error
