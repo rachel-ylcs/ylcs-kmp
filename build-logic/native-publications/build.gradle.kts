@@ -19,9 +19,6 @@ val modules = compose["modules"] as Map<*, *>
 val coordinates = listOf("skiko", "skiko-skottie").map { skiko["group"].toString() to it } + modules.map { (name, value) ->
     ((value as Map<*, *>)["group"] ?: compose["group"]).toString() to name.toString()
 }
-val emptyJavadoc = tasks.register<Jar>("nativeJavadocJar") {
-    archiveClassifier.set("javadoc")
-}
 
 fun Element.appendTextElement(name: String, value: String): Element = ownerDocument.createElement(name).also {
     it.textContent = value
@@ -56,6 +53,15 @@ if (inputRepository != null) {
             }
             require(files.any { it.name == "$prefix-sources.jar" }) { "Missing Native sources: $directory" }
             val publicationName = "native${coordinates.indexOf(groupName to rootArtifact)}${suffix.replace("-", "")}"
+
+            // Each publication needs a distinct Javadoc archive so its signature task
+            // cannot overlap another publication's .jar.asc output.
+            val emptyJavadoc = if (files.none { it.name == "${prefix}-javadoc.jar" }) {
+                tasks.register<Jar>("${publicationName}EmptyJavadocJar") {
+                    archiveBaseName.set("${project.name}-${publicationName}")
+                    archiveClassifier.set("javadoc")
+                }
+            } else null
             extensions.getByType<PublishingExtension>().publications.create<MavenPublication>(publicationName) {
                 groupId = groupName
                 artifactId = artifact
@@ -64,7 +70,7 @@ if (inputRepository != null) {
                     extension = file.extension
                     classifier = file.name.removePrefix(prefix).removeSuffix(".${file.extension}").removePrefix("-").ifEmpty { null }
                 }
-                if (files.none { it.name == "$prefix-javadoc.jar" }) artifact(emptyJavadoc)
+                emptyJavadoc?.let { artifact(it) }
                 pom.withXml {
                     val destination = asElement()
                     while (destination.hasChildNodes()) destination.removeChild(destination.firstChild)
