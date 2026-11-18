@@ -696,16 +696,16 @@ index dd1c704220c..4aabe8dcfdf 100644
  
      override fun getWordBoundary(offset: Int): TextRange {
 diff --git a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
-index ef19734ea58..eec10361417 100644
+index 2d6cf3ed2a0..c6b8ff917fc 100644
 --- a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
 +++ b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
-@@ -47,6 +47,8 @@ internal class SkikoParagraphIntrinsics(
+@@ -46,6 +46,8 @@ internal class SkikoParagraphIntrinsics(
      private val fontFamilyResolver: FontFamily.Resolver,
      private val defaultLocaleList: LocaleList,
  ) : ParagraphIntrinsics {
 +    internal val boundaryLocale: String? get() = (style.localeList ?: defaultLocaleList).firstOrNull()?.toLanguageTag()
 +
-     private val resolvedTypefaces = TypefaceDirtyTracker()
+     private val fontResolutions = ParagraphFontResolutions(fontFamilyResolver)
  
      val textDirection =
 diff --git a/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt b/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt

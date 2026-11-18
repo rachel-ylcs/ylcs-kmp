@@ -8,7 +8,7 @@ Rachel 使用仓库根目录的 Gradle Wrapper，以及 `build-logic` 中的统�
 | --- | --- | --- |
 | Gradle Wrapper | 9.8.2 | `gradle/wrapper/gradle-wrapper.properties` |
 | Kotlin | 2.5.0-Beta2 | `libs.versions.toml` |
-| Compose Multiplatform | 1.13.0-beta02 | `libs.versions.toml` |
+| Compose Multiplatform | 1.13.0-rc01 | `libs.versions.toml` |
 | Android Gradle Plugin | 9.3.3 | `libs.versions.toml` |
 | Ktor | 3.6.0 | `libs.versions.toml` |
 | Coroutines | 1.11.0 | `libs.versions.toml` |
