@@ -10,14 +10,17 @@ internal object NativeDesktopPackaging {
 
     fun resourceDirectory(desktop: NativeDesktopDistribution, target: String): String = if (desktop.enabled && target == "macos_arm64") "${desktop.packageName}.app/Contents/Resources" else ""
 
-    fun configureArchive(archive: Zip, directory: Provider<File>, executablePath: String) {
+    fun configureArchive(archive: Zip, directory: Provider<File>, executablePath: String, archiveRoot: String?) {
+        val archiveExecutablePath = archiveRoot?.let { "$it/$executablePath" } ?: executablePath
         with(archive) {
             from(directory) {
+                archiveRoot?.let { into(it) }
                 // Path patterns also traverse parent directories inside a macOS .app bundle.
                 include(executablePath)
                 filePermissions { unix("rwxr-xr-x") }
             }
             from(directory) {
+                archiveRoot?.let { into(it) }
                 exclude(executablePath)
                 filePermissions { unix("rw-r--r--") }
             }
@@ -28,8 +31,8 @@ internal object NativeDesktopPackaging {
             }
             doLast {
                 ZipFile(archiveFile.get().asFile).use { zip ->
-                    val executable = zip.getEntry(executablePath)
-                    require(executable != null && !executable.isDirectory && executable.size > 0 && executable.size == directory.get().resolve(executablePath).length()) { "Native archive is missing its executable: $executablePath" }
+                    val executable = zip.getEntry(archiveExecutablePath)
+                    require(executable != null && !executable.isDirectory && executable.size > 0 && executable.size == directory.get().resolve(executablePath).length()) { "Native archive is missing its executable: $archiveExecutablePath" }
                 }
             }
         }

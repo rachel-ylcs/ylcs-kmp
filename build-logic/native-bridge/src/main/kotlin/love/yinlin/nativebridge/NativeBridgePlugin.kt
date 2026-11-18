@@ -323,7 +323,12 @@ class NativeBridgePlugin : Plugin<Project> {
                 val archive = project.tasks.register("package$suffix", Zip::class.java) {
                     group = "native application"
                     dependsOn(stage)
-                    NativeDesktopPackaging.configureArchive(this, stage.map { task -> task.destinationDir }, executablePath)
+                    val archiveRoot = when {
+                        desktop.enabled && target.konanTarget.name == "macos_arm64" -> null
+                        desktop.enabled -> desktop.packageName
+                        else -> application.baseName.get()
+                    }
+                    NativeDesktopPackaging.configureArchive(this, stage.map { task -> task.destinationDir }, executablePath, archiveRoot)
                     archiveBaseName.set(application.baseName)
                     archiveClassifier.set("${target.konanTarget.name}-${binary.buildType.name.lowercase()}")
                     if (!desktop.versionedArchive && binary.buildType == NativeBuildType.RELEASE) archiveVersion.set("")

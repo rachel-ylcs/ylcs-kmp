@@ -23,6 +23,10 @@ on:
         description: Archive path with OS placeholder {0} and platform label placeholder {1}.
         type: string
         required: true
+      artifact-use-platform-names:
+        description: Use generic Windows, Linux, and macOS names for native desktop artifacts.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -94,7 +98,7 @@ jobs:
       - name: Upload Application
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ format(inputs.artifact-name, inputs.native && matrix.native-platform || matrix.platform) }}
-          path: ${{ format(inputs.artifact-path, matrix.platform, inputs.native && matrix.native-platform-label || matrix.platform-label) }}
+          name: ${{ format(inputs.artifact-name, inputs.artifact-use-platform-names && matrix.platform || inputs.native && matrix.native-platform || matrix.platform) }}
+          path: ${{ format(inputs.artifact-path, matrix.platform, inputs.artifact-use-platform-names && matrix.platform-label || inputs.native && matrix.native-platform-label || matrix.platform-label) }}
           archive: false
           if-no-files-found: error

@@ -70,14 +70,6 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  package-desktop:
-    name: Package JVM Desktop
-    uses: ./.github/workflows/desktop-build.yml
-    with:
-      task: :ylcs-app:desktop-app:desktopPublish
-      artifact-name: ylcs-{0}
-      artifact-path: outputs/*{1}*.zip
-
   package-web:
     name: Package Web
     runs-on: ubuntu-latest
@@ -92,21 +84,13 @@ jobs:
         uses: ./.github/actions/setup-build
 
       - name: Build
-        run: ./gradlew :ylcs-app:web-app:webJsPublish :ylcs-app:web-app:webPublish
+        run: ./gradlew :ylcs-app:web-app:webPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: ylcs-js
-          path: outputs/*WebJs*.zip
-          archive: false
-          if-no-files-found: error
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-wasm
-          path: outputs/*WebWasm*.zip
+          name: ylcs-web
+          path: outputs/*Web*.zip
           archive: false
           if-no-files-found: error
 
@@ -149,7 +133,8 @@ jobs:
     with:
       task: :ylcs-app:native-desktop-app:nativeDesktopPublish
       native: true
-      artifact-name: ylcs-native-{0}
+      artifact-name: ylcs-{0}
+      artifact-use-platform-names: true
       artifact-path: outputs/*{1}*.zip
 
   package-landpage:
@@ -179,7 +164,6 @@ jobs:
     needs: [
       package-android,
       package-ios,
-      package-desktop,
       package-web,
       package-server,
       package-modManager,

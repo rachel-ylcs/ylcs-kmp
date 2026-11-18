@@ -44,9 +44,9 @@ rachel {
 
         artifacts {
             val (target, platform) = when (C.platform) {
-                BuildPlatform.Windows -> "windows" to "WindowsNative"
-                BuildPlatform.Linux -> "linux" to "LinuxNative"
-                BuildPlatform.Mac -> "macos" to "macOSNative"
+                BuildPlatform.Windows -> "windows" to "Windows"
+                BuildPlatform.Linux -> "linux" to "Linux"
+                BuildPlatform.Mac -> "macos" to "macOS"
             }
             val archive = nativeDesktopReleaseArchive
             copy("nativeDesktopArtifact", archive, C.root.outputs, "ylcs-native-$target.zip", "打包当前平台的原生桌面端工件")

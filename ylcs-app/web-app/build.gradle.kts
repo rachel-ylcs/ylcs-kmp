@@ -43,14 +43,10 @@ rachel {
         }
 
         artifacts {
-            val js = browserDistribution(BrowserArtifactTarget.Js)
             val wasm = browserDistribution(BrowserArtifactTarget.Wasm)
             val excludes = listOf("*.map", "*.txt")
-            val jsArtifact = zip("webJsArtifact", js, C.root.outputs, "ylcs-js.zip", "打包Web/Js网页版", "webJs", excludes, replaceUnpackedOutput = true)
-            val wasmArtifact = zip("webWasmArtifact", wasm, C.root.outputs, "ylcs-wasm.zip", "打包Web/Wasm网页版", "webWasm", excludes, replaceUnpackedOutput = true)
-            zip("webJsPublish", js, C.root.outputs, "[WebJs]${C.app.displayName}${C.versionName}.zip", "发布Web/Js网页版", "webJs", excludes, replaceUnpackedOutput = true)
-            zip("webPublish", wasm, C.root.outputs, "[WebWasm]${C.app.displayName}${C.versionName}.zip", "发布网页版", "webWasm", excludes, replaceUnpackedOutput = true)
-            aggregate("webArtifact", "打包网页版", jsArtifact, wasmArtifact)
+            zip("webArtifact", wasm, C.root.outputs, "ylcs-web.zip", "打包Web网页版", "Web", excludes, replaceUnpackedOutput = true)
+            zip("webPublish", wasm, C.root.outputs, "[Web]${C.app.displayName}${C.versionName}.zip", "发布Web网页版", "Web", excludes, replaceUnpackedOutput = true)
         }
 
         runs {
