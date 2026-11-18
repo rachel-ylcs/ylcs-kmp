@@ -232,7 +232,7 @@ class ScreenUser : BasicScreen() {
 
     private suspend fun signin(profile: UserProfile) {
         ApiProfileSignin.request(app.config.userToken) { status, newData ->
-            if (status) {
+            if (!status) {
                 app.config.userProfile = profile.copy(
                     coin = profile.coin + 1,
                     exp = profile.exp + 1,
