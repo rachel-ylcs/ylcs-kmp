@@ -35,6 +35,8 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.text.DateInput
+import love.yinlin.compose.ui.text.DateInputState
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
 import love.yinlin.compose.ui.text.InputState
@@ -54,7 +56,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     // 活动信息状态
     private val shortTitle = InputState(initText = activity.shortTitle ?: "", maxLength = 5, imeAction = ImeAction.Next)
     private val fullTitle = InputState(initText = activity.title ?: "", maxLength = 32, imeAction = ImeAction.Next)
-    private val date = InputState(initText = activity.ts ?: "", maxLength = 12, imeAction = ImeAction.Next)
+    private val date = DateInputState(initValue = activity.ts?.let(DateEx.Formatter.standardDate::parse))
     private val timeInfo = InputState(initText = activity.tsInfo ?: "", maxLength = 128, imeAction = ImeAction.Next)
     private val location = InputState(initText = activity.location ?: "", maxLength = 32, imeAction = ImeAction.Next)
     private val content = InputState(initText = activity.content ?: "", maxLength = 512, maxLines = 5)
@@ -72,12 +74,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     private var photo by mutableRefStateOf(activity.photo)
 
     private suspend fun updateActivity() {
-        // 检查
-        val ts = date.text
-        if (catchingError { DateEx.Formatter.standardDate.parse(ts) } != null) {
-            slot.tip.warning("日期格式应为YYYY-MM-DD")
-            return
-        }
+        val ts = date.value?.let(DateEx.Formatter.standardDate::format)
         val tsInfo = timeInfo.text
         val location = location.text
         val shortTitle = shortTitle.text
@@ -287,7 +284,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         ) {
             Input(state = shortTitle, hint = "短活动名称(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
             Input(state = fullTitle, hint = "活动名称(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = date, hint = "活动时间(可空, YYYY-MM-DD)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            DateInput(state = date, hint = "活动日期(可空)", modifier = Modifier.fillMaxWidth())
             Input(state = timeInfo, hint = "活动时间补充信息(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
             Input(state = location, hint = "活动地点(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
             Input(state = content, hint = "活动内容(可空, 512字)", modifier = Modifier.fillMaxWidth())

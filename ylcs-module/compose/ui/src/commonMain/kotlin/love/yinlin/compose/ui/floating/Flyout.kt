@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -30,9 +29,8 @@ fun Flyout(
 ) {
     Box {
         val spacePx = with(LocalDensity.current) { space.roundToPx() }
-        val containerSize = LocalWindowInfo.current.containerSize
-        val positionProvider = remember(position, spacePx, containerSize) {
-            FlyoutPositionProvider(position, spacePx, containerSize)
+        val positionProvider = remember(position, spacePx) {
+            FlyoutPositionProvider(position, spacePx)
         }
 
         val transition = updateTransition(visible)

@@ -42,6 +42,7 @@ rachel {
 
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.lottie,
+                    projects.ylcsModule.compose.components.picker,
                     projects.ylcsModule.compose.components.richText,
                 )
             }

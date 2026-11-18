@@ -19,7 +19,8 @@ import love.yinlin.compose.Theme
 /**
  * @param state 状态
  * @param hint 提示
- * @param enabled 可写入
+ * @param readOnly 禁止编辑文本
+ * @param enabled 是否启用输入框
  * @param style 文字样式
  * @param alignment 文字对齐方式
  * @param colorProvider 提示灯颜色
@@ -31,6 +32,7 @@ fun Input(
     modifier: Modifier = Modifier,
     state: InputState = rememberInputState(),
     hint: String? = null,
+    readOnly: Boolean = false,
     enabled: Boolean = true,
     style: TextStyle = LocalStyle.current,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
@@ -51,7 +53,7 @@ fun Input(
             state = state.rawState,
             modifier = modifier,
             enabled = enabled,
-            readOnly = !enabled,
+            readOnly = readOnly || !enabled,
             inputTransformation = state.inputTransformation,
             textStyle = textStyle,
             keyboardOptions = remember(state.imeAction) {
