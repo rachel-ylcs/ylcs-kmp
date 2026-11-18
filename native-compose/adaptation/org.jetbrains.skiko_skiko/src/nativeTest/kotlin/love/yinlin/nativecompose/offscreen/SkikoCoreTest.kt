@@ -81,6 +81,27 @@ class SkikoCoreTest {
     }
 
     @Test
+    fun svgBuilderRendersTextWithFontManager() {
+        val svg = """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><text x="4" y="40" font-size="32" fill="#0000ff">SVG</text></svg>"""
+        Data.makeFromBytes(svg.encodeToByteArray()).use { data ->
+            val document = SVGDOM.Builder().use { builder ->
+                assertNotNull(builder.setFontManager(FontMgr.default).buildFromData(data))
+            }
+            document.use {
+                Surface.makeRasterN32Premul(64, 64).use { surface ->
+                    surface.canvas.clear(Color.WHITE)
+                    document.render(surface.canvas)
+                    Bitmap().use { bitmap ->
+                        assertTrue(bitmap.allocPixels(ImageInfo.makeN32Premul(64, 64)))
+                        assertTrue(surface.readPixels(bitmap, 0, 0))
+                        assertTrue((0 ..< 64).any { y -> (0 ..< 64).any { x -> bitmap.getColor(x, y) != Color.WHITE } })
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun fontsShapingAndParagraphLayout() {
         assertTrue(FontMgr.default.familiesCount > 0, "Install system fonts before running the Core tests")
         FontCollection().use { fonts ->

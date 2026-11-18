@@ -31,7 +31,6 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
                 }
             }
         }
-        sourceSets.getByName("commonMain").dependencies { api(project(":")) }
     }
 }
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))

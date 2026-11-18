@@ -15,6 +15,9 @@ dependencyResolutionManagement {
             url = uri(providers.gradleProperty("native.repository").getOrElse(generation.resolve("build/native-compose/repository").path))
         }
         mavenCentral()
+        maven("https://redirector.kotlinlang.org/maven/compose-dev") {
+            content { includeGroup("org.jetbrains.skiko") }
+        }
     }
     versionCatalogs {
         create("libs") { from(files("../../../libs.versions.toml")) }

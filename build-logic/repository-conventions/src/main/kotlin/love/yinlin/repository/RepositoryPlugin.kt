@@ -68,6 +68,9 @@ class RepositoryPlugin @Inject constructor(private val objects: ObjectFactory) :
             mavenCentral()
             google()
             if (plugins) gradlePluginPortal()
+            else maven("https://redirector.kotlinlang.org/maven/compose-dev") {
+                content { includeGroup("org.jetbrains.skiko") }
+            }
         }
     }
 }

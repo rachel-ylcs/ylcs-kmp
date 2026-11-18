@@ -11,16 +11,16 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  import org.gradle.api.tasks.compile.JavaCompile
  import org.gradle.api.tasks.testing.logging.TestExceptionFormat
  import org.gradle.kotlin.dsl.withType
-@@ -8,6 +10,8 @@
+@@ -8,6 +10,8 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
  import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
  import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
  import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 +import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 +import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
- import org.jetbrains.skiko.build.configuration.WasmImportsGeneratorCompilerPluginSupportPlugin
- import org.jetbrains.skiko.build.configuration.WasmImportsGeneratorForTestCompilerPluginSupportPlugin
- import org.jetbrains.skiko.build.configuration.configureGenerateSymbolsList
-@@ -29,7 +33,6 @@
+ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+ import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+@@ -33,7 +37,6 @@ import org.jetbrains.skiko.build.context.SkikoProjectContext
  import org.jetbrains.skiko.build.context.androidMainSourceSet
  import org.jetbrains.skiko.build.context.awtMainSourceSet
  import org.jetbrains.skiko.build.context.awtTestSourceSet
@@ -28,7 +28,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  import org.jetbrains.skiko.build.context.jvmMainSourceSet
  import org.jetbrains.skiko.build.context.jvmTestSourceSet
  import org.jetbrains.skiko.build.context.registerOrGetSkiaDirProvider
-@@ -41,6 +44,8 @@
+@@ -45,6 +48,8 @@ import org.jetbrains.skiko.build.context.supportNativeIosArm64
  import org.jetbrains.skiko.build.context.supportNativeIosSimulatorArm64
  import org.jetbrains.skiko.build.context.supportNativeIosX64
  import org.jetbrains.skiko.build.context.supportNativeLinux
@@ -37,7 +37,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  import org.jetbrains.skiko.build.context.supportNativeMac
  import org.jetbrains.skiko.build.context.supportNativeTvosArm64
  import org.jetbrains.skiko.build.context.supportNativeTvosSimulatorArm64
-@@ -60,23 +65,17 @@
+@@ -64,23 +69,17 @@ import org.jetbrains.skiko.build.utils.Arch
  import org.jetbrains.skiko.build.utils.OS
  import org.jetbrains.skiko.build.utils.SkikoArtifacts
  import org.jetbrains.skiko.build.utils.SkikoProperties
@@ -55,20 +55,19 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 -    org.gradle.crypto.checksum
 -    org.jetbrains.kotlinx.benchmark
 -}
--
--if (supportAndroid) {
--    apply(plugin = "com.android.kotlin.multiplatform.library")
--}
 +val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
 +fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
 +val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
 +fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
 +val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
-+
+ 
+-if (supportAndroid) {
+-    apply(plugin = "com.android.kotlin.multiplatform.library")
+-}
  
  apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
  apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
-@@ -85,7 +84,7 @@
+@@ -89,7 +88,7 @@ val skiko = SkikoProperties(rootProject)
  val buildType = skiko.buildType
  val targetOs = hostOs
  val targetArch = skiko.targetArch
@@ -77,7 +76,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  val coreDependencies: SkikoDependencyScope.() -> Unit = {
      targets {
-@@ -157,12 +156,8 @@
+@@ -161,12 +160,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
          }
          native {
@@ -91,7 +90,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
                  // Hack to fix problem with linker not always finding certain declarations.
                  directStaticSkiaLibs(
                      "skshaper",
-@@ -171,13 +166,37 @@
+@@ -175,13 +170,37 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
                      "skia",
                      "skia_ganesh_ext"
                  )
@@ -130,7 +129,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
                      "CoreGraphics",
                      "CoreText",
                      "CoreServices",
-@@ -185,6 +204,7 @@
+@@ -189,6 +208,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              ios {
@@ -138,7 +137,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
                  frameworks(
                      "Metal",
                      "CoreGraphics",
-@@ -194,6 +214,7 @@
+@@ -198,6 +218,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              tvos {
@@ -146,14 +145,16 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
                  frameworks(
                      "Metal",
                      "CoreGraphics",
-@@ -243,36 +264,22 @@
+@@ -247,7 +268,7 @@ val skikoProjectContext = SkikoProjectContext(
  )
  
  allprojects {
 -    group = SkikoArtifacts.DEFAULT_GROUP_ID
 +    group = skikoArtifacts.groupId
      version = skiko.deployVersion
- }
+ 
+     // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
+@@ -264,30 +285,16 @@ allprojects {
  
  repositories {
      mavenCentral {
@@ -166,7 +167,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  kotlin {
      applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)
 -    skikoProjectContext.declareSkiaTasks()
--
+ 
 -    if (supportAwt) {
 -        jvm("awt") {
 -            generateVersion(targetOs, targetArch, skiko)
@@ -182,13 +183,12 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 -            withHostTest {}
 -        }
 -    }
-+
 +    @Suppress("UNCHECKED_CAST")
 +    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoProjectContext)
  
  
      if (supportWeb) {
-@@ -331,35 +338,18 @@
+@@ -346,35 +353,18 @@ kotlin {
      }
  
      if (supportNativeMac) {
@@ -198,9 +198,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 -    if (supportNativeLinux) {
 +    if (supportNativeLinuxX64) {
          skikoProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-+    }
-+    if (supportNativeLinuxArm64) {
-         skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
+-        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
 -    }
 -    if (supportNativeIosArm64) {
 -        skikoProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
@@ -213,12 +211,14 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 -    }
 -    if (supportNativeTvosArm64) {
 -        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosArm64())
--    }
+     }
 -    if (supportNativeTvosSimulatorArm64) {
 -        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.Arm64, tvosSimulatorArm64())
 -    }
 -    if (supportNativeTvosX64) {
 -        skikoProjectContext.configureNativeTarget(OS.TVOS, Arch.X64, tvosX64())
++    if (supportNativeLinuxArm64) {
++        skikoProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64())
      }
  
      sourceSets.commonMain.dependencies {
@@ -228,7 +228,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
  
      sourceSets.commonTest.dependencies {
-@@ -370,23 +360,23 @@
+@@ -385,23 +375,23 @@ kotlin {
  
      skikoProjectContext.jvmMainSourceSet?.dependencies {
          implementation(kotlin("stdlib"))
@@ -257,7 +257,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
  
      if (supportAndroid && supportAwt) {
-@@ -396,7 +386,7 @@
+@@ -411,7 +401,7 @@ kotlin {
      }
  
      skikoProjectContext.jvmTestSourceSet?.dependencies {
@@ -266,7 +266,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
          implementation(kotlin("test-junit"))
          implementation(kotlin("test"))
      }
-@@ -419,44 +409,6 @@
+@@ -434,44 +424,6 @@ kotlin {
  /**
   * Setup JVM benchmarks
   */
@@ -311,7 +311,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  afterEvaluate {
      tasks.named("clean").configure {
-@@ -488,23 +440,6 @@
+@@ -503,23 +455,6 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
      }
  }
  
@@ -335,7 +335,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  if (supportWeb) {
      skikoProjectContext.provideWasmTestResources()
-@@ -523,11 +458,55 @@
+@@ -538,11 +473,55 @@ if (supportWeb) {
  
  skikoProjectContext.declarePublications()
  
@@ -393,7 +393,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
      configureSignAndPublishDependencies()
  }
-@@ -581,3 +560,47 @@
+@@ -592,3 +571,47 @@ tasks.register("printSkiaVersion") {
  }
  
  configureKotlinCompilerOptions()
@@ -442,7 +442,6 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 +    }
 +}
 diff --git a/skiko/buildSrc/build.gradle.kts b/skiko/buildSrc/build.gradle.kts
-index 32fd2b3..9358c16 100644
 --- a/skiko/buildSrc/build.gradle.kts
 +++ b/skiko/buildSrc/build.gradle.kts
 @@ -1,17 +1,37 @@
@@ -488,7 +487,6 @@ index 32fd2b3..9358c16 100644
 +    }
  }
 diff --git a/skiko/buildSrc/settings.gradle.kts b/skiko/buildSrc/settings.gradle.kts
-index 517dffe..345f129 100644
 --- a/skiko/buildSrc/settings.gradle.kts
 +++ b/skiko/buildSrc/settings.gradle.kts
 @@ -1,7 +1,7 @@
@@ -517,7 +515,6 @@ index 517dffe..345f129 100644
              from(files("../../dependencies.toml"))
          }
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
-index ba0b45a..2d94901 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/CommonTasksConfiguration.kt
 @@ -33,6 +33,9 @@ import org.jetbrains.skiko.build.utils.skikoKotlinLanguageVersion
@@ -530,7 +527,7 @@ index ba0b45a..2d94901 100644
  
  private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
      runCatching {
-@@ -200,18 +203,26 @@ fun Project.configureSignAndPublishDependencies() {
+@@ -184,18 +187,26 @@ fun Project.configureSignAndPublishDependencies() {
          tasks.configureEach {
              when {
                  name.startsWith(publishLinuxX64) -> {
@@ -560,7 +557,6 @@ index ba0b45a..2d94901 100644
          val publishMacosArm64 = "publishMacosArm64PublicationTo"
          val publishMacosX64 = "publishMacosX64PublicationTo"
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
-index fa8a118..17de602 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/JvmTasksConfiguration.kt
 @@ -43,6 +43,7 @@ import org.jetbrains.skiko.build.utils.linkerForTarget
@@ -590,7 +586,6 @@ index fa8a118..17de602 100644
              }
          )
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
-index 5853665..4683bc1 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/NativeTasksConfiguration.kt
 @@ -7,9 +7,15 @@ import org.gradle.api.Project
@@ -864,13 +859,12 @@ index 5853665..4683bc1 100644
          }
          OS.IOS -> {
              // list of linker options to be included into klib, which are needed for skiko consumers
-@@ -353,16 +473,34 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -353,23 +473,34 @@ fun SkikoProjectContext.configureNativeTarget(
                  "-L/usr/lib64",
                  "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
              )
--            options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
-             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
-             options.addAll(resolvedBinaryInputs.linkFlags)
++            options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
++            options.addAll(resolvedBinaryInputs.linkFlags)
              // When cross-compiling for ARM64 from x64, use the ARM toolchain sysroot
              if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
                  // ARM GNU toolchain sysroot paths
@@ -879,7 +873,9 @@ index 5853665..4683bc1 100644
 +                options.add(0, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/lib64")
 +                options.add(1, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/usr/lib64")
              }
--            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
+-            configureCinterop(cinteropName, os, arch, target, targetString,
+-                options + resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+-            options.addAll(resolvedBinaryInputs.directStaticArchivePaths)
 +            configureCinterop(cinteropName, os, arch, target, targetString, options)
 +            mutableListOfLinkerOptions(options)
 +        }
@@ -897,13 +893,19 @@ index 5853665..4683bc1 100644
 +                "-Wl,/nodefaultlib:libvcruntime",
 +                "-Wl,/nodefaultlib:vcruntime",
 +            )
-+            options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
-+            options.addAll(resolvedBinaryInputs.linkFlags)
+             options.addAll(resolvedBinaryInputs.dynamicLibNames.map { "-l$it" })
+             options.addAll(resolvedBinaryInputs.linkFlags)
+-            options.add("-lstdc++")
+-            // Kotlin/Native's bundled Linux toolchain may not resolve symbols from newer system libraries.
+-            // Work around this until the toolchain is updated: https://youtrack.jetbrains.com/issue/KT-67046
+-            options.add("--unresolved-symbols=ignore-all")
+-            options.add("--undefined-version")
+-            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
 +            configureCinterop(cinteropName, os, arch, target, targetString, options)
              mutableListOfLinkerOptions(options)
          }
          else -> mutableListOf()
-@@ -379,7 +517,9 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -386,7 +517,9 @@ fun SkikoProjectContext.configureNativeTarget(
  
      // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
      target.binaries.all {
@@ -914,7 +916,7 @@ index 5853665..4683bc1 100644
      }
  
      target.compilations.all {
-@@ -402,13 +542,17 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -409,13 +542,17 @@ fun SkikoProjectContext.configureNativeTarget(
          }
          inputs.files(objectFiles)
          val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
@@ -933,7 +935,7 @@ index 5853665..4683bc1 100644
              OS.MacOS, OS.IOS, OS.TVOS -> {
                  executable = "libtool"
                  argumentProviders.add { listOf("-static", "-o", staticLib) }
-@@ -420,6 +564,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -427,6 +564,24 @@ fun SkikoProjectContext.configureNativeTarget(
          outputs.dir(outDir)
      }
  
@@ -958,7 +960,7 @@ index 5853665..4683bc1 100644
      // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
      val compilationDependency = if (requiresSymbolPatching) {
          val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
-@@ -432,6 +594,7 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -439,6 +594,7 @@ fun SkikoProjectContext.configureNativeTarget(
          }
          project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
              dependsOn(unzipper)
@@ -966,7 +968,7 @@ index 5853665..4683bc1 100644
              dependsOn(linkTask)
              if (coreSymbolSources != null) {
                  dependsOn(coreSymbolSources)
-@@ -445,18 +608,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -452,18 +608,24 @@ fun SkikoProjectContext.configureNativeTarget(
                  configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
              }
          }
@@ -997,10 +999,9 @@ index 5853665..4683bc1 100644
      }
  }
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
-index 0a8c728..1654b53 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configuration/WasmTasksConfiguration.kt
-@@ -90,16 +90,16 @@ fun SkikoProjectContext.declareWasmTasks() {
+@@ -100,16 +100,16 @@ fun SkikoProjectContext.declareWasmTasks() {
          buildTargetArch.set(Arch.Wasm)
          buildVariant.set(buildType)
  
@@ -1022,7 +1023,6 @@ index 0a8c728..1654b53 100644
          }
          includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
-index 5ef6d38..5e5c1f2 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/SkiaTarget.kt
 @@ -10,7 +10,10 @@ enum class SkiaTarget(
@@ -1056,7 +1056,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
  import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  import org.jetbrains.skiko.build.cpp.WindowsSdkPaths
  import org.jetbrains.skiko.build.dependencies.AdditionalRuntimeLibrary
-@@ -102,89 +99,19 @@
+@@ -102,90 +99,20 @@ class SkikoProjectContext(
      }
  }
  
@@ -1127,7 +1127,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
 - */
  fun SkikoProjectContext.registerOrGetSkiaDirProvider(
      os: OS, arch: Arch, isUikitSim: Boolean = false
--): Provider<File> {
+ ): Provider<File> {
 -    val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.idWithSuffix(isUikitSim = isUikitSim), arch.id)
 -
 -    val skiaDir = skiko.skiaDir
@@ -1140,10 +1140,6 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
 -            enabled = false
 -        }.map {
 -            skiaDir.absoluteFile
--        }
--    } else {
--        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
-+): Provider<File> {
 +    val osId = os.idWithSuffix(isUikitSim = isUikitSim)
 +    val target = "$osId-${buildType.id}-${arch.id}"
 +    val version = project.rootProject.property("dependencies.skia").toString()
@@ -1153,12 +1149,15 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
 +    return project.tasks.registerOrGetTask<DefaultTask>("verifyPreparedSkia$suffix") {
 +        doLast {
 +            check(directory.isDirectory) { "Skia SDK is not prepared for $target. Run prepareNativeSources from the Rachel repository." }
-+        }
-+    }.map { directory }
+         }
+-    } else {
+-        project.rootProject.tasks.withType<Copy>().named("unzipSkia$taskNameSuffix").map { it.destinationDir.absoluteFile }
 -    }
++    }.map { directory }
  }
  
-@@ -194,55 +121,70 @@
+ internal val Project.isInIdea: Boolean
+@@ -194,55 +121,70 @@ internal val Project.isInIdea: Boolean
      }
  
  val Project.supportAndroid: Boolean
@@ -1245,7 +1244,6 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
  fun Project.skiaVersion(target: String): String {
      val platformSpecificVersion = "dependencies.skia.$target"
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
-index d839b03..1a8b2b9 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/sourceHierarchy.kt
 @@ -38,27 +38,16 @@ val skikoSourceSetHierarchyTemplate = KotlinHierarchyTemplate {
@@ -1285,7 +1283,6 @@ index d839b03..1a8b2b9 100644
      }
  }
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
-index 5bb0cca..440eed7 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/MergeStaticArchivesTask.kt
 @@ -94,7 +94,7 @@ abstract class MergeStaticArchivesTask : DefaultTask() {
@@ -1299,7 +1296,6 @@ index 5bb0cca..440eed7 100644
          val out = ByteArrayOutputStream()
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt
 new file mode 100644
-index 0000000..3e8825e
 --- /dev/null
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/StripCoffDirectivesTask.kt
 @@ -0,0 +1,83 @@
@@ -1387,7 +1383,6 @@ index 0000000..3e8825e
 +    }
 +}
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
-index 08f2491..77c39fa 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/cpp/windowsSdkPaths.kt
 @@ -16,18 +16,36 @@ import org.jetbrains.skiko.build.utils.hostOs
@@ -1537,7 +1532,6 @@ index 08f2491..77c39fa 100644
          val vsLocator = gradle.serviceOf<VisualStudioLocator>()
          val vsComponent = if (skikoVsbtPath != null) {
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
-index 6769256..18641b2 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/dependencies/SkikoDependency.kt
 @@ -22,8 +22,8 @@ annotation class SkikoBinaryDsl
@@ -1552,13 +1546,25 @@ index 6769256..18641b2 100644
          OS.Wasm -> listOf(TargetEnv.WASM)
      }
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
-index ea4b478..2ed547e 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/publishing/publishing.kt
-@@ -118,8 +118,9 @@ private val SkikoPublishingContext.emptySourcesJar
-         archiveClassifier.set("sources")
-     }
+@@ -13,7 +13,6 @@ import org.gradle.kotlin.dsl.named
+ import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+ import org.jetbrains.skiko.build.context.SkikoProjectContext
+ import org.jetbrains.skiko.build.context.supportAndroid
+-import org.jetbrains.skiko.build.context.supportAwt
+ import org.jetbrains.skiko.build.utils.Arch
+ import org.jetbrains.skiko.build.utils.OS
+ import org.jetbrains.skiko.build.utils.SkikoArtifacts
+@@ -89,13 +88,9 @@ fun SkikoProjectContext.declarePublications() {
+     ctx.configurePublishingTaskGroups()
+ }
  
+-private val SkikoPublishingContext.emptySourcesJar
+-    get() = project.tasks.registerOrGetTask<Jar>("emptySourcesJar") {
+-        archiveClassifier.set("sources")
+-    }
+-
 -private val SkikoPublishingContext.emptyJavadocJar
 -    get() = project.tasks.registerOrGetTask<Jar>("emptyJavadocJar") {
 +private fun SkikoPublishingContext.emptyJavadocJar(publicationName: String) =
@@ -1567,7 +1573,7 @@ index ea4b478..2ed547e 100644
          archiveClassifier.set("javadoc")
      }
  
-@@ -137,14 +138,6 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
+@@ -113,14 +108,6 @@ private fun SkikoPublishingContext.configurePublishingRepositories() {
                  name = "BuildRepo"
                  url = project.rootProject.layout.buildDirectory.dir("repo").get().asFile.toURI()
              }
@@ -1582,7 +1588,7 @@ index ea4b478..2ed547e 100644
          }
      }
  }
-@@ -170,10 +163,10 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
+@@ -146,10 +133,10 @@ private fun SkikoPublishingContext.configurePublicationDefaults() {
      publishing {
          publications.configureEach {
              this as MavenPublication
@@ -1595,34 +1601,7 @@ index ea4b478..2ed547e 100644
  
              pom {
                  description.set(skikoArtifacts.pomDescription)
-@@ -197,7 +190,7 @@ private fun SkikoPublishingContext.configureAllJvmRuntimeJarPublications() = pub
-             pom.withXml {
-                 asNode().appendNode("dependencies")
-                     .appendNode("dependency").apply {
--                        appendNode("groupId", SkikoArtifacts.DEFAULT_GROUP_ID)
-+                        appendNode("groupId", skikoArtifacts.groupId)
-                         appendNode("artifactId", skikoArtifacts.jvmArtifactId)
-                         appendNode("version", "[${skiko.deployVersion}]")
-                         appendNode("scope", "compile")
-@@ -347,7 +340,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
-              */
-             dependencies.add(
-                 project.dependencies.create(
--                    SkikoArtifacts.DEFAULT_GROUP_ID,
-+                    skikoArtifacts.groupId,
-                     skikoArtifacts.jvmRuntimeArtifactIdFor(os, arch),
-                     skiko.deployVersion
-                 )
-@@ -368,7 +361,7 @@ private fun SkikoPublishingContext.configureAwtRuntimeJarPublication() {
-         create("awtRuntimeElements", MavenPublication::class.java) {
-             from(component)
-             pomNameForPublication[name] = "${skikoArtifacts.displayName} JVM Runtime"
--            groupId = SkikoArtifacts.DEFAULT_GROUP_ID
-+            groupId = skikoArtifacts.groupId
-             artifactId = skikoArtifacts.jvmRuntimeArtifactId
-             version = skiko.deployVersion
- 
-@@ -418,7 +411,7 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
+@@ -189,7 +176,7 @@ private fun SkikoPublishingContext.configureAwtPublicationConstraints() {
          awtRuntimeTargets.forEach { (os, arch) ->
              config.dependencyConstraints.add(
                  project.dependencies.constraints.create(
@@ -1632,7 +1611,6 @@ index ea4b478..2ed547e 100644
              )
          }
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
-index 22b9121..7ad33f2 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/ArgBuilder.kt
 @@ -78,6 +78,10 @@ internal abstract class AbstractArgBuilder : ArgBuilder {
@@ -1647,7 +1625,6 @@ index 22b9121..7ad33f2 100644
              .replace("/", "\\")
              .replace("\\", "\\\\")
 diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
-index b08a021..0dabf4a 100644
 --- a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
 +++ b/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/utils/properties.kt
 @@ -6,6 +6,7 @@ import org.gradle.api.GradleException
@@ -1716,7 +1693,6 @@ index b08a021..0dabf4a 100644
      companion object {
          const val DEFAULT_ARTIFACT_ID_PREFIX = "skiko"
 diff --git a/skiko/gradle.properties b/skiko/gradle.properties
-index c60a153..b93a6fb 100644
 --- a/skiko/gradle.properties
 +++ b/skiko/gradle.properties
 @@ -38,14 +38,28 @@ dependencies.angle=ec4d8f8e4d
@@ -1751,7 +1727,6 @@ index c60a153..b93a6fb 100644
 +
 +kotlin.native.ignoreDisabledTargets=true
 diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
-index 31ceaa5..856f268 100644
 --- a/skiko/settings.gradle.kts
 +++ b/skiko/settings.gradle.kts
 @@ -1,3 +1,6 @@
@@ -1761,7 +1736,7 @@ index 31ceaa5..856f268 100644
  dependencyResolutionManagement {
      versionCatalogs {
          register("libs") {
-@@ -7,18 +10,29 @@ dependencyResolutionManagement {
+@@ -7,19 +10,29 @@ dependencyResolutionManagement {
  }
  
  pluginManagement {
@@ -1785,7 +1760,8 @@ index 31ceaa5..856f268 100644
  include("test-utils")
  include("skiko-skottie")
 -include("skiko-graphite")
-+// Rachel: skiko-graphite is outside the core Native build.
+-include("runtime-publications")
++// Rachel: skiko-graphite and runtime-publications are outside the core Native build.
 +
 +rootProject.buildFileName = "__REPOSITORY__/native-compose/adaptation/org.jetbrains.skiko_skiko/build.gradle.kts"
 +
@@ -1797,7 +1773,6 @@ index 31ceaa5..856f268 100644
 +val catalogHash = MessageDigest.getInstance("SHA-256").digest(catalog.readBytes()).joinToString("") { "%02x".format(it) }
 +check(ready["catalogSha256"] == catalogHash) { "Prepared Skiko sources are stale; use the root build to synchronize sources" }
 diff --git a/skiko/skiko-skottie/build.gradle.kts b/skiko/skiko-skottie/build.gradle.kts
-index 4aaa050..1aa78c4 100644
 --- a/skiko/skiko-skottie/build.gradle.kts
 +++ b/skiko/skiko-skottie/build.gradle.kts
 @@ -1,6 +1,5 @@
@@ -1891,7 +1866,9 @@ index 4aaa050..1aa78c4 100644
 -                }
 -            }
 -            binaries.executable()
--
++    @Suppress("UNCHECKED_CAST")
++    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoSkottieProjectContext)
+ 
 -            val test by compilations.getting
 -            project.tasks.named<Copy>(test.processResourcesTaskName) {
 -                dependsOn(
@@ -1902,9 +1879,7 @@ index 4aaa050..1aa78c4 100644
 -
 -            setupImportsGeneratorPlugin(skikoSkottieArtifacts.artifactIdPrefix, isSideModule = skikoSkottieProjectContext.kind == SkikoModuleKind.EXTENSION)
 -        }
-+    @Suppress("UNCHECKED_CAST")
-+    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)(skikoSkottieProjectContext)
- 
+-
 -        @OptIn(ExperimentalWasmDsl::class)
 -        wasmJs {
 -            outputModuleName.set("skiko-skottie-kjs-wasm")
@@ -1931,7 +1906,7 @@ index 4aaa050..1aa78c4 100644
  
      fun coreNativeSymbolSources(os: OS, arch: Arch, isUikitSim: Boolean) =
          skikoSkottieProjectContext.nativeSymbolSourcesFor(os, arch, isUikitSim).also {
-@@ -192,51 +127,17 @@ kotlin {
+@@ -192,38 +127,13 @@ kotlin {
          }
  
      if (supportNativeMac) {
@@ -1943,16 +1918,16 @@ index 4aaa050..1aa78c4 100644
 +    if (supportNativeLinuxX64) {
          skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.X64, linuxX64(), ::coreNativeSymbolSources)
 -        skikoSkottieProjectContext.configureNativeTarget(OS.Linux, Arch.Arm64, linuxArm64(), ::coreNativeSymbolSources)
--    }
--
+     }
+ 
 -    if (supportNativeIosArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64(), ::coreNativeSymbolSources)
 -    }
 -
 -    if (supportNativeIosSimulatorArm64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.Arm64, iosSimulatorArm64(), ::coreNativeSymbolSources)
-     }
- 
+-    }
+-
 -    if (supportNativeIosX64) {
 -        skikoSkottieProjectContext.configureNativeTarget(OS.IOS, Arch.X64, iosX64(), ::coreNativeSymbolSources)
 -    }
@@ -1971,21 +1946,7 @@ index 4aaa050..1aa78c4 100644
  
      sourceSets.commonMain.dependencies {
          implementation(kotlin("stdlib"))
--        /*
--        We use compileOnly here because the root project publishes multiple artifacts
--        which makes api/implementation(project(":")) fail during publishing.
--        This avoids Gradle's multi-publication ambiguity but skiko core is NOT added
--        as a transitive dependency of skiko-skottie, and it will NOT appear in the published POM
--        consumers MUST explicitly depend on both:
--            - implementation("org.jetbrains.skiko:skiko-x")
--            - implementation("org.jetbrains.skiko:skiko-skottie-x")
--         */
--        compileOnly(project(":"))
-+
-     }
- 
-     sourceSets.commonTest.dependencies {
-@@ -251,24 +152,24 @@ kotlin {
+@@ -242,24 +152,24 @@ kotlin {
      }
  
      skikoSkottieProjectContext.jvmTestSourceSet?.dependencies {
@@ -2015,7 +1976,7 @@ index 4aaa050..1aa78c4 100644
      }
  
      if (supportAndroid && supportAwt) {
-@@ -281,7 +182,7 @@ kotlin {
+@@ -272,7 +182,7 @@ kotlin {
          implementation(kotlin("test-wasm-js"))
      }
      skikoSkottieProjectContext.webTestSourceSet?.dependencies {
@@ -2024,7 +1985,7 @@ index 4aaa050..1aa78c4 100644
      }
  
      skikoSkottieProjectContext.webTestSourceSet?.apply {
-@@ -300,69 +201,6 @@ kotlin {
+@@ -292,69 +202,6 @@ kotlin {
      }
  }
  
@@ -2094,7 +2055,7 @@ index 4aaa050..1aa78c4 100644
  
  skikoSkottieProjectContext.declarePublications()
  
-@@ -376,3 +214,36 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
+@@ -368,3 +215,36 @@ if (skiko.isTeamcityCIBuild || mavenCentral.signArtifacts) {
  }
  
  configureKotlinCompilerOptions()
@@ -2133,7 +2094,6 @@ index 4aaa050..1aa78c4 100644
 +}
 diff --git a/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Animation.cc b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Animation.cc
 new file mode 100644
-index 0000000..16ec897
 --- /dev/null
 +++ b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Animation.cc
 @@ -0,0 +1,109 @@
@@ -2248,7 +2208,6 @@ index 0000000..16ec897
 +
 diff --git a/skiko/skiko-skottie/src/nativeMain/cpp/skottie/AnimationBuilder.cc b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/AnimationBuilder.cc
 new file mode 100644
-index 0000000..f9a896c
 --- /dev/null
 +++ b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/AnimationBuilder.cc
 @@ -0,0 +1,58 @@
@@ -2312,7 +2271,6 @@ index 0000000..f9a896c
 +}
 diff --git a/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Logger.cc b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Logger.cc
 new file mode 100644
-index 0000000..8edb517
 --- /dev/null
 +++ b/skiko/skiko-skottie/src/nativeMain/cpp/skottie/Logger.cc
 @@ -0,0 +1,73 @@
@@ -2391,7 +2349,6 @@ index 0000000..8edb517
 +}
 diff --git a/skiko/skiko-skottie/src/nativeMain/cpp/sksg/InvalidationController.cc b/skiko/skiko-skottie/src/nativeMain/cpp/sksg/InvalidationController.cc
 new file mode 100644
-index 0000000..4992f48
 --- /dev/null
 +++ b/skiko/skiko-skottie/src/nativeMain/cpp/sksg/InvalidationController.cc
 @@ -0,0 +1,36 @@
@@ -2433,7 +2390,6 @@ index 0000000..4992f48
 +}
 diff --git a/skiko/skiko-skottie/src/nativeMain/kotlin/org/jetbrains/skia/skottie/Logger.shared.kt b/skiko/skiko-skottie/src/nativeMain/kotlin/org/jetbrains/skia/skottie/Logger.shared.kt
 new file mode 100644
-index 0000000..b6f05bb
 --- /dev/null
 +++ b/skiko/skiko-skottie/src/nativeMain/kotlin/org/jetbrains/skia/skottie/Logger.shared.kt
 @@ -0,0 +1,18 @@
@@ -2456,7 +2412,6 @@ index 0000000..b6f05bb
 +    }
 +}
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
-index 4154190..fce528e 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt
 @@ -6,6 +6,8 @@ import kotlin.math.min
@@ -2559,7 +2514,6 @@ index 4154190..fce528e 100644
       * Creates an empty Bitmap without pixels, with [ColorType.UNKNOWN],
       * [ColorAlphaType.UNKNOWN], and with a width and height of zero.
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
-index f37859a..44315f4 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 @@ -601,15 +601,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
@@ -2665,7 +2619,6 @@ index f37859a..44315f4 100644
          try {
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
 new file mode 100644
-index 0000000..08417db
 --- /dev/null
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
 @@ -0,0 +1,23 @@
@@ -2693,7 +2646,6 @@ index 0000000..08417db
 +    assembledInterface: GLAssembledInterface,
 +): DirectContext
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
-index c0b86bd..49af027 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 @@ -3,7 +3,10 @@ package org.jetbrains.skia
@@ -2789,7 +2741,6 @@ index c0b86bd..49af027 100644
 +    alphaType: Int,
 +): NativePointer
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Matrix33.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Matrix33.kt
-index d68cbed..8409e18 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Matrix33.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Matrix33.kt
 @@ -8,6 +8,7 @@ import kotlin.math.sin
@@ -2801,7 +2752,6 @@ index d68cbed..8409e18 100644
  
  /**
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
-index f0982a2..5d04e47 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.kt
 @@ -53,7 +53,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
@@ -2814,7 +2764,6 @@ index f0982a2..5d04e47 100644
  
      private fun nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
-index 00ef144..d01b790 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
 @@ -44,6 +44,7 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
@@ -2835,7 +2784,6 @@ index 00ef144..d01b790 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
-index 9d8f764..0d0cc24 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/HbIcuScriptRunIterator.kt
 @@ -21,6 +21,7 @@ class HbIcuScriptRunIterator(text: ManagedString, manageText: Boolean) : Managed
@@ -2856,7 +2804,6 @@ index 9d8f764..0d0cc24 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
-index 9bbced8..b6a9419 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/IcuBidiRunIterator.kt
 @@ -32,6 +32,7 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
@@ -2877,7 +2824,6 @@ index 9bbced8..b6a9419 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
-index 292e392..c9980bf 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/ManagedRunIterator.kt
 @@ -20,10 +20,11 @@ abstract class ManagedRunIterator<T> internal constructor(
@@ -2903,7 +2849,6 @@ index 292e392..c9980bf 100644
  }
  
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
-index 3d02e0f..43c1078 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TextBlobBuilderRunHandler.kt
 @@ -24,6 +24,7 @@ class TextBlobBuilderRunHandler internal constructor(
@@ -2934,7 +2879,6 @@ index 3d02e0f..43c1078 100644
      }
  }
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialBidiRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialBidiRunIterator.kt
-index 5a2fb80..267f174 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialBidiRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialBidiRunIterator.kt
 @@ -7,6 +7,7 @@ class TrivialBidiRunIterator(text: String, level: Int) : MutableIterator<BidiRun
@@ -2955,7 +2899,6 @@ index 5a2fb80..267f174 100644
  }
 \ No newline at end of file
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialFontRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialFontRunIterator.kt
-index 0d8a66d..f2455e2 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialFontRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialFontRunIterator.kt
 @@ -9,6 +9,7 @@ class TrivialFontRunIterator(text: String, font: Font) : MutableIterator<FontRun
@@ -2976,7 +2919,6 @@ index 0d8a66d..f2455e2 100644
  }
 \ No newline at end of file
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialLanguageRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialLanguageRunIterator.kt
-index c03388d..53c5f3e 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialLanguageRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialLanguageRunIterator.kt
 @@ -7,6 +7,7 @@ class TrivialLanguageRunIterator(text: String, language: String) : MutableIterat
@@ -2997,7 +2939,6 @@ index c03388d..53c5f3e 100644
  }
 \ No newline at end of file
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialScriptRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialScriptRunIterator.kt
-index 1b9c3db..3d7cea0 100644
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialScriptRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/TrivialScriptRunIterator.kt
 @@ -7,6 +7,7 @@ class TrivialScriptRunIterator(text: String, script: String) : MutableIterator<S
@@ -3019,7 +2960,6 @@ index 1b9c3db..3d7cea0 100644
 \ No newline at end of file
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skiko/GraphicsApiSupport.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skiko/GraphicsApiSupport.kt
 new file mode 100644
-index 0000000..b2ffe7a
 --- /dev/null
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skiko/GraphicsApiSupport.kt
 @@ -0,0 +1,34 @@
@@ -3058,17 +2998,9 @@ index 0000000..b2ffe7a
 +        if (adapter.exactPattern) adapter.pattern == name else name.startsWith(adapter.pattern)
 +    }
 diff --git a/skiko/src/commonTest/kotlin/org/jetbrains/skia/BitmapTest.kt b/skiko/src/commonTest/kotlin/org/jetbrains/skia/BitmapTest.kt
-index 20b0234..eb59d83 100644
 --- a/skiko/src/commonTest/kotlin/org/jetbrains/skia/BitmapTest.kt
 +++ b/skiko/src/commonTest/kotlin/org/jetbrains/skia/BitmapTest.kt
-@@ -1,5 +1,6 @@
- package org.jetbrains.skia
- 
-+import org.jetbrains.skia.impl.use
- import org.jetbrains.skiko.KotlinBackend
- import org.jetbrains.skiko.kotlinBackend
- import org.jetbrains.skiko.tests.runTest
-@@ -45,6 +46,31 @@ class BitmapTest {
+@@ -158,6 +158,31 @@ class BitmapTest {
          bitmap.generationId
      }
  
@@ -3101,7 +3033,6 @@ index 20b0234..eb59d83 100644
      fun canMakeShader() = runTest {
          val bitmap = Bitmap()
 diff --git a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
-index 1daafac..34432f0 100644
 --- a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
 +++ b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
 @@ -44,7 +44,7 @@ private external fun _nMakeVulkanJvmAllocator(
@@ -3114,7 +3045,6 @@ index 1daafac..34432f0 100644
      Stats.onNativeCall()
      val ptr = _nMakeGLWithInterface(assembledInterface._ptr)
 diff --git a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
-index fc7adec..5139196 100644
 --- a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
 +++ b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
 @@ -6,8 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
@@ -3139,7 +3069,6 @@ index fc7adec..5139196 100644
              val ptr = _nCreateFromNativePointers(ctxPtr, fPtr)
 diff --git a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
 deleted file mode 100644
-index 307b729..0000000
 --- a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
 +++ /dev/null
 @@ -1,42 +0,0 @@
@@ -3188,7 +3117,6 @@ index 307b729..0000000
 \ No newline at end of file
 diff --git a/skiko/src/linuxTest/kotlin/org/jetbrains/skiko/SkiaLayerLinuxTest.kt b/skiko/src/linuxTest/kotlin/org/jetbrains/skiko/SkiaLayerLinuxTest.kt
 new file mode 100644
-index 0000000..c7d0571
 --- /dev/null
 +++ b/skiko/src/linuxTest/kotlin/org/jetbrains/skiko/SkiaLayerLinuxTest.kt
 @@ -0,0 +1,432 @@
@@ -3626,7 +3554,6 @@ index 0000000..c7d0571
 +}
 diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skia/Image.macos.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skia/Image.macos.kt
 new file mode 100644
-index 0000000..41ad122
 --- /dev/null
 +++ b/skiko/src/macosMain/kotlin/org/jetbrains/skia/Image.macos.kt
 @@ -0,0 +1,14 @@
@@ -3647,7 +3574,6 @@ index 0000000..41ad122
 \ No newline at end of file
 diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
 new file mode 100644
-index 0000000..02a8e6b
 --- /dev/null
 +++ b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
 @@ -0,0 +1,93 @@
@@ -3746,7 +3672,6 @@ index 0000000..02a8e6b
 +}
 diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
 new file mode 100644
-index 0000000..a1613a1
 --- /dev/null
 +++ b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
 @@ -0,0 +1,16 @@
@@ -3768,7 +3693,6 @@ index 0000000..a1613a1
 +    pairs.find { it.first == hostOs }?.let { it.second <= hostOSVersion } ?: false
 diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
 deleted file mode 100644
-index a95f1ed..0000000
 --- a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
 +++ /dev/null
 @@ -1,184 +0,0 @@
@@ -3958,7 +3882,6 @@ index a95f1ed..0000000
 -}
 diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
 deleted file mode 100644
-index 5146f29..0000000
 --- a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
 +++ /dev/null
 @@ -1,261 +0,0 @@
@@ -4225,7 +4148,6 @@ index 5146f29..0000000
 -}
 diff --git a/skiko/src/macosTest/kotlin/org/jetbrains/skia/ImageTest.macos.kt b/skiko/src/macosTest/kotlin/org/jetbrains/skia/ImageTest.macos.kt
 new file mode 100644
-index 0000000..89baff4
 --- /dev/null
 +++ b/skiko/src/macosTest/kotlin/org/jetbrains/skia/ImageTest.macos.kt
 @@ -0,0 +1,54 @@
@@ -4286,7 +4208,6 @@ index 0000000..89baff4
 \ No newline at end of file
 diff --git a/skiko/src/nativeJsMain/cpp/Image.cc b/skiko/src/nativeJsMain/cpp/Image.cc
 deleted file mode 100644
-index 84c083a..0000000
 --- a/skiko/src/nativeJsMain/cpp/Image.cc
 +++ /dev/null
 @@ -1,189 +0,0 @@
@@ -4481,7 +4402,6 @@ index 84c083a..0000000
 -}
 diff --git a/skiko/src/nativeMain/cpp/BBHFactory.cc b/skiko/src/nativeMain/cpp/BBHFactory.cc
 new file mode 100644
-index 0000000..314c7f7
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/BBHFactory.cc
 @@ -0,0 +1,17 @@
@@ -4504,7 +4424,6 @@ index 0000000..314c7f7
 +}
 diff --git a/skiko/src/nativeMain/cpp/BackendRenderTarget.cc b/skiko/src/nativeMain/cpp/BackendRenderTarget.cc
 new file mode 100644
-index 0000000..b03d99d
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/BackendRenderTarget.cc
 @@ -0,0 +1,92 @@
@@ -4602,7 +4521,6 @@ index 0000000..b03d99d
 +}
 diff --git a/skiko/src/nativeMain/cpp/BackendTexture.cc b/skiko/src/nativeMain/cpp/BackendTexture.cc
 new file mode 100644
-index 0000000..9be2ced
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/BackendTexture.cc
 @@ -0,0 +1,38 @@
@@ -4647,7 +4565,6 @@ index 0000000..9be2ced
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/Bitmap.cc b/skiko/src/nativeMain/cpp/Bitmap.cc
 new file mode 100644
-index 0000000..86b3321
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Bitmap.cc
 @@ -0,0 +1,322 @@
@@ -4975,7 +4892,6 @@ index 0000000..86b3321
 +
 diff --git a/skiko/src/nativeMain/cpp/Blender.cc b/skiko/src/nativeMain/cpp/Blender.cc
 new file mode 100644
-index 0000000..49bf916
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Blender.cc
 @@ -0,0 +1,15 @@
@@ -4996,7 +4912,6 @@ index 0000000..49bf916
 +}
 diff --git a/skiko/src/nativeMain/cpp/BreakIterator.cc b/skiko/src/nativeMain/cpp/BreakIterator.cc
 new file mode 100644
-index 0000000..688f5a3
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/BreakIterator.cc
 @@ -0,0 +1,113 @@
@@ -5116,7 +5031,6 @@ index 0000000..688f5a3
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/Canvas.cc b/skiko/src/nativeMain/cpp/Canvas.cc
 new file mode 100644
-index 0000000..6d6188e
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Canvas.cc
 @@ -0,0 +1,391 @@
@@ -5513,7 +5427,6 @@ index 0000000..6d6188e
 +}
 diff --git a/skiko/src/nativeMain/cpp/Codec.cc b/skiko/src/nativeMain/cpp/Codec.cc
 new file mode 100644
-index 0000000..ac17c3d
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Codec.cc
 @@ -0,0 +1,108 @@
@@ -5628,7 +5541,6 @@ index 0000000..ac17c3d
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/ColorFilter.cc b/skiko/src/nativeMain/cpp/ColorFilter.cc
 new file mode 100644
-index 0000000..2e42e23
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ColorFilter.cc
 @@ -0,0 +1,112 @@
@@ -5746,7 +5658,6 @@ index 0000000..2e42e23
 +}
 diff --git a/skiko/src/nativeMain/cpp/ColorSpace.cc b/skiko/src/nativeMain/cpp/ColorSpace.cc
 new file mode 100644
-index 0000000..eb33f3c
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ColorSpace.cc
 @@ -0,0 +1,64 @@
@@ -5816,7 +5727,6 @@ index 0000000..eb33f3c
 +}
 diff --git a/skiko/src/nativeMain/cpp/ColorType.cc b/skiko/src/nativeMain/cpp/ColorType.cc
 new file mode 100644
-index 0000000..455c6e5
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ColorType.cc
 @@ -0,0 +1,7 @@
@@ -5829,7 +5739,6 @@ index 0000000..455c6e5
 +}
 diff --git a/skiko/src/nativeMain/cpp/Data.cc b/skiko/src/nativeMain/cpp/Data.cc
 new file mode 100644
-index 0000000..aa2695c
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Data.cc
 @@ -0,0 +1,78 @@
@@ -5913,7 +5822,6 @@ index 0000000..aa2695c
 +}
 diff --git a/skiko/src/nativeMain/cpp/DirectContext.cc b/skiko/src/nativeMain/cpp/DirectContext.cc
 new file mode 100644
-index 0000000..d2d0e96
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/DirectContext.cc
 @@ -0,0 +1,156 @@
@@ -6075,7 +5983,6 @@ index 0000000..d2d0e96
 +
 diff --git a/skiko/src/nativeMain/cpp/Drawable.cc b/skiko/src/nativeMain/cpp/Drawable.cc
 new file mode 100644
-index 0000000..0216187
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Drawable.cc
 @@ -0,0 +1,98 @@
@@ -6179,7 +6086,6 @@ index 0000000..0216187
 +
 diff --git a/skiko/src/nativeMain/cpp/DynamicMemoryWStream.cc b/skiko/src/nativeMain/cpp/DynamicMemoryWStream.cc
 new file mode 100644
-index 0000000..a1a4f4f
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/DynamicMemoryWStream.cc
 @@ -0,0 +1,29 @@
@@ -6215,7 +6121,6 @@ index 0000000..a1a4f4f
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/Font.cc b/skiko/src/nativeMain/cpp/Font.cc
 new file mode 100644
-index 0000000..4dfe921
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Font.cc
 @@ -0,0 +1,361 @@
@@ -6582,7 +6487,6 @@ index 0000000..4dfe921
 +}
 diff --git a/skiko/src/nativeMain/cpp/FontMgr.cc b/skiko/src/nativeMain/cpp/FontMgr.cc
 new file mode 100644
-index 0000000..44fe80d
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/FontMgr.cc
 @@ -0,0 +1,111 @@
@@ -6700,7 +6604,6 @@ index 0000000..44fe80d
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/FontStyleSet.cc b/skiko/src/nativeMain/cpp/FontStyleSet.cc
 new file mode 100644
-index 0000000..a86e93b
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/FontStyleSet.cc
 @@ -0,0 +1,47 @@
@@ -6753,7 +6656,6 @@ index 0000000..a86e93b
 +}
 diff --git a/skiko/src/nativeMain/cpp/Graphics.cc b/skiko/src/nativeMain/cpp/Graphics.cc
 new file mode 100644
-index 0000000..af186e4
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Graphics.cc
 @@ -0,0 +1,72 @@
@@ -6831,7 +6733,6 @@ index 0000000..af186e4
 +}
 diff --git a/skiko/src/nativeMain/cpp/ImageFilter.cc b/skiko/src/nativeMain/cpp/ImageFilter.cc
 new file mode 100644
-index 0000000..c27c115
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ImageFilter.cc
 @@ -0,0 +1,249 @@
@@ -7086,7 +6987,6 @@ index 0000000..c27c115
 +}
 diff --git a/skiko/src/nativeMain/cpp/Managed.cc b/skiko/src/nativeMain/cpp/Managed.cc
 new file mode 100644
-index 0000000..f59f437
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Managed.cc
 @@ -0,0 +1,8 @@
@@ -7100,7 +7000,6 @@ index 0000000..f59f437
 +}
 diff --git a/skiko/src/nativeMain/cpp/ManagedString.cc b/skiko/src/nativeMain/cpp/ManagedString.cc
 new file mode 100644
-index 0000000..0beb8bb
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ManagedString.cc
 @@ -0,0 +1,57 @@
@@ -7163,7 +7062,6 @@ index 0000000..0beb8bb
 +}
 diff --git a/skiko/src/nativeMain/cpp/MaskFilter.cc b/skiko/src/nativeMain/cpp/MaskFilter.cc
 new file mode 100644
-index 0000000..9098790
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/MaskFilter.cc
 @@ -0,0 +1,40 @@
@@ -7209,7 +7107,6 @@ index 0000000..9098790
 +}
 diff --git a/skiko/src/nativeMain/cpp/OutputWStream.cc b/skiko/src/nativeMain/cpp/OutputWStream.cc
 new file mode 100644
-index 0000000..b974038
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/OutputWStream.cc
 @@ -0,0 +1,32 @@
@@ -7247,7 +7144,6 @@ index 0000000..b974038
 +
 diff --git a/skiko/src/nativeMain/cpp/Paint.cc b/skiko/src/nativeMain/cpp/Paint.cc
 new file mode 100644
-index 0000000..ece9c35
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Paint.cc
 @@ -0,0 +1,257 @@
@@ -7510,7 +7406,6 @@ index 0000000..ece9c35
 +}
 diff --git a/skiko/src/nativeMain/cpp/PaintFilterCanvas.cc b/skiko/src/nativeMain/cpp/PaintFilterCanvas.cc
 new file mode 100644
-index 0000000..93b1017
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PaintFilterCanvas.cc
 @@ -0,0 +1,64 @@
@@ -7580,7 +7475,6 @@ index 0000000..93b1017
 +
 diff --git a/skiko/src/nativeMain/cpp/Path.cc b/skiko/src/nativeMain/cpp/Path.cc
 new file mode 100644
-index 0000000..01d8d6b
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Path.cc
 @@ -0,0 +1,404 @@
@@ -7990,7 +7884,6 @@ index 0000000..01d8d6b
 +}
 diff --git a/skiko/src/nativeMain/cpp/PathBuilder.cc b/skiko/src/nativeMain/cpp/PathBuilder.cc
 new file mode 100644
-index 0000000..6b0ae76
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PathBuilder.cc
 @@ -0,0 +1,202 @@
@@ -8198,7 +8091,6 @@ index 0000000..6b0ae76
 +}
 diff --git a/skiko/src/nativeMain/cpp/PathEffect.cc b/skiko/src/nativeMain/cpp/PathEffect.cc
 new file mode 100644
-index 0000000..191b186
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PathEffect.cc
 @@ -0,0 +1,65 @@
@@ -8269,7 +8161,6 @@ index 0000000..191b186
 +}
 diff --git a/skiko/src/nativeMain/cpp/PathMeasure.cc b/skiko/src/nativeMain/cpp/PathMeasure.cc
 new file mode 100644
-index 0000000..8f72624
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PathMeasure.cc
 @@ -0,0 +1,117 @@
@@ -8392,7 +8283,6 @@ index 0000000..8f72624
 +}
 diff --git a/skiko/src/nativeMain/cpp/PathSegmentIterator.cc b/skiko/src/nativeMain/cpp/PathSegmentIterator.cc
 new file mode 100644
-index 0000000..936dc75
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PathSegmentIterator.cc
 @@ -0,0 +1,50 @@
@@ -8449,7 +8339,6 @@ index 0000000..936dc75
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/PathUtils.cc b/skiko/src/nativeMain/cpp/PathUtils.cc
 new file mode 100644
-index 0000000..a19212e
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PathUtils.cc
 @@ -0,0 +1,39 @@
@@ -8494,7 +8383,6 @@ index 0000000..a19212e
 +}
 diff --git a/skiko/src/nativeMain/cpp/Picture.cc b/skiko/src/nativeMain/cpp/Picture.cc
 new file mode 100644
-index 0000000..42b139d
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Picture.cc
 @@ -0,0 +1,96 @@
@@ -8596,7 +8484,6 @@ index 0000000..42b139d
 +
 diff --git a/skiko/src/nativeMain/cpp/PictureRecorder.cc b/skiko/src/nativeMain/cpp/PictureRecorder.cc
 new file mode 100644
-index 0000000..cdfe70a
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PictureRecorder.cc
 @@ -0,0 +1,57 @@
@@ -8659,7 +8546,6 @@ index 0000000..cdfe70a
 +}
 diff --git a/skiko/src/nativeMain/cpp/PixelRef.cc b/skiko/src/nativeMain/cpp/PixelRef.cc
 new file mode 100644
-index 0000000..23c37df
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/PixelRef.cc
 @@ -0,0 +1,50 @@
@@ -8715,7 +8601,6 @@ index 0000000..23c37df
 +}
 diff --git a/skiko/src/nativeMain/cpp/Pixmap.cc b/skiko/src/nativeMain/cpp/Pixmap.cc
 new file mode 100644
-index 0000000..800c69c
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Pixmap.cc
 @@ -0,0 +1,177 @@
@@ -8898,7 +8783,6 @@ index 0000000..800c69c
 +}
 diff --git a/skiko/src/nativeMain/cpp/RefCnt.cc b/skiko/src/nativeMain/cpp/RefCnt.cc
 new file mode 100644
-index 0000000..4c94c68
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/RefCnt.cc
 @@ -0,0 +1,31 @@
@@ -8936,7 +8820,6 @@ index 0000000..4c94c68
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/Region.cc b/skiko/src/nativeMain/cpp/Region.cc
 new file mode 100644
-index 0000000..7bf34dc
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Region.cc
 @@ -0,0 +1,176 @@
@@ -9118,7 +9001,6 @@ index 0000000..7bf34dc
 +}
 diff --git a/skiko/src/nativeMain/cpp/RuntimeEffect.cc b/skiko/src/nativeMain/cpp/RuntimeEffect.cc
 new file mode 100644
-index 0000000..cfb20b7
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/RuntimeEffect.cc
 @@ -0,0 +1,80 @@
@@ -9204,7 +9086,6 @@ index 0000000..cfb20b7
 +}
 diff --git a/skiko/src/nativeMain/cpp/RuntimeShaderBuilder.cc b/skiko/src/nativeMain/cpp/RuntimeShaderBuilder.cc
 new file mode 100644
-index 0000000..6c4df7b
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/RuntimeShaderBuilder.cc
 @@ -0,0 +1,122 @@
@@ -9332,7 +9213,6 @@ index 0000000..6c4df7b
 +}
 diff --git a/skiko/src/nativeMain/cpp/Shader.cc b/skiko/src/nativeMain/cpp/Shader.cc
 new file mode 100644
-index 0000000..bc63d56
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Shader.cc
 @@ -0,0 +1,133 @@
@@ -9471,7 +9351,6 @@ index 0000000..bc63d56
 +}
 diff --git a/skiko/src/nativeMain/cpp/ShadowUtils.cc b/skiko/src/nativeMain/cpp/ShadowUtils.cc
 new file mode 100644
-index 0000000..0454f2e
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/ShadowUtils.cc
 @@ -0,0 +1,25 @@
@@ -9502,7 +9381,6 @@ index 0000000..0454f2e
 +}
 diff --git a/skiko/src/nativeMain/cpp/StdVectorDecoder.cc b/skiko/src/nativeMain/cpp/StdVectorDecoder.cc
 new file mode 100644
-index 0000000..a1302ea
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/StdVectorDecoder.cc
 @@ -0,0 +1,32 @@
@@ -9540,7 +9418,6 @@ index 0000000..a1302ea
 +    }
 diff --git a/skiko/src/nativeMain/cpp/Surface.cc b/skiko/src/nativeMain/cpp/Surface.cc
 new file mode 100644
-index 0000000..70ddcd8
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Surface.cc
 @@ -0,0 +1,279 @@
@@ -9825,7 +9702,6 @@ index 0000000..70ddcd8
 +}
 diff --git a/skiko/src/nativeMain/cpp/TextBlob.cc b/skiko/src/nativeMain/cpp/TextBlob.cc
 new file mode 100644
-index 0000000..cdef0f5
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/TextBlob.cc
 @@ -0,0 +1,211 @@
@@ -10042,7 +9918,6 @@ index 0000000..cdef0f5
 +}
 diff --git a/skiko/src/nativeMain/cpp/TextBlobBuilder.cc b/skiko/src/nativeMain/cpp/TextBlobBuilder.cc
 new file mode 100644
-index 0000000..2363536
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/TextBlobBuilder.cc
 @@ -0,0 +1,70 @@
@@ -10118,7 +9993,6 @@ index 0000000..2363536
 +}
 diff --git a/skiko/src/nativeMain/cpp/TextLine.cc b/skiko/src/nativeMain/cpp/TextLine.cc
 new file mode 100644
-index 0000000..423afc1
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/TextLine.cc
 @@ -0,0 +1,224 @@
@@ -10348,7 +10222,6 @@ index 0000000..423afc1
 +
 diff --git a/skiko/src/nativeMain/cpp/Typeface.cc b/skiko/src/nativeMain/cpp/Typeface.cc
 new file mode 100644
-index 0000000..f3e0685
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/Typeface.cc
 @@ -0,0 +1,200 @@
@@ -10555,7 +10428,6 @@ index 0000000..f3e0685
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/U16String.cc b/skiko/src/nativeMain/cpp/U16String.cc
 new file mode 100644
-index 0000000..80d673f
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/U16String.cc
 @@ -0,0 +1,11 @@
@@ -10572,7 +10444,6 @@ index 0000000..80d673f
 +}
 diff --git a/skiko/src/nativeMain/cpp/common.h b/skiko/src/nativeMain/cpp/common.h
 new file mode 100644
-index 0000000..4208fa3
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/common.h
 @@ -0,0 +1,223 @@
@@ -10801,7 +10672,6 @@ index 0000000..4208fa3
 +
 diff --git a/skiko/src/nativeMain/cpp/common/svg/SVGCanvas.cc b/skiko/src/nativeMain/cpp/common/svg/SVGCanvas.cc
 new file mode 100644
-index 0000000..fc3d04f
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/common/svg/SVGCanvas.cc
 @@ -0,0 +1,13 @@
@@ -10820,7 +10690,6 @@ index 0000000..fc3d04f
 +}
 diff --git a/skiko/src/nativeMain/cpp/common_interop.cc b/skiko/src/nativeMain/cpp/common_interop.cc
 new file mode 100644
-index 0000000..5937723
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/common_interop.cc
 @@ -0,0 +1,441 @@
@@ -11267,7 +11136,6 @@ index 0000000..5937723
 +
 diff --git a/skiko/src/nativeMain/cpp/icu/Unicode.cc b/skiko/src/nativeMain/cpp/icu/Unicode.cc
 new file mode 100644
-index 0000000..3471258
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/icu/Unicode.cc
 @@ -0,0 +1,10 @@
@@ -11283,7 +11151,6 @@ index 0000000..3471258
 +}
 diff --git a/skiko/src/nativeMain/cpp/node/RenderNode.native.cpp b/skiko/src/nativeMain/cpp/node/RenderNode.native.cpp
 new file mode 100644
-index 0000000..5384c6f
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/node/RenderNode.native.cpp
 @@ -0,0 +1,247 @@
@@ -11536,7 +11403,6 @@ index 0000000..5384c6f
 +}
 diff --git a/skiko/src/nativeMain/cpp/node/RenderNodeContext.native.cpp b/skiko/src/nativeMain/cpp/node/RenderNodeContext.native.cpp
 new file mode 100644
-index 0000000..d548eae
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/node/RenderNodeContext.native.cpp
 @@ -0,0 +1,22 @@
@@ -11564,7 +11430,6 @@ index 0000000..d548eae
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/FontCollection.cc b/skiko/src/nativeMain/cpp/paragraph/FontCollection.cc
 new file mode 100644
-index 0000000..e65ff38
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/FontCollection.cc
 @@ -0,0 +1,110 @@
@@ -11680,7 +11545,6 @@ index 0000000..e65ff38
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/LineMetrics.cc b/skiko/src/nativeMain/cpp/paragraph/LineMetrics.cc
 new file mode 100644
-index 0000000..f741579
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/LineMetrics.cc
 @@ -0,0 +1,43 @@
@@ -11729,7 +11593,6 @@ index 0000000..f741579
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/Paragraph.cc b/skiko/src/nativeMain/cpp/paragraph/Paragraph.cc
 new file mode 100644
-index 0000000..7181d82
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/Paragraph.cc
 @@ -0,0 +1,196 @@
@@ -11931,7 +11794,6 @@ index 0000000..7181d82
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/ParagraphBuilder.cc b/skiko/src/nativeMain/cpp/paragraph/ParagraphBuilder.cc
 new file mode 100644
-index 0000000..be3b9fa
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/ParagraphBuilder.cc
 @@ -0,0 +1,62 @@
@@ -11999,7 +11861,6 @@ index 0000000..be3b9fa
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/ParagraphCache.cc b/skiko/src/nativeMain/cpp/paragraph/ParagraphCache.cc
 new file mode 100644
-index 0000000..ac4744e
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/ParagraphCache.cc
 @@ -0,0 +1,50 @@
@@ -12055,7 +11916,6 @@ index 0000000..ac4744e
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/ParagraphStyle.cc b/skiko/src/nativeMain/cpp/paragraph/ParagraphStyle.cc
 new file mode 100644
-index 0000000..2793cbd
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/ParagraphStyle.cc
 @@ -0,0 +1,189 @@
@@ -12250,7 +12110,6 @@ index 0000000..2793cbd
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/StrutStyle.cc b/skiko/src/nativeMain/cpp/paragraph/StrutStyle.cc
 new file mode 100644
-index 0000000..17389d2
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/StrutStyle.cc
 @@ -0,0 +1,159 @@
@@ -12415,7 +12274,6 @@ index 0000000..17389d2
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/TextBox.cc b/skiko/src/nativeMain/cpp/paragraph/TextBox.cc
 new file mode 100644
-index 0000000..7f8e469
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/TextBox.cc
 @@ -0,0 +1,34 @@
@@ -12455,7 +12313,6 @@ index 0000000..7f8e469
 +
 diff --git a/skiko/src/nativeMain/cpp/paragraph/TextStyle.cc b/skiko/src/nativeMain/cpp/paragraph/TextStyle.cc
 new file mode 100644
-index 0000000..960d593
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/TextStyle.cc
 @@ -0,0 +1,428 @@
@@ -12889,7 +12746,6 @@ index 0000000..960d593
 +}
 diff --git a/skiko/src/nativeMain/cpp/paragraph/TypefaceFontProvider.cc b/skiko/src/nativeMain/cpp/paragraph/TypefaceFontProvider.cc
 new file mode 100644
-index 0000000..7d02478
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/paragraph/TypefaceFontProvider.cc
 @@ -0,0 +1,41 @@
@@ -12936,7 +12792,6 @@ index 0000000..7d02478
 +
 diff --git a/skiko/src/nativeMain/cpp/render.cc b/skiko/src/nativeMain/cpp/render.cc
 new file mode 100644
-index 0000000..565caf5
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/render.cc
 @@ -0,0 +1,56 @@
@@ -12998,7 +12853,6 @@ index 0000000..565caf5
 +
 diff --git a/skiko/src/nativeMain/cpp/shaper/FontMgrRunIterator.cc b/skiko/src/nativeMain/cpp/shaper/FontMgrRunIterator.cc
 new file mode 100644
-index 0000000..9ed634a
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/FontMgrRunIterator.cc
 @@ -0,0 +1,39 @@
@@ -13043,7 +12897,6 @@ index 0000000..9ed634a
 +}
 diff --git a/skiko/src/nativeMain/cpp/shaper/HbIcuScriptRunIterator.cc b/skiko/src/nativeMain/cpp/shaper/HbIcuScriptRunIterator.cc
 new file mode 100644
-index 0000000..aadf22a
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/HbIcuScriptRunIterator.cc
 @@ -0,0 +1,15 @@
@@ -13064,7 +12917,6 @@ index 0000000..aadf22a
 +}
 diff --git a/skiko/src/nativeMain/cpp/shaper/IcuBidiRunIterator.cc b/skiko/src/nativeMain/cpp/shaper/IcuBidiRunIterator.cc
 new file mode 100644
-index 0000000..124c7ab
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/IcuBidiRunIterator.cc
 @@ -0,0 +1,15 @@
@@ -13085,7 +12937,6 @@ index 0000000..124c7ab
 +}
 diff --git a/skiko/src/nativeMain/cpp/shaper/ManagedRunIterator.cc b/skiko/src/nativeMain/cpp/shaper/ManagedRunIterator.cc
 new file mode 100644
-index 0000000..28fba93
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/ManagedRunIterator.cc
 @@ -0,0 +1,31 @@
@@ -13122,7 +12973,6 @@ index 0000000..28fba93
 +}
 diff --git a/skiko/src/nativeMain/cpp/shaper/Shaper.cc b/skiko/src/nativeMain/cpp/shaper/Shaper.cc
 new file mode 100644
-index 0000000..856ae9e
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/Shaper.cc
 @@ -0,0 +1,460 @@
@@ -13588,7 +13438,6 @@ index 0000000..856ae9e
 +}
 diff --git a/skiko/src/nativeMain/cpp/shaper/TextBlobBuilderRunHandler.cc b/skiko/src/nativeMain/cpp/shaper/TextBlobBuilderRunHandler.cc
 new file mode 100644
-index 0000000..31f7534
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/shaper/TextBlobBuilderRunHandler.cc
 @@ -0,0 +1,25 @@
@@ -13619,7 +13468,6 @@ index 0000000..31f7534
 +}
 diff --git a/skiko/src/nativeMain/cpp/svg/SVGCanvas.cc b/skiko/src/nativeMain/cpp/svg/SVGCanvas.cc
 new file mode 100644
-index 0000000..7efa931
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/svg/SVGCanvas.cc
 @@ -0,0 +1,13 @@
@@ -13638,12 +13486,12 @@ index 0000000..7efa931
 +}
 diff --git a/skiko/src/nativeMain/cpp/svg/SVGDOM.cc b/skiko/src/nativeMain/cpp/svg/SVGDOM.cc
 new file mode 100644
-index 0000000..6a9762d
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/svg/SVGDOM.cc
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,72 @@
 +#include "SkCanvas.h"
 +#include "SkData.h"
++#include "SkFontMgr.h"
 +#include "SkStream.h"
 +#include "SkSVGDOM.h"
 +#include "SkSVGSVG.h"
@@ -13651,15 +13499,16 @@ index 0000000..6a9762d
 +
 +SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nMakeFromData
 +  (KNativePointer dataPtr) {
-+    SkData* data = reinterpret_cast<SkData*>((dataPtr));
++    SkData* data = reinterpret_cast<SkData*>(dataPtr);
 +    SkMemoryStream stream(sk_ref_sp(data));
++    // No font manager: <text> that needs a font is not drawn. Callers that need text use Builder.
 +    sk_sp<SkSVGDOM> instance = SkSVGDOM::MakeFromStream(stream);
 +    return reinterpret_cast<KNativePointer>(instance.release());
 +}
 +
 +SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nGetRoot
 +  (KNativePointer ptr) {
-+    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>((ptr));
++    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(ptr);
 +    SkSVGSVG* root = instance->getRoot();
 +    root->ref();
 +    return reinterpret_cast<KNativePointer>(root);
@@ -13667,26 +13516,53 @@ index 0000000..6a9762d
 +
 +SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize
 +  (KNativePointer ptr, KInteropPointer dst) {
-+    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>((ptr));
++    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(ptr);
 +    const SkSize& size = instance->containerSize();
 +    skija::Point::copyToInterop({size.fWidth, size.fHeight}, dst);
 +}
 +
 +SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize
 +  (KNativePointer ptr, KFloat width, KFloat height) {
-+    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>((ptr));
++    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(ptr);
 +    instance->setContainerSize(SkSize{width, height});
 +}
 +
 +SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nRender
 +  (KNativePointer ptr, KNativePointer canvasPtr) {
-+    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>((ptr));
-+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
++    SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(ptr);
++    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(canvasPtr);
 +    instance->render(canvas);
++}
++
++static void deleteSVGDOMBuilder(SkSVGDOM::Builder* builder) {
++    delete builder;
++}
++
++SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nBuilderGetFinalizer
++  () {
++    return reinterpret_cast<KNativePointer>(&deleteSVGDOMBuilder);
++}
++
++SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nBuilderMake
++  () {
++    return reinterpret_cast<KNativePointer>(new SkSVGDOM::Builder());
++}
++
++SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nBuilderSetFontManager
++  (KNativePointer ptr, KNativePointer fontMgrPtr) {
++    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(ptr);
++    instance->setFontManager(sk_ref_sp(reinterpret_cast<SkFontMgr*>(fontMgrPtr)));
++}
++
++SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nBuilderBuildFromData
++  (KNativePointer ptr, KNativePointer dataPtr) {
++    SkSVGDOM::Builder* instance = reinterpret_cast<SkSVGDOM::Builder*>(ptr);
++    SkData* data = reinterpret_cast<SkData*>(dataPtr);
++    SkMemoryStream stream(sk_ref_sp(data));
++    return reinterpret_cast<KNativePointer>(instance->make(stream).release());
 +}
 diff --git a/skiko/src/nativeMain/cpp/svg/SVGNode.cc b/skiko/src/nativeMain/cpp/svg/SVGNode.cc
 new file mode 100644
-index 0000000..066fb04
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/svg/SVGNode.cc
 @@ -0,0 +1,8 @@
@@ -13700,7 +13576,6 @@ index 0000000..066fb04
 +}
 diff --git a/skiko/src/nativeMain/cpp/svg/SVGSVG.cc b/skiko/src/nativeMain/cpp/svg/SVGSVG.cc
 new file mode 100644
-index 0000000..db6e6d3
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/svg/SVGSVG.cc
 @@ -0,0 +1,96 @@
@@ -13802,7 +13677,6 @@ index 0000000..db6e6d3
 +}
 diff --git a/skiko/src/nativeMain/cpp/types.h b/skiko/src/nativeMain/cpp/types.h
 new file mode 100644
-index 0000000..606574b
 --- /dev/null
 +++ b/skiko/src/nativeMain/cpp/types.h
 @@ -0,0 +1,22 @@
@@ -13829,7 +13703,6 @@ index 0000000..606574b
 +#endif /* SKIKO_TYPES_H */
 +
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
-index d105f9e..e7a812d 100644
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
 @@ -9,7 +9,7 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
@@ -13843,7 +13716,6 @@ index d105f9e..e7a812d 100644
  actual class Pattern constructor(regex: String) {
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Drawable.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Drawable.shared.kt
 new file mode 100644
-index 0000000..658ec0e
 --- /dev/null
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Drawable.shared.kt
 @@ -0,0 +1,19 @@
@@ -13868,7 +13740,6 @@ index 0000000..658ec0e
 +}
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/PaintFilterCanvas.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/PaintFilterCanvas.shared.kt
 new file mode 100644
-index 0000000..8528d8a
 --- /dev/null
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/PaintFilterCanvas.shared.kt
 @@ -0,0 +1,20 @@
@@ -13894,7 +13765,6 @@ index 0000000..8528d8a
 +internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/RuntimeEffect.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/RuntimeEffect.shared.kt
 new file mode 100644
-index 0000000..90f618e
 --- /dev/null
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/RuntimeEffect.shared.kt
 @@ -0,0 +1,19 @@
@@ -13919,7 +13789,6 @@ index 0000000..90f618e
 +}
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.shared.kt
 new file mode 100644
-index 0000000..0972275
 --- /dev/null
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.shared.kt
 @@ -0,0 +1,12 @@
@@ -13937,7 +13806,6 @@ index 0000000..0972275
 +}
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Stats.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Stats.native.kt
-index 1f72c4c..977a35e 100644
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Stats.native.kt
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Stats.native.kt
 @@ -8,19 +8,21 @@ actual object Stats {
@@ -13967,7 +13835,6 @@ index 1f72c4c..977a35e 100644
      }
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/shaper/Shaper.shared.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/shaper/Shaper.shared.kt
 new file mode 100644
-index 0000000..c2e9377
 --- /dev/null
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/shaper/Shaper.shared.kt
 @@ -0,0 +1,239 @@
@@ -14212,7 +14079,6 @@ index 0000000..c2e9377
 +
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt
 deleted file mode 100644
-index a44ff88..0000000
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt
 +++ /dev/null
 @@ -1,13 +0,0 @@
@@ -14231,7 +14097,6 @@ index a44ff88..0000000
 -}
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
 deleted file mode 100644
-index 7f37323..0000000
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
 +++ /dev/null
 @@ -1,13 +0,0 @@
@@ -14251,7 +14116,6 @@ index 7f37323..0000000
 \ No newline at end of file
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt
 deleted file mode 100644
-index 2b587ac..0000000
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt
 +++ /dev/null
 @@ -1,47 +0,0 @@
@@ -14304,7 +14168,6 @@ index 2b587ac..0000000
 -}
 diff --git a/skiko/src/nativeTest/cpp/TestHelpers.cc b/skiko/src/nativeTest/cpp/TestHelpers.cc
 new file mode 100644
-index 0000000..6766b66
 --- /dev/null
 +++ b/skiko/src/nativeTest/cpp/TestHelpers.cc
 @@ -0,0 +1,183 @@
@@ -14493,7 +14356,6 @@ index 0000000..6766b66
 +#endif // SKIKO_TEST_GL_INCLUDED
 diff --git a/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt b/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
 new file mode 100644
-index 0000000..cbf7806
 --- /dev/null
 +++ b/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
 @@ -0,0 +1,7 @@
@@ -14506,7 +14368,6 @@ index 0000000..cbf7806
 +}
 diff --git a/skiko/src/windowsTest/kotlin/org/jetbrains/skiko/SkiaLayerWindowsTest.kt b/skiko/src/windowsTest/kotlin/org/jetbrains/skiko/SkiaLayerWindowsTest.kt
 new file mode 100644
-index 0000000..76b9f4f
 --- /dev/null
 +++ b/skiko/src/windowsTest/kotlin/org/jetbrains/skiko/SkiaLayerWindowsTest.kt
 @@ -0,0 +1,646 @@
@@ -15157,7 +15018,6 @@ index 0000000..76b9f4f
 +    }
 +}
 diff --git a/skiko/test-utils/build.gradle.kts b/skiko/test-utils/build.gradle.kts
-index 0726aa0..f6b5ad5 100644
 --- a/skiko/test-utils/build.gradle.kts
 +++ b/skiko/test-utils/build.gradle.kts
 @@ -1,7 +1,5 @@
@@ -15289,7 +15149,6 @@ index 0726aa0..f6b5ad5 100644
  tasks.withType<KotlinNativeCompile>().configureEach {
 diff --git a/skiko/test-utils/src/macosMain/kotlin/org/jetbrains/skiko/resourcePath.kt b/skiko/test-utils/src/macosMain/kotlin/org/jetbrains/skiko/resourcePath.kt
 new file mode 100644
-index 0000000..f6fbc5e
 --- /dev/null
 +++ b/skiko/test-utils/src/macosMain/kotlin/org/jetbrains/skiko/resourcePath.kt
 @@ -0,0 +1,14 @@
@@ -15309,7 +15168,6 @@ index 0000000..f6fbc5e
 +}
 diff --git a/skiko/test-utils/src/windowsMain/kotlin/org/jetbrains/skiko/resourcePath.kt b/skiko/test-utils/src/windowsMain/kotlin/org/jetbrains/skiko/resourcePath.kt
 new file mode 100644
-index 0000000..92a6ea3
 --- /dev/null
 +++ b/skiko/test-utils/src/windowsMain/kotlin/org/jetbrains/skiko/resourcePath.kt
 @@ -0,0 +1,5 @@

@@ -21,6 +21,9 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
+        maven("https://redirector.kotlinlang.org/maven/compose-dev") {
+            content { includeGroup("org.jetbrains.skiko") }
+        }
     }
     versionCatalogs {
         create("libs") { from(files("__REPOSITORY__/libs.versions.toml")) }

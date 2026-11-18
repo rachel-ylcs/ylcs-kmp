@@ -31,6 +31,8 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。
 
+根构建的 `local.properties` 中 `mirror` 对应 Central、Google 和 Gradle 插件镜像。JetBrains Compose Dev 是 Central 和 Google 之后的官方回退源，仅用于 `org.jetbrains.skiko`。Native Compose 的 Skiko、Compose UI included builds 和 `verification` 工程各自声明仓库。Compose UI 与验证工程也配置 Compose Dev，Native Skiko 则直接编译同步后的 Skiko 源码。同步器从 GitHub 获取 Skiko 和 Skia SDK，按 `upstream/compose.json` 从 Maven Central 获取选定的 Compose 源码工件。
+
 Gradle 版本由根 `gradle/wrapper/gradle-wrapper.properties` 中的 `distributionUrl` 决定。独立验证从同一链接读取版本，生成的上游工程在源码准备时复制根 Wrapper。Kotlin 源码统一使用根版本目录中的 KGP，语言及 API 级别取该 Kotlin 版本的主次版本，实验参数取根 `gradle.properties`。`.gradle.kts` 脚本自身由当前 Gradle 发行版内嵌的 Kotlin 编译，编写脚本时要使用它支持的语法。
 
 桥插件为本地源码消费单独生成项目结构元数据：保留发布坐标，并为实际选中的源码项目补充其 Gradle group/name 身份，兼容 Kotlin 在同一 build 和跨 included build 时使用的不同匹配方式。该文件仅替换 KGP 的 `kotlinProjectStructureMetadata` secondary variant；Maven publication 和 metadata JAR 继续使用原始发布元数据。通过 `ExportLib`／`api` 传递的依赖可沿模块链导入共享 Native 源码，不需要消费模块重复声明 Compose 子工件。
