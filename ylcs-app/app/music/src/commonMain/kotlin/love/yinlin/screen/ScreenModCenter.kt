@@ -45,7 +45,7 @@ class ScreenModCenter : Screen() {
     private var currentLibrary: List<Song> by mutableStateOf([])
     private var currentFilter: SongFilter? by mutableStateOf(null)
 
-    override val title: String = "工坊"
+    override val title: String = "银临合集"
 
     private fun searchSongs(filter: SongFilter): List<Song> = currentLibrary.filter { (val name, val singer, val lyricist, val composer, val album, val animation, val video, val rhyme, val accompaniment) ->
         (!filter.useAnimation || animation) &&
