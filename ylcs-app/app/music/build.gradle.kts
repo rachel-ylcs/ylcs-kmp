@@ -18,7 +18,6 @@ rachel {
             commonMain {
                 lib(
                     libs.compose.resources,
-                    projects.ylcsModule.compose.ui,
 
                     projects.ylcsApp.app.global,
                     projects.ylcsApp.app.viewer,

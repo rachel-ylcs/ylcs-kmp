@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,6 +42,19 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 @Stable
 class StepperState(initialValue: Int = 0) {
     var value: Int by mutableIntStateOf(initialValue)
+        private set
+
+    /**
+     * 在指定范围内更新当前值。
+     *
+     * @param value 目标值
+     * @param min 最小值
+     * @param max 最大值
+     */
+    fun setValue(value: Int, min: Int, max: Int) {
+        require(min <= max) { "Stepper min must not exceed max" }
+        this.value = value.coerceIn(min, max)
+    }
 }
 
 /**
@@ -72,9 +84,6 @@ fun Stepper(
     require(min <= max) { "Stepper min must not exceed max" }
 
     val value = state.value.coerceIn(min, max)
-    SideEffect {
-        if (state.value != value) state.value = value
-    }
 
     Row(
         modifier = modifier
@@ -89,7 +98,7 @@ fun Stepper(
             description = "减少",
             enabled = enabled && value > min,
             faster = faster,
-            onStep = { state.value = (state.value.coerceIn(min, max) - 1).coerceAtLeast(min) }
+            onStep = { state.setValue(value - 1, min, max) }
         )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -104,7 +113,7 @@ fun Stepper(
             description = "增加",
             enabled = enabled && value < max,
             faster = faster,
-            onStep = { state.value = (state.value.coerceIn(min, max) + 1).coerceAtMost(max) }
+            onStep = { state.setValue(value + 1, min, max) }
         )
     }
 }

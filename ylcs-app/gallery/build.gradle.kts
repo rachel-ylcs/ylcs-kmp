@@ -24,7 +24,6 @@ rachel {
                     libs.compose.resources,
                     projects.ylcsModule.foundation.fts,
                     projects.ylcsModule.compose.app,
-                    projects.ylcsModule.compose.ui,
                     projects.ylcsModule.compose.platformView,
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.blur,

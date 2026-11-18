@@ -151,14 +151,21 @@ object InputPage : Page(
                         Stepper(state = state, min = 0, max = 11, faster = true, label = "小时", converter = { it.toString().padStart(2, '0') })
                     }
 
-                    Example("最小值") {
-                        val state = remember { StepperState(0) }
-                        Stepper(state = state, min = 0, max = 5)
-                    }
+                    Example("边界值") {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Stepper(state = remember { StepperState(0) }, min = 0, max = 5)
+                                GalleryCaption("最小值")
+                            }
 
-                    Example("最大值") {
-                        val state = remember { StepperState(5) }
-                        Stepper(state = state, min = 0, max = 5)
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Stepper(state = remember { StepperState(5) }, min = 0, max = 5)
+                                GalleryCaption("最大值")
+                            }
+                        }
                     }
 
                     Example("整体禁用") {
