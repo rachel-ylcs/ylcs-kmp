@@ -140,15 +140,15 @@ object InputPage : Page(
 
             Component(demoStepper) {
                 ExampleRow {
-                    Example("普通步进器") {
+                    Example("普通") {
                         val state = remember { StepperState(5) }
                         Stepper(state = state)
                         GalleryCaption("value: ${state.value}")
                     }
 
-                    Example("前导零 · 小时") {
-                        val state = remember { StepperState(8) }
-                        Stepper(state = state, min = 0, max = 11, faster = true, label = "小时", converter = { it.toString().padStart(2, '0') })
+                    Example("前导零 · 长按") {
+                        val state = remember { StepperState(8, min = 0, max = 11) }
+                        Stepper(state = state, faster = true, label = "小时", converter = { it.toString().padStart(2, '0') })
                     }
 
                     Example("边界值") {
@@ -157,12 +157,12 @@ object InputPage : Page(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Stepper(state = remember { StepperState(0) }, min = 0, max = 5)
+                                Stepper(state = remember { StepperState(min = 0, max = 5) })
                                 GalleryCaption("最小值")
                             }
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Stepper(state = remember { StepperState(5) }, min = 0, max = 5)
+                                Stepper(state = remember { StepperState(5, min = 0, max = 5) })
                                 GalleryCaption("最大值")
                             }
                         }
