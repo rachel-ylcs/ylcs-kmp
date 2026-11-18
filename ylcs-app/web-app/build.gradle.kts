@@ -45,8 +45,16 @@ rachel {
         artifacts {
             val wasm = browserDistribution(BrowserArtifactTarget.Wasm)
             val excludes = listOf("*.map", "*.txt")
-            zip("webArtifact", wasm, C.root.outputs, "ylcs-web.zip", "打包Web网页版", "Web", excludes, replaceUnpackedOutput = true, omitEmptyComposeResourceDirectories = true)
-            zip("webPublish", wasm, C.root.outputs, "[Web]${C.app.displayName}${C.versionName}.zip", "发布Web网页版", "Web", excludes, replaceUnpackedOutput = true, omitEmptyComposeResourceDirectories = true)
+            zip(
+                "webArtifact", wasm, C.root.outputs, "ylcs-web.zip", "打包Web网页版", "Web", excludes,
+                replaceUnpackedOutput = true,
+                omitEmptyComposeResourceDirectories = true,
+            )
+            zip(
+                "webPublish", wasm, C.root.outputs, "[Web]${C.app.displayName}${C.versionName}.zip", "发布Web网页版", "Web", excludes,
+                replaceUnpackedOutput = true,
+                omitEmptyComposeResourceDirectories = true,
+            )
         }
 
         runs {
