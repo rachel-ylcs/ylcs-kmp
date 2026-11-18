@@ -44,6 +44,7 @@ object InputPage : Page(
 ) {
     private val demoButton = component("Button", "用填充、描边或文字按钮触发操作，耗时任务可显示加载状态。", "PrimaryButton SecondaryButton TertiaryButton OutlinedButton TextButton IconButton LoadingButton")
     private val demoNumberInput = component("NumberInput", "每个格子输入一位数字，支持 2-8 位、末尾退格、掩码显示、焦点及满格提示。", "数字输入 验证码 密码 掩码 NumberInputState 0-9 OTP")
+    private val demoStepper = component("Stepper", "通过两侧按钮调整整数，支持范围限制、长按连续调整和次级标签。", "步进器 数字调整 递增 递减 长按")
     private val demoSwitch = component("Switch", "用于即时打开或关闭设置。", "开关")
     private val demoOptions = component("Choice", "从一组选项中单选或多选，复选框也支持部分选中。", "Radio CheckBox RadioGroup TriStateCheckBox", previewAlias = "Radio / CheckBox")
     private val demoSlider = component("Slider", "拖动滑块调整数值，支持自定义数值显示。", "滑块")
@@ -133,6 +134,36 @@ object InputPage : Page(
                         val state = remember { NumberInputState("4829") }
                         NumberInput(state = state, mask = '●')
                         GalleryCaption("真实 value: ${state.value}")
+                    }
+                }
+            }
+
+            Component(demoStepper) {
+                ExampleRow {
+                    Example("普通步进器") {
+                        val state = remember { StepperState(5) }
+                        Stepper(state = state)
+                        GalleryCaption("value: ${state.value}")
+                    }
+
+                    Example("前导零 · 小时") {
+                        val state = remember { StepperState(8) }
+                        Stepper(state = state, min = 0, max = 11, faster = true, label = "小时", converter = { it.toString().padStart(2, '0') })
+                    }
+
+                    Example("最小值") {
+                        val state = remember { StepperState(0) }
+                        Stepper(state = state, min = 0, max = 5)
+                    }
+
+                    Example("最大值") {
+                        val state = remember { StepperState(5) }
+                        Stepper(state = state, min = 0, max = 5)
+                    }
+
+                    Example("整体禁用") {
+                        val state = remember { StepperState(3) }
+                        Stepper(state = state, enabled = false)
                     }
                 }
             }

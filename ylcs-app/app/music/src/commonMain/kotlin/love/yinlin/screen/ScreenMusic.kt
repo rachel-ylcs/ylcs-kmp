@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,11 +40,7 @@ import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlin.math.abs
-import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
@@ -63,6 +58,8 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.input.Stepper
+import love.yinlin.compose.ui.input.StepperState
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.*
@@ -88,8 +85,8 @@ class ScreenMusic : BasicScreen() {
 
     private val blurState = BlurState()
 
-    private var sleepHour by mutableIntStateOf(0)
-    private var sleepMinutes by mutableIntStateOf(0)
+    private val sleepHour = StepperState()
+    private val sleepMinutes = StepperState()
 
     @Composable
     private fun ResourceControl(text: String, icon: ImageVector, color: Color, horizontal: Boolean, onClick: () -> Unit) {
@@ -299,56 +296,6 @@ class ScreenMusic : BasicScreen() {
     }
 
     @Composable
-    private fun TimeStepButton(icon: ImageVector, enabled: Boolean, onStep: () -> Unit) {
-        val currentOnStep by rememberUpdatedState(onStep)
-
-        Box(
-            modifier = Modifier.size(width = Theme.size.icon, height = Theme.size.input9).clip(Theme.shape.v7)
-                .pointerIcon(PointerIcon.Hand, enabled)
-                .pointerInput(enabled) {
-                    if (enabled) {
-                        detectTapGestures(onPress = {
-                            coroutineScope {
-                                var repeated = false
-                                val repeatJob = launch {
-                                    delay(viewConfiguration.longPressTimeoutMillis.milliseconds)
-                                    while (isActive) {
-                                        repeated = true
-                                        currentOnStep()
-                                        delay(100.milliseconds)
-                                    }
-                                }
-                                try {
-                                    if (tryAwaitRelease() && !repeated) currentOnStep()
-                                }
-                                finally { repeatJob.cancel() }
-                            }
-                        })
-                    }
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon = icon, color = if (enabled) Theme.color.primary else Theme.color.disabledContent)
-        }
-    }
-
-    @Composable
-    private fun SleepTimeAdjuster(value: Int, range: IntRange, unit: String, enabled: Boolean, modifier: Modifier = Modifier, onValueChange: (Int) -> Unit) {
-        Row(
-            modifier = modifier.clip(Theme.shape.v7).background(Theme.color.onSurface.copy(alpha = 0.06f)).padding(horizontal = Theme.padding.v, vertical = Theme.padding.g),
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.v),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TimeStepButton(icon = Icons.Remove, enabled = enabled && value > range.first, onStep = { onValueChange((value - 1).coerceIn(range)) })
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                SimpleEllipsisText(text = value.toString().padStart(2, '0'), style = Theme.typography.v7.bold, color = Theme.color.onSurface)
-                SimpleEllipsisText(text = unit, style = Theme.typography.v9, color = Theme.color.onSurfaceVariant)
-            }
-            TimeStepButton(icon = Icons.Add, enabled = enabled && value < range.last, onStep = { onValueChange((value + 1).coerceIn(range)) })
-        }
-    }
-
-    @Composable
     private fun SleepLayout(player: StartupMusicPlayer, modifier: Modifier = Modifier) {
         val timer = player.sleepTimer
 
@@ -369,7 +316,7 @@ class ScreenMusic : BasicScreen() {
                 onClick = {
                     if (timer.isRunning) timer.stop()
                     else {
-                        val sleepTime = sleepHour * 3600 + sleepMinutes * 60
+                        val sleepTime = sleepHour.value * 3600 + sleepMinutes.value * 60
                         if (sleepTime > 0) timer.start(sleepTime)
                         else slot.tip.warning("未设定时间")
                     }
@@ -380,8 +327,24 @@ class ScreenMusic : BasicScreen() {
             }
             else {
                 Spacer(modifier = Modifier.weight(1f))
-                SleepTimeAdjuster(value = sleepHour, range = 0 .. 11, unit = "小时", enabled = player.isReady, onValueChange = { sleepHour = it })
-                SleepTimeAdjuster(value = sleepMinutes, range = 0 .. 59, unit = "分钟", enabled = player.isReady, onValueChange = { sleepMinutes = it })
+                Stepper(
+                    state = sleepHour,
+                    enabled = player.isReady,
+                    faster = true,
+                    min = 0,
+                    max = 11,
+                    label = "小时",
+                    converter = { it.toString().padStart(2, '0') }
+                )
+                Stepper(
+                    state = sleepMinutes,
+                    enabled = player.isReady,
+                    faster = true,
+                    min = 0,
+                    max = 59,
+                    label = "分钟",
+                    converter = { it.toString().padStart(2, '0') }
+                )
             }
         }
     }
