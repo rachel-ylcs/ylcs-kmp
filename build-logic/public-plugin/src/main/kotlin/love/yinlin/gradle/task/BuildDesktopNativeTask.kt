@@ -41,6 +41,9 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val additionalSourceDirs: ConfigurableFileCollection
 
+    @get:Input
+    val additionalSourcePaths: List<String> get() = additionalSourceDirs.files.map { it.invariantSeparatorsPath }
+
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
@@ -145,7 +148,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             "-DRACHEL_JNI_INCLUDE_DIRS=${jdk.invariantSeparatorsPath};${jdk.resolve(jniPlatform).invariantSeparatorsPath}",
             "-DNATIVE_JNI_DIR=$include", "-DRACHEL_CPP_INCLUDE_DIR=$include",
             "-DNATIVE_OUTPUT_NAME=${nativeModuleName.get()}",
-            "-DRACHEL_CPP_SOURCE_DIRS=${additionalSourceDirs.files.joinToString(";") { it.invariantSeparatorsPath }}",
+            "-DRACHEL_CPP_SOURCE_DIRS=${additionalSourcePaths.joinToString(";")}",
         )
         var build = nativeBuildDir.get().asFile
         if (platform == BuildPlatform.Windows) {

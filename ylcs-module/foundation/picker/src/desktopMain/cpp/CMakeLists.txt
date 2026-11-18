@@ -7,7 +7,14 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-find_path(SDL_SOURCE_ROOT include/SDL3/SDL_dialog.h PATHS ${RACHEL_CPP_SOURCE_DIRS} NO_DEFAULT_PATH REQUIRED)
+
+# Native Compose versions can change the SDL directory while reusing the picker build tree.
+unset(SDL_SOURCE_ROOT CACHE)
+find_path(SDL_SOURCE_ROOT include/SDL3/SDL_dialog.h PATHS ${RACHEL_CPP_SOURCE_DIRS} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+if(NOT EXISTS "${SDL_SOURCE_ROOT}/CMakeLists.txt")
+    message(FATAL_ERROR "SDL source directory is incomplete: ${SDL_SOURCE_ROOT}/CMakeLists.txt is missing")
+endif()
+
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
