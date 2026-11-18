@@ -98,6 +98,7 @@ rachel {
                     archiveRoot = desktopReleaseDirectoryName,
                     executable = executable,
                     replaceUnpackedOutput = true,
+                    omitEmptyComposeResourceDirectories = true,
                 )
             }
         }

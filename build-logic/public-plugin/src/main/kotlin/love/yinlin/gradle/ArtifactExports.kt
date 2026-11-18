@@ -35,6 +35,7 @@ class ArtifactExports internal constructor(private val project: Project) {
         excludes: List<String> = emptyList(),
         executable: Provider<RegularFile>? = null,
         replaceUnpackedOutput: Boolean = false,
+        omitEmptyComposeResourceDirectories: Boolean = false,
     ): TaskProvider<out Zip> {
         require(archiveRoot.isNotBlank() && archiveRoot == archiveRoot.trimEnd(' ', '.') &&
             archiveRoot.none { it < ' ' || it in "/\\:" }) {
@@ -42,9 +43,20 @@ class ArtifactExports internal constructor(private val project: Project) {
         }
         return project.tasks.register<ArtifactZip>(taskName) {
             this.description = description
-            from(source) {
+            val distributionSpec = from(source) {
                 into(archiveRoot)
                 exclude(excludes)
+            }
+            if (omitEmptyComposeResourceDirectories) {
+                // Keep unrelated empty distribution directories; filter only the Compose resources subtree.
+                val composeResourcePatterns = arrayOf("**/composeResources", "**/composeResources/**")
+                distributionSpec.exclude(*composeResourcePatterns)
+                from(source) {
+                    into(archiveRoot)
+                    include(*composeResourcePatterns)
+                    exclude(excludes)
+                    includeEmptyDirs = false
+                }
             }
             destinationDirectory.set(destination)
             archiveFileName.set(fileName)

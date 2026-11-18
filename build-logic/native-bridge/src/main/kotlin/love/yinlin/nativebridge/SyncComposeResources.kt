@@ -30,6 +30,7 @@ abstract class SyncComposeResources : DefaultTask() {
         fileSystem.sync {
             from(resourceDirectories)
             into(outputDirectory)
+            includeEmptyDirs = false
             duplicatesStrategy = DuplicatesStrategy.FAIL
         }
     }
