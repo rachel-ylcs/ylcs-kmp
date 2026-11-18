@@ -60,11 +60,23 @@ runs:
     - name: Restore the shared Gradle distribution
       uses: ./.github/actions/setup-gradle-wrapper
 
+    - name: Read Android compile SDK
+      if: ${{ inputs.android == 'true' }}
+      id: android-sdk
+      shell: bash
+      run: |
+        version=$(sed -nE 's/^[[:space:]]*compileSdk[[:space:]]*=[[:space:]]*([0-9]+)[[:space:]]+to[[:space:]]+([0-9]+)[[:space:]]*$/\1.\2/p' settings.gradle.kts)
+        if [[ ! "$version" =~ ^[0-9]+\.[0-9]+$ ]]; then
+          echo "::error file=settings.gradle.kts::Expected one Android compileSdk = <major> to <minor> declaration"
+          exit 1
+        fi
+        printf 'platform=platforms;android-%s\n' "$version" >> "$GITHUB_OUTPUT"
+
     - name: Setup Android SDK
       if: ${{ inputs.android == 'true' }}
       uses: android-actions/setup-android@v4
       with:
-        packages: 'platform-tools platforms;android-37.2'
+        packages: 'platform-tools ${{ steps.android-sdk.outputs.platform }}'
 
     - name: Setup MSVC
       if: ${{ runner.os == 'Windows' && inputs.msvc == 'true' }}

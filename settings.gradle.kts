@@ -42,7 +42,7 @@ repository {
 
         android {
             minSdk = 28
-            compileSdk = 37 to 1
+            compileSdk = 37 to 2
             targetSdk = 37
             ndkAbi = listOf("arm64-v8a")
             ndkVersion = "29.0.14206865"

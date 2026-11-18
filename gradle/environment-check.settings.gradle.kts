@@ -141,8 +141,8 @@ for ((name, relative) in listOf(
 }
 
 // # 8 : Android Platform Tools
-val platform = File(android, "platforms/android-37.1")
-report("Android SDK Platform 37.1", platform.takeIf { it.isDirectory }?.absolutePath, "未安装 ${platform.absolutePath}；Android 构建可能需要补装", false)
+val platform = File(android, "platforms/android-37.2")
+report("Android SDK Platform 37.2", platform.takeIf { it.isDirectory }?.absolutePath, "未安装 ${platform.absolutePath}；Android 构建可能需要补装", false)
 
 // # 9 : Android NDK
 val ndk = File(android, "ndk/29.0.14206865")

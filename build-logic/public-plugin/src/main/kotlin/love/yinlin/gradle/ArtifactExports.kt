@@ -73,15 +73,16 @@ class ArtifactExports internal constructor(private val project: Project) {
 
 @DisableCachingByDefault(because = "Exports a local distribution archive")
 internal abstract class ArtifactZip : Zip() {
+    // AbstractCopyTask also exposes getFileSystem() for Gradle's internal file system.
     @get:Inject
-    abstract val fileSystem: FileSystemOperations
+    abstract val artifactFileOperations: FileSystemOperations
 
     @get:Internal
     abstract val previousDirectory: DirectoryProperty
 
     init {
         doFirst {
-            previousDirectory.orNull?.let { directory -> fileSystem.delete { delete(directory) } }
+            previousDirectory.orNull?.let { directory -> artifactFileOperations.delete { delete(directory) } }
         }
     }
 }
