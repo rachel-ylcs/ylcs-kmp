@@ -9,10 +9,10 @@ import love.yinlin.compose.ui.icon.Icons
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
         platform = "全平台发布",
-        title = "银临茶舍 原生桌面端上线",
+        title = "银临茶舍 界面UI焕新",
         force = true,
         maintenance = true,
-        date = LocalDate(2026, 11, 1),
+        date = LocalDate(2026, 11, 18),
         groups = [
             AppUpdateRecordGroup(
                 type = "特性",
@@ -20,9 +20,8 @@ internal object AppAbout {
                 color = Colors.Steel5,
                 background = Colors.Steel2,
                 records = [
-                    "1. 统一资讯源支持（微博、超话、B站、小红书、抖音）",
-                    "2. 银临的剪刀手电台支持（本地缓存电台节目离线播放）",
-                    "3. 演出记忆板块支持（聆听每一场演出的回忆）"
+                    "1. 界面焕新 UI新设计",
+                    "2. 平台音乐极速下载"
                 ]
             ),
             AppUpdateRecordGroup(
@@ -31,11 +30,9 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = [
-                    "1. Android端向下兼容安卓9，优化安装包体积",
-                    "2. 桌面原生客户端上线，极致性能，支持windows, linux, macos",
-                    "3. 全平台支持音视频播放",
-                    "4. 移除在线更新及更新包的功能",
-                    "5. 为部分页面提供返回键",
+                    "1. 输入框增加标题提示",
+                    "2. 按钮悬浮提示默认关闭",
+                    "3. 演出记忆唯一清单关闭非银临歌曲",
                 ]
             ),
             AppUpdateRecordGroup(
@@ -44,10 +41,10 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = [
-                    "1. 修复切换资讯源卡住的问题",
-                    "3. 修复iOS登录崩溃的问题",
-                    "3. 修复电台断网下无法浏览的问题",
-                    "4. 修复未登录时无法进入登录页的问题"
+                    "1. 修复全平台大图无法加载的问题",
+                    "2. 修复Android端背景模糊闪白的问题",
+                    "3. 修复iOS端播放，下载，键盘异常的问题",
+                    "4. 修复macOS端鼠标滚动距离的问题"
                 ]
             )
         ]
