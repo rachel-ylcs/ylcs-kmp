@@ -48,6 +48,7 @@ class ArtifactExports internal constructor(private val project: Project) {
                 exclude(excludes)
             }
             if (omitEmptyComposeResourceDirectories) {
+                // Keep unrelated empty distribution directories; filter only the Compose resources subtree.
                 val composeResourcePatterns = arrayOf("**/composeResources", "**/composeResources/**")
                 distributionSpec.exclude(*composeResourcePatterns)
                 from(source) {
