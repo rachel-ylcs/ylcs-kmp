@@ -67,7 +67,9 @@ internal class NoSemicolonRule : RuleV2(RuleId(ID), About(maintainer = "YLCS")) 
         val body = parent ?: return false
 
         // The common form: the semicolon is part of the final enum entry.
-        if (body.elementType == ENUM_ENTRY) return true
+        if (body.elementType == ENUM_ENTRY) {
+            return body.nextCodeSibling?.elementType != ENUM_ENTRY
+        }
 
         // Also accept a semicolon on its own line after the final enum entry.
         if (body.elementType != CLASS_BODY) return false
@@ -75,7 +77,9 @@ internal class NoSemicolonRule : RuleV2(RuleId(ID), About(maintainer = "YLCS")) 
         if (enumClass.elementType != CLASS || !enumClass.hasModifier(ENUM_KEYWORD)) return false
 
         val previousEntry = prevCodeLeaf?.findParentByType(ENUM_ENTRY)
-        if (previousEntry?.parent == body) return true
+        if (previousEntry?.parent == body) {
+            return nextCodeSibling?.elementType != ENUM_ENTRY
+        }
 
         // An empty enum may use ';' to introduce members. Do not accept a trailing ';'
         // when it is the final code token before the closing brace.
