@@ -55,7 +55,7 @@ object ContainerPage : Page(
     private val demoAdderBox = component("AdderBox", "向容器中添加项目，也可替换或删除已有项目。", "添加")
     private val demoBanner = component("Banner", "自动轮播一组图片，也可以手动切换。", "轮播")
     private val demoWatermark = component("Watermark", "在内容上平铺水印，仍可操作下方控件。", "平铺 透明度")
-    private val demoPalette = component("rememberPalette", "从 ImageBitmap 异步生成并缓存调色板状态。", "ImageBitmap 图片 主色 调色板", "palette")
+    private val demoPalette = component("Palette", "从 ImageBitmap 异步生成并缓存调色板状态。", "ImageBitmap 图片 主色 调色板", "palette")
 
     @Composable
     override fun Content() {
