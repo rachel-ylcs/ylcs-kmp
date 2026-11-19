@@ -139,7 +139,7 @@ def comment_rules_for(language: str, suffix: str):
     if language == "Config":
         if suffix in {".xml", ".plist", ".storyboard", ".xib"}:
             return (), ("<!--", "-->")
-        if suffix in {".conf", ".ini"}:
+        if suffix in {".properties", ".conf", ".ini", ".cfg", ".pro", ".proguard"}:
             return ("#", ";"), None
         return ("#",), None
     return COMMENT_RULES.get(language, ((), None))
