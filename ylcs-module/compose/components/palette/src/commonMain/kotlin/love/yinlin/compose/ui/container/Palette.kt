@@ -194,16 +194,35 @@ class Palette internal constructor(
     /**
      * 调色板生成器。默认使用 112×112 像素的采样面积、16 种颜色和 AndroidX 默认颜色过滤器。
      */
+    /**
+     * 调色板配置 DSL。
+     *
+     * 使用 [Palette.from] 创建 Builder，在配置块中声明采样参数、过滤器和目标色。
+     */
+    @PaletteDsl
     class Builder private constructor(
         private val bitmap: ImageBitmap?,
         private val inputSwatches: List<Swatch>?,
     ) {
         private val targets = mutableListOf<Target>()
         private val filters = mutableListOf(DEFAULT_FILTER)
-        private var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
         private var resizeArea = DEFAULT_RESIZE_BITMAP_AREA
         private var resizeMaximumDimension = -1
-        private var region: Region? = null
+        private var selectedRegion: Region? = null
+
+        var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
+            set(value) {
+                require(value > 0) { "maximumColorCount must be greater than zero." }
+                field = value
+            }
+
+        var resizeBitmapArea: Int
+            get() = resizeArea
+            set(value) {
+                require(value > 0) { "resizeBitmapArea must be greater than zero." }
+                resizeArea = value
+                resizeMaximumDimension = -1
+            }
 
         internal constructor(bitmap: ImageBitmap) : this(bitmap, null) {
             targets += Target.DEFAULT_TARGETS
@@ -213,32 +232,19 @@ class Palette internal constructor(
             require(swatches.isNotEmpty()) { "List of swatches must not be empty." }
         }
 
-        fun maximumColorCount(colors: Int) = apply {
-            require(colors > 0) { "maximumColorCount must be greater than zero." }
-            maximumColorCount = colors
-        }
-
-        fun resizeBitmapArea(area: Int) = apply {
-            resizeArea = area
-            resizeMaximumDimension = -1
-        }
-
-        @Deprecated("Use resizeBitmapArea instead.")
-        fun resizeBitmapSize(maxDimension: Int) = apply {
-            resizeMaximumDimension = maxDimension
-            resizeArea = -1
-        }
-
-        fun addFilter(filter: Filter) = apply {
+        /** 添加颜色过滤器。 */
+        fun filter(filter: Filter) {
             filters += filter
         }
 
-        fun clearFilters() = apply {
+        /** 移除默认过滤器及此前添加的过滤器。 */
+        fun clearFilters() {
             filters.clear()
         }
 
-        fun setRegion(left: Int, top: Int, right: Int, bottom: Int) = apply {
-            val source = bitmap ?: return@apply
+        /** 限定采样区域，坐标以原始 ImageBitmap 为准。 */
+        fun region(left: Int, top: Int, right: Int, bottom: Int) {
+            val source = bitmap ?: return
             val clippedLeft = left.coerceAtLeast(0)
             val clippedTop = top.coerceAtLeast(0)
             val clippedRight = right.coerceAtMost(source.width)
@@ -246,18 +252,26 @@ class Palette internal constructor(
             require(clippedLeft < clippedRight && clippedTop < clippedBottom) {
                 "The given region must intersect with the ImageBitmap dimensions."
             }
-            region = Region(clippedLeft, clippedTop, clippedRight, clippedBottom)
+            selectedRegion = Region(clippedLeft, clippedTop, clippedRight, clippedBottom)
         }
 
-        fun clearRegion() = apply {
-            region = null
+        /** 清除采样区域限制。 */
+        fun clearRegion() {
+            selectedRegion = null
         }
 
-        fun addTarget(target: Target) = apply {
+        /** 添加一个预定义或已构建的目标色。 */
+        fun target(target: Target) {
             if (target !in targets) targets += target
         }
 
-        fun clearTargets() = apply {
+        /** 通过 DSL 配置并添加自定义目标色。 */
+        fun target(block: Target.Builder.() -> Unit) {
+            target(Target(block))
+        }
+
+        /** 清除所有目标色。 */
+        fun clearTargets() {
             targets.clear()
         }
 
@@ -273,9 +287,7 @@ class Palette internal constructor(
             return Palette(swatches, targets)
         }
 
-        /**
-         * 在 [Dispatchers.Default] 上生成调色板，调用方可直接从协程中使用。
-         */
+        /** 在 [Dispatchers.Default] 上生成调色板，调用方可直接从协程中使用。 */
         suspend fun generateAsync(): Palette = withContext(Dispatchers.Default) { generate() }
 
         /**
@@ -312,11 +324,11 @@ class Palette internal constructor(
 
             val scaledWidth = ceil(sourceWidth * scaleRatio).toInt().coerceAtLeast(1)
             val scaledHeight = ceil(sourceHeight * scaleRatio).toInt().coerceAtLeast(1)
-            val selectedRegion = region
-            val left = selectedRegion?.let { floor(it.left * scaleRatio).toInt() } ?: 0
-            val top = selectedRegion?.let { floor(it.top * scaleRatio).toInt() } ?: 0
-            val right = selectedRegion?.let { ceil(it.right * scaleRatio).toInt().coerceAtMost(scaledWidth) } ?: scaledWidth
-            val bottom = selectedRegion?.let { ceil(it.bottom * scaleRatio).toInt().coerceAtMost(scaledHeight) } ?: scaledHeight
+            val region = selectedRegion
+            val left = region?.let { floor(it.left * scaleRatio).toInt() } ?: 0
+            val top = region?.let { floor(it.top * scaleRatio).toInt() } ?: 0
+            val right = region?.let { ceil(it.right * scaleRatio).toInt().coerceAtMost(scaledWidth) } ?: scaledWidth
+            val bottom = region?.let { ceil(it.bottom * scaleRatio).toInt().coerceAtMost(scaledHeight) } ?: scaledHeight
             val outputWidth = (right - left).coerceAtLeast(1)
             val outputHeight = (bottom - top).coerceAtLeast(1)
             val output = IntArray(outputWidth * outputHeight)
@@ -354,7 +366,7 @@ class Palette internal constructor(
             !isBlack && !isWhite && !isNearRedILine
         }
 
-        fun from(bitmap: ImageBitmap): Builder = Builder(bitmap)
+        fun from(bitmap: ImageBitmap, block: Builder.() -> Unit = {}): Builder = Builder(bitmap).apply(block)
 
         fun from(swatches: List<Swatch>): Palette = Builder(swatches).generate()
 
