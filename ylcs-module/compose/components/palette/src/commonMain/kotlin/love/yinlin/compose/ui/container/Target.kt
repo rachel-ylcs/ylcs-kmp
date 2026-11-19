@@ -21,7 +21,7 @@ import androidx.compose.runtime.Stable
 /**
  * 描述调色板中目标颜色的 HSL 范围与评分权重。
  *
- * 可直接使用六种内置目标，也可以通过 [invoke] 或 [copy] 使用 DSL 创建自定义目标。
+ * 可直接使用六种内置目标，也可以通过 DSL 创建自定义目标，或基于预设目标复制并调整。
  */
 @Stable
 class Target private constructor(
