@@ -11,7 +11,6 @@ import io.github.ktlint.core.rule.engine.core.api.ElementType.FOR
 import io.github.ktlint.core.rule.engine.core.api.ElementType.IF
 import io.github.ktlint.core.rule.engine.core.api.ElementType.KDOC
 import io.github.ktlint.core.rule.engine.core.api.ElementType.OBJECT_KEYWORD
-import io.github.ktlint.core.rule.engine.core.api.ElementType.RBRACE
 import io.github.ktlint.core.rule.engine.core.api.ElementType.SEMICOLON
 import io.github.ktlint.core.rule.engine.core.api.ElementType.THEN
 import io.github.ktlint.core.rule.engine.core.api.ElementType.WHILE
@@ -36,17 +35,67 @@ internal class NoSemicolonRule : RuleV2(RuleId(ID), About(maintainer = "YLCS")) 
         node: ASTNode,
         emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision
     ) {
+        // The rule is invoked for every AST node, so do no work until a semicolon is found.
         if (node.elementType != SEMICOLON) return
 
         val nextLeaf = node.nextLeaf
-        val isEnumEntryTerminator = node.parent?.elementType == ENUM_ENTRY
-        if (nextLeaf.doesNotRequirePreSemi() && isNoSemicolonRequiredAfter(node)) {
+
+        // Enum-entry terminators are required. Check their following whitespace separately:
+        // "NORTH; }" is valid, while "NORTH;}" must still report missing spacing.
+        if (node.isEnumSeparator()) {
+            if (!nextLeaf.isWhiteSpace) {
+                val _ = emit(node.startOffset + 1, "Missing spacing after \";\"", false)
+            }
+            return
+        }
+
+        // A non-whitespace token immediately after ';' needs a separator unless the semicolon
+        // itself starts a new line. This branch avoids scanning ahead through comments/whitespace.
+        if (nextLeaf != null && !nextLeaf.isWhiteSpace) {
+            if (!node.prevLeaf.isWhiteSpaceWithNewline) {
+                val _ = emit(node.startOffset + 1, "Missing spacing after \";\"", false)
+            }
+            return
+        }
+
+        if (nextLeaf.doesNotRequirePreSemi() && node.isNoSemicolonRequiredAfter()) {
             val _ = emit(node.startOffset, "Unnecessary semicolon", false)
-        } else if (!nextLeaf.isWhiteSpace && !(isEnumEntryTerminator && nextLeaf?.elementType == RBRACE)) {
-            if (node.prevLeaf.isWhiteSpaceWithNewline) return
-            val _ = emit(node.startOffset + 1, "Missing spacing after \";\"", false)
         }
     }
+
+    private fun ASTNode.isEnumSeparator(): Boolean {
+        val body = parent ?: return false
+
+        // The common form: the semicolon is part of the final enum entry.
+        if (body.elementType == ENUM_ENTRY) return true
+
+        // Also accept a semicolon on its own line after the final enum entry.
+        if (body.elementType != CLASS_BODY) return false
+        val enumClass = body.parent ?: return false
+        if (enumClass.elementType != CLASS || !enumClass.hasModifier(ENUM_KEYWORD)) return false
+
+        val previousEntry = prevCodeLeaf?.findParentByType(ENUM_ENTRY)
+        if (previousEntry?.parent == body) return true
+
+        // An empty enum may use ';' to introduce members. Do not accept a trailing ';'
+        // when it is the final code token before the closing brace.
+        return body.firstChildNode.nextCodeSibling == this &&
+            body.lastChildLeafOrSelf?.prevCodeLeaf != this
+    }
+
+    private fun ASTNode.isNoSemicolonRequiredAfter(): Boolean {
+        val previousCodeLeaf = prevCodeLeaf
+        if (previousCodeLeaf?.elementType == OBJECT_KEYWORD) return false
+
+        val previousParent = previousCodeLeaf?.parent ?: return true
+        return !previousParent.isLoopWithoutBody() && !previousParent.isIfExpressionWithoutThen()
+    }
+
+    private fun ASTNode.isLoopWithoutBody() =
+        (elementType == WHILE || elementType == FOR) &&
+            findChildByType(BODY)?.firstChildNode == null
+
+    private fun ASTNode.isIfExpressionWithoutThen() = elementType == IF && findChildByType(THEN)?.firstChildNode == null
 
     private fun ASTNode?.doesNotRequirePreSemi(): Boolean =
         when {
@@ -56,55 +105,13 @@ internal class NoSemicolonRule : RuleV2(RuleId(ID), About(maintainer = "YLCS")) 
                     it.isCode &&
                         it.findParentByType(KDOC) == null &&
                         it.findParentByType(ANNOTATION_ENTRY) == null
-                }.let { nextLeaf ->
-                    nextLeaf == null ||
-                        (textContains('\n') && nextLeaf.elementType != KtTokens.LBRACE)
+                }.let { nextCodeLeaf ->
+                    nextCodeLeaf == null ||
+                        (textContains('\n') && nextCodeLeaf.elementType != KtTokens.LBRACE)
                 }
             }
             else -> false
         }
-
-    private fun isNoSemicolonRequiredAfter(node: ASTNode): Boolean {
-        node.prevCodeLeaf
-            ?.also { prevCodeLeaf ->
-                if (prevCodeLeaf.elementType == OBJECT_KEYWORD) return false
-            }?.parent
-            ?.run {
-                if (isLoopWithoutBody()) return false
-                if (isIfExpressionWithoutThen()) return false
-            }
-
-        // A semicolon after an enum entry separates enum values from class members.
-        // Keep it even when the enum has no members after it.
-        if (node.parent?.elementType == ENUM_ENTRY) return false
-        if (node.isEnumClassWithoutValues()) return false
-
-        return true
-    }
-
-    private fun ASTNode.isLoopWithoutBody() =
-        (elementType == WHILE || elementType == FOR) &&
-            findChildByType(BODY)?.firstChildNode == null
-
-    private fun ASTNode.isIfExpressionWithoutThen() = elementType == IF && findChildByType(THEN)?.firstChildNode == null
-
-    private fun ASTNode?.isLastCodeLeafBeforeClosingOfClassBody() =
-        getLastCodeLeafBeforeClosingOfClassBody() == this
-
-    private fun ASTNode?.getLastCodeLeafBeforeClosingOfClassBody() =
-        this
-            ?.findParentByType(CLASS_BODY)
-            ?.lastChildLeafOrSelf
-            ?.prevCodeLeaf
-
-    private fun ASTNode?.isEnumClassWithoutValues() =
-        this
-            ?.takeIf { !it.isLastCodeLeafBeforeClosingOfClassBody() }
-            ?.findParentByType(CLASS_BODY)
-            ?.takeIf { this == it.firstChildNode.nextCodeSibling }
-            ?.findParentByType(CLASS)
-            ?.hasModifier(ENUM_KEYWORD)
-            ?: false
 
     companion object {
         const val ID = "ylcs:no-semi"

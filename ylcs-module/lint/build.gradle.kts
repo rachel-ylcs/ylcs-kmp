@@ -9,7 +9,6 @@ kotlin {
 dependencies {
     implementation(libs.ktlint.engine)
     implementation(libs.ktlint.standard)
-    testImplementation(libs.test)
 }
 
 val repositoryDirectory = layout.settingsDirectory
