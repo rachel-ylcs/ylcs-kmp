@@ -251,11 +251,11 @@ object ContainerPage : Page(
                 else {
                     val palette = rememberPalette(source)
                     val customTarget = remember {
-                        PaletteTarget.Builder(PaletteTarget.VIBRANT)
-                            .setTargetSaturation(0.8f)
-                            .setTargetLightness(0.62f)
-                            .setExclusive(false)
-                            .build()
+                        PaletteTarget.VIBRANT.copy {
+                            targetSaturation = 0.8f
+                            targetLightness = 0.62f
+                            exclusive = false
+                        }
                     }
                     var customPalette by rememberNull<Palette>(source)
                     LaunchedEffect(source) {
@@ -263,12 +263,12 @@ object ContainerPage : Page(
                         val top = source.height / 4
                         val right = (source.width * 3 / 4).coerceAtLeast(left + 1)
                         val bottom = (source.height * 3 / 4).coerceAtLeast(top + 1)
-                        customPalette = Palette.from(source)
-                            .maximumColorCount(8)
-                            .setRegion(left, top, right, bottom)
-                            .addFilter(Palette.Filter { _, hsl -> hsl[1] >= 0.15f })
-                            .addTarget(customTarget)
-                            .generateAsync()
+                        customPalette = Palette.from(source) {
+                            maximumColorCount = 8
+                            region(left, top, right, bottom)
+                            filter { _, hsl -> hsl[1] >= 0.15f }
+                            target(customTarget)
+                        }.generateAsync()
                     }
 
                     Column(
