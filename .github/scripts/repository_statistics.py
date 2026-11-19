@@ -39,6 +39,7 @@ LANGUAGE_EXTENSIONS = {
     "Shell": {".sh", ".bash", ".zsh"},
     "JavaScript": {".html", ".htm", ".js", ".mjs", ".cjs", ".css", ".scss", ".ts", ".tsx", ".jsx"},
     "Groovy": {".gradle"},
+    "JSON": {".json"},
     "SQL": {".sql"},
     "Markdown": {".md", ".mdx"},
     "Config": {
