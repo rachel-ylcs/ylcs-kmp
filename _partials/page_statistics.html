@@ -1,0 +1,6 @@
+<div class="rc-page-meta" markdown="0">
+<span class="rc-page-meta__item"><span class="rc-page-meta__icon">文</span>{{ words }} 字</span>
+{% if code_lines != 0 %}<span class="rc-page-meta__item"><span class="rc-page-meta__icon">码</span>{{ code_lines }} 行代码</span>{% endif %}
+{% if page_images %}{% if images != 0 %}<span class="rc-page-meta__item"><span class="rc-page-meta__icon">图</span>{{ images }} 张图像</span>{% endif %}{% endif %}
+{% if page_read_time %}<span class="rc-page-meta__item"><span class="rc-page-meta__icon">时</span>约 {{ read_time if read_time > 0 else 1 }} 分钟</span>{% endif %}
+</div>

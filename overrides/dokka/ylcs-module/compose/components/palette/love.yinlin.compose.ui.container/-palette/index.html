@@ -1,0 +1,479 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Palette</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.7.2
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:components:palette/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:components:palette/commonMain" data-filter=":ylcs-module:compose:components:palette/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.components.palette::love.yinlin.compose.ui.container/Palette///PointingToDeclaration//-1409867698">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.components.palette</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.ui.container</a><span class="delimiter">/</span><span class="current">Palette</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Palette</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Stable.html"><span class="token annotation builtin">Stable</span></a></div></div><span class="token keyword">class </span><a href="index.html">Palette</a></div><p class="paragraph">从图像中提取的代表性色彩集合</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="85816086%2FClasslikes%2F-1409867698" anchor-label="Builder" id="85816086%2FClasslikes%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-builder/index.html"><span><span>Builder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="85816086%2FClasslikes%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-builder/index.html">Builder</a></div><div class="brief "><p class="paragraph">调色板配置 DSL</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1664551109%2FClasslikes%2F-1409867698" anchor-label="Companion" id="1664551109%2FClasslikes%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1664551109%2FClasslikes%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2030533223%2FClasslikes%2F-1409867698" anchor-label="Filter" id="-2030533223%2FClasslikes%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-filter/index.html"><span><span>Filter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2030533223%2FClasslikes%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-filter/index.html">Filter</a></div><div class="brief "><p class="paragraph">控制量化阶段允许进入调色板的颜色</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1420681557%2FClasslikes%2F-1409867698" anchor-label="Swatch" id="1420681557%2FClasslikes%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-swatch/index.html"><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1420681557%2FClasslikes%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Stable.html"><span class="token annotation builtin">Stable</span></a></div></div><span class="token keyword">class </span><a href="-swatch/index.html">Swatch</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>rgb<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>population<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">代表调色板中的一种颜色及其像素占比</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="707214222%2FProperties%2F-1409867698" anchor-label="darkMutedColor" id="707214222%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dark-muted-color.html"><span>dark</span><wbr><span>Muted</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="707214222%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dark-muted-color.html">darkMutedColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1235026861%2FProperties%2F-1409867698" anchor-label="darkMutedSwatch" id="1235026861%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dark-muted-swatch.html"><span>dark</span><wbr><span>Muted</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1235026861%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dark-muted-swatch.html">darkMutedSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="762240743%2FProperties%2F-1409867698" anchor-label="darkVibrantColor" id="762240743%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dark-vibrant-color.html"><span>dark</span><wbr><span>Vibrant</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="762240743%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dark-vibrant-color.html">darkVibrantColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1354118284%2FProperties%2F-1409867698" anchor-label="darkVibrantSwatch" id="-1354118284%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dark-vibrant-swatch.html"><span>dark</span><wbr><span>Vibrant</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1354118284%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dark-vibrant-swatch.html">darkVibrantSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1077939131%2FProperties%2F-1409867698" anchor-label="dominantColor" id="1077939131%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dominant-color.html"><span>dominant</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1077939131%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dominant-color.html">dominantColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-157402848%2FProperties%2F-1409867698" anchor-label="dominantSwatch" id="-157402848%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dominant-swatch.html"><span>dominant</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157402848%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="dominant-swatch.html">dominantSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1749709840%2FProperties%2F-1409867698" anchor-label="lightMutedColor" id="1749709840%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="light-muted-color.html"><span>light</span><wbr><span>Muted</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1749709840%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="light-muted-color.html">lightMutedColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-807347349%2FProperties%2F-1409867698" anchor-label="lightMutedSwatch" id="-807347349%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="light-muted-swatch.html"><span>light</span><wbr><span>Muted</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-807347349%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="light-muted-swatch.html">lightMutedSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1873149673%2FProperties%2F-1409867698" anchor-label="lightVibrantColor" id="1873149673%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="light-vibrant-color.html"><span>light</span><wbr><span>Vibrant</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1873149673%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="light-vibrant-color.html">lightVibrantColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1275679822%2FProperties%2F-1409867698" anchor-label="lightVibrantSwatch" id="-1275679822%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="light-vibrant-swatch.html"><span>light</span><wbr><span>Vibrant</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1275679822%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="light-vibrant-swatch.html">lightVibrantSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1145644109%2FProperties%2F-1409867698" anchor-label="maxPopulation" id="1145644109%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-population.html"><span>max</span><wbr><span><span>Population</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1145644109%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="max-population.html">maxPopulation</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="113233508%2FProperties%2F-1409867698" anchor-label="mutedColor" id="113233508%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="muted-color.html"><span>muted</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="113233508%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="muted-color.html">mutedColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1493911%2FProperties%2F-1409867698" anchor-label="mutedSwatch" id="1493911%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="muted-swatch.html"><span>muted</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1493911%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="muted-swatch.html">mutedSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1268264242%2FProperties%2F-1409867698" anchor-label="swatches" id="1268264242%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="swatches.html"><span><span>swatches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1268264242%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="swatches.html">swatches</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="806107388%2FProperties%2F-1409867698" anchor-label="targets" id="806107388%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="targets.html"><span><span>targets</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="806107388%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="targets.html">targets</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-palette-target/index.html">PaletteTarget</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1177424957%2FProperties%2F-1409867698" anchor-label="vibrantColor" id="1177424957%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="vibrant-color.html"><span>vibrant</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1177424957%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="vibrant-color.html">vibrantColor</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1368309538%2FProperties%2F-1409867698" anchor-label="vibrantSwatch" id="-1368309538%2FProperties%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="vibrant-swatch.html"><span>vibrant</span><wbr><span><span>Swatch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1368309538%2FProperties%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="vibrant-swatch.html">vibrantSwatch</a><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-214184715%2FFunctions%2F-1409867698" anchor-label="getColorForTarget" id="-214184715%2FFunctions%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-color-for-target.html"><span>get</span><wbr><span>Color</span><wbr><span>For</span><wbr><span><span>Target</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-214184715%2FFunctions%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-color-for-target.html"><span class="token function">getColorForTarget</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">target<span class="token operator">: </span><a href="../-palette-target/index.html">PaletteTarget</a><span class="token punctuation">, </span></span><span class="parameter ">defaultColor<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator"> = </span>Color.Unspecified</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-color-for-target.html"><span class="token function">getColorForTarget</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">target<span class="token operator">: </span><a href="../-palette-target/index.html">PaletteTarget</a><span class="token punctuation">, </span></span><span class="parameter ">defaultColor<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-171983692%2FFunctions%2F-1409867698" anchor-label="getSwatchForTarget" id="-171983692%2FFunctions%2F-1409867698" data-filterable-set=":ylcs-module:compose:components:palette/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:palette/commonMain" data-filterable-set=":ylcs-module:compose:components:palette/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-swatch-for-target.html"><span>get</span><wbr><span>Swatch</span><wbr><span>For</span><wbr><span><span>Target</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-171983692%2FFunctions%2F-1409867698"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:palette/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-swatch-for-target.html"><span class="token function">getSwatchForTarget</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">target<span class="token operator">: </span><a href="../-palette-target/index.html">PaletteTarget</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-swatch/index.html">Palette.Swatch</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
