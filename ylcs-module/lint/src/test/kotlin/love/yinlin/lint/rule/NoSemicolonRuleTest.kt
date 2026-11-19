@@ -11,6 +11,7 @@ internal class NoSemicolonRuleTest {
     @Test
     fun enumEntryTerminatorIsAllowedWithoutMembers() {
         assertTrue(lint("enum class Direction { NORTH; }").isEmpty())
+        assertTrue(lint("enum class Direction { NORTH;}").isEmpty())
     }
 
     @Test
