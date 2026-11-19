@@ -1,6 +1,7 @@
 package love.yinlin.compose.ui.container
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -22,9 +23,12 @@ enum class PaletteStatus {
 @Stable
 class PaletteState internal constructor() {
     /** 最近一次成功生成的调色板；重新采样期间保留上一份结果。 */
-    val paletteState: State<Palette?> field = mutableStateOf(null)
-    val statusState: State<PaletteStatus> field = mutableStateOf(PaletteStatus.Loading)
-    val errorState: State<Throwable?> field = mutableStateOf(null)
+    val paletteState: State<Palette?>
+        field: MutableState<Palette?> = mutableStateOf(null)
+    val statusState: State<PaletteStatus>
+        field: MutableState<PaletteStatus> = mutableStateOf(PaletteStatus.Loading)
+    val errorState: State<Throwable?>
+        field: MutableState<Throwable?> = mutableStateOf(null)
 
     val palette: Palette? get() = paletteState.value
     val status: PaletteStatus get() = statusState.value
