@@ -5,8 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * 从 [bitmap] 异步生成并记忆调色板。
@@ -25,9 +23,7 @@ fun rememberPalette(bitmap: ImageBitmap): PaletteState {
     LaunchedEffect(bitmap) {
         palette.beginGeneration()
         try {
-            val result = withContext(Dispatchers.Default) {
-                Palette.from(bitmap).generate()
-            }
+            val result = Palette.from(bitmap).generateAsync()
             palette.publish(result)
         } catch (cancelled: CancellationException) {
             throw cancelled
