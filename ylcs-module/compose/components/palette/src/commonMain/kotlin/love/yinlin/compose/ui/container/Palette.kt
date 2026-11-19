@@ -192,9 +192,6 @@ class Palette internal constructor(
     }
 
     /**
-     * 调色板生成器。默认使用 112×112 像素的采样面积、16 种颜色和 AndroidX 默认颜色过滤器。
-     */
-    /**
      * 调色板配置 DSL。
      *
      * 使用 [Palette.from] 创建 Builder，在配置块中声明采样参数、过滤器和目标色。
@@ -207,7 +204,6 @@ class Palette internal constructor(
         private val targets = mutableListOf<Target>()
         private val filters = mutableListOf(DEFAULT_FILTER)
         private var resizeArea = DEFAULT_RESIZE_BITMAP_AREA
-        private var resizeMaximumDimension = -1
         private var selectedRegion: Region? = null
 
         var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
@@ -221,7 +217,6 @@ class Palette internal constructor(
             set(value) {
                 require(value > 0) { "resizeBitmapArea must be greater than zero." }
                 resizeArea = value
-                resizeMaximumDimension = -1
             }
 
         internal constructor(bitmap: ImageBitmap) : this(bitmap, null) {
@@ -314,13 +309,7 @@ class Palette internal constructor(
             source.readPixels(sourcePixels)
 
             val sourceArea = sourceWidth.toLong() * sourceHeight.toLong()
-            val scaleRatio = when {
-                resizeArea > 0 && sourceArea > resizeArea -> sqrt(resizeArea / sourceArea.toDouble())
-                resizeMaximumDimension > 0 && maxOf(sourceWidth, sourceHeight) > resizeMaximumDimension ->
-                    resizeMaximumDimension.toDouble() / maxOf(sourceWidth, sourceHeight)
-
-                else -> 1.0
-            }
+            val scaleRatio = if (sourceArea > resizeArea) sqrt(resizeArea / sourceArea.toDouble()) else 1.0
 
             val scaledWidth = ceil(sourceWidth * scaleRatio).toInt().coerceAtLeast(1)
             val scaledHeight = ceil(sourceHeight * scaleRatio).toInt().coerceAtLeast(1)
@@ -373,12 +362,12 @@ class Palette internal constructor(
         fun generate(bitmap: ImageBitmap): Palette = from(bitmap).generate()
 
         fun generate(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
-            from(bitmap).maximumColorCount(maximumColorCount).generate()
+            from(bitmap) { this.maximumColorCount = maximumColorCount }.generate()
 
         suspend fun generateAsync(bitmap: ImageBitmap): Palette = from(bitmap).generateAsync()
 
         suspend fun generateAsync(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
-            from(bitmap).maximumColorCount(maximumColorCount).generateAsync()
+            from(bitmap) { this.maximumColorCount = maximumColorCount }.generateAsync()
     }
 }
 
