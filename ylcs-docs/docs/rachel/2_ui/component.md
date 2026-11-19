@@ -64,7 +64,7 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 
 在 Composable 中调用 `val palette = rememberPalette(bitmap)` 即可异步生成并记忆调色板，无需额外的容器 Composable 或内容槽。`PaletteState` 直接提供主色、六种标准目标色、Swatch 集合（包含 HSL 和文字对比色）以及加载和错误状态；读取这些属性会订阅快照状态。图像实例变化时旧任务会自动取消并重新分析，刷新期间保留最近一次成功结果。分析在协程 `Dispatchers.Default` 上运行。
 
-独立使用时，可通过 `Palette.from(bitmap)` 创建 `Palette.Builder`，配置最大颜色数、采样区域、过滤器和自定义 `Target`，再调用 `generate()` 或 `generateAsync()`。模块使用 commonMain 算法，不依赖 `androidx.palette`。
+独立使用时，可通过 `Palette.from(bitmap) { ... }` 配置 `Palette.Builder`，在 DSL 块中设置 `maximumColorCount`、采样区域、过滤器和目标色，再调用 `generate()` 或挂起函数 `generateAsync()`。自定义目标色可通过 `Target { ... }` 创建，也可以从预设目标调用 `copy { ... }` 修改。模块仅依赖 `commonMain`，不需要平台专属实现，也不依赖 `androidx.palette`。
 
 ## 可选模块
 
