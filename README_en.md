@@ -98,7 +98,7 @@ The interface library covers various components such as themes, text, inputs, im
 
 # Cross-Platform Module Support
 
-Browse all 53 modules under `ylcs-module` in their current directory structure: 18 core and foundation modules, 24 Compose modules, 5 client/server modules, 4 platform integration modules, and 2 build tools. Each module name links to its source directory, followed by its supported platforms, purpose and platform-specific limits.
+Browse all 54 modules under `ylcs-module` in their current directory structure: 18 core and foundation modules, 25 Compose modules, 5 client/server modules, 4 platform integration modules, and 2 build tools. Each module name links to its source directory, followed by its supported platforms, purpose and platform-specific limits.
 
 - **All platforms**: Android, iOS, Desktop JVM, Web (JS / WasmJS), and Native Windows / Linux / macOS.
 - **Web**: both JS and WasmJS; any differences are listed separately.
@@ -224,7 +224,7 @@ Find modules by purpose:
 </details>
 
 <details>
-<summary>UI components · 14 modules · Images, blur, calendars, drag-and-drop, media and QR codes (compose/components)</summary>
+<summary>UI components · 15 modules · Images, blur, palettes, calendars, drag-and-drop, media and QR codes (compose/components)</summary>
 
 - **[image](ylcs-module/compose/components/image) · All platforms**<br>
   Async images, animations, zoom, caching and crop regions
@@ -255,6 +255,9 @@ Find modules by purpose:
 
 - **[pagination-layout](ylcs-module/compose/components/pagination-layout) · All platforms**<br>
   Paginated data state and loading layouts
+
+- **[palette](ylcs-module/compose/components/palette) · All platforms**<br>
+  Extracts representative colors, target swatches and readable text colors from an ImageBitmap
 
 - **[qrcode](ylcs-module/compose/components/qrcode) · All platforms**<br>
   QR generation on all targets; scanning implemented on Android/iOS only

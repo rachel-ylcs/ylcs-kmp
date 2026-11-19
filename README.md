@@ -97,7 +97,7 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 # 全平台模块支持
 
-按当前目录结构列出 `ylcs-module` 中的全部 53 个模块：核心与基础能力 18 个、Compose 24 个、客户端与服务端 5 个、平台集成 4 个、构建工具 2 个。点击模块名进入源码目录；每个条目先标注支持平台，再说明用途和平台差异。
+按当前目录结构列出 `ylcs-module` 中的全部 54 个模块：核心与基础能力 18 个、Compose 25 个、客户端与服务端 5 个、平台集成 4 个、构建工具 2 个。点击模块名进入源码目录；每个条目先标注支持平台，再说明用途和平台差异。
 
 - **全平台**：Android、iOS、JVM 桌面、Web（JS / WasmJS），以及 Native Windows / Linux / macOS。
 - **Web**：同时支持 JS 和 WasmJS；两者存在差异时分别标注。
@@ -223,7 +223,7 @@ implementation("love.yinlin.compose:app:x.x.x")
 </details>
 
 <details>
-<summary>界面组件 · 14 个模块 · 图片、模糊、日历、拖放、多媒体与二维码（compose/components）</summary>
+<summary>界面组件 · 15 个模块 · 图片、模糊、调色板、日历、拖放、多媒体与二维码（compose/components）</summary>
 
 - **[image](ylcs-module/compose/components/image) · 全平台**<br>
   异步图片、动图、缩放、缓存与裁剪选区
@@ -254,6 +254,9 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 - **[pagination-layout](ylcs-module/compose/components/pagination-layout) · 全平台**<br>
   分页数据状态与加载布局
+
+- **[palette](ylcs-module/compose/components/palette) · 全平台**<br>
+  从指定 ImageBitmap 提取代表色、目标色与文字对比色
 
 - **[qrcode](ylcs-module/compose/components/qrcode) · 全平台**<br>
   全 target 二维码生成；扫码仅 Android/iOS 实现

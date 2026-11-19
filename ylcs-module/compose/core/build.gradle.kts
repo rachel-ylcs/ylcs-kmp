@@ -47,6 +47,10 @@ rachel {
                 )
             }
 
+            commonTest {
+                lib(libs.test)
+            }
+
             appleMain(commonMain)
 
             skikoMain(commonMain) {

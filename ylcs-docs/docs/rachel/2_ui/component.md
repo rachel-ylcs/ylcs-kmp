@@ -60,6 +60,12 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 
 `Surface` 统一形状、边框、阴影、内容边距及色调层次。组件实现应优先复用这些能力与主题值。
 
+## 图像调色板
+
+在 Composable 中调用 `val palette = rememberPalette(bitmap)` 即可异步生成并记忆调色板，无需额外的容器 Composable 或内容槽。`PaletteState` 直接提供主色、六种标准目标色、Swatch 集合（包含 HSL 和文字对比色）以及加载和错误状态；读取这些属性会订阅快照状态。图像实例变化时旧任务会自动取消并重新分析，刷新期间保留最近一次成功结果。分析在协程 `Dispatchers.Default` 上运行。
+
+独立使用时，可通过 `Palette.from(bitmap) { ... }` 配置 `Palette.Builder`，在 DSL 块中设置 `maximumColorCount`、采样区域、过滤器和目标色，再调用 `generate()` 或挂起函数 `generateAsync()`。自定义目标色可通过 `Target { ... }` 创建，也可以从预设目标调用 `copy { ... }` 修改。模块仅依赖 `commonMain`，不需要平台专属实现，也不依赖 `androidx.palette`。
+
 ## 可选模块
 
 | `compose/components` 子模块 | 能力 |
@@ -73,6 +79,7 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 | `lottie` | Lottie 动画 |
 | `media` | 音频、视频及播放控制 |
 | `pagination-layout` | 分页加载布局 |
+| `palette` | ImageBitmap 取色、标准目标色与文字对比色 |
 | `qrcode` | 二维码相关组件 |
 | `reordering` | 列表重排 |
 | `rich-text` | 富文本渲染 |

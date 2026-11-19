@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.util.*
+import love.yinlin.compose.graphics.HSV
 import love.yinlin.extension.enum
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
@@ -90,6 +91,32 @@ fun rememberValueState(value: Color, vararg keys: Any?) = remember(*keys) { muta
 
 @Composable
 inline fun rememberColorState(vararg keys: Any?, crossinline init: () -> Color) = remember(*keys) { mutableColorStateOf(init()) }
+
+// MutableHSVState
+
+@Stable
+interface MutableHSVState : MutableState<HSV>
+
+@Stable
+private class DelegateHSVState(initValue: HSV) : MutableHSVState {
+    val delegate = mutableLongStateOf(initValue.packedValue)
+
+    override var value: HSV
+        get() = HSV(delegate.value)
+        set(initValue) { delegate.value = initValue.packedValue }
+
+    override fun component1(): HSV = value
+    override fun component2(): (HSV) -> Unit = { value = it }
+}
+
+@StateFactoryMarker
+fun mutableHSVStateOf(value: HSV): MutableHSVState = DelegateHSVState(value)
+
+@Composable
+fun rememberValueState(value: HSV, vararg keys: Any?) = remember(*keys) { mutableHSVStateOf(value) }
+
+@Composable
+inline fun rememberHSVState(vararg keys: Any?, crossinline init: () -> HSV) = remember(*keys) { mutableHSVStateOf(init()) }
 
 // MutableDpState
 
