@@ -352,8 +352,9 @@ object ContainerPage : Page(
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
                                         Box(Modifier.size(40.dp).clip(Theme.shape.v3).background(customSwatch.color))
                                         Column {
+                                            val hsl = customSwatch.hsl
                                             Text("自定义目标 ${customSwatch.rgb.toPaletteHex()}")
-                                            Text("HSL ${customSwatch.hsl.joinToString { (it * 100).toInt().toString() }} · ${customSwatch.population} 像素")
+                                            Text("HSL ${hsl[0].toInt()}°, ${(hsl[1] * 100).toInt()}%, ${(hsl[2] * 100).toInt()}% · ${customSwatch.population} 像素")
                                         }
                                     }
                                 }
