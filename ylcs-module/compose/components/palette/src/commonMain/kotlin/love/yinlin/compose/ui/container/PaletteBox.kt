@@ -6,13 +6,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import love.yinlin.extension.catchingError
 
 /**
  * 为内容提供由指定图像生成的调色板。
  *
- * [bitmap] 是唯一采样输入，内容槽只负责布局与展示，不会参与取色。请将传入图像视为不可变对象；
- * 图像内容更新时传入新的 [ImageBitmap] 实例。图像变化会取消旧分析并启动新分析。
+ * [bitmap] 是唯一采样输入，内容槽只负责布局与展示，不会参与取色。需要显示原图时，请在内容槽中自行绘制。
+ * 请将传入图像视为不可变对象；图像内容更新时传入新的 [ImageBitmap] 实例。图像变化会取消旧分析并启动新分析。
  *
  * @param bitmap 待采样图像
  * @param modifier 容器修饰符
@@ -29,13 +31,13 @@ fun PaletteBox(
 
     LaunchedEffect(bitmap) {
         state.beginGeneration()
-        try {
-            state.publish(Palette.from(bitmap).generateAsync())
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (error: Throwable) {
-            state.fail(error)
+        val [palette, error] = withContext(Dispatchers.Default) {
+            var generated: Palette? = null
+            val error = catchingError { generated = Palette.from(bitmap).generate() }
+            generated to error
         }
+        if (error == null) state.publish(requireNotNull(palette))
+        else state.fail(error)
     }
 
     Box(modifier) {
