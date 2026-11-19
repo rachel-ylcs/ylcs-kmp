@@ -77,7 +77,7 @@ internal class NoSemicolonRule : RuleV2(RuleId(ID), About(maintainer = "YLCS")) 
         if (enumClass.elementType != CLASS || !enumClass.hasModifier(ENUM_KEYWORD)) return false
 
         val previousEntry = prevCodeLeaf?.findParentByType(ENUM_ENTRY)
-        if (previousEntry?.parent == body) {
+        if (previousEntry?.findParentByType(CLASS_BODY) == body) {
             return nextCodeSibling?.elementType != ENUM_ENTRY
         }
 
