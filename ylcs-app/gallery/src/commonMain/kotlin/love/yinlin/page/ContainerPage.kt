@@ -48,6 +48,7 @@ object ContainerPage : Page(
     private val demoAdderBox = component("AdderBox", "向容器中添加项目，也可替换或删除已有项目。", "添加")
     private val demoBanner = component("Banner", "自动轮播一组图片，也可以手动切换。", "轮播")
     private val demoWatermark = component("Watermark", "在内容上平铺水印，仍可操作下方控件。", "平铺 透明度")
+    private val demoPalette = component("PaletteBox", "从背景图像异步提取代表色，为覆盖内容提供自适应配色。", "图片 主色 调色板", "palette")
 
     @Composable
     override fun Content() {
@@ -229,6 +230,68 @@ object ContainerPage : Page(
                     }
                 }
             }
+
+            Component(demoPalette) {
+                val paletteImages = [
+                    Res.drawable.img0,
+                    Res.drawable.img1,
+                    Res.drawable.img2,
+                    Res.drawable.img3
+                ]
+                var imageIndex by rememberValueState(0)
+
+                PaletteBox(
+                    modifier = Modifier.fillMaxWidth().height(Theme.size.cell3).clip(Theme.shape.v3),
+                    backdrop = {
+                        Image(
+                            res = paletteImages[imageIndex],
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                ) {
+                    val colors = listOfNotNull(
+                        dominantSwatch,
+                        vibrantSwatch,
+                        lightVibrantSwatch,
+                        darkVibrantSwatch,
+                        mutedSwatch,
+                        lightMutedSwatch,
+                        darkMutedSwatch
+                    )
+                    val dominantHex = dominantSwatch?.rgb?.toUInt()?.toString(16)?.takeLast(6)?.uppercase() ?: "暂无"
+
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.38f)).padding(Theme.padding.v8)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                            Text("PaletteBox · 动态配色", color = Color.White)
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                for (swatch in colors.take(7)) {
+                                    Box(
+                                        Modifier.size(24.dp).clip(RoundedCornerShape(8.dp)).background(swatch.color)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = when {
+                                    isLoading -> "正在提取背景颜色…"
+                                    dominantSwatch != null -> "主色 #$dominantHex"
+                                    else -> "暂无可用颜色"
+                                },
+                                color = dominantSwatch?.titleColor ?: Color.White
+                            )
+                        }
+
+                        PrimaryTextButton(
+                            "换一张",
+                            onClick = { imageIndex = (imageIndex + 1) % paletteImages.size },
+                            modifier = Modifier.align(Alignment.BottomEnd)
+                        )
+                    }
+                }
+            }
+
         }
     }
 }

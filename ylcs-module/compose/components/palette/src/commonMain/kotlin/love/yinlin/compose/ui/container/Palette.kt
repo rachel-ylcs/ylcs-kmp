@@ -1,0 +1,378 @@
+package love.yinlin.compose.ui.container
+
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.sqrt
+
+/**
+ * 从图像中提取的代表性色彩集合。
+ *
+ * 量化使用 AndroidX Palette 的 5-bit RGB 中值切分算法；目标颜色按饱和度、明度和像素占比评分。
+ * [Builder.generate] 是同步 API，图像较大时应优先使用 [Builder.generateAsync]。
+ */
+@Stable
+class Palette internal constructor(
+    swatches: List<Swatch>,
+    targets: List<Target>,
+    internal val fingerprint: Long? = null,
+) {
+    val swatches: List<Swatch> = swatches.toList()
+    val targets: List<Target> = targets.toList()
+    val dominantSwatch: Swatch? = this.swatches.maxByOrNull { it.population }
+    val maxPopulation: Int = dominantSwatch?.population ?: 0
+
+    private val selectedSwatches = mutableMapOf<Target, Swatch>()
+
+    init {
+        generateTargets()
+    }
+
+    val vibrantSwatch: Swatch? get() = getSwatchForTarget(Target.VIBRANT)
+    val lightVibrantSwatch: Swatch? get() = getSwatchForTarget(Target.LIGHT_VIBRANT)
+    val darkVibrantSwatch: Swatch? get() = getSwatchForTarget(Target.DARK_VIBRANT)
+    val mutedSwatch: Swatch? get() = getSwatchForTarget(Target.MUTED)
+    val lightMutedSwatch: Swatch? get() = getSwatchForTarget(Target.LIGHT_MUTED)
+    val darkMutedSwatch: Swatch? get() = getSwatchForTarget(Target.DARK_MUTED)
+
+    val vibrantColor: Color? get() = vibrantSwatch?.color
+    val lightVibrantColor: Color? get() = lightVibrantSwatch?.color
+    val darkVibrantColor: Color? get() = darkVibrantSwatch?.color
+    val mutedColor: Color? get() = mutedSwatch?.color
+    val lightMutedColor: Color? get() = lightMutedSwatch?.color
+    val darkMutedColor: Color? get() = darkMutedSwatch?.color
+    val dominantColor: Color? get() = dominantSwatch?.color
+
+    fun getSwatchForTarget(target: Target): Swatch? = selectedSwatches[target]
+
+    fun getColorForTarget(target: Target, defaultColor: Int): Int =
+        getSwatchForTarget(target)?.rgb ?: defaultColor
+
+    fun getColorForTarget(target: Target, defaultColor: Color = Color.Unspecified): Color =
+        getSwatchForTarget(target)?.color ?: defaultColor
+
+    fun getVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.VIBRANT, defaultColor)
+    fun getLightVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.LIGHT_VIBRANT, defaultColor)
+    fun getDarkVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.DARK_VIBRANT, defaultColor)
+    fun getMutedColor(defaultColor: Int): Int = getColorForTarget(Target.MUTED, defaultColor)
+    fun getLightMutedColor(defaultColor: Int): Int = getColorForTarget(Target.LIGHT_MUTED, defaultColor)
+    fun getDarkMutedColor(defaultColor: Int): Int = getColorForTarget(Target.DARK_MUTED, defaultColor)
+    fun getDominantColor(defaultColor: Int): Int = dominantSwatch?.rgb ?: defaultColor
+
+    fun getVibrantColor(defaultColor: Color = Color.Unspecified): Color = vibrantSwatch?.color ?: defaultColor
+    fun getLightVibrantColor(defaultColor: Color = Color.Unspecified): Color = lightVibrantSwatch?.color ?: defaultColor
+    fun getDarkVibrantColor(defaultColor: Color = Color.Unspecified): Color = darkVibrantSwatch?.color ?: defaultColor
+    fun getMutedColor(defaultColor: Color = Color.Unspecified): Color = mutedSwatch?.color ?: defaultColor
+    fun getLightMutedColor(defaultColor: Color = Color.Unspecified): Color = lightMutedSwatch?.color ?: defaultColor
+    fun getDarkMutedColor(defaultColor: Color = Color.Unspecified): Color = darkMutedSwatch?.color ?: defaultColor
+    fun getDominantColor(defaultColor: Color = Color.Unspecified): Color = dominantSwatch?.color ?: defaultColor
+
+    private fun generateTargets() {
+        val usedColors = mutableSetOf<Int>()
+        for (target in targets) {
+            val weights = target.normalizedWeights()
+            var bestSwatch: Swatch? = null
+            var bestScore = 0f
+
+            for (swatch in swatches) {
+                val hsl = swatch.hslArray
+                if (hsl[1] < target.minimumSaturation || hsl[1] > target.maximumSaturation ||
+                    hsl[2] < target.minimumLightness || hsl[2] > target.maximumLightness ||
+                    swatch.rgb in usedColors
+                ) continue
+
+                val score = weights[0] * (1f - kotlin.math.abs(hsl[1] - target.targetSaturation)) +
+                    weights[1] * (1f - kotlin.math.abs(hsl[2] - target.targetLightness)) +
+                    weights[2] * (swatch.population / maxPopulation.coerceAtLeast(1).toFloat())
+
+                if (bestSwatch == null || score > bestScore) {
+                    bestSwatch = swatch
+                    bestScore = score
+                }
+            }
+
+            if (bestSwatch != null) {
+                selectedSwatches[target] = bestSwatch
+                if (target.isExclusive) usedColors += bestSwatch.rgb
+            }
+        }
+    }
+
+    /**
+     * 代表调色板中的一种颜色及其像素占比。
+     *
+     * [rgb] 为 ARGB 整数；[color]、[titleColor] 和 [bodyColor] 可直接用于 Compose。
+     */
+    @Stable
+    class Swatch(
+        val rgb: Int,
+        val population: Int,
+    ) {
+        internal val hslArray: FloatArray by lazy { PaletteColorUtils.rgbToHsl(rgb) }
+        val hsl: FloatArray get() = hslArray.copyOf()
+        val color: Color get() = PaletteColorUtils.toColor(rgb)
+
+        private val textColors: TextColors by lazy { generateTextColors() }
+
+        val titleTextColor: Int get() = textColors.title
+        val bodyTextColor: Int get() = textColors.body
+        val titleColor: Color get() = PaletteColorUtils.toColor(titleTextColor)
+        val bodyColor: Color get() = PaletteColorUtils.toColor(bodyTextColor)
+
+        private fun generateTextColors(): TextColors {
+            val lightBodyAlpha = PaletteColorUtils.calculateMinimumAlpha(WHITE, rgb, MIN_CONTRAST_BODY_TEXT)
+            val lightTitleAlpha = PaletteColorUtils.calculateMinimumAlpha(WHITE, rgb, MIN_CONTRAST_TITLE_TEXT)
+
+            if (lightBodyAlpha != -1 && lightTitleAlpha != -1) {
+                return TextColors(setAlpha(WHITE, lightTitleAlpha), setAlpha(WHITE, lightBodyAlpha))
+            }
+
+            val darkBodyAlpha = PaletteColorUtils.calculateMinimumAlpha(BLACK, rgb, MIN_CONTRAST_BODY_TEXT)
+            val darkTitleAlpha = PaletteColorUtils.calculateMinimumAlpha(BLACK, rgb, MIN_CONTRAST_TITLE_TEXT)
+
+            if (darkBodyAlpha != -1 && darkTitleAlpha != -1) {
+                return TextColors(setAlpha(BLACK, darkTitleAlpha), setAlpha(BLACK, darkBodyAlpha))
+            }
+
+            val title = if (lightTitleAlpha != -1) setAlpha(WHITE, lightTitleAlpha) else setAlpha(BLACK, darkTitleAlpha)
+            val body = if (lightBodyAlpha != -1) setAlpha(WHITE, lightBodyAlpha) else setAlpha(BLACK, darkBodyAlpha)
+            return TextColors(title, body)
+        }
+
+        override fun equals(other: Any?): Boolean =
+            other is Swatch && rgb == other.rgb && population == other.population
+
+        override fun hashCode(): Int = 31 * rgb + population
+
+        override fun toString(): String =
+            "Swatch [RGB: #${rgb.toUInt().toString(16)}] [HSL: ${hsl.contentToString()}] [Population: $population]"
+
+        private data class TextColors(val title: Int, val body: Int)
+
+        private companion object {
+            const val WHITE = -1
+            const val BLACK = -0x1000000
+            const val MIN_CONTRAST_TITLE_TEXT = 3f
+            const val MIN_CONTRAST_BODY_TEXT = 4.5f
+
+            fun setAlpha(color: Int, alpha: Int): Int = (color and 0x00FFFFFF) or (alpha shl 24)
+        }
+    }
+
+    /** 控制量化阶段允许进入调色板的颜色。 */
+    fun interface Filter {
+        fun isAllowed(rgb: Int, hsl: FloatArray): Boolean
+    }
+
+    fun interface PaletteAsyncListener {
+        fun onGenerated(palette: Palette?)
+    }
+
+    /**
+     * 调色板生成器。默认使用 112×112 像素的采样面积、16 种颜色和 AndroidX 默认颜色过滤器。
+     */
+    class Builder private constructor(
+        private val bitmap: ImageBitmap?,
+        private val inputSwatches: List<Swatch>?,
+    ) {
+        private val targets = mutableListOf<Target>()
+        private val filters = mutableListOf(DEFAULT_FILTER)
+        private var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
+        private var resizeArea = DEFAULT_RESIZE_BITMAP_AREA
+        private var resizeMaximumDimension = -1
+        private var region: Region? = null
+
+        internal constructor(bitmap: ImageBitmap) : this(bitmap, null) {
+            targets += Target.DEFAULT_TARGETS
+        }
+
+        internal constructor(swatches: List<Swatch>) : this(null, swatches.toList()) {
+            require(swatches.isNotEmpty()) { "List of swatches must not be empty." }
+        }
+
+        fun maximumColorCount(colors: Int) = apply {
+            require(colors > 0) { "maximumColorCount must be greater than zero." }
+            maximumColorCount = colors
+        }
+
+        fun resizeBitmapArea(area: Int) = apply {
+            resizeArea = area
+            resizeMaximumDimension = -1
+        }
+
+        @Deprecated("Use resizeBitmapArea instead.")
+        fun resizeBitmapSize(maxDimension: Int) = apply {
+            resizeMaximumDimension = maxDimension
+            resizeArea = -1
+        }
+
+        fun addFilter(filter: Filter) = apply {
+            filters += filter
+        }
+
+        fun clearFilters() = apply {
+            filters.clear()
+        }
+
+        fun setRegion(left: Int, top: Int, right: Int, bottom: Int) = apply {
+            val source = bitmap ?: return@apply
+            val clippedLeft = left.coerceAtLeast(0)
+            val clippedTop = top.coerceAtLeast(0)
+            val clippedRight = right.coerceAtMost(source.width)
+            val clippedBottom = bottom.coerceAtMost(source.height)
+            require(clippedLeft < clippedRight && clippedTop < clippedBottom) {
+                "The given region must intersect with the ImageBitmap dimensions."
+            }
+            region = Region(clippedLeft, clippedTop, clippedRight, clippedBottom)
+        }
+
+        fun clearRegion() = apply {
+            region = null
+        }
+
+        fun addTarget(target: Target) = apply {
+            if (target !in targets) targets += target
+        }
+
+        fun clearTargets() = apply {
+            targets.clear()
+        }
+
+        /**
+         * 同步生成调色板。图像分析是 CPU 密集操作，不应在 UI 线程调用。
+         */
+        fun generate(): Palette = generateIfChanged(null).palette
+            ?: error("Palette generation unexpectedly returned no result.")
+
+        /**
+         * 在 [Dispatchers.Default] 上生成调色板，调用方可直接从协程中使用。
+         */
+        suspend fun generateAsync(): Palette = withContext(Dispatchers.Default) { generate() }
+
+        /**
+         * 在 [scope] 中异步生成调色板。发生生成错误时，监听器收到 null。
+         */
+        fun generate(scope: CoroutineScope, listener: PaletteAsyncListener): Job = scope.launch {
+            val result = try {
+                generateAsync()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                null
+            }
+            listener.onGenerated(result)
+        }
+
+        /** 与 [generate] 相同，但使用异步 API 命名。 */
+        fun generateAsync(scope: CoroutineScope, listener: PaletteAsyncListener): Job = generate(scope, listener)
+
+        internal fun generateIfChanged(previousFingerprint: Long?): PaletteGenerationResult {
+            val source = bitmap
+            if (source == null) {
+                val palette = Palette(inputSwatches.orEmpty(), targets)
+                return PaletteGenerationResult(palette, null)
+            }
+
+            val pixels = extractPixels(source)
+            val fingerprint = fingerprint(pixels.values, pixels.width, pixels.height)
+            if (fingerprint == previousFingerprint) return PaletteGenerationResult(null, fingerprint)
+
+            val swatches = ColorCutQuantizer(pixels.values, maximumColorCount, filters).quantize()
+            return PaletteGenerationResult(Palette(swatches, targets, fingerprint), fingerprint)
+        }
+
+        private fun extractPixels(source: ImageBitmap): PixelData {
+            val sourceWidth = source.width
+            val sourceHeight = source.height
+            val sourcePixels = IntArray(sourceWidth * sourceHeight)
+            source.readPixels(sourcePixels)
+
+            val sourceArea = sourceWidth.toLong() * sourceHeight.toLong()
+            val scaleRatio = when {
+                resizeArea > 0 && sourceArea > resizeArea -> sqrt(resizeArea / sourceArea.toDouble())
+                resizeMaximumDimension > 0 && maxOf(sourceWidth, sourceHeight) > resizeMaximumDimension ->
+                    resizeMaximumDimension.toDouble() / maxOf(sourceWidth, sourceHeight)
+
+                else -> 1.0
+            }
+
+            val scaledWidth = ceil(sourceWidth * scaleRatio).toInt().coerceAtLeast(1)
+            val scaledHeight = ceil(sourceHeight * scaleRatio).toInt().coerceAtLeast(1)
+            val selectedRegion = region
+            val left = selectedRegion?.let { floor(it.left * scaleRatio).toInt() } ?: 0
+            val top = selectedRegion?.let { floor(it.top * scaleRatio).toInt() } ?: 0
+            val right = selectedRegion?.let { ceil(it.right * scaleRatio).toInt().coerceAtMost(scaledWidth) } ?: scaledWidth
+            val bottom = selectedRegion?.let { ceil(it.bottom * scaleRatio).toInt().coerceAtMost(scaledHeight) } ?: scaledHeight
+            val outputWidth = (right - left).coerceAtLeast(1)
+            val outputHeight = (bottom - top).coerceAtLeast(1)
+            val output = IntArray(outputWidth * outputHeight)
+
+            var outputIndex = 0
+            for (y in top until bottom) {
+                val sourceY = floor(y / scaleRatio).toInt().coerceIn(0, sourceHeight - 1)
+                for (x in left until right) {
+                    val sourceX = floor(x / scaleRatio).toInt().coerceIn(0, sourceWidth - 1)
+                    output[outputIndex++] = sourcePixels[sourceY * sourceWidth + sourceX]
+                }
+            }
+
+            return PixelData(output, outputWidth, outputHeight)
+        }
+
+        private fun fingerprint(pixels: IntArray, width: Int, height: Int): Long {
+            var hash = -0x340d631b7bdddcdbL
+            hash = (hash xor width.toLong()) * 1099511628211L
+            hash = (hash xor height.toLong()) * 1099511628211L
+            for (pixel in pixels) hash = (hash xor pixel.toLong()) * 1099511628211L
+            return hash
+        }
+
+        private data class Region(val left: Int, val top: Int, val right: Int, val bottom: Int)
+        private data class PixelData(val values: IntArray, val width: Int, val height: Int)
+    }
+
+    companion object {
+        private const val DEFAULT_FILTER_BLACK_MAX_LIGHTNESS = 0.05f
+        private const val DEFAULT_FILTER_WHITE_MIN_LIGHTNESS = 0.95f
+
+        /** 默认量化采样面积，112×112。 */
+        const val DEFAULT_RESIZE_BITMAP_AREA = 112 * 112
+
+        /** 默认生成 16 种代表色。 */
+        const val DEFAULT_CALCULATE_NUMBER_COLORS = 16
+
+        private val DEFAULT_FILTER = Filter { _, hsl ->
+            val isBlack = hsl[2] <= DEFAULT_FILTER_BLACK_MAX_LIGHTNESS
+            val isWhite = hsl[2] >= DEFAULT_FILTER_WHITE_MIN_LIGHTNESS
+            val isNearRedILine = hsl[0] in 10f..37f && hsl[1] <= 0.82f
+            !isBlack && !isWhite && !isNearRedILine
+        }
+
+        fun from(bitmap: ImageBitmap): Builder = Builder(bitmap)
+
+        fun from(swatches: List<Swatch>): Palette = Builder(swatches).generate()
+
+        fun generate(bitmap: ImageBitmap): Palette = from(bitmap).generate()
+
+        fun generate(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
+            from(bitmap).maximumColorCount(maximumColorCount).generate()
+
+        suspend fun generateAsync(bitmap: ImageBitmap): Palette = from(bitmap).generateAsync()
+
+        suspend fun generateAsync(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
+            from(bitmap).maximumColorCount(maximumColorCount).generateAsync()
+    }
+}
+
+internal data class PaletteGenerationResult(
+    val palette: Palette?,
+    val fingerprint: Long?,
+)

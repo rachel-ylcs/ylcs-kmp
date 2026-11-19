@@ -27,6 +27,7 @@ rachel {
                     projects.ylcsModule.compose.platformView,
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.blur,
+                    projects.ylcsModule.compose.components.palette,
                     projects.ylcsModule.compose.components.calendar,
                     projects.ylcsModule.compose.components.dataTable,
                     projects.ylcsModule.compose.components.dragDrop,
