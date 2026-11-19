@@ -224,7 +224,7 @@ Find modules by purpose:
 </details>
 
 <details>
-<summary>UI components · 15 modules · Images, blur, calendars, drag-and-drop, media and QR codes (compose/components)</summary>
+<summary>UI components · 15 modules · Images, blur, palettes, calendars, drag-and-drop, media and QR codes (compose/components)</summary>
 
 - **[image](ylcs-module/compose/components/image) · All platforms**<br>
   Async images, animations, zoom, caching and crop regions

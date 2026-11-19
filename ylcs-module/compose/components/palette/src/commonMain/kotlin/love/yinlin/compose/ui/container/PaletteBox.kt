@@ -75,9 +75,7 @@ fun PaletteBox(
         )
 
         Box(Modifier.matchParentSize()) {
-            with(paletteScope) {
-                content()
-            }
+            paletteScope.content()
         }
     }
 }

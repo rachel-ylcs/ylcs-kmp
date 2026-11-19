@@ -223,7 +223,7 @@ implementation("love.yinlin.compose:app:x.x.x")
 </details>
 
 <details>
-<summary>界面组件 · 15 个模块 · 图片、模糊、日历、拖放、多媒体与二维码（compose/components）</summary>
+<summary>界面组件 · 15 个模块 · 图片、模糊、调色板、日历、拖放、多媒体与二维码（compose/components）</summary>
 
 - **[image](ylcs-module/compose/components/image) · 全平台**<br>
   异步图片、动图、缩放、缓存与裁剪选区

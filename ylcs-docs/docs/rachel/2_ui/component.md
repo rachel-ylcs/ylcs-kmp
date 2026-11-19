@@ -66,7 +66,6 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 
 图层变化会触发重新采样。连续动画的采样请求会合并，后台分析最多每 400 ms 执行一次；采样像素指纹未变化时跳过量化。需要在背景数据变化但绘制层未失效时，可调用 `PaletteScope.refresh()`。图像量化在协程 `Dispatchers.Default` 上运行，Android 也使用同一份 commonMain 实现，不依赖 `androidx.palette`。
 
-
 ## 可选模块
 
 | `compose/components` 子模块 | 能力 |

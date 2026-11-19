@@ -9,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 /**
  * 捕获任务只持有最新采样层。绘制失效会合并为待处理标记，避免动画帧触发并行分析。
@@ -48,6 +49,8 @@ internal class PaletteCaptureController(
 
     private suspend fun captureLoop() {
         try {
+            // drawWithContent may run on Main.immediate; defer snapshot mutations until drawing has returned.
+            yield()
             while (capturePending && !disposed) {
                 capturePending = false
                 if (hasCaptured) delay(MIN_CAPTURE_INTERVAL_MILLIS)
@@ -55,6 +58,7 @@ internal class PaletteCaptureController(
 
                 val layer = latestLayer?.takeUnless { it.isReleased } ?: break
                 state.beginCapture()
+                hasCaptured = true
 
                 // 图层转成小尺寸 ImageBitmap 只发生在采样任务中；量化在 Default dispatcher 执行。
                 val bitmap = layer.toImageBitmap()
@@ -69,7 +73,6 @@ internal class PaletteCaptureController(
                 } else {
                     state.finishCapture()
                 }
-                hasCaptured = true
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
