@@ -41,10 +41,11 @@ LOGO_TARGETS = (
     LogoTarget("ylcs-app/config/icon.icns", 256),
     LogoTarget("ylcs-app/web-app/src/webMain/resources/icon.webp", 256, True),
     LogoTarget("ylcs-app/web-app/src/webMain/resources/favicon.ico", 256),
-    LogoTarget("ylcs-app/landpage/src/jsMain/resources/favicon.ico", 256),
     LogoTarget("ylcs-app/gallery/src/wasmJsMain/resources/favicon.ico", 256),
     LogoTarget("ylcs-app/modern-screen/src/wasmJsMain/resources/favicon.ico", 256),
     LogoTarget("ylcs-app/server/src/nativeMain/resources/public/emoji/0.webp", 128),
+    LogoTarget("ylcs-docs/landing/docs/assets/logo.webp", 256),
+    LogoTarget("ylcs-docs/landing/docs/assets/favicon.ico", 256),
 )
 
 # ICNS 中承载单个 PNG 图像的标准块类型，避免默认编码器额外生成 1024 像素图像。

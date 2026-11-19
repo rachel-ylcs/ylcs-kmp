@@ -1,3 +1,44 @@
+{% if config.extra.site_kind == "landing" %}
+<div class="rc-footer">
+  <div class="rc-footer__brand">
+    <a class="rc-footer__mark" href="{{ nav.homepage.url | url }}" aria-label="{{ config.site_name }}">
+      <img src="{{ 'assets/logo.webp' | url }}" alt="" width="42" height="42">
+      <span>
+        <strong>银临茶舍</strong>
+        <small>小银子的跨平台聚集地</small>
+      </span>
+    </a>
+    <p>银临茶舍以 Rachel 框架构建，将资讯、音乐、美图、演出、社区与轻量游戏汇于一处，并在 Android、iOS、桌面与 Web 端保持一致体验。</p>
+  </div>
+
+  <div class="rc-footer__columns">
+    <div class="rc-footer__column">
+      <h4>产品</h4>
+      <a href="{{ nav.homepage.url | url }}">官网首页</a>
+      <a href="{{ nav.homepage.url | url }}#download">下载应用</a>
+      <a href="{{ 'guide/' | url }}">使用指南</a>
+      <a href="{{ 'recruitment/' | url }}">茶舍招新</a>
+    </div>
+    <div class="rc-footer__column">
+      <h4>社区</h4>
+      <a href="{{ config.extra.qq_url }}" target="_blank" rel="noopener">QQ 水群</a>
+      <a href="{{ config.extra.weibo_url }}" target="_blank" rel="noopener">微博</a>
+      <a href="{{ config.extra.bilibili_url }}" target="_blank" rel="noopener">哔哩哔哩</a>
+    </div>
+    <div class="rc-footer__column rc-footer__column--wide">
+      <h4>生态</h4>
+      <a class="rc-footer__external" href="{{ config.extra.switch_url }}">Rachel 框架 <span>↗</span></a>
+      <a class="rc-footer__external" href="{{ config.extra.web_app_url }}" target="_blank" rel="noopener">Web 版应用 <span>↗</span></a>
+      <a class="rc-footer__external" href="{{ config.extra.github_url }}" target="_blank" rel="noopener">GitHub 开源仓库 <span>↗</span></a>
+    </div>
+  </div>
+
+  <div class="rc-footer__legal">
+    <span>{{ config.copyright }}</span>
+    <span><a href="{{ config.extra.beian_url }}" target="_blank" rel="noopener">{{ config.extra.beian_number }}</a> · 基于 Rachel 框架构建</span>
+  </div>
+</div>
+{% else %}
 <div class="rc-footer">
   <div class="rc-footer__brand">
     <a class="rc-footer__mark" href="{{ nav.homepage.url | url }}" aria-label="{{ config.site_name }}">
@@ -26,10 +67,11 @@
       <a href="{{ 'appendix/docs/' | url }}">文档工程</a>
     </div>
     <div class="rc-footer__column rc-footer__column--wide">
-      <h4>KMP 在线示例</h4>
+      <h4>生态与在线示例</h4>
       <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/" target="_blank" rel="noopener">UI Gallery <span>↗</span></a>
       <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen/" target="_blank" rel="noopener">Modern Navigation <span>↗</span></a>
       <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka/" target="_blank" rel="noopener">API Reference <span>↗</span></a>
+      <a class="rc-footer__external" href="{{ config.extra.switch_url }}">银临茶舍 APP <span>↗</span></a>
     </div>
   </div>
 
@@ -38,3 +80,4 @@
     <span>以 MIT 许可发布 · 文档与源码共同维护</span>
   </div>
 </div>
+{% endif %}

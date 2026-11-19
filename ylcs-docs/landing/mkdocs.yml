@@ -1,0 +1,94 @@
+nav:
+    - 首页: index.md
+    - 使用指南: guide.md
+    - 茶舍招新: recruitment.md
+    - Rachel 框架: https://rachel-ylcs.github.io/ylcs-kmp/
+
+site_name: 银临茶舍
+site_url: https://yinlin.love/
+site_author: 银临茶舍项目组
+site_description: 银临茶舍是集资讯、音乐、美图、演出、社区与轻量游戏于一体的跨平台应用。
+copyright: © 2024-2026 银临茶舍 版权所有
+
+theme:
+    name: material
+    custom_dir: ../theme
+    language: zh
+    logo: assets/logo.webp
+    favicon: assets/favicon.ico
+    font: false
+    palette:
+        - scheme: rachel-dark
+          primary: custom
+          accent: custom
+          toggle:
+              icon: material/weather-night
+              name: 切换到浅色模式
+        - scheme: rachel-light
+          primary: custom
+          accent: custom
+          toggle:
+              icon: material/weather-sunny
+              name: 切换到深色模式
+    features:
+        - navigation.tracking
+        - navigation.tabs
+        - navigation.top
+        - navigation.footer
+        - content.tooltips
+        - toc.follow
+
+hooks:
+    - ../hooks.py
+
+plugins:
+    - search:
+          lang:
+              - zh
+              - en
+          separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+extra_css:
+    - assets/stylesheets/rachel.css
+    - assets/stylesheets/landing.css
+
+extra_javascript:
+    - assets/javascripts/rachel.js
+
+extra:
+    generator: false
+    shared_theme_assets: true
+    site_kind: landing
+    switch_url: https://rachel-ylcs.github.io/ylcs-kmp/
+    switch_label: Rachel 框架
+    switch_short: 框架
+    switch_mark: R
+    app_url: https://yinlin.love
+    web_app_url: https://web.yinlin.love
+    github_url: https://github.com/rachel-ylcs/ylcs-kmp
+    qq_url: https://qm.qq.com/q/8sfRdA1XPy
+    weibo_url: https://weibo.com/u/7969517430
+    bilibili_url: https://space.bilibili.com/3546773870086322
+    beian_url: https://beian.miit.gov.cn
+    beian_number: 皖ICP备2024063749号
+
+markdown_extensions:
+    - attr_list
+    - md_in_html
+    - tables
+    - toc:
+          permalink: "¶"
+          toc_depth: 3
+    - pymdownx.details
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.tasklist:
+          custom_checkbox: true
+
+validation:
+    nav:
+        omitted_files: info
+    links:
+        not_found: warn
+        absolute_links: info

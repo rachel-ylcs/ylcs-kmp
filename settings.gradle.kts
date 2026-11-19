@@ -176,7 +176,7 @@ repository {
 
             module("cs", "mod", "third-party")
             module("gallery", "modern-screen")
-            module("mod-manager", "landpage")
+            module("mod-manager")
             module("android-app", "desktop-app", "native-desktop-app", "web-app", "server")
         }
     }

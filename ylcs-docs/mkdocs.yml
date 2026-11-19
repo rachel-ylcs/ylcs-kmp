@@ -94,6 +94,9 @@ theme:
         - content.tooltips
         - toc.follow
 
+hooks:
+    - hooks.py
+
 plugins:
     - search:
           lang:
@@ -151,6 +154,12 @@ extra_javascript:
 
 extra:
     generator: false
+    site_kind: docs
+    site_short: Rachel
+    switch_url: https://yinlin.love/
+    switch_label: 银临茶舍 APP
+    switch_short: 茶舍
+    switch_mark: 茶
     social:
         - icon: fontawesome/brands/github
           link: https://github.com/rachel-ylcs/ylcs-kmp

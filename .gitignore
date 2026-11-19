@@ -46,3 +46,5 @@ ylcs-app/config/secret/
 
 # 文档
 ylcs-docs/docs/overrides/*
+ylcs-docs/site/
+ylcs-docs/landing/site/

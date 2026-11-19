@@ -17,7 +17,7 @@ nostatistics: true
     <div class="rc-hero__actions">
       <a class="rc-btn rc-btn--primary" href="start/"><span>开始阅读</span><span>→</span></a>
       <a class="rc-btn" href="start/first-app/"><span>建立第一个应用</span><span>↗</span></a>
-      <a class="rc-btn" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/" target="_blank" rel="noopener"><span>UI Gallery</span><span>↗</span></a>
+      <a class="rc-btn" href="https://yinlin.love/"><span>银临茶舍 APP</span><span>↗</span></a>
     </div>
     <div class="rc-hero__meta">
       <span class="rc-chip rc-chip--accent">Android</span>

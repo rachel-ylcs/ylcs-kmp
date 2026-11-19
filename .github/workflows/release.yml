@@ -143,14 +143,30 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
-        with:
-          submodules: recursive
 
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - uses: actions/cache@v6
+        with:
+          key: mkdocs-landing-pip-${{ runner.os }}-${{ hashFiles('ylcs-docs/landing/mkdocs.yml', 'ylcs-docs/hooks.py') }}
+          path: ~/.cache/pip
+          restore-keys: mkdocs-landing-pip-${{ runner.os }}-
+
+      - name: Install MkDocs
+        run: |
+          pip install mkdocs-material
+          pip install jieba
 
       - name: Build
-        run: ./gradlew ylcs-app:landpage:landpagePublish
+        run: mkdocs build --strict --clean -f ylcs-docs/landing/mkdocs.yml
+
+      - name: Package
+        run: |
+          mkdir -p outputs
+          cd ylcs-docs/landing/site
+          zip -r "$GITHUB_WORKSPACE/outputs/landpage.zip" .
 
       - name: Upload
         uses: actions/upload-artifact@v7

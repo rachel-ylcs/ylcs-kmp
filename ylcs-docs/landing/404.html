@@ -7,10 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            color-scheme: dark;
+            --rc-bg: #06070d;
+            --rc-bg-soft: #0a0c15;
+            --rc-panel: rgba(15, 18, 30, .72);
+            --rc-border: rgba(255, 255, 255, .085);
+            --rc-text: #e9ebf4;
+            --rc-text-dim: #9aa1b8;
+            --rc-text-faint: #6d7488;
+            --rc-accent: #8b7bff;
+            --rc-accent-2: #56d4ff;
+            --rc-gold: #e9c88a;
+            --rc-glow: rgba(124, 92, 255, .35);
+            --rc-glow-2: rgba(76, 201, 240, .18);
+            --rc-shadow: 0 24px 70px rgba(0, 0, 0, .45);
+        }
+
         body {
             font-family: 'Noto Serif SC', serif;
-            background: #1a1a1a;
-            color: #d4af37;
+            background: var(--rc-bg);
+            color: var(--rc-text);
             overflow: hidden;
             margin: 0;
         }
@@ -21,7 +38,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, #2c3e50 0%, #000 100%);
+            background:
+                radial-gradient(60rem 40rem at 12% -10%, var(--rc-glow), transparent 62%),
+                radial-gradient(48rem 34rem at 92% 4%, var(--rc-glow-2), transparent 60%),
+                radial-gradient(circle at center, var(--rc-bg-soft) 0%, var(--rc-bg) 100%);
             z-index: -2;
         }
 
@@ -30,7 +50,7 @@
             width: 200%;
             height: 100%;
             background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3;
+            opacity: 0.2;
             animation: moveMist 60s linear infinite;
         }
 
@@ -41,9 +61,9 @@
 
         .petal {
             position: absolute;
-            background: #fff;
+            background: #c4b5fd;
             border-radius: 150% 0 150% 0;
-            opacity: 0.3;
+            opacity: 0.33;
             pointer-events: none;
             animation: fall linear infinite;
         }
@@ -64,13 +84,13 @@
         .string {
             width: 1px;
             height: 150px;
-            background: linear-gradient(to bottom, transparent, #d4af37, transparent);
+            background: linear-gradient(to bottom, transparent, var(--rc-gold), transparent);
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         .string:hover {
-            box-shadow: 0 0 15px #d4af37;
+            box-shadow: 0 0 15px var(--rc-gold);
             transform: scaleY(1.2);
         }
 
@@ -79,31 +99,49 @@
             writing-mode: vertical-rl;
             text-orientation: mixed;
             letter-spacing: 0.5rem;
+            color: var(--rc-text-dim);
         }
 
         .glass-card {
-            background: rgba(0, 0, 0, 0.6);
+            background: var(--rc-panel);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--rc-border);
             padding: 3rem;
             border-radius: 4px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: var(--rc-shadow);
+        }
+
+        .glass-card h1,
+        .glass-card .text-3xl {
+            color: var(--rc-gold);
+        }
+
+        .rc-soft {
+            color: var(--rc-text-dim);
+        }
+
+        .rc-faint {
+            color: var(--rc-text-faint);
+        }
+
+        .rc-corner {
+            border-color: var(--rc-accent);
         }
 
         .btn-gufeng {
             position: relative;
             padding: 0.8rem 2.5rem;
-            border: 1px solid #d4af37;
-            color: #d4af37;
-            background: transparent;
+            border: 1px solid transparent;
+            color: #fff;
+            background: linear-gradient(112deg, #7c5cff, #5b48d9 45%, #2fb8e6);
+            box-shadow: 0 12px 34px rgba(91, 72, 217, .38), inset 0 1px 0 rgba(255, 255, 255, .25);
             transition: all 0.4s;
             overflow: hidden;
         }
 
         .btn-gufeng:hover {
-            background: #d4af37;
-            color: #1a1a1a;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            color: #fff;
+            box-shadow: 0 18px 44px rgba(91, 72, 217, .5), inset 0 1px 0 rgba(255, 255, 255, .3);
         }
     </style>
 </head>
@@ -117,8 +155,8 @@
 
 <div class="container max-w-4xl mx-auto px-4 z-10 text-center">
     <div class="glass-card relative">
-        <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#d4af37]"></div>
-        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#d4af37]"></div>
+        <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rc-corner"></div>
+        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rc-corner"></div>
 
         <div class="flex flex-col md:flex-row items-center justify-center gap-12">
             <div class="vertical-text text-2xl font-light opacity-80 hidden md:block">
@@ -128,7 +166,7 @@
             <div class="flex-1">
                 <h1 class="text-9xl font-bold mb-4 opacity-20">404</h1>
                 <div class="text-3xl mb-6 tracking-widest">泸沽寻梦</div>
-                <p class="text-gray-400 mb-8 leading-relaxed">
+                <p class="rc-soft mb-8 leading-relaxed">
                     我应是泸沽烟水里的过客, 孑然弹铗划天地开阖<br>
                     邂逅过的, 梦醒之余, 却忘了该如何洒脱
                 </p>
@@ -151,7 +189,7 @@
             </div>
         </div>
     </div>
-    <p class="mt-12 text-sm opacity-30 tracking-widest uppercase">Copyright © 2024-2026 银临茶舍</p>
+    <p class="mt-12 text-sm rc-faint tracking-widest uppercase">Copyright © 2024-2026 银临茶舍</p>
 </div>
 
 <script>
