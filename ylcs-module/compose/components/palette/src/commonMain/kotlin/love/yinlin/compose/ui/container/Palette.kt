@@ -206,12 +206,14 @@ class Palette internal constructor(
         private var resizeArea = DEFAULT_RESIZE_BITMAP_AREA
         private var selectedRegion: Region? = null
 
+        /** 最大保留颜色数量，默认 16。 */
         var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
             set(value) {
                 require(value > 0) { "maximumColorCount must be greater than zero." }
                 field = value
             }
 
+        /** 采样像素总面积上限，默认 112×112。 */
         var resizeBitmapArea: Int
             get() = resizeArea
             set(value) {
