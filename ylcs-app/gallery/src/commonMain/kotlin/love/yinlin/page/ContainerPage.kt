@@ -55,7 +55,7 @@ object ContainerPage : Page(
     private val demoAdderBox = component("AdderBox", "向容器中添加项目，也可替换或删除已有项目。", "添加")
     private val demoBanner = component("Banner", "自动轮播一组图片，也可以手动切换。", "轮播")
     private val demoWatermark = component("Watermark", "在内容上平铺水印，仍可操作下方控件。", "平铺 透明度")
-    private val demoPalette = component("PaletteBox", "从指定 ImageBitmap 提取代表色、目标色和文字对比色。", "ImageBitmap 图片 主色 调色板", "palette")
+    private val demoPalette = component("rememberPalette", "从 ImageBitmap 异步生成并缓存调色板状态。", "ImageBitmap 图片 主色 调色板", "palette")
 
     @Composable
     override fun Content() {
@@ -249,6 +249,7 @@ object ContainerPage : Page(
                     Text("正在加载示例图像…", color = Theme.color.onBackgroundVariant)
                 }
                 else {
+                    val palette = rememberPalette(source)
                     val customTarget = remember {
                         PaletteTarget.Builder(PaletteTarget.VIBRANT)
                             .setTargetSaturation(0.8f)
@@ -270,8 +271,10 @@ object ContainerPage : Page(
                             .generateAsync()
                     }
 
-                    PaletteBox(bitmap = source, modifier = Modifier.fillMaxWidth()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)
+                    ) {
                             Image(
                                 bitmap = source,
                                 modifier = Modifier.fillMaxWidth().height(Theme.size.cell3).clip(Theme.shape.v3),
@@ -280,11 +283,11 @@ object ContainerPage : Page(
 
                             Text("默认调色板", color = Theme.color.onBackground)
                             when {
-                                isLoading -> Text("正在分析 ImageBitmap…", color = Theme.color.onBackgroundVariant)
-                                error != null -> Text("取色失败：${error?.message}", color = Theme.color.error)
-                                palette == null -> Text("没有可用颜色", color = Theme.color.onBackgroundVariant)
+                                palette.isLoading -> Text("正在分析 ImageBitmap…", color = Theme.color.onBackgroundVariant)
+                                palette.error != null -> Text("取色失败：${palette.error?.message}", color = Theme.color.error)
+                                !palette.isReady -> Text("没有可用颜色", color = Theme.color.onBackgroundVariant)
                                 else -> {
-                                    val dominant = dominantSwatch
+                                    val dominant = palette.dominantSwatch
                                     if (dominant != null) {
                                         Text("主色 ${dominant.rgb.toPaletteHex()} · ${dominant.population} 像素")
                                         Column(
@@ -298,12 +301,12 @@ object ContainerPage : Page(
 
                                     Text("六种标准目标色")
                                     val targetSwatches = [
-                                        vibrantSwatch?.let { "Vibrant" to it },
-                                        lightVibrantSwatch?.let { "Light vibrant" to it },
-                                        darkVibrantSwatch?.let { "Dark vibrant" to it },
-                                        mutedSwatch?.let { "Muted" to it },
-                                        lightMutedSwatch?.let { "Light muted" to it },
-                                        darkMutedSwatch?.let { "Dark muted" to it },
+                                        palette.vibrantSwatch?.let { "Vibrant" to it },
+                                        palette.lightVibrantSwatch?.let { "Light vibrant" to it },
+                                        palette.darkVibrantSwatch?.let { "Dark vibrant" to it },
+                                        palette.mutedSwatch?.let { "Muted" to it },
+                                        palette.lightMutedSwatch?.let { "Light muted" to it },
+                                        palette.darkMutedSwatch?.let { "Dark muted" to it },
                                     ].filterNotNull()
                                     Row(
                                         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -324,12 +327,12 @@ object ContainerPage : Page(
                                         }
                                     }
 
-                                    Text("全部 Swatch · ${swatches.size} 种颜色")
+                                    Text("全部 Swatch · ${palette.swatches.size} 种颜色")
                                     Row(
                                         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)
                                     ) {
-                                        for (swatch in swatches) {
+                                        for (swatch in palette.swatches) {
                                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                                 Box(
                                                     Modifier.size(30.dp).clip(Theme.shape.v3).background(swatch.color)
@@ -371,7 +374,6 @@ object ContainerPage : Page(
                                 }
                                 Text("中央区域采样 · 最多 8 色 · 饱和度过滤 · 自定义 Target", color = Theme.color.onBackgroundVariant)
                             }
-                        }
                     }
                 }
             }
