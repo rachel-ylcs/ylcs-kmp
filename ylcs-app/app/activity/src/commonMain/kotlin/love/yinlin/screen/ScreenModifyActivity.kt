@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.io.readByteArray
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -115,7 +116,8 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 saleTime = saleTime,
                 lineup = lineup,
                 link = link,
-                playlist = playlist
+                playlist = playlist,
+                hide = hide
             )
         }.errorTipOrPop()
     }
@@ -232,8 +234,9 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     @Composable
     override fun RowScope.RightActions() {
         Icon(
-            icon = if (hide) Icons.Visibility else Icons.VisibilityOff,
-            tip = if (hide) "公开" else "隐藏",
+            icon = if (hide) Icons.VisibilityOff else Icons.Visibility,
+            color = if (hide) Colors.Orange4 else Colors.Green4,
+            tip = if (hide) "已隐藏" else "已公开",
             onClick = { hide = !hide }
         )
 
@@ -299,9 +302,9 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 items = price,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h),
                 onAdd = { price += ActivityPrice("票种", 0) },
-                onReplace = { index, item ->
+                onReplace = { index, (val name, val value) ->
                     launch {
-                        pairInputDialog.open(item.name, item.value.toString())?.then { [newName, newValue] ->
+                        pairInputDialog.open(name, value.toString())?.then { [newName, newValue] ->
                             price[index] = ActivityPrice(newName, newValue.toIntOrNull() ?: 0)
                         }
                     }
