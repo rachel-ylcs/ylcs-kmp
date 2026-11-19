@@ -1,0 +1,40 @@
+<div class="rc-footer">
+  <div class="rc-footer__brand">
+    <a class="rc-footer__mark" href="{{ nav.homepage.url | url }}" aria-label="{{ config.site_name }}">
+      <img src="{{ 'assets/logo.svg' | url }}" alt="" width="42" height="42">
+      <span>
+        <strong>Rachel</strong>
+        <small>Kotlin Multiplatform Framework</small>
+      </span>
+    </a>
+    <p>Rachel 是以 Kotlin Multiplatform 与 Compose Multiplatform 构建全平台客户端、原生服务端与桌面应用的模块化开发框架。</p>
+  </div>
+
+  <div class="rc-footer__columns">
+    <div class="rc-footer__column">
+      <h4>指南</h4>
+      <a href="{{ 'start/' | url }}">快速开始</a>
+      <a href="{{ 'build/' | url }}">构建插件</a>
+      <a href="{{ 'core/' | url }}">核心库</a>
+      <a href="{{ 'client/' | url }}">客户端交互</a>
+    </div>
+    <div class="rc-footer__column">
+      <h4>体系</h4>
+      <a href="{{ 'ui/' | url }}">UI 框架</a>
+      <a href="{{ 'native/' | url }}">Native Compose</a>
+      <a href="{{ 'module/' | url }}">深入模块</a>
+      <a href="{{ 'appendix/docs/' | url }}">文档工程</a>
+    </div>
+    <div class="rc-footer__column rc-footer__column--wide">
+      <h4>KMP 在线示例</h4>
+      <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/" target="_blank" rel="noopener">UI Gallery <span>↗</span></a>
+      <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen/" target="_blank" rel="noopener">Modern Navigation <span>↗</span></a>
+      <a class="rc-footer__external" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka/" target="_blank" rel="noopener">API Reference <span>↗</span></a>
+    </div>
+  </div>
+
+  <div class="rc-footer__legal">
+    <span>{{ config.copyright }}</span>
+    <span>以 MIT 许可发布 · 文档与源码共同维护</span>
+  </div>
+</div>

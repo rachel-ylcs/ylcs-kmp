@@ -1,84 +1,248 @@
-# Rachel 多平台开发框架
+---
+title: Rachel 开发向导
+description: Rachel 是以 Kotlin Multiplatform 与 Compose Multiplatform 构建全平台客户端、原生服务端与桌面应用的模块化开发框架。
+hide:
+  - navigation
+  - toc
+nostatistics: true
+---
 
-![Rachel](assets/title.png)
+<div class="rc-hero">
+  <div class="rc-hero__content">
+    <div class="rc-eyebrow rc-hero__eyebrow">Kotlin Multiplatform · Compose Multiplatform</div>
+    <h1 class="rc-hero__title">一套 Kotlin 代码<br><span class="rc-grad">构建全平台应用</span></h1>
+    <p class="rc-hero__lede">
+      Rachel 将跨平台入口、共享界面、应用服务、客户端与原生服务端通信、页面导航、平台视图与桌面分发组织为模块化体系，并提供统一的类型安全 DSL。框架能力按模块发布，应用可按实际目标引入依赖。
+    </p>
+    <div class="rc-hero__actions">
+      <a class="rc-btn rc-btn--primary" href="start/"><span>开始阅读</span><span>→</span></a>
+      <a class="rc-btn" href="start/first-app/"><span>建立第一个应用</span><span>↗</span></a>
+      <a class="rc-btn" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/" target="_blank" rel="noopener"><span>UI Gallery</span><span>↗</span></a>
+    </div>
+    <div class="rc-hero__meta">
+      <span class="rc-chip rc-chip--accent">Android</span>
+      <span class="rc-chip">iOS</span>
+      <span class="rc-chip">Windows</span>
+      <span class="rc-chip">Linux</span>
+      <span class="rc-chip">macOS</span>
+      <span class="rc-chip">Web</span>
+      <span class="rc-chip">Server</span>
+    </div>
+  </div>
+  <div class="rc-hero__visual">
+    <div class="rc-hero__frame">
+      <div class="rc-hero__frame-inner">
+        <img src="assets/title-hero.png" alt="Rachel 主题人物与流苏插画" loading="eager">
+      </div>
+    </div>
+  </div>
+</div>
 
-Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化开发框架。仓库提供公共基础库、跨平台界面体系、应用启动与导航能力、客户端与原生服务端通信引擎，以及业务应用和独立工具示例。
+<div class="rc-metrics">
+  <div class="rc-metric">
+    <span class="rc-metric__value">KMP</span>
+    <span class="rc-metric__label">共享核心与目标配置</span>
+  </div>
+  <div class="rc-metric">
+    <span class="rc-metric__value">CMP</span>
+    <span class="rc-metric__label">跨平台界面体系</span>
+  </div>
+  <div class="rc-metric">
+    <span class="rc-metric__value">Native</span>
+    <span class="rc-metric__label">无 JVM 桌面与原生服务端</span>
+  </div>
+  <div class="rc-metric">
+    <span class="rc-metric__value">MIT</span>
+    <span class="rc-metric__label">开源许可</span>
+  </div>
+</div>
 
-本文档依据当前仓库源码编写。依赖、自有构建插件、框架与应用版本以 `libs.versions.toml` 为准，其他平台与应用常量以 根目录 `settings.gradle.kts` 的 `repository {}` 为准。各模块的目标平台、依赖导出范围和构建任务以对应 `build.gradle.kts` 及构建模板为准。配置详情见[编译环境与工程结构](rachel/1_start/environment.md)。
+<div class="rc-section">
+  <div class="rc-section__head">
+    <div>
+      <div class="rc-kicker">框架能力</div>
+      <h2 class="rc-section__title">核心能力与模块边界</h2>
+      <p class="rc-section__desc">以下能力均由独立模块提供。目标平台、依赖导出与资源范围由模块构建脚本定义，应用可按需引入。</p>
+    </div>
+  </div>
+  <div class="rc-feature-grid">
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/></svg></div>
+      <h3>多平台目标</h3>
+      <p>构建模板支持 Android、iOS、JVM Desktop、Web，以及 Windows、Linux、macOS 的 Kotlin/Native 目标。模块按需启用目标。</p>
+      <span class="rc-feature__tag">共享源集</span>
+    </div>
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17 10 5l6 12"/><path d="M6.5 13h7"/><path d="M17 5v12"/></svg></div>
+      <h3>原生构建路径</h3>
+      <p>Kotlin/Native 生成平台二进制，桌面端不依赖 JVM。窗口、媒体、文件与平台句柄由对应所有者创建和释放。</p>
+      <span class="rc-feature__tag">Kotlin/Native</span>
+    </div>
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6"/><path d="m16 6 5 6-5 6"/><path d="M13 4l-2 16"/></svg></div>
+      <h3>类型安全 DSL</h3>
+      <p>模块、源集、依赖、接口、导航与构建产物通过结构化 DSL 声明。类型与导出关系在编译期检查。</p>
+      <span class="rc-feature__tag">编译期约束</span>
+    </div>
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+      <h3>模块化依赖</h3>
+      <p>框架按 core、foundation、compose、cs 与 platform 分组。应用只引入实际使用的模块，依赖方向保持单向。</p>
+      <span class="rc-feature__tag">按需依赖</span>
+    </div>
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <h3>前后端共享契约</h3>
+      <p>接口、资源路径、文件参数与 WebSocket 入口在共享模块中声明，客户端与服务端使用同一套类型与线格式。</p>
+      <span class="rc-feature__tag">共享类型</span>
+    </div>
+    <div class="rc-feature">
+      <div class="rc-feature__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M5 16h14"/><circle cx="5" cy="8" r="2"/><circle cx="19" cy="8" r="2"/><circle cx="5" cy="16" r="2"/><circle cx="19" cy="16" r="2"/></svg></div>
+      <h3>构建与发布约定</h3>
+      <p>统一构建模板、目标开关、运行目录、产物注册与发布配置。新增模块可按固定步骤接入构建与测试流程。</p>
+      <span class="rc-feature__tag">构建约定</span>
+    </div>
+  </div>
+</div>
 
-## 模块体系
+<div class="rc-section">
+  <div class="rc-section__head">
+    <div>
+      <div class="rc-kicker">分层结构</div>
+      <h2 class="rc-section__title">模块分层与依赖方向</h2>
+      <p class="rc-section__desc">上层模块依赖下层契约；平台差异停留在源集边界。框架模块不依赖业务应用。</p>
+    </div>
+    <a class="rc-section__more" href="module/">查看模块全景 →</a>
+  </div>
+  <div class="rc-board">
+    <div class="rc-board__head">
+      <span>模块分层 / 依赖方向</span>
+      <span class="rc-board__dots"><i></i><i></i><i></i></span>
+    </div>
+    <div class="rc-arch">
+      <div class="rc-arch__layer">
+        <span class="rc-arch__label">App</span>
+        <span class="rc-arch__chips">
+          <span class="rc-arch__chip rc-arch__chip--accent">业务模块</span>
+          <span class="rc-arch__chip">Gallery</span>
+          <span class="rc-arch__chip">Modern Navigation</span>
+          <span class="rc-arch__chip">Server</span>
+        </span>
+      </div>
+      <div class="rc-arch__layer">
+        <span class="rc-arch__label">UI</span>
+        <span class="rc-arch__chips">
+          <span class="rc-arch__chip rc-arch__chip--cyan">theme</span>
+          <span class="rc-arch__chip">ui</span>
+          <span class="rc-arch__chip">screen</span>
+          <span class="rc-arch__chip">app</span>
+          <span class="rc-arch__chip">platform-view</span>
+          <span class="rc-arch__chip">components</span>
+        </span>
+      </div>
+      <div class="rc-arch__layer">
+        <span class="rc-arch__label">C / S</span>
+        <span class="rc-arch__chips">
+          <span class="rc-arch__chip rc-arch__chip--gold">cs:core</span>
+          <span class="rc-arch__chip">client-engine</span>
+          <span class="rc-arch__chip">server-engine</span>
+          <span class="rc-arch__chip">mysql · redis</span>
+        </span>
+      </div>
+      <div class="rc-arch__layer">
+        <span class="rc-arch__label">Core</span>
+        <span class="rc-arch__chips">
+          <span class="rc-arch__chip">core</span>
+          <span class="rc-arch__chip">foundation</span>
+          <span class="rc-arch__chip">filesystem</span>
+          <span class="rc-arch__chip">network</span>
+          <span class="rc-arch__chip">startup</span>
+          <span class="rc-arch__chip">parsers</span>
+        </span>
+      </div>
+      <div class="rc-arch__layer">
+        <span class="rc-arch__label">Native</span>
+        <span class="rc-arch__chips">
+          <span class="rc-arch__chip">ffi</span>
+          <span class="rc-arch__chip">posix · win32</span>
+          <span class="rc-arch__chip">native-compose</span>
+          <span class="rc-arch__chip">bridge plugin</span>
+        </span>
+      </div>
+    </div>
+    <div class="rc-board__note"><i></i>依赖方向：App → UI → C/S → Core → Native；手写指南与生成页面分开维护。</div>
+  </div>
+</div>
 
-| 模块路径 | 职责 |
-| --- | --- |
-| `ylcs-module/core` | 平台识别、协程、序列化、集合、编码及字节操作 |
-| `ylcs-module/foundation/*` | 平台上下文、文件系统、网络、启动编排、压缩、加密及解析器 |
-| `ylcs-module/compose/core` | Compose 状态扩展、图形辅助、窗口状态和平台上下文 Local |
-| `ylcs-module/compose/theme`、`ui` | 主题、布局、输入、文本、图像及浮层组件 |
-| `ylcs-module/compose/screen` | 页面模型、导航策略、宿主作用域和页面资源管理 |
-| `ylcs-module/compose/platform-view` | Android View、Swing、UIKit 和 DOM 的宿主适配 |
-| `ylcs-module/compose/components/*`、`startup/*`、`cache` | 可选组件、应用服务与缓存能力 |
-| `ylcs-module/cs/*` | 共享接口契约、客户端引擎、原生服务端引擎及数据库服务 |
-| `ylcs-module/platform/*`、`native/*` | FFI、动态库加载、操作系统集成及 Win32 封装 |
-| `ylcs-app/*` | 业务应用、组件展厅、导航示例、服务端与 MOD 工具 |
-| `build-logic` | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
-| `native-compose` | Windows、Linux、macOS 的 Compose Native 上游锁、适配、桥接与消费验证 |
+<div class="rc-section">
+  <div class="rc-section__head">
+    <div>
+      <div class="rc-kicker">阅读路径</div>
+      <h2 class="rc-section__title">按任务选择阅读路径</h2>
+      <p class="rc-section__desc">各章可独立阅读。初次接触 Rachel 时，建议先完成快速开始，再按实际开发目标进入对应章节。</p>
+    </div>
+  </div>
+  <div class="rc-path-grid">
+    <a class="rc-path" href="start/">
+      <span class="rc-path__index">01</span>
+      <h3>建立应用</h3>
+      <p>环境、模块依赖、共享应用、平台入口与运行打包。</p>
+      <span class="rc-path__arrow">进入快速开始 →</span>
+    </a>
+    <a class="rc-path" href="ui/">
+      <span class="rc-path__index">02</span>
+      <h3>编写界面</h3>
+      <p>主题、组件、导航、浮层、自适应布局与平台视图。</p>
+      <span class="rc-path__arrow">进入 UI 框架 →</span>
+    </a>
+    <a class="rc-path" href="client/">
+      <span class="rc-path__index">03</span>
+      <h3>连接后端</h3>
+      <p>共享契约、客户端请求、原生服务端、实时通信与数据服务。</p>
+      <span class="rc-path__arrow">进入客户端交互 →</span>
+    </a>
+    <a class="rc-path" href="module/">
+      <span class="rc-path__index">04</span>
+      <h3>扩展框架</h3>
+      <p>源集、API 导出、数据处理、FFI、测试与发布边界。</p>
+      <span class="rc-path__arrow">进入深入模块 →</span>
+    </a>
+  </div>
+</div>
 
-基础库与业务应用保持单向依赖。共享协议集中声明接口和传输模型，具体网络请求、数据库访问与界面交互分别由相应模块实现。
+<div class="rc-section">
+  <div class="rc-section__head">
+    <div>
+      <div class="rc-kicker">在线资源</div>
+      <h2 class="rc-section__title">组件、导航与 API 在线示例</h2>
+      <p class="rc-section__desc">以下页面由当前源码生成，与手写指南分开维护。阅读对应章节时可结合在线页面核对实际行为与签名。</p>
+    </div>
+  </div>
+  <div class="rc-eco-grid">
+    <a class="rc-eco rc-eco--gallery" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/" target="_blank" rel="noopener">
+      <div class="rc-eco__top"><span class="rc-eco__icon">UI</span><span class="rc-eco__external">↗</span></div>
+      <h3>Rachel UI Gallery</h3>
+      <p>组件交互、主题切换、布局与浮层示例。</p>
+      <span class="rc-eco__link">打开在线示例 →</span>
+    </a>
+    <a class="rc-eco rc-eco--nav" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen/" target="_blank" rel="noopener">
+      <div class="rc-eco__top"><span class="rc-eco__icon">NAV</span><span class="rc-eco__external">↗</span></div>
+      <h3>Modern Navigation</h3>
+      <p>导航策略、参数传递、页面恢复与嵌套宿主示例。</p>
+      <span class="rc-eco__link">打开导航示例 →</span>
+    </a>
+    <a class="rc-eco rc-eco--api" href="https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka/" target="_blank" rel="noopener">
+      <div class="rc-eco__top"><span class="rc-eco__icon">API</span><span class="rc-eco__external">↗</span></div>
+      <h3>模块 API 参考</h3>
+      <p>由源码生成的公开 API、重载与类型约束。</p>
+      <span class="rc-eco__link">打开 API 参考 →</span>
+    </a>
+  </div>
+</div>
 
-## 平台范围
-
-构建模板支持 Android、iOS、JVM Desktop、JavaScript、WasmJS，以及 Windows、Linux、macOS 的 Kotlin/Native 目标。平台能力由模块按需启用，不能依据仓库整体的平台范围推断单个组件的可用性。
-
-Android 当前仅打包 `arm64-v8a`。iOS 启用 `iosArm64`，并在 Apple Silicon macOS 主机上配置 `iosSimulatorArm64`；未启用 `iosX64`。桌面原生目标分别为 `mingwX64`、`linuxX64` 和 `macosArm64`。服务端采用 Kotlin/Native 与 Ktor CIO。
-
-## 阅读路径
-
-| 开发目标 | 文档入口 |
-| --- | --- |
-| 配置环境并建立应用 | [编译环境](rachel/1_start/environment.md)、[快速开始](rachel/1_start/entry.md)、[应用入口](rachel/2_ui/entry.md) |
-| 编写跨平台界面 | [主题](rachel/2_ui/theme.md)、[设备模型](rachel/2_ui/device.md)、[组件](rachel/2_ui/component.md)、[浮层](rachel/2_ui/floating.md) |
-| 管理页面与状态 | [导航与页面](rachel/2_ui/navigation.md)、[应用服务](rachel/2_ui/service.md) |
-| 接入共享后端 | [C/S 共享契约](rachel/1_start/cs_core.md)、[客户端引擎](rachel/3_client/entry.md)、[服务端引擎](rachel/4_server/entry.md) |
-| 扩展公共能力 | [核心库](rachel/1_start/core.md)、[Compose 核心](rachel/1_start/compose_core.md)、[平台组件](rachel/2_ui/platform_component.md) |
-| 使用解析器、压缩、摘要或检索 | [基础能力模块](rachel/1_start/foundation.md) |
-| 新增模块、配置目标与分发 | [构建插件与模块配置](rachel/1_start/build.md) |
-| 维护媒体工具 | [MOD 文件格式](tool/mod.md)、[Android FFmpeg 解码库](tool/ffmpeg.md) |
-
-文档中的业务示例用于说明框架调用方式；未展开的业务类型、数据仓库和校验函数需要由使用方实现。平台专属示例应放置在对应源集中。
-
-## 文档位置与维护边界
-
-| 位置 | 内容与维护方式 |
-| --- | --- |
-| 根目录 `README.md`、`README_en.md` | 项目介绍、预览与全模块平台支持矩阵 |
-| 根目录 `AGENTS.md` | 自动化代码协作的仓库约定，不是面向使用方的 API 说明 |
-| `native-compose/README.md` | 桌面 Native Compose 的消费、窗口、分发与移植维护 |
-| `ylcs-docs/docs/index.md` | 框架与指南索引 |
-| `ylcs-docs/docs/rachel/1_start/*.md` | 环境、构建、核心库、共享契约与基础能力 |
-| `ylcs-docs/docs/rachel/2_ui/*.md` | 入口、上下文、主题、设备、导航、服务、网络、组件与浮层 |
-| `ylcs-docs/docs/rachel/3_client/*.md` | 客户端请求、资源、上传与 WebSocket |
-| `ylcs-docs/docs/rachel/4_server/*.md` | 原生服务端、接口、资源、上传、Socket、回调、数据库与插件 |
-| `ylcs-docs/docs/tool/*.md` | MOD 协议、MOD Manager 与 Android FFmpeg 适配 |
-| `ylcs-docs/docs/overrides/` | 站点模板及发布流程生成的 Gallery、ModernScreen、Dokka 页面；生成结果从相应源码维护 |
-
-模块平台矩阵来自各模块构建脚本及模板的默认目标，源码中的占位或空实现另外注明。完整矩阵见[仓库首页](https://github.com/rachel-ylcs/ylcs-kmp#全平台模块支持)。指南中的源码链接指向当前 `main`；阅读历史版本时应同时切换代码与文档版本。
-
-## 状态与资源归属
-
-应用级服务由 `StartupPool` 管理。页面继承 `ScreenModel`，保留 ViewModel、`viewModelScope` 与清理语义；`BasicScreen` 和 `Screen` 在其上提供浮层及标准页面布局。导航条目保存类型、初始参数和实例标识，运行时页面由所属 `ScreenManager` 的 `ScreenStore` 管理。
-
-当前导航通过宿主的 `ViewModelStoreOwner` 保留管理器，仅将管理器标识放入 `rememberSaveable`。该实现不等同于完整导航栈的进程死亡恢复。可持久化内容应限制为标识、可序列化参数和小型界面状态；平台句柄、回调、文件流与 ViewModel 应由运行时所有者管理。
-
-原生视图、上传流、数据库连接与媒体播放器均具有独立的资源生命周期。使用相应能力前，应确认创建、复用和释放责任，避免将临时资源保存到更长的生命周期中。
-
-## 示例工程
-
-| 路径 | 内容 |
-| --- | --- |
-| `ylcs-app/gallery` | UI 组件、主题、布局和浮层演示 |
-| `ylcs-app/modern-screen` | 导航策略、参数、工厂、嵌套导航和页面状态演示 |
-| `ylcs-app/app/portal`、`app/global` | 业务应用入口、全局服务与导航注册 |
-| `ylcs-app/server` | 原生服务端、接口、数据库、Redis 和 WebSocket 组合 |
-| `ylcs-app/mod-manager` | MOD 预览、解包、打包和部署工具 |
-
-组件展厅、导航示例和模块 API 页面由文档发布流程生成。本文档描述手写指南；生成页面与源码应使用相同版本。
+<div class="rc-panel" style="margin: 4rem 0 1rem; text-align:center">
+  <div class="rc-kicker" style="justify-content:center">开始使用</div>
+  <h2 class="rc-heading--center" style="border:0; margin:.7rem 0 .4rem; font-size:clamp(1.4rem,2.6vw,2rem)">从模块依赖开始建立应用</h2>
+  <p style="max-width:36rem; margin:0 auto 1.2rem; color:var(--rc-text-dim); font-size:.8rem">快速开始包含环境、模块、共享应用、平台入口与运行打包的完整步骤。</p>
+  <a class="rc-btn rc-btn--primary" href="start/first-app/"><span>进入快速开始</span><span>→</span></a>
+</div>

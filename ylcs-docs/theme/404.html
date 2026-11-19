@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block content %}
+  <div class="rc-404">
+    <div class="rc-404__code">404</div>
+    <h1 style="margin-top:1rem">这条路径没有对应的页面</h1>
+    <p class="rc-lead" style="margin:0 auto 1.5rem">链接可能已更新，或页面尚未生成。可以从首页重新选择阅读路径，或使用搜索查找关键词。</p>
+    <div class="rc-hero__actions" style="justify-content:center">
+      <a class="rc-btn rc-btn--primary" href="{{ nav.homepage.url | url }}"><span>返回首页</span><span>→</span></a>
+      <a class="rc-btn" href="{{ 'start/' | url }}"><span>快速开始</span><span>↗</span></a>
+    </div>
+  </div>
+{% endblock %}

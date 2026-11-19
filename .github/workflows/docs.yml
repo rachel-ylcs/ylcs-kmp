@@ -107,7 +107,8 @@ jobs:
       - name: Pip Install Mkdocs Plugins
         run: |
           pip install mkdocs-material
-          pip install mkdocs-glightbox
+          pip install mkdocs-statistics-plugin
+          pip install jieba
 
       - name: Deploy
         run: |

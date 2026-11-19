@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rachel">
+  <defs>
+    <linearGradient id="rc-g" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b9a7ff"/>
+      <stop offset=".5" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <linearGradient id="rc-g2" x1="18" y1="46" x2="50" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4cc9f0" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#e8c37a" stop-opacity=".9"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="#0b0d17"/>
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="17.25" fill="none" stroke="url(#rc-g)" stroke-width="1.5" opacity=".8"/>
+  <path d="M20 46V19h13.4c6.1 0 10.1 3.4 10.1 8.8 0 4.1-2.2 7-6 8.2L46 46h-7.4l-7.2-8.6h-4.2V46H20Zm7.2-14.3h5.7c2.8 0 4.5-1.5 4.5-3.9s-1.7-3.9-4.5-3.9h-5.7v7.8Z" fill="url(#rc-g)"/>
+  <path d="M16 50.5c8.3-5.3 16.5-7.9 24.6-7.9 2.5 0 5 .2 7.4.7" fill="none" stroke="url(#rc-g2)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="48.5" cy="43.5" r="2.2" fill="#e8c37a"/>
+</svg>

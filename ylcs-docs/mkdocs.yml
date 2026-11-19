@@ -1,62 +1,86 @@
 nav:
-    - 主页: index.md
+    - 首页: index.md
     - 快速开始:
-        - 1. hello world: rachel/1_start/entry.md
-        - 2. 编译环境: rachel/1_start/environment.md
-        - 3. 核心: rachel/1_start/core.md
-        - 4. Compose 核心: rachel/1_start/compose_core.md
-        - 5. C/S 核心: rachel/1_start/cs_core.md
-        - 6. 基础能力模块: rachel/1_start/foundation.md
-        - 7. 构建插件与模块配置: rachel/1_start/build.md
-    - 跨平台UI:
-        - 1. 程序入口: rachel/2_ui/entry.md
-        - 2. 上下文环境: rachel/2_ui/context.md
-        - 3. 主题: rachel/2_ui/theme.md
-        - 4. 导航: rachel/2_ui/navigation.md
-        - 5. 服务: rachel/2_ui/service.md
-        - 6. 网络: rachel/2_ui/network.md
-        - 7. 组件: rachel/2_ui/component.md
-        - 8. 浮窗: rachel/2_ui/floating.md
-        - 9. 平台组件: rachel/2_ui/platform_component.md
-        - 10. 设备与自适应布局: rachel/2_ui/device.md
-    - 客户端引擎:
-        - 1. 配置入口: rachel/3_client/entry.md
-        - 2. HTTP请求: rachel/3_client/request.md
-        - 3. 资源: rachel/3_client/resource.md
-        - 4. 文件上传: rachel/3_client/file.md
-        - 5. Sockets: rachel/3_client/sockets.md
-    - 服务端引擎:
-        - 1. 配置入口: rachel/4_server/entry.md
-        - 2. HTTP请求: rachel/4_server/request.md
-        - 3. 资源: rachel/4_server/resource.md
-        - 4. 文件上传: rachel/4_server/file.md
-        - 5. Sockets: rachel/4_server/sockets.md
-        - 6. 代理: rachel/4_server/proxy.md
-        - 7. 回调: rachel/4_server/callback.md
-        - 8. 服务: rachel/4_server/service.md
-        - 9. 插件: rachel/4_server/plugin.md
-    - 工具与格式:
-        - MOD 文件格式与管理器: tool/mod.md
-        - Android FFmpeg 解码库: tool/ffmpeg.md
-    - UI组件库: overrides/gallery/index.html
-    - 现代导航库: overrides/modern-screen/index.html
-    - 模块API合集: overrides/dokka/index.html
+        - 快速开始: start/index.md
+        - 开发环境: start/environment.md
+        - 模块与依赖: start/modules.md
+        - 编写第一个应用: start/first-app.md
+        - 多平台配置: start/platforms.md
+        - 运行与打包: start/run-package.md
+    - 构建插件:
+        - 构建体系: build/index.md
+        - 插件与模板: build/plugins.md
+        - 模块 DSL: build/dsl.md
+        - 产物与发布: build/artifacts.md
+    - 核心库:
+        - 能力分层: core/index.md
+        - 基础核心: core/essentials.md
+        - Compose 核心: core/compose-core.md
+        - 基础能力模块: core/capabilities.md
+    - 客户端交互:
+        - 交互模型: client/index.md
+        - 共享契约: client/contract.md
+        - 客户端引擎: client/client-engine.md
+        - 服务端引擎: client/server-engine.md
+        - 数据、实时与插件: client/data-realtime.md
+    - UI 框架:
+        - 界面体系: ui/index.md
+        - 入口与生命周期: ui/lifecycle.md
+        - 主题系统: ui/theme.md
+        - 组件体系: ui/components.md
+        - 导航与页面: ui/navigation.md
+        - 浮层与窗口: ui/floating.md
+        - 自适应与平台视图: ui/adaptive.md
+    - Native Compose:
+        - 原生桌面: native/index.md
+        - 桥接与窗口: native/bridge.md
+        - 分发与维护: native/distribution.md
+    - 深入模块:
+        - 模块全景: module/index.md
+        - 源集与 API: module/sourcesets.md
+        - 数据处理: module/data.md
+        - 平台与 FFI: module/platform.md
+        - 扩展与验证: module/extend.md
+    - 附录:
+        - 生态入口: appendix/index.md
+        - MOD 格式: appendix/tools.md
+        - 文档工程: appendix/docs.md
+        - UI Gallery: https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery/
+        - 导航示例: https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen/
+        - API 参考: https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka/
 
-
-site_name: Rachel框架开发向导
-site_url: https://rachel-ylcs.github.io/ylcs-kmp
+site_name: Rachel 开发向导
+site_url: https://rachel-ylcs.github.io/ylcs-kmp/
 site_author: 银临茶舍项目组
-site_description: 于万人中万幸得以相逢
+site_description: 以 Kotlin Multiplatform 与 Compose Multiplatform 构建全平台应用的 Rachel 框架官方指南。
+copyright: 银临茶舍 · Rachel 框架文档
 
+repo_url: https://github.com/rachel-ylcs/ylcs-kmp
+repo_name: ylcs-kmp
 
 theme:
-    palette:
-        primary: indigo
     name: material
-    custom_dir: docs/overrides
-    favicon: https://yinlin.love/favicon.ico
+    custom_dir: theme
+    language: zh
+    logo: assets/logo.svg
+    favicon: assets/favicon.svg
+    font: false
+    icon:
+        repo: fontawesome/brands/github
+    palette:
+        - scheme: rachel-dark
+          primary: custom
+          accent: custom
+          toggle:
+              icon: material/weather-night
+              name: 切换到浅色模式
+        - scheme: rachel-light
+          primary: custom
+          accent: custom
+          toggle:
+              icon: material/weather-sunny
+              name: 切换到深色模式
     features:
-        - announce.dismiss
         - navigation.tracking
         - navigation.tabs
         - navigation.sections
@@ -65,81 +89,79 @@ theme:
         - search.suggest
         - search.highlight
         - search.share
-        - navigation.expand
-        - navigation.indexes
-        - content.tooltips
         - content.code.copy
         - content.code.annotate
-    language: zh
-    icon:
-        repo: fontawesome/brands/github
-        logo: logo
-
-repo_url: https://github.com/rachel-ylcs/ylcs-kmp
-repo_name: 银临茶舍 ylcs-kmp
-copyright: 银临茶舍 是在 MIT 许可下许可的开源软件。
-
-extra:
-    generator: false
-    social:
-        - icon: fontawesome/brands/qq
-          link: https://qm.qq.com/cgi-bin/qm/qr?k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R
-          name: QQ
-        - icon: fontawesome/brands/github
-          link: https://github.com/rachel-ylcs/ylcs-kmp
-          name: Github
+        - content.tooltips
+        - toc.follow
 
 plugins:
-    - search
-    - glightbox:
-          enabled: true
-          touchNavigation: true
-          loop: false
-          effect: fade
-          slide_effect: slide
-          width: 100%
-          height: auto
-          zoomable: true
-          draggable: true
-          skip_classes:
-              - custom-skip-class-name
-          auto_caption: false
-          caption_position: bottom
-          background: white
-          shadow: true
-          manual: false
+    - search:
+          lang:
+              - zh
+              - en
+          separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+    - statistics:
+          page_template: _partials/page_statistics.html
+          words_per_minute: 300
+          codelines_per_minute: 80
 
 markdown_extensions:
     - abbr
-    - attr_list
     - admonition
+    - attr_list
     - def_list
     - footnotes
     - md_in_html
-    - pymdownx.caret
+    - tables
+    - toc:
+          permalink: "¶"
+          toc_depth: 3
     - pymdownx.betterem
-    - pymdownx.critic
+    - pymdownx.caret
     - pymdownx.details
-    - pymdownx.inlinehilite
-    - pymdownx.keys
-    - pymdownx.mark
-    - pymdownx.snippets
-    - pymdownx.smartsymbols
-    - pymdownx.tilde
-    - pymdownx.superfences:
-          custom_fences:
-              - name: mermaid
-                class: mermaid
-                format:
-                    !!python/name:pymdownx.superfences.fence_code_format
-    - pymdownx.highlight:
-          anchor_linenums: true
-          linenums: true
-          auto_title: true
     - pymdownx.emoji:
           emoji_index: !!python/name:material.extensions.emoji.twemoji
           emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.highlight:
+          anchor_linenums: true
+          auto_title: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.smartsymbols
+    - pymdownx.snippets
+    - pymdownx.superfences:
+          custom_fences:
+              - name: mermaid
+                class: rc-mermaid
+                format: !!python/name:pymdownx.superfences.fence_code_format
     - pymdownx.tabbed:
           alternate_style: true
     - pymdownx.tasklist:
           custom_checkbox: true
+    - pymdownx.tilde
+
+extra_css:
+    - assets/stylesheets/rachel.css
+
+extra_javascript:
+    - assets/javascripts/rachel.js
+
+extra:
+    generator: false
+    social:
+        - icon: fontawesome/brands/github
+          link: https://github.com/rachel-ylcs/ylcs-kmp
+          name: GitHub
+        - icon: fontawesome/brands/qq
+          link: https://qm.qq.com/cgi-bin/qm/qr?k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R
+          name: QQ 群
+
+validation:
+    nav:
+        omitted_files: info
+    links:
+        not_found: warn
+        absolute_links: info
