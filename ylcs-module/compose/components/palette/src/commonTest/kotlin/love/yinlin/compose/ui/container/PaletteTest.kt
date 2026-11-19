@@ -36,6 +36,39 @@ class PaletteTest {
     }
 
     @Test
+    fun paletteStatePublishesAndExposesDerivedColors() {
+        val dominant = Palette.Swatch(0xFF777777.toInt(), 80)
+        val vibrant = Palette.Swatch(0xFFE02020.toInt(), 20)
+        val generated = Palette.from([dominant, vibrant])
+        val state = PaletteState()
+
+        assertEquals(PaletteStatus.Loading, state.status)
+        state.beginGeneration()
+        state.publish(generated)
+
+        assertEquals(PaletteStatus.Ready, state.status)
+        assertEquals(generated, state.palette)
+        assertEquals(dominant, state.dominantSwatch)
+        assertEquals(vibrant, state.vibrantSwatch)
+        assertEquals(generated.swatches, state.swatches)
+        assertEquals(generated.targets, state.targets)
+    }
+
+    @Test
+    fun paletteStateReportsGenerationErrors() {
+        val state = PaletteState()
+        val failure = IllegalStateException("sample failed")
+
+        state.beginGeneration()
+        state.fail(failure)
+
+        assertEquals(PaletteStatus.Error, state.status)
+        assertEquals(failure, state.error)
+        assertEquals(false, state.isLoading)
+        assertEquals(false, state.isReady)
+    }
+
+    @Test
     fun targetBuilderCopiesPreset() {
         val custom = Target.Builder(Target.VIBRANT)
             .setTargetLightness(0.6f)
