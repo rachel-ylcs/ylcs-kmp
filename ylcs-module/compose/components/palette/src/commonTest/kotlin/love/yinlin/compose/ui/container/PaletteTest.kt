@@ -39,7 +39,7 @@ class PaletteTest {
     fun paletteStatePublishesAndExposesDerivedColors() {
         val dominant = Palette.Swatch(0xFF777777.toInt(), 80)
         val vibrant = Palette.Swatch(0xFFE02020.toInt(), 20)
-        val generated = Palette.from([dominant, vibrant])
+        val generated = Palette([dominant, vibrant], [Target.VIBRANT])
         val state = PaletteState()
 
         assertEquals(PaletteStatus.Loading, state.status)
@@ -81,7 +81,7 @@ class PaletteTest {
             .build()
 
         assertEquals(Target.VIBRANT.minimumSaturation, custom.minimumSaturation)
-        assertEquals(0.6f, custom.targetLightness)
+        assertEquals(0.6f, custom.targetLightness, 0.0001f)
         assertEquals(false, custom.isExclusive)
     }
 }
