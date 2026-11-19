@@ -25,6 +25,7 @@ import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.HSV
 import love.yinlin.compose.graphics.hsv
 import love.yinlin.compose.ui.layout.MeasurePolicies
@@ -35,7 +36,7 @@ private fun ValueSlider(
     onValueChange: (Float) -> Unit,
     onFinished: () -> Unit
 ) {
-    val brush = remember(hsv) { Brush.verticalGradient(colors = [hsv.copy(value = 1f).color, Colors.Black]) }
+    val brush = remember(hsv) { Brush.verticalGradient(colors = [HSV(hsv.hue, hsv.saturation, 1f).color, Colors.Black]) }
 
     Layout(modifier = Modifier.pointerInput(Unit) {
         detectDragGestures(
@@ -164,7 +165,7 @@ fun ColorPicker(
     enableAlpha: Boolean = true,
     onColorChanged: ((Color) -> Unit)? = null,
 ) {
-    var currentHsv by rememberState { initColor.hsv }
+    var currentHsv by rememberValueState(initColor.hsv)
     var currentAlpha by rememberState { initColor.alpha }
 
     Layout(
@@ -173,7 +174,7 @@ fun ColorPicker(
             ValueSlider(
                 hsv = currentHsv,
                 onValueChange = {
-                    val newHsv = currentHsv.copy(value = it)
+                    val newHsv = HSV(currentHsv.hue, currentHsv.saturation, it)
                     currentHsv = newHsv
                     onColorChanged?.invoke(newHsv.color.copy(alpha = currentAlpha))
                 },
@@ -183,7 +184,7 @@ fun ColorPicker(
             SpectrumArea(
                 hsv = currentHsv,
                 onHsvChange = { h, s ->
-                    val newHsv = currentHsv.copy(hue = h, saturation = s)
+                    val newHsv = HSV(h, s, currentHsv.value)
                     currentHsv = newHsv
                     onColorChanged?.invoke(newHsv.color.copy(alpha = currentAlpha))
                 },
