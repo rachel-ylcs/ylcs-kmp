@@ -22,6 +22,7 @@ import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.ui.container.*
+import love.yinlin.compose.ui.container.Target as PaletteTarget
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -249,7 +250,7 @@ object ContainerPage : Page(
                 }
                 else {
                     val customTarget = remember {
-                        Target.Builder(Target.VIBRANT)
+                        PaletteTarget.Builder(PaletteTarget.VIBRANT)
                             .setTargetSaturation(0.8f)
                             .setTargetLightness(0.62f)
                             .setExclusive(false)
