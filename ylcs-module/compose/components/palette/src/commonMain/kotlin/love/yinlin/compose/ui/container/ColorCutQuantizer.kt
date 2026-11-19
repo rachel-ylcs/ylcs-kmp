@@ -125,7 +125,7 @@ internal class ColorCutQuantizer(
             var maxBlue = Int.MIN_VALUE
             var count = 0
 
-            for (index in lowerIndex..upperIndex) {
+            for (index in lowerIndex .. upperIndex) {
                 val color = colors[index]
                 count += histogram[color]
 
@@ -174,7 +174,7 @@ internal class ColorCutQuantizer(
             val midpoint = population / 2
             var count = 0
 
-            for (index in lowerIndex..upperIndex) {
+            for (index in lowerIndex .. upperIndex) {
                 count += histogram[colors[index]]
                 if (count >= midpoint) return minOf(upperIndex - 1, index)
             }
@@ -188,7 +188,7 @@ internal class ColorCutQuantizer(
             var blueSum = 0
             var totalPopulation = 0
 
-            for (index in lowerIndex..upperIndex) {
+            for (index in lowerIndex .. upperIndex) {
                 val color = colors[index]
                 val colorPopulation = histogram[color]
                 totalPopulation += colorPopulation

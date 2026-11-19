@@ -77,9 +77,9 @@ value class HSV(val packedValue: Long) {
         private const val CHANNEL_MASK = 0x1FFFFFL
 
         private fun pack(hue: Float, saturation: Float, value: Float): Long {
-            require(hue in 0f..360f) { "Hue must be in the range 0..360." }
-            require(saturation in 0f..1f) { "Saturation must be in the range 0..1." }
-            require(value in 0f..1f) { "Value must be in the range 0..1." }
+            require(hue in 0f .. 360f) { "Hue must be in the range 0..360." }
+            require(saturation in 0f .. 1f) { "Saturation must be in the range 0..1." }
+            require(value in 0f .. 1f) { "Value must be in the range 0..1." }
 
             val hueBits = (hue / 360f * HUE_MAX).roundToLong()
             val saturationBits = (saturation * CHANNEL_MAX).roundToLong()

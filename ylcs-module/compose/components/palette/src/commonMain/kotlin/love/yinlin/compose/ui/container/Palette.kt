@@ -271,7 +271,7 @@ class Palette internal constructor(swatches: List<Swatch>, targets: List<Palette
         private val DEFAULT_FILTER = Filter { _, hsl ->
             val isBlack = hsl[2] <= DEFAULT_FILTER_BLACK_MAX_LIGHTNESS
             val isWhite = hsl[2] >= DEFAULT_FILTER_WHITE_MIN_LIGHTNESS
-            val isNearRedILine = hsl[0] in 10f..37f && hsl[1] <= 0.82f
+            val isNearRedILine = hsl[0] in 10f .. 37f && hsl[1] <= 0.82f
             !isBlack && !isWhite && !isNearRedILine
         }
 
