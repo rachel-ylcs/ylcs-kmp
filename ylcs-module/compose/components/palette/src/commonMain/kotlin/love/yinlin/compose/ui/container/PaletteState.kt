@@ -21,18 +21,14 @@ enum class PaletteStatus {
  */
 @Stable
 class PaletteState internal constructor() {
-    private val _paletteState = mutableStateOf<Palette?>(null)
-    private val _statusState = mutableStateOf(PaletteStatus.Loading)
-    private val _errorState = mutableStateOf<Throwable?>(null)
-
     /** 最近一次成功生成的调色板；重新采样期间保留上一份结果。 */
-    val paletteState: State<Palette?> get() = _paletteState
-    val statusState: State<PaletteStatus> get() = _statusState
-    val errorState: State<Throwable?> get() = _errorState
+    val paletteState: State<Palette?> field = mutableStateOf(null)
+    val statusState: State<PaletteStatus> field = mutableStateOf(PaletteStatus.Loading)
+    val errorState: State<Throwable?> field = mutableStateOf(null)
 
-    val palette: Palette? get() = _paletteState.value
-    val status: PaletteStatus get() = _statusState.value
-    val error: Throwable? get() = _errorState.value
+    val palette: Palette? get() = paletteState.value
+    val status: PaletteStatus get() = statusState.value
+    val error: Throwable? get() = errorState.value
     val isLoading: Boolean get() = status == PaletteStatus.Loading || status == PaletteStatus.Refreshing
     val isReady: Boolean get() = status == PaletteStatus.Ready
 
@@ -81,18 +77,18 @@ class PaletteState internal constructor() {
     fun getDominantColor(defaultColor: Color = Color.Unspecified): Color = dominantColor ?: defaultColor
 
     internal fun beginGeneration() {
-        _statusState.value = if (_paletteState.value == null) PaletteStatus.Loading else PaletteStatus.Refreshing
-        _errorState.value = null
+        statusState.value = if (paletteState.value == null) PaletteStatus.Loading else PaletteStatus.Refreshing
+        errorState.value = null
     }
 
     internal fun publish(palette: Palette) {
-        _paletteState.value = palette
-        _statusState.value = PaletteStatus.Ready
-        _errorState.value = null
+        paletteState.value = palette
+        statusState.value = PaletteStatus.Ready
+        errorState.value = null
     }
 
     internal fun fail(error: Throwable) {
-        _statusState.value = PaletteStatus.Error
-        _errorState.value = error
+        statusState.value = PaletteStatus.Error
+        errorState.value = error
     }
 }
