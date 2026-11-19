@@ -5,6 +5,7 @@ import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
 import io.github.ktlint.core.ruleset.standard.rules.FunctionNamingRule
 import love.yinlin.lint.KtlintSeverity.*
 import love.yinlin.lint.rule.ComposableFunctionNamingRule
+import love.yinlin.lint.rule.NoSemicolonRule
 import love.yinlin.lint.rule.RangeSpacingRule
 
 internal data class KtlintRule(
@@ -49,7 +50,8 @@ internal object RepositoryKtlintRules {
         KtlintRule("standard:no-line-break-after-else", true, WARNING, "else 关键字之后的多余换行"),
         KtlintRule("standard:no-line-break-before-assignment", true, WARNING, "赋值符之前的多余换行"),
         KtlintRule("standard:no-multi-spaces", true, WARNING, "多余的连续空格"),
-        KtlintRule("standard:no-semi", true, ERROR, "不必要的分号"),
+        KtlintRule("standard:no-semi", false, ERROR, "不必要的分号"),
+        KtlintRule(NoSemicolonRule.ID, true, ERROR, "不必要的分号"),
         KtlintRule("standard:no-trailing-spaces", true, WARNING, "行尾空白字符"),
         KtlintRule("standard:no-unit-return", true, WARNING, "不必要的显式 Unit 返回类型"),
         KtlintRule("standard:no-unused-imports", true, WARNING, "未使用的 import 声明"),
@@ -74,6 +76,7 @@ internal object RepositoryKtlintRules {
     val custom = setOf(
         RuleV2Provider { RangeSpacingRule() },
         RuleV2Provider { ComposableFunctionNamingRule() },
+        RuleV2Provider { NoSemicolonRule() },
     )
 
     val options = EditorConfigOverride.from(

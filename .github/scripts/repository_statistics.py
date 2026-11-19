@@ -23,6 +23,7 @@ EXCLUDED_DIRS = {"vendor", "vendors", "upstream", "upstreams", "third_party", "t
 TOOL_MODULES = {"build-tool", "lint", "dokka"}
 PLACEHOLDERS = {".gitkeep", ".keep", ".placeholder", "placeholder", ".empty"}
 LONG_FILE_THRESHOLD = 1000
+UNREPORTED_LANGUAGE_CATEGORIES = {"JSON", "Other text"}
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX|HACK)\b")
 SEMVER_RE = re.compile(r"^(?:v|m|release[-_]?|rel[-_]?)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix>[-+][0-9A-Za-z.-]+)?$", re.IGNORECASE)
 
@@ -36,24 +37,22 @@ LANGUAGE_EXTENSIONS = {
     "Rust": {".rs"},
     "CMake": {".cmake"},
     "Shell": {".sh", ".bash", ".zsh"},
-    "Web": {".html", ".htm", ".js", ".mjs", ".cjs", ".css", ".scss", ".ts", ".tsx", ".jsx"},
+    "JavaScript": {".html", ".htm", ".js", ".mjs", ".cjs", ".css", ".scss", ".ts", ".tsx", ".jsx"},
     "Groovy": {".gradle"},
-    "YAML": {".yml", ".yaml"},
-    "JSON": {".json"},
-    "TOML": {".toml"},
-    "XML": {".xml", ".plist", ".storyboard", ".xib"},
     "SQL": {".sql"},
     "Markdown": {".md", ".mdx"},
-    "Config": {".properties", ".conf", ".ini", ".cfg", ".pro", ".proguard"},
+    "Config": {
+        ".xml", ".plist", ".storyboard", ".xib", ".yml", ".yaml", ".toml",
+        ".properties", ".conf", ".ini", ".cfg", ".pro", ".proguard",
+    },
 }
 COMMENT_RULES = {
     "Kotlin": (("//",), ("/*", "*/")), "C++": (("//", ";"), ("/*", "*/")),
     "Objective-C++": (("//",), ("/*", "*/")), "Java": (("//",), ("/*", "*/")),
     "Swift": (("//",), ("/*", "*/")), "Rust": (("//",), ("/*", "*/")),
-    "Web": (("//",), ("/*", "*/")), "Groovy": (("//",), ("/*", "*/")),
-    "Python": (("#",), None), "Shell": (("#",), None), "YAML": (("#",), None),
-    "CMake": (("#",), None), "TOML": (("#",), None), "Config": (("#", ";"), None),
-    "SQL": (("--",), ("/*", "*/")), "XML": ((), ("<!--", "-->")),
+    "JavaScript": (("//",), ("/*", "*/")), "Groovy": (("//",), ("/*", "*/")),
+    "Python": (("#",), None), "Shell": (("#",), None), "Config": (("#",), None),
+    "CMake": (("#",), None), "SQL": (("--",), ("/*", "*/")),
     "Markdown": ((), ("<!--", "-->")), "JSON": ((), None),
 }
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico", ".icns", ".svg", ".avif"}
@@ -135,8 +134,18 @@ def is_text_file(path: Path) -> bool:
         return False
 
 
+def comment_rules_for(language: str, suffix: str):
+    if language == "Config":
+        if suffix in {".xml", ".plist", ".storyboard", ".xib"}:
+            return (), ("<!--", "-->")
+        if suffix in {".conf", ".ini"}:
+            return ("#", ";"), None
+        return ("#",), None
+    return COMMENT_RULES.get(language, ((), None))
+
+
 def count_lines(content: str, language: str, suffix: str) -> dict:
-    markers, block = COMMENT_RULES.get(language, ((), None))
+    markers, block = comment_rules_for(language, suffix)
     if suffix == ".def":
         markers, block = (";",), None
     block_start, block_end = block if block else (None, None)
@@ -484,19 +493,24 @@ def git_history(catalog: dict) -> dict:
         patch = git("diff", "--no-ext-diff", "--unified=0", old, new, "--", *SCOPES)
         added_code_lines = deleted_code_lines = 0
         current_language = None
+        current_suffix = ""
         for patch_line in patch.splitlines():
             if patch_line.startswith("--- a/"):
-                current_language = language_for(Path(patch_line[6:]), True)
+                current_path = Path(patch_line[6:])
+                current_language = language_for(current_path, True)
+                current_suffix = current_path.suffix.lower()
             elif patch_line.startswith("+++ b/"):
-                current_language = language_for(Path(patch_line[6:]), True)
+                current_path = Path(patch_line[6:])
+                current_language = language_for(current_path, True)
+                current_suffix = current_path.suffix.lower()
             elif current_language and patch_line.startswith("+") and not patch_line.startswith("+++"):
                 source_line = patch_line[1:].strip()
-                markers = COMMENT_RULES.get(current_language, ((), None))[0]
+                markers = comment_rules_for(current_language, current_suffix)[0]
                 if source_line and not source_line.startswith(markers) and not source_line.startswith(("*", "*/", "<!--", "-->")):
                     added_code_lines += 1
             elif current_language and patch_line.startswith("-") and not patch_line.startswith("---"):
                 source_line = patch_line[1:].strip()
-                markers = COMMENT_RULES.get(current_language, ((), None))[0]
+                markers = comment_rules_for(current_language, current_suffix)[0]
                 if source_line and not source_line.startswith(markers) and not source_line.startswith(("*", "*/", "<!--", "-->")):
                     deleted_code_lines += 1
 
@@ -562,7 +576,7 @@ def collect_statistics() -> dict:
         file_rows.append(row)
         scope_rows[scope].append(row)
         module_rows[module].append(row)
-        if language:
+        if language and language not in UNREPORTED_LANGUAGE_CATEGORIES:
             language_rows[language].append(row)
             if line_counts["code"] > LONG_FILE_THRESHOLD:
                 large_files.append({"path": relative, "code_lines": line_counts["code"], "total_lines": line_counts["total"]})
