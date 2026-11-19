@@ -21,8 +21,8 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.decode
-import love.yinlin.compose.ui.container.*
 import love.yinlin.compose.ui.container.Target as PaletteTarget
+import love.yinlin.compose.ui.container.*
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -239,7 +239,7 @@ object ContainerPage : Page(
             }
 
             Component(demoPalette) {
-                var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+                var bitmap by rememberNull<ImageBitmap>()
                 LaunchedEffect(Unit) {
                     bitmap = requireNotNull(ImageBitmap.decode(Res.readBytes("drawable/img0.webp")))
                 }
@@ -256,7 +256,7 @@ object ContainerPage : Page(
                             .setExclusive(false)
                             .build()
                     }
-                    var customPalette by remember(source) { mutableStateOf<Palette?>(null) }
+                    var customPalette by rememberNull<Palette>(source)
                     LaunchedEffect(source) {
                         val left = source.width / 4
                         val top = source.height / 4
@@ -297,14 +297,14 @@ object ContainerPage : Page(
                                     }
 
                                     Text("六种标准目标色")
-                                    val targetSwatches = listOfNotNull(
+                                    val targetSwatches = [
                                         vibrantSwatch?.let { "Vibrant" to it },
                                         lightVibrantSwatch?.let { "Light vibrant" to it },
                                         darkVibrantSwatch?.let { "Dark vibrant" to it },
                                         mutedSwatch?.let { "Muted" to it },
                                         lightMutedSwatch?.let { "Light muted" to it },
-                                        darkMutedSwatch?.let { "Dark muted" to it }
-                                    )
+                                        darkMutedSwatch?.let { "Dark muted" to it },
+                                    ].filterNotNull()
                                     Row(
                                         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)
