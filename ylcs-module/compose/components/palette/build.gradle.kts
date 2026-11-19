@@ -25,32 +25,5 @@ rachel {
                     projects.ylcsModule.compose.ui,
                 )
             }
-
-            commonTest {
-                lib(libs.test)
-            }
-
-            skikoMain(commonMain)
-
-            iosMain(skikoMain)
-
-            iosMainList(iosMain)
-
-            desktopMain(skikoMain)
-
-            nativeMain(skikoMain)
-
-            windowsMain(nativeMain)
-
-            linuxMain(nativeMain)
-
-            macosMain(nativeMain)
-
-            webMain(skikoMain)
-
-            jsMain(webMain)
-
-            wasmJsMain(webMain)
-        }
-    }
+        }    }
 }
