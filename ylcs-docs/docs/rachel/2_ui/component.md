@@ -60,11 +60,11 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 
 `Surface` 统一形状、边框、阴影、内容边距及色调层次。组件实现应优先复用这些能力与主题值。
 
-## 背景调色板
+## 图像调色板
 
-`PaletteBox` 先将背景内容记录到可复用的 `GraphicsLayer`，再将缩小后的采样层交给公共 Kotlin 调色板算法。内容通过 `PaletteScope` 读取主色、六种标准目标色、Swatch、HSL 与文字对比色；读取到的属性由 Compose 快照状态驱动。
+`PaletteBox` 接收明确的 `ImageBitmap` 作为唯一采样输入。内容槽只负责布局与展示，不参与取色；图像内容更新时传入新的 `ImageBitmap` 实例，组件会取消旧任务并重新分析。分析在协程 `Dispatchers.Default` 上运行，结果通过 `PaletteScope` 的快照状态提供主色、六种标准目标色、Swatch、HSL 与文字对比色。
 
-图层变化会触发重新采样。连续动画的采样请求会合并，后台分析最多每 400 ms 执行一次；采样像素指纹未变化时跳过量化。需要在背景数据变化但绘制层未失效时，可调用 `PaletteScope.refresh()`。图像量化在协程 `Dispatchers.Default` 上运行，Android 也使用同一份 commonMain 实现，不依赖 `androidx.palette`。
+独立使用时，可通过 `Palette.from(bitmap)` 创建 `Palette.Builder`，配置最大颜色数、采样区域、过滤器和自定义 `Target`，再调用 `generate()` 或 `generateAsync()`。模块使用 commonMain 算法，不依赖 `androidx.palette`。
 
 ## 可选模块
 
@@ -79,7 +79,7 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 | `lottie` | Lottie 动画 |
 | `media` | 音频、视频及播放控制 |
 | `pagination-layout` | 分页加载布局 |
-| `palette` | 背景图像取色、标准目标色与文字对比色 |
+| `palette` | ImageBitmap 取色、标准目标色与文字对比色 |
 | `qrcode` | 二维码相关组件 |
 | `reordering` | 列表重排 |
 | `rich-text` | 富文本渲染 |

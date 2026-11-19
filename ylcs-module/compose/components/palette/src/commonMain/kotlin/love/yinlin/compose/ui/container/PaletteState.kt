@@ -17,20 +17,13 @@ internal class PaletteState {
     val statusState = mutableStateOf(PaletteStatus.Loading)
     val errorState = mutableStateOf<Throwable?>(null)
 
-    var fingerprint: Long? = null
-
-    fun beginCapture() {
+    fun beginGeneration() {
         statusState.value = if (paletteState.value == null) PaletteStatus.Loading else PaletteStatus.Refreshing
         errorState.value = null
     }
 
     fun publish(palette: Palette) {
         paletteState.value = palette
-        statusState.value = PaletteStatus.Ready
-        errorState.value = null
-    }
-
-    fun finishCapture() {
         statusState.value = PaletteStatus.Ready
         errorState.value = null
     }

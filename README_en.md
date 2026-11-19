@@ -257,7 +257,7 @@ Find modules by purpose:
   Paginated data state and loading layouts
 
 - **[palette](ylcs-module/compose/components/palette) · All platforms**<br>
-  Extracts representative colors, target swatches and readable text colors from images
+  Extracts representative colors, target swatches and readable text colors from an ImageBitmap
 
 - **[qrcode](ylcs-module/compose/components/qrcode) · All platforms**<br>
   QR generation on all targets; scanning implemented on Android/iOS only

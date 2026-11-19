@@ -39,7 +39,6 @@ import kotlin.math.sqrt
 class Palette internal constructor(
     swatches: List<Swatch>,
     targets: List<Target>,
-    internal val fingerprint: Long? = null,
 ) {
     val swatches: List<Swatch> = swatches.toList()
     val targets: List<Target> = targets.toList()
@@ -265,8 +264,14 @@ class Palette internal constructor(
         /**
          * 同步生成调色板。图像分析是 CPU 密集操作，不应在 UI 线程调用。
          */
-        fun generate(): Palette = generateIfChanged(null).palette
-            ?: error("Palette generation unexpectedly returned no result.")
+        fun generate(): Palette {
+            val source = bitmap
+            if (source == null) return Palette(inputSwatches.orEmpty(), targets)
+
+            val pixels = extractPixels(source)
+            val swatches = ColorCutQuantizer(pixels.values, maximumColorCount, filters).quantize()
+            return Palette(swatches, targets)
+        }
 
         /**
          * 在 [Dispatchers.Default] 上生成调色板，调用方可直接从协程中使用。
@@ -289,21 +294,6 @@ class Palette internal constructor(
 
         /** 与 [generate] 相同，但使用异步 API 命名。 */
         fun generateAsync(scope: CoroutineScope, listener: PaletteAsyncListener): Job = generate(scope, listener)
-
-        internal fun generateIfChanged(previousFingerprint: Long?): PaletteGenerationResult {
-            val source = bitmap
-            if (source == null) {
-                val palette = Palette(inputSwatches.orEmpty(), targets)
-                return PaletteGenerationResult(palette, null)
-            }
-
-            val pixels = extractPixels(source)
-            val fingerprint = fingerprint(pixels.values, pixels.width, pixels.height)
-            if (fingerprint == previousFingerprint) return PaletteGenerationResult(null, fingerprint)
-
-            val swatches = ColorCutQuantizer(pixels.values, maximumColorCount, filters).quantize()
-            return PaletteGenerationResult(Palette(swatches, targets, fingerprint), fingerprint)
-        }
 
         private fun extractPixels(source: ImageBitmap): PixelData {
             val sourceWidth = source.width
@@ -343,14 +333,6 @@ class Palette internal constructor(
             return PixelData(output, outputWidth, outputHeight)
         }
 
-        private fun fingerprint(pixels: IntArray, width: Int, height: Int): Long {
-            var hash = -0x340d631b7bdddcdbL
-            hash = (hash xor width.toLong()) * 1099511628211L
-            hash = (hash xor height.toLong()) * 1099511628211L
-            for (pixel in pixels) hash = (hash xor pixel.toLong()) * 1099511628211L
-            return hash
-        }
-
         private data class Region(val left: Int, val top: Int, val right: Int, val bottom: Int)
         private data class PixelData(val values: IntArray, val width: Int, val height: Int)
     }
@@ -388,7 +370,3 @@ class Palette internal constructor(
     }
 }
 
-internal data class PaletteGenerationResult(
-    val palette: Palette?,
-    val fingerprint: Long?,
-)

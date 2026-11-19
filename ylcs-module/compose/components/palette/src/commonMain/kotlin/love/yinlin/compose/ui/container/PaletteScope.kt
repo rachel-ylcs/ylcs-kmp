@@ -7,13 +7,12 @@ import androidx.compose.ui.graphics.Color
 /**
  * [PaletteBox] 内容槽可访问的调色板作用域。
  *
- * 读取 [palette]、[swatches] 或颜色属性时会订阅对应的 Compose 快照状态；新一轮分析完成后，
+ * 读取 [palette]、[swatches] 或颜色属性时会订阅对应的 Compose 快照状态；图像分析完成后，
  * 读取这些属性的内容会自动重组。状态对象可直接通过 [paletteState]、[statusState] 访问。
  */
 @Stable
 class PaletteScope internal constructor(
     private val state: PaletteState,
-    private val controller: PaletteCaptureController,
 ) {
     val paletteState: State<Palette?> get() = state.paletteState
     val statusState: State<PaletteStatus> get() = state.statusState
@@ -67,14 +66,4 @@ class PaletteScope internal constructor(
     fun getLightMutedColor(defaultColor: Color = Color.Unspecified): Color = lightMutedColor ?: defaultColor
     fun getDarkMutedColor(defaultColor: Color = Color.Unspecified): Color = darkMutedColor ?: defaultColor
     fun getDominantColor(defaultColor: Color = Color.Unspecified): Color = dominantColor ?: defaultColor
-
-    /**
-     * 请求重新采样当前背景。
-     *
-     * 正常情况下背景绘制失效会自动触发分析；此方法适用于背景数据已变化但绘制层没有失效的场景。
-     * 连续请求会合并，分析频率仍受内部节流策略限制。
-     */
-    fun refresh() {
-        controller.refresh()
-    }
 }

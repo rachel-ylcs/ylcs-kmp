@@ -2,13 +2,16 @@ package love.yinlin.page
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -17,6 +20,7 @@ import love.yinlin.PageGroup
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.ui.container.*
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -31,6 +35,8 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.enum
 import love.yinlin.extension.enumSize
 import love.yinlin.gallery.resources.*
+
+private fun Int.toPaletteHex(): String = "#${toUInt().toString(16).takeLast(6).uppercase()}"
 
 @Stable
 object ContainerPage : Page(
@@ -48,7 +54,7 @@ object ContainerPage : Page(
     private val demoAdderBox = component("AdderBox", "向容器中添加项目，也可替换或删除已有项目。", "添加")
     private val demoBanner = component("Banner", "自动轮播一组图片，也可以手动切换。", "轮播")
     private val demoWatermark = component("Watermark", "在内容上平铺水印，仍可操作下方控件。", "平铺 透明度")
-    private val demoPalette = component("PaletteBox", "从背景图像异步提取代表色，为覆盖内容提供自适应配色。", "图片 主色 调色板", "palette")
+    private val demoPalette = component("PaletteBox", "从指定 ImageBitmap 提取代表色、目标色和文字对比色。", "ImageBitmap 图片 主色 调色板", "palette")
 
     @Composable
     override fun Content() {
@@ -232,66 +238,141 @@ object ContainerPage : Page(
             }
 
             Component(demoPalette) {
-                val paletteImages = [
-                    Res.drawable.img0,
-                    Res.drawable.img1,
-                    Res.drawable.img2,
-                    Res.drawable.img3
-                ]
-                var imageIndex by rememberValueState(0)
+                var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+                LaunchedEffect(Unit) {
+                    bitmap = requireNotNull(ImageBitmap.decode(Res.readBytes("drawable/img0.webp")))
+                }
 
-                PaletteBox(
-                    modifier = Modifier.fillMaxWidth().height(Theme.size.cell3).clip(Theme.shape.v3),
-                    backdrop = {
-                        Image(
-                            res = paletteImages[imageIndex],
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                val source = bitmap
+                if (source == null) {
+                    Text("正在加载示例图像…", color = Theme.color.onBackgroundVariant)
+                }
+                else {
+                    val customTarget = remember {
+                        Target.Builder(Target.VIBRANT)
+                            .setTargetSaturation(0.8f)
+                            .setTargetLightness(0.62f)
+                            .setExclusive(false)
+                            .build()
                     }
-                ) {
-                    val colors = listOfNotNull(
-                        dominantSwatch,
-                        vibrantSwatch,
-                        lightVibrantSwatch,
-                        darkVibrantSwatch,
-                        mutedSwatch,
-                        lightMutedSwatch,
-                        darkMutedSwatch
-                    )
-                    val dominantHex = dominantSwatch?.rgb?.toUInt()?.toString(16)?.takeLast(6)?.uppercase() ?: "暂无"
+                    var customPalette by remember(source) { mutableStateOf<Palette?>(null) }
+                    LaunchedEffect(source) {
+                        val left = source.width / 4
+                        val top = source.height / 4
+                        val right = (source.width * 3 / 4).coerceAtLeast(left + 1)
+                        val bottom = (source.height * 3 / 4).coerceAtLeast(top + 1)
+                        customPalette = Palette.from(source)
+                            .maximumColorCount(8)
+                            .setRegion(left, top, right, bottom)
+                            .addFilter(Palette.Filter { _, hsl -> hsl[1] >= 0.15f })
+                            .addTarget(customTarget)
+                            .generateAsync()
+                    }
 
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.38f)).padding(Theme.padding.v8)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
-                            Text("PaletteBox · 动态配色", color = Color.White)
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                for (swatch in colors.take(7)) {
-                                    Box(
-                                        Modifier.size(24.dp).clip(RoundedCornerShape(8.dp)).background(swatch.color)
+                    PaletteBox(bitmap = source, modifier = Modifier.fillMaxWidth()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)) {
+                            Image(
+                                bitmap = source,
+                                modifier = Modifier.fillMaxWidth().height(Theme.size.cell3).clip(Theme.shape.v3),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Text("默认调色板", color = Theme.color.onBackground)
+                            when {
+                                isLoading -> Text("正在分析 ImageBitmap…", color = Theme.color.onBackgroundVariant)
+                                error != null -> Text("取色失败：${error?.message}", color = Theme.color.error)
+                                palette == null -> Text("没有可用颜色", color = Theme.color.onBackgroundVariant)
+                                else -> {
+                                    val dominant = dominantSwatch
+                                    if (dominant != null) {
+                                        Text("主色 ${dominant.rgb.toPaletteHex()} · ${dominant.population} 像素")
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth().clip(Theme.shape.v3)
+                                                .background(dominant.color).padding(Theme.padding.v8)
+                                        ) {
+                                            Text("标题文字", color = dominant.titleColor)
+                                            Text("正文文字", color = dominant.bodyColor)
+                                        }
+                                    }
+
+                                    Text("六种标准目标色")
+                                    val targetSwatches = listOfNotNull(
+                                        vibrantSwatch?.let { "Vibrant" to it },
+                                        lightVibrantSwatch?.let { "Light vibrant" to it },
+                                        darkVibrantSwatch?.let { "Dark vibrant" to it },
+                                        mutedSwatch?.let { "Muted" to it },
+                                        lightMutedSwatch?.let { "Light muted" to it },
+                                        darkMutedSwatch?.let { "Dark muted" to it }
                                     )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)
+                                    ) {
+                                        for ([label, swatch] in targetSwatches) {
+                                            Column(
+                                                modifier = Modifier.width(72.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Box(
+                                                    Modifier.fillMaxWidth().height(44.dp).clip(Theme.shape.v3)
+                                                        .background(swatch.color)
+                                                )
+                                                Text(label)
+                                                Text(swatch.rgb.toPaletteHex(), color = Theme.color.onBackgroundVariant)
+                                            }
+                                        }
+                                    }
+
+                                    Text("全部 Swatch · ${swatches.size} 种颜色")
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)
+                                    ) {
+                                        for (swatch in swatches) {
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Box(
+                                                    Modifier.size(30.dp).clip(Theme.shape.v3).background(swatch.color)
+                                                )
+                                                Text(swatch.population.toString(), color = Theme.color.onBackgroundVariant)
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            Text(
-                                text = when {
-                                    isLoading -> "正在提取背景颜色…"
-                                    dominantSwatch != null -> "主色 #$dominantHex"
-                                    else -> "暂无可用颜色"
-                                },
-                                color = dominantSwatch?.titleColor ?: Color.White
-                            )
-                        }
 
-                        PrimaryTextButton(
-                            "换一张",
-                            onClick = { imageIndex = (imageIndex + 1) % paletteImages.size },
-                            modifier = Modifier.align(Alignment.BottomEnd)
-                        )
+                            Text("自定义 Builder", color = Theme.color.onBackground)
+                            val custom = customPalette
+                            if (custom == null) {
+                                Text("正在生成中央区域调色板…", color = Theme.color.onBackgroundVariant)
+                            }
+                            else {
+                                val customSwatch = custom.getSwatchForTarget(customTarget)
+                                if (customSwatch != null) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)) {
+                                        Box(Modifier.size(40.dp).clip(Theme.shape.v3).background(customSwatch.color))
+                                        Column {
+                                            Text("自定义目标 ${customSwatch.rgb.toPaletteHex()}")
+                                            Text("HSL ${customSwatch.hsl.joinToString { (it * 100).toInt().toString() }} · ${customSwatch.population} 像素")
+                                        }
+                                    }
+                                }
+                                else {
+                                    Text("中央区域没有符合自定义目标的颜色", color = Theme.color.onBackgroundVariant)
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.g)
+                                ) {
+                                    for (swatch in custom.swatches) {
+                                        Box(Modifier.size(24.dp).clip(Theme.shape.v3).background(swatch.color))
+                                    }
+                                }
+                                Text("中央区域采样 · 最多 8 色 · 饱和度过滤 · 自定义 Target", color = Theme.color.onBackgroundVariant)
+                            }
+                        }
                     }
                 }
             }
-
         }
     }
 }

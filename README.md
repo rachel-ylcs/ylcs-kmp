@@ -256,7 +256,7 @@ implementation("love.yinlin.compose:app:x.x.x")
   分页数据状态与加载布局
 
 - **[palette](ylcs-module/compose/components/palette) · 全平台**<br>
-  从背景图像提取代表色、目标色与文字对比色
+  从指定 ImageBitmap 提取代表色、目标色与文字对比色
 
 - **[qrcode](ylcs-module/compose/components/qrcode) · 全平台**<br>
   全 target 二维码生成；扫码仅 Android/iOS 实现
