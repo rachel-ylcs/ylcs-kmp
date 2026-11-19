@@ -21,10 +21,10 @@ import androidx.compose.runtime.Stable
 /**
  * 描述调色板中目标颜色的 HSL 范围与评分权重。
  *
- * 可通过 [Builder] 创建自定义目标，也可以直接使用六种内置目标。
+ * 可直接使用六种内置目标，也可以通过 [invoke] 或 [copy] 使用 DSL 创建自定义目标。
  */
 @Stable
-class Target internal constructor(
+class Target private constructor(
     private val saturation: FloatArray,
     private val lightness: FloatArray,
     private val weights: FloatArray,
@@ -48,77 +48,43 @@ class Target internal constructor(
         else floatArrayOf(0f, 0f, 0f)
     }
 
+    /** 基于当前目标创建自定义副本。 */
+    fun copy(block: Builder.() -> Unit): Target = Builder(this).apply(block).build()
+
     /**
-     * 自定义目标的构建器。权重会在调色板评分时自动归一化。
+     * 目标色配置 DSL。
+     *
+     * 饱和度、明度和评分权重均使用 0..1 范围；权重会在评分时自动归一化。
      */
-    class Builder {
-        private val saturation = floatArrayOf(0f, 0.5f, 1f)
-        private val lightness = floatArrayOf(0f, 0.5f, 1f)
-        private val weights = floatArrayOf(0.24f, 0.52f, 0.24f)
-        private var exclusive = true
+    @PaletteDsl
+    class Builder internal constructor(target: Target? = null) {
+        var minimumSaturation = target?.minimumSaturation ?: 0f
+        var targetSaturation = target?.targetSaturation ?: 0.5f
+        var maximumSaturation = target?.maximumSaturation ?: 1f
 
-        constructor()
+        var minimumLightness = target?.minimumLightness ?: 0f
+        var targetLightness = target?.targetLightness ?: 0.5f
+        var maximumLightness = target?.maximumLightness ?: 1f
 
-        constructor(target: Target) {
-            target.saturation.copyInto(saturation)
-            target.lightness.copyInto(lightness)
-            target.weights.copyInto(weights)
-            exclusive = target.isExclusive
-        }
+        var saturationWeight = target?.saturationWeight ?: 0.24f
+        var lightnessWeight = target?.lightnessWeight ?: 0.52f
+        var populationWeight = target?.populationWeight ?: 0.24f
 
-        fun setMinimumSaturation(value: Float) = apply {
-            require(value in 0f..1f)
-            saturation[0] = value
-        }
-
-        fun setTargetSaturation(value: Float) = apply {
-            require(value in 0f..1f)
-            saturation[1] = value
-        }
-
-        fun setMaximumSaturation(value: Float) = apply {
-            require(value in 0f..1f)
-            saturation[2] = value
-        }
-
-        fun setMinimumLightness(value: Float) = apply {
-            require(value in 0f..1f)
-            lightness[0] = value
-        }
-
-        fun setTargetLightness(value: Float) = apply {
-            require(value in 0f..1f)
-            lightness[1] = value
-        }
-
-        fun setMaximumLightness(value: Float) = apply {
-            require(value in 0f..1f)
-            lightness[2] = value
-        }
-
-        fun setSaturationWeight(weight: Float) = apply {
-            require(weight >= 0f)
-            weights[0] = weight
-        }
-
-        fun setLightnessWeight(weight: Float) = apply {
-            require(weight >= 0f)
-            weights[1] = weight
-        }
-
-        fun setPopulationWeight(weight: Float) = apply {
-            require(weight >= 0f)
-            weights[2] = weight
-        }
-
-        fun setExclusive(exclusive: Boolean) = apply {
-            this.exclusive = exclusive
-        }
+        var exclusive = target?.isExclusive ?: true
 
         fun build(): Target {
-            require(saturation[0] <= saturation[1] && saturation[1] <= saturation[2])
-            require(lightness[0] <= lightness[1] && lightness[1] <= lightness[2])
-            return Target(saturation.copyOf(), lightness.copyOf(), weights.copyOf(), exclusive)
+            require(minimumSaturation in 0f..1f && targetSaturation in 0f..1f && maximumSaturation in 0f..1f)
+            require(minimumSaturation <= targetSaturation && targetSaturation <= maximumSaturation)
+            require(minimumLightness in 0f..1f && targetLightness in 0f..1f && maximumLightness in 0f..1f)
+            require(minimumLightness <= targetLightness && targetLightness <= maximumLightness)
+            require(saturationWeight >= 0f && lightnessWeight >= 0f && populationWeight >= 0f)
+
+            return Target(
+                floatArrayOf(minimumSaturation, targetSaturation, maximumSaturation),
+                floatArrayOf(minimumLightness, targetLightness, maximumLightness),
+                floatArrayOf(saturationWeight, lightnessWeight, populationWeight),
+                exclusive,
+            )
         }
     }
 
@@ -174,5 +140,8 @@ class Target internal constructor(
             MUTED,
             DARK_MUTED,
         ]
+
+        /** 使用 DSL 创建自定义目标色。 */
+        operator fun invoke(block: Builder.() -> Unit): Target = Builder().apply(block).build()
     }
 }
