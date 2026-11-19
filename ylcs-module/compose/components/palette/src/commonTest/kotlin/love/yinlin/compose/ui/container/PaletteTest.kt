@@ -52,6 +52,11 @@ class PaletteTest {
         assertEquals(vibrant, state.vibrantSwatch)
         assertEquals(generated.swatches, state.swatches)
         assertEquals(generated.targets, state.targets)
+
+        state.beginGeneration()
+        assertEquals(PaletteStatus.Refreshing, state.status)
+        assertEquals(generated, state.palette)
+        state.publish(generated)
     }
 
     @Test
