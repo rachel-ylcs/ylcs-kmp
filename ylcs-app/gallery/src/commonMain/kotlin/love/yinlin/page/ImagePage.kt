@@ -68,7 +68,6 @@ object ImagePage : Page(
     @Stable
     private data class NetworkSample(val format: String, val size: String, val dimensions: String)
 
-    // 2026-10-21 实际 GET 核对，两处公开 HTTP 测试服务提供相同样本，并响应跨域 Origin。
     private val networkSamples: List<NetworkSample> = [
         NetworkSample("png", "7.9 KiB", "100 × 100"),
         NetworkSample("jpeg", "34.8 KiB", "239 × 178"),

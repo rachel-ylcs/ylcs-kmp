@@ -13,50 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package love.yinlin.compose.ui.container
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import love.yinlin.coroutines.Coroutines
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.sqrt
 
 /**
- * 从图像中提取的代表性色彩集合。
- *
- * 量化使用 AndroidX Palette 的 5-bit RGB 中值切分算法；目标颜色按饱和度、明度和像素占比评分。
- * [Builder.generate] 是同步 API，图像较大时应优先使用 [Builder.generateAsync]。
+ * 从图像中提取的代表性色彩集合
  */
 @Stable
-class Palette internal constructor(
-    swatches: List<Swatch>,
-    targets: List<Target>,
-) {
+class Palette internal constructor(swatches: List<Swatch>, targets: List<PaletteTarget>) {
     val swatches: List<Swatch> = swatches.toList()
-    val targets: List<Target> = targets.toList()
+    val targets: List<PaletteTarget> = targets.toList()
     val dominantSwatch: Swatch? = this.swatches.maxByOrNull { it.population }
     val maxPopulation: Int = dominantSwatch?.population ?: 0
 
-    private val selectedSwatches = mutableMapOf<Target, Swatch>()
+    private val selectedSwatches = mutableMapOf<PaletteTarget, Swatch>()
 
     init {
         generateTargets()
     }
 
-    val vibrantSwatch: Swatch? get() = getSwatchForTarget(Target.VIBRANT)
-    val lightVibrantSwatch: Swatch? get() = getSwatchForTarget(Target.LIGHT_VIBRANT)
-    val darkVibrantSwatch: Swatch? get() = getSwatchForTarget(Target.DARK_VIBRANT)
-    val mutedSwatch: Swatch? get() = getSwatchForTarget(Target.MUTED)
-    val lightMutedSwatch: Swatch? get() = getSwatchForTarget(Target.LIGHT_MUTED)
-    val darkMutedSwatch: Swatch? get() = getSwatchForTarget(Target.DARK_MUTED)
+    val vibrantSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.VIBRANT)
+    val lightVibrantSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.LIGHT_VIBRANT)
+    val darkVibrantSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.DARK_VIBRANT)
+    val mutedSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.MUTED)
+    val lightMutedSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.LIGHT_MUTED)
+    val darkMutedSwatch: Swatch? get() = getSwatchForTarget(PaletteTarget.DARK_MUTED)
 
     val vibrantColor: Color? get() = vibrantSwatch?.color
     val lightVibrantColor: Color? get() = lightVibrantSwatch?.color
@@ -66,32 +55,14 @@ class Palette internal constructor(
     val darkMutedColor: Color? get() = darkMutedSwatch?.color
     val dominantColor: Color? get() = dominantSwatch?.color
 
-    fun getSwatchForTarget(target: Target): Swatch? = selectedSwatches[target]
+    fun getSwatchForTarget(target: PaletteTarget): Swatch? = selectedSwatches[target]
 
-    fun getColorForTarget(target: Target, defaultColor: Int): Int =
-        getSwatchForTarget(target)?.rgb ?: defaultColor
+    fun getColorForTarget(target: PaletteTarget, defaultColor: Int): Int = getSwatchForTarget(target)?.rgb ?: defaultColor
 
-    fun getColorForTarget(target: Target, defaultColor: Color = Color.Unspecified): Color =
-        getSwatchForTarget(target)?.color ?: defaultColor
-
-    fun getVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.VIBRANT, defaultColor)
-    fun getLightVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.LIGHT_VIBRANT, defaultColor)
-    fun getDarkVibrantColor(defaultColor: Int): Int = getColorForTarget(Target.DARK_VIBRANT, defaultColor)
-    fun getMutedColor(defaultColor: Int): Int = getColorForTarget(Target.MUTED, defaultColor)
-    fun getLightMutedColor(defaultColor: Int): Int = getColorForTarget(Target.LIGHT_MUTED, defaultColor)
-    fun getDarkMutedColor(defaultColor: Int): Int = getColorForTarget(Target.DARK_MUTED, defaultColor)
-    fun getDominantColor(defaultColor: Int): Int = dominantSwatch?.rgb ?: defaultColor
-
-    fun getVibrantColor(defaultColor: Color = Color.Unspecified): Color = vibrantSwatch?.color ?: defaultColor
-    fun getLightVibrantColor(defaultColor: Color = Color.Unspecified): Color = lightVibrantSwatch?.color ?: defaultColor
-    fun getDarkVibrantColor(defaultColor: Color = Color.Unspecified): Color = darkVibrantSwatch?.color ?: defaultColor
-    fun getMutedColor(defaultColor: Color = Color.Unspecified): Color = mutedSwatch?.color ?: defaultColor
-    fun getLightMutedColor(defaultColor: Color = Color.Unspecified): Color = lightMutedSwatch?.color ?: defaultColor
-    fun getDarkMutedColor(defaultColor: Color = Color.Unspecified): Color = darkMutedSwatch?.color ?: defaultColor
-    fun getDominantColor(defaultColor: Color = Color.Unspecified): Color = dominantSwatch?.color ?: defaultColor
+    fun getColorForTarget(target: PaletteTarget, defaultColor: Color = Color.Unspecified): Color = getSwatchForTarget(target)?.color ?: defaultColor
 
     private fun generateTargets() {
-        val usedColors = mutableSetOf<Int>()
+        val usedColors: MutableSet<Int> = []
         for (target in targets) {
             val weights = target.normalizedWeights()
             var bestSwatch: Swatch? = null
@@ -99,13 +70,10 @@ class Palette internal constructor(
 
             for (swatch in swatches) {
                 val hsl = swatch.hslArray
-                if (hsl[1] < target.minimumSaturation || hsl[1] > target.maximumSaturation ||
-                    hsl[2] < target.minimumLightness || hsl[2] > target.maximumLightness ||
-                    swatch.rgb in usedColors
-                ) continue
+                if (hsl[1] < target.minimumSaturation || hsl[1] > target.maximumSaturation || hsl[2] < target.minimumLightness || hsl[2] > target.maximumLightness || swatch.rgb in usedColors) continue
 
-                val score = weights[0] * (1f - kotlin.math.abs(hsl[1] - target.targetSaturation)) +
-                    weights[1] * (1f - kotlin.math.abs(hsl[2] - target.targetLightness)) +
+                val score = weights[0] * (1f - abs(hsl[1] - target.targetSaturation)) +
+                    weights[1] * (1f - abs(hsl[2] - target.targetLightness)) +
                     weights[2] * (swatch.population / maxPopulation.coerceAtLeast(1).toFloat())
 
                 if (bestSwatch == null || score > bestScore) {
@@ -122,16 +90,12 @@ class Palette internal constructor(
     }
 
     /**
-     * 代表调色板中的一种颜色及其像素占比。
-     *
-     * [rgb] 为 ARGB 整数；[color]、[titleColor] 和 [bodyColor] 可直接用于 Compose。
+     * 代表调色板中的一种颜色及其像素占比
      */
     @Stable
-    class Swatch(
-        val rgb: Int,
-        val population: Int,
-    ) {
+    class Swatch(val rgb: Int, val population: Int) {
         internal val hslArray: FloatArray by lazy { PaletteColorUtils.rgbToHsl(rgb) }
+
         val hsl: FloatArray get() = hslArray.copyOf()
         val color: Color get() = PaletteColorUtils.toColor(rgb)
 
@@ -146,29 +110,23 @@ class Palette internal constructor(
             val lightBodyAlpha = PaletteColorUtils.calculateMinimumAlpha(WHITE, rgb, MIN_CONTRAST_BODY_TEXT)
             val lightTitleAlpha = PaletteColorUtils.calculateMinimumAlpha(WHITE, rgb, MIN_CONTRAST_TITLE_TEXT)
 
-            if (lightBodyAlpha != -1 && lightTitleAlpha != -1) {
-                return TextColors(setAlpha(WHITE, lightTitleAlpha), setAlpha(WHITE, lightBodyAlpha))
-            }
+            if (lightBodyAlpha != -1 && lightTitleAlpha != -1) return TextColors(setAlpha(WHITE, lightTitleAlpha), setAlpha(WHITE, lightBodyAlpha))
 
             val darkBodyAlpha = PaletteColorUtils.calculateMinimumAlpha(BLACK, rgb, MIN_CONTRAST_BODY_TEXT)
             val darkTitleAlpha = PaletteColorUtils.calculateMinimumAlpha(BLACK, rgb, MIN_CONTRAST_TITLE_TEXT)
 
-            if (darkBodyAlpha != -1 && darkTitleAlpha != -1) {
-                return TextColors(setAlpha(BLACK, darkTitleAlpha), setAlpha(BLACK, darkBodyAlpha))
-            }
+            if (darkBodyAlpha != -1 && darkTitleAlpha != -1) return TextColors(setAlpha(BLACK, darkTitleAlpha), setAlpha(BLACK, darkBodyAlpha))
 
             val title = if (lightTitleAlpha != -1) setAlpha(WHITE, lightTitleAlpha) else setAlpha(BLACK, darkTitleAlpha)
             val body = if (lightBodyAlpha != -1) setAlpha(WHITE, lightBodyAlpha) else setAlpha(BLACK, darkBodyAlpha)
             return TextColors(title, body)
         }
 
-        override fun equals(other: Any?): Boolean =
-            other is Swatch && rgb == other.rgb && population == other.population
+        override fun equals(other: Any?): Boolean = other is Swatch && rgb == other.rgb && population == other.population
 
         override fun hashCode(): Int = 31 * rgb + population
 
-        override fun toString(): String =
-            "Swatch [RGB: #${rgb.toUInt().toString(16)}] [HSL: ${hsl.contentToString()}] [Population: $population]"
+        override fun toString(): String = "Swatch [RGB: #${rgb.toUInt().toString(16)}] [HSL: ${hsl.contentToString()}] [Population: $population]"
 
         private data class TextColors(val title: Int, val body: Int)
 
@@ -182,38 +140,32 @@ class Palette internal constructor(
         }
     }
 
-    /** 控制量化阶段允许进入调色板的颜色。 */
+    /** 控制量化阶段允许进入调色板的颜色 */
     fun interface Filter {
         fun isAllowed(rgb: Int, hsl: FloatArray): Boolean
     }
 
-    fun interface PaletteAsyncListener {
-        fun onGenerated(palette: Palette?)
-    }
-
     /**
-     * 调色板配置 DSL。
-     *
-     * 使用 [Palette.from] 创建 Builder，在配置块中声明采样参数、过滤器和目标色。
+     * 调色板配置 DSL
      */
     @PaletteDsl
     class Builder private constructor(
         private val bitmap: ImageBitmap?,
         private val inputSwatches: List<Swatch>?,
     ) {
-        private val targets = mutableListOf<Target>()
-        private val filters = mutableListOf(DEFAULT_FILTER)
+        private val targets: MutableList<PaletteTarget> = []
+        private val filters: MutableList<Filter> = [DEFAULT_FILTER]
         private var resizeArea = DEFAULT_RESIZE_BITMAP_AREA
         private var selectedRegion: Region? = null
 
-        /** 最大保留颜色数量，默认 16。 */
+        // 最大保留颜色数量，默认 16
         var maximumColorCount = DEFAULT_CALCULATE_NUMBER_COLORS
             set(value) {
                 require(value > 0) { "maximumColorCount must be greater than zero." }
                 field = value
             }
 
-        /** 采样像素总面积上限，默认 112×112。 */
+        // 采样像素总面积上限，默认 112×112
         var resizeBitmapArea: Int
             get() = resizeArea
             set(value) {
@@ -222,87 +174,56 @@ class Palette internal constructor(
             }
 
         internal constructor(bitmap: ImageBitmap) : this(bitmap, null) {
-            targets += Target.DEFAULT_TARGETS
+            targets += PaletteTarget.DEFAULT_TARGETS
         }
 
         internal constructor(swatches: List<Swatch>) : this(null, swatches.toList()) {
             require(swatches.isNotEmpty()) { "List of swatches must not be empty." }
         }
 
-        /** 添加颜色过滤器。 */
         fun filter(filter: Filter) {
             filters += filter
         }
 
-        /** 移除默认过滤器及此前添加的过滤器。 */
         fun clearFilters() {
             filters.clear()
         }
 
-        /** 限定采样区域，坐标以原始 ImageBitmap 为准。 */
         fun region(left: Int, top: Int, right: Int, bottom: Int) {
             val source = bitmap ?: return
             val clippedLeft = left.coerceAtLeast(0)
             val clippedTop = top.coerceAtLeast(0)
             val clippedRight = right.coerceAtMost(source.width)
             val clippedBottom = bottom.coerceAtMost(source.height)
-            require(clippedLeft < clippedRight && clippedTop < clippedBottom) {
-                "The given region must intersect with the ImageBitmap dimensions."
-            }
+
+            require(clippedLeft < clippedRight && clippedTop < clippedBottom) { "The given region must intersect with the ImageBitmap dimensions." }
+
             selectedRegion = Region(clippedLeft, clippedTop, clippedRight, clippedBottom)
         }
 
-        /** 清除采样区域限制。 */
         fun clearRegion() {
             selectedRegion = null
         }
 
-        /** 添加一个预定义或已构建的目标色。 */
-        fun target(target: Target) {
+        fun target(target: PaletteTarget) {
             if (target !in targets) targets += target
         }
 
-        /** 通过 DSL 配置并添加自定义目标色。 */
-        fun target(block: Target.Builder.() -> Unit) {
-            target(Target(block))
+        fun target(block: PaletteTarget.Builder.() -> Unit) {
+            target(PaletteTarget(block))
         }
 
-        /** 清除所有目标色。 */
         fun clearTargets() {
             targets.clear()
         }
 
-        /**
-         * 同步生成调色板。图像分析是 CPU 密集操作，不应在 UI 线程调用。
-         */
-        fun generate(): Palette {
-            val source = bitmap
-            if (source == null) return Palette(inputSwatches.orEmpty(), targets)
+        suspend fun generate(): Palette = Coroutines.cpu {
+            val source = bitmap ?: return@cpu Palette(inputSwatches.orEmpty(), targets)
 
             val pixels = extractPixels(source)
             val swatches = ColorCutQuantizer(pixels.values, maximumColorCount, filters).quantize()
-            return Palette(swatches, targets)
+            Palette(swatches, targets)
         }
-
-        /** 在 [Dispatchers.Default] 上生成调色板，调用方可直接从协程中使用。 */
-        suspend fun generateAsync(): Palette = withContext(Dispatchers.Default) { generate() }
-
-        /**
-         * 在 [scope] 中异步生成调色板。发生生成错误时，监听器收到 null。
-         */
-        fun generate(scope: CoroutineScope, listener: PaletteAsyncListener): Job = scope.launch {
-            val result = try {
-                generateAsync()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (_: Throwable) {
-                null
-            }
-            listener.onGenerated(result)
-        }
-
-        /** 与 [generate] 相同，但使用异步 API 命名。 */
-        fun generateAsync(scope: CoroutineScope, listener: PaletteAsyncListener): Job = generate(scope, listener)
 
         private fun extractPixels(source: ImageBitmap): PixelData {
             val sourceWidth = source.width
@@ -337,18 +258,15 @@ class Palette internal constructor(
         }
 
         private data class Region(val left: Int, val top: Int, val right: Int, val bottom: Int)
-        private data class PixelData(val values: IntArray, val width: Int, val height: Int)
+
+        private class PixelData(val values: IntArray, val width: Int, val height: Int)
     }
 
     companion object {
         private const val DEFAULT_FILTER_BLACK_MAX_LIGHTNESS = 0.05f
         private const val DEFAULT_FILTER_WHITE_MIN_LIGHTNESS = 0.95f
-
-        /** 默认量化采样面积，112×112。 */
-        const val DEFAULT_RESIZE_BITMAP_AREA = 112 * 112
-
-        /** 默认生成 16 种代表色。 */
-        const val DEFAULT_CALCULATE_NUMBER_COLORS = 16
+        const val DEFAULT_RESIZE_BITMAP_AREA = 112 * 112 // 默认量化采样面积，112×112
+        const val DEFAULT_CALCULATE_NUMBER_COLORS = 16 // 默认生成 16 种代表色
 
         private val DEFAULT_FILTER = Filter { _, hsl ->
             val isBlack = hsl[2] <= DEFAULT_FILTER_BLACK_MAX_LIGHTNESS
@@ -357,19 +275,7 @@ class Palette internal constructor(
             !isBlack && !isWhite && !isNearRedILine
         }
 
-        fun from(bitmap: ImageBitmap, block: Builder.() -> Unit = {}): Builder = Builder(bitmap).apply(block)
-
-        fun from(swatches: List<Swatch>): Palette = Builder(swatches).generate()
-
-        fun generate(bitmap: ImageBitmap): Palette = from(bitmap).generate()
-
-        fun generate(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
-            from(bitmap) { this.maximumColorCount = maximumColorCount }.generate()
-
-        suspend fun generateAsync(bitmap: ImageBitmap): Palette = from(bitmap).generateAsync()
-
-        suspend fun generateAsync(bitmap: ImageBitmap, maximumColorCount: Int): Palette =
-            from(bitmap) { this.maximumColorCount = maximumColorCount }.generateAsync()
+        fun from(bitmap: ImageBitmap, block: Builder.() -> Unit = { }): Builder = Builder(bitmap).apply(block)
     }
 }
 

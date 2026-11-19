@@ -48,7 +48,10 @@ rachel {
             }
 
             commonTest {
-                lib(libs.test)
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test,
+                )
             }
 
             appleMain(commonMain)

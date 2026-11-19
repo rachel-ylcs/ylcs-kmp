@@ -6,12 +6,6 @@ import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.roundToLong
 
-/**
- * HSV color packed into a [Long].
- *
- * Hue occupies 22 bits in the range 0..360; saturation and value each occupy 21 bits in the range 0..1.
- * The constructor quantizes these components to their packed precision.
- */
 @Stable
 @JvmInline
 value class HSV(val packedValue: Long) {
@@ -34,19 +28,38 @@ value class HSV(val packedValue: Long) {
         var b = 0f
 
         when {
-            hue < 60f -> { r = c; g = x }
-            hue < 120f -> { r = x; g = c }
-            hue < 180f -> { g = c; b = x }
-            hue < 240f -> { g = x; b = c }
-            hue < 300f -> { r = x; b = c }
-            else -> { r = c; b = x }
+            hue < 60f -> {
+                r = c
+                g = x
+            }
+            hue < 120f -> {
+                r = x
+                g = c
+            }
+            hue < 180f -> {
+                g = c
+                b = x
+            }
+            hue < 240f -> {
+                g = x
+                b = c
+            }
+            hue < 300f -> {
+                r = x
+                b = c
+            }
+            else -> {
+                r = c
+                b = x
+            }
         }
 
         return Color(r + m, g + m, b + m)
     }
 
-    fun copy(hue: Float = this.hue, saturation: Float = this.saturation, value: Float = this.value): HSV =
-        HSV(hue, saturation, value)
+    private fun unpack(shift: Int, mask: Long, maximum: Int): Float = ((packedValue ushr shift) and mask).toFloat() / maximum
+
+    fun copy(hue: Float = this.hue, saturation: Float = this.saturation, value: Float = this.value): HSV = HSV(hue, saturation, value)
 
     operator fun component1(): Float = hue
     operator fun component2(): Float = saturation
@@ -54,19 +67,16 @@ value class HSV(val packedValue: Long) {
 
     override fun toString(): String = "HSV(hue=$hue, saturation=$saturation, value=$value)"
 
-    private fun unpack(shift: Int, mask: Long, maximum: Int): Float =
-        ((packedValue ushr shift) and mask).toFloat() / maximum
+    companion object {
+        private const val HUE_SHIFT = 42
+        private const val SATURATION_SHIFT = 21
+        private const val VALUE_SHIFT = 0
+        private const val HUE_MAX = 0x3FFFFF
+        private const val CHANNEL_MAX = 0x1FFFFF
+        private const val HUE_MASK = 0x3FFFFFL
+        private const val CHANNEL_MASK = 0x1FFFFFL
 
-    private companion object {
-        const val HUE_SHIFT = 42
-        const val SATURATION_SHIFT = 21
-        const val VALUE_SHIFT = 0
-        const val HUE_MAX = 0x3FFFFF
-        const val CHANNEL_MAX = 0x1FFFFF
-        const val HUE_MASK = 0x3FFFFFL
-        const val CHANNEL_MASK = 0x1FFFFFL
-
-        fun pack(hue: Float, saturation: Float, value: Float): Long {
+        private fun pack(hue: Float, saturation: Float, value: Float): Long {
             require(hue in 0f..360f) { "Hue must be in the range 0..360." }
             require(saturation in 0f..1f) { "Saturation must be in the range 0..1." }
             require(value in 0f..1f) { "Value must be in the range 0..1." }
@@ -77,27 +87,23 @@ value class HSV(val packedValue: Long) {
 
             return (hueBits shl HUE_SHIFT) or (saturationBits shl SATURATION_SHIFT) or valueBits
         }
+
+        operator fun invoke(color: Color): HSV {
+            val r = color.red
+            val g = color.green
+            val b = color.blue
+            val max = maxOf(r, g, b)
+            val min = minOf(r, g, b)
+            val delta = max - min
+
+            val h = when {
+                delta == 0f -> 0f
+                max == r -> ((g - b) / delta) % 6
+                max == g -> ((b - r) / delta) + 2
+                else -> ((r - g) / delta) + 4
+            } * 60
+
+            return HSV(hue = if (h < 0) h + 360 else h, saturation = if (max == 0f) 0f else delta / max, value = max)
+        }
     }
-}
-
-val Color.hsv: HSV get() {
-    val r = red
-    val g = green
-    val b = blue
-    val max = maxOf(r, g, b)
-    val min = minOf(r, g, b)
-    val delta = max - min
-
-    val h = when {
-        delta == 0f -> 0f
-        max == r -> ((g - b) / delta) % 6
-        max == g -> ((b - r) / delta) + 2
-        else -> ((r - g) / delta) + 4
-    } * 60
-
-    return HSV(
-        hue = if (h < 0) h + 360 else h,
-        saturation = if (max == 0f) 0f else delta / max,
-        value = max
-    )
 }

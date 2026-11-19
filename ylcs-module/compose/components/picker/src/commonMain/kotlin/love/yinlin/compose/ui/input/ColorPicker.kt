@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -27,7 +28,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.HSV
-import love.yinlin.compose.graphics.hsv
 import love.yinlin.compose.ui.layout.MeasurePolicies
 
 @Composable
@@ -37,31 +37,39 @@ private fun ValueSlider(
     onFinished: () -> Unit
 ) {
     val brush = remember(hsv) { Brush.verticalGradient(colors = [HSV(hsv.hue, hsv.saturation, 1f).color, Colors.Black]) }
+    val onValueChangeUpdate by rememberUpdatedState(onValueChange)
+    val onFinishedUpdate by rememberUpdatedState(onFinished)
 
-    Layout(modifier = Modifier.pointerInput(Unit) {
-        detectDragGestures(
-            onDrag = { change, _ -> onValueChange(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
-            onDragEnd = onFinished
-        )
-    }.pointerInput(Unit) {
-        detectTapGestures { offset ->
-            onValueChange(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
-            onFinished()
-        }
-    }.drawWithContent {
-        val [w, h] = size
-        val height = h * 0.05f
+    Layout(
+        modifier = Modifier.pointerInput(Unit) {
+            detectDragGestures(
+                onDrag = { change, _ -> onValueChangeUpdate(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
+                onDragEnd = onFinishedUpdate
+            )
+        }.pointerInput(Unit) {
+            detectTapGestures { offset ->
+                onValueChangeUpdate(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
+                onFinishedUpdate()
+            }
+        }.drawWithContent {
+            val [w, h] = size
+            val height = h * 0.05f
 
-        drawRect(brush)
-        drawRoundRect(
-            color = Colors.White,
-            topLeft = Offset(0f, ((1 - hsv.value) * h - height / 2).fastCoerceIn(0f, h - height)),
-            size = Size(w, height),
-            cornerRadius = CornerRadius(height / 4),
-            style = Stroke(width = height / 4)
-        )
-    }, measurePolicy = MeasurePolicies.Empty)
+            drawRect(brush)
+            drawRoundRect(
+                color = Colors.White,
+                topLeft = Offset(0f, ((1 - hsv.value) * h - height / 2).fastCoerceIn(0f, h - height)),
+                size = Size(w, height),
+                cornerRadius = CornerRadius(height / 4),
+                style = Stroke(width = height / 4)
+            )
+        },
+        measurePolicy = MeasurePolicies.Empty
+    )
 }
+
+private val HueBrush = Brush.horizontalGradient(colors = List(7) { i -> HSV(i * 60f, 1f, 1f).color })
+private val SaturationBrush = Brush.verticalGradient(colors = [Colors.Transparent, Colors.White])
 
 @Composable
 private fun SpectrumArea(
@@ -69,42 +77,41 @@ private fun SpectrumArea(
     onHsvChange: (Float, Float) -> Unit,
     onFinished: () -> Unit
 ) {
-    val hueBrush = remember {
-        Brush.horizontalGradient(colors = List(7) { i -> HSV(i * 60f, 1f, 1f).color })
-    }
-    val saturationBrush = remember {
-        Brush.verticalGradient(colors = [Colors.Transparent, Colors.White])
-    }
+    val onHsvChangeUpdate by rememberUpdatedState(onHsvChange)
+    val onFinishedUpdate by rememberUpdatedState(onFinished)
 
-    Layout(modifier = Modifier.pointerInput(Unit) {
-        detectDragGestures(
-            onDrag = { change, _ ->
-                onHsvChange((change.position.x / size.width).fastCoerceIn(0f, 1f) * 360, 1 - (change.position.y / size.height).fastCoerceIn(0f, 1f))
-            },
-            onDragEnd = onFinished
-        )
-    }.pointerInput(Unit) {
-        detectTapGestures { offset ->
-            val h = (offset.x / size.width).fastCoerceIn(0f, 1f) * 360f
-            val s = 1f - (offset.y / size.height).fastCoerceIn(0f, 1f)
-            onHsvChange(h, s)
-            onFinished()
-        }
-    }.drawWithContent {
-        clipRect {
-            drawRect(brush = hueBrush)
-            drawRect(brush = saturationBrush)
+    Layout(
+        modifier = Modifier.pointerInput(Unit) {
+            detectDragGestures(
+                onDrag = { change, _ ->
+                    onHsvChangeUpdate((change.position.x / size.width).fastCoerceIn(0f, 1f) * 360, 1 - (change.position.y / size.height).fastCoerceIn(0f, 1f))
+                },
+                onDragEnd = onFinishedUpdate
+            )
+        }.pointerInput(Unit) {
+            detectTapGestures { offset ->
+                val h = (offset.x / size.width).fastCoerceIn(0f, 1f) * 360f
+                val s = 1f - (offset.y / size.height).fastCoerceIn(0f, 1f)
+                onHsvChangeUpdate(h, s)
+                onFinishedUpdate()
+            }
+        }.drawWithContent {
+            clipRect {
+                drawRect(brush = HueBrush)
+                drawRect(brush = SaturationBrush)
 
-            val x = (hsv.hue / 360f) * size.width
-            val y = (1f - hsv.saturation) * size.height
-            val boxSize = minOf(size.width, size.height) * 0.05f
-            val center = Offset(x, y)
-            val stroke = Stroke(width = boxSize * 0.25f)
+                val x = (hsv.hue / 360f) * size.width
+                val y = (1f - hsv.saturation) * size.height
+                val boxSize = minOf(size.width, size.height) * 0.05f
+                val center = Offset(x, y)
+                val stroke = Stroke(width = boxSize * 0.25f)
 
-            drawCircle(color = Colors.Black, radius = boxSize * 1.1f, center = center, style = stroke)
-            drawCircle(color = Colors.White, radius = boxSize, center = center, style = stroke)
-        }
-    }, measurePolicy = MeasurePolicies.Empty)
+                drawCircle(color = Colors.Black, radius = boxSize * 1.1f, center = center, style = stroke)
+                drawCircle(color = Colors.White, radius = boxSize, center = center, style = stroke)
+            }
+        },
+        measurePolicy = MeasurePolicies.Empty
+    )
 }
 
 @Composable
@@ -117,44 +124,49 @@ private fun AlphaSlider(
 ) {
     val brush = remember(color) { Brush.verticalGradient(colors = [color.copy(alpha = 1f), Colors.Transparent]) }
     val disabledContainer = Theme.color.disabledContainer
+    val onAlphaChangeUpdate by rememberUpdatedState(onAlphaChange)
+    val onFinishedUpdate by rememberUpdatedState(onFinished)
 
-    Layout(modifier = Modifier.pointerInput(enabled) {
-        if (enabled) {
-            detectDragGestures(
-                onDrag = { change, _ -> onAlphaChange(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
-                onDragEnd = onFinished
+    Layout(
+        modifier = Modifier.pointerInput(enabled) {
+            if (enabled) {
+                detectDragGestures(
+                    onDrag = { change, _ -> onAlphaChangeUpdate(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
+                    onDragEnd = onFinishedUpdate
+                )
+            }
+        }.pointerInput(enabled) {
+            if (enabled) {
+                detectTapGestures { offset ->
+                    onAlphaChangeUpdate(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
+                    onFinishedUpdate()
+                }
+            }
+        }.drawWithContent {
+            val [w, h] = size
+            val height = h * 0.05f
+            val tipSize = height / 2
+            val tipBounds = Size(tipSize, tipSize)
+
+            for (y in 0 ..< (h / tipSize).toInt()) {
+                for (x in 0 ..< (w / tipSize).toInt()) {
+                    if ((x + y) % 2 == 0) drawRect(color = Colors.Gray5, topLeft = Offset(x * tipSize, y * tipSize), size = tipBounds)
+                }
+            }
+
+            drawRect(brush)
+
+            if (!enabled) drawRect(disabledContainer)
+            else drawRoundRect(
+                color = Colors.White,
+                topLeft = Offset(0f, ((1 - alpha) * h - height / 2).fastCoerceIn(0f, h - height)),
+                size = Size(w, height),
+                cornerRadius = CornerRadius(height / 4),
+                style = Stroke(width = height / 4)
             )
-        }
-    }.pointerInput(enabled) {
-        if (enabled) {
-            detectTapGestures { offset ->
-                onAlphaChange(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
-                onFinished()
-            }
-        }
-    }.drawWithContent {
-        val [w, h] = size
-        val height = h * 0.05f
-        val tipSize = height / 2
-        val tipBounds = Size(tipSize, tipSize)
-
-        for (y in 0 ..< (h / tipSize).toInt()) {
-            for (x in 0 ..< (w / tipSize).toInt()) {
-                if ((x + y) % 2 == 0) drawRect(color = Colors.Gray5, topLeft = Offset(x * tipSize, y * tipSize), size = tipBounds)
-            }
-        }
-
-        drawRect(brush)
-
-        if (!enabled) drawRect(disabledContainer)
-        else drawRoundRect(
-            color = Colors.White,
-            topLeft = Offset(0f, ((1 - alpha) * h - height / 2).fastCoerceIn(0f, h - height)),
-            size = Size(w, height),
-            cornerRadius = CornerRadius(height / 4),
-            style = Stroke(width = height / 4)
-        )
-    }, measurePolicy = MeasurePolicies.Empty)
+        },
+        measurePolicy = MeasurePolicies.Empty
+    )
 }
 
 @Composable
@@ -165,8 +177,10 @@ fun ColorPicker(
     enableAlpha: Boolean = true,
     onColorChanged: ((Color) -> Unit)? = null,
 ) {
-    var currentHsv by rememberValueState(initColor.hsv)
+    var currentHsv by rememberValueState(HSV(initColor))
     var currentAlpha by rememberState { initColor.alpha }
+    val onColorChangeFinishedUpdate by rememberUpdatedState(onColorChangeFinished)
+    val onColorChangedUpdate by rememberUpdatedState(onColorChanged)
 
     Layout(
         modifier = modifier.defaultMinSize(minWidth = 200.dp, minHeight = 150.dp).border(Theme.border.v10, Theme.color.outline),
@@ -176,9 +190,9 @@ fun ColorPicker(
                 onValueChange = {
                     val newHsv = HSV(currentHsv.hue, currentHsv.saturation, it)
                     currentHsv = newHsv
-                    onColorChanged?.invoke(newHsv.color.copy(alpha = currentAlpha))
+                    onColorChangedUpdate?.invoke(newHsv.color.copy(alpha = currentAlpha))
                 },
-                onFinished = { onColorChangeFinished(currentHsv.color.copy(alpha = currentAlpha)) }
+                onFinished = { onColorChangeFinishedUpdate(currentHsv.color.copy(alpha = currentAlpha)) }
             )
 
             SpectrumArea(
@@ -186,9 +200,9 @@ fun ColorPicker(
                 onHsvChange = { h, s ->
                     val newHsv = HSV(h, s, currentHsv.value)
                     currentHsv = newHsv
-                    onColorChanged?.invoke(newHsv.color.copy(alpha = currentAlpha))
+                    onColorChangedUpdate?.invoke(newHsv.color.copy(alpha = currentAlpha))
                 },
-                onFinished = { onColorChangeFinished(currentHsv.color.copy(alpha = currentAlpha)) }
+                onFinished = { onColorChangeFinishedUpdate(currentHsv.color.copy(alpha = currentAlpha)) }
             )
 
             AlphaSlider(
@@ -197,9 +211,9 @@ fun ColorPicker(
                 enabled = enableAlpha,
                 onAlphaChange = { alpha ->
                     currentAlpha = alpha
-                    onColorChanged?.invoke(currentHsv.color.copy(alpha = alpha))
+                    onColorChangedUpdate?.invoke(currentHsv.color.copy(alpha = alpha))
                 },
-                onFinished = { onColorChangeFinished(currentHsv.color.copy(alpha = currentAlpha)) }
+                onFinished = { onColorChangeFinishedUpdate(currentHsv.color.copy(alpha = currentAlpha)) }
             )
         }
     ) { measurables, constraints ->

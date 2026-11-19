@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package love.yinlin.compose.ui.container
 
-import kotlin.math.max
-import kotlin.math.min
-
 /**
- * 基于 AndroidX Palette ColorCutQuantizer 的 5-bit RGB 中值切分量化器。
+ * 基于 AndroidX Palette ColorCutQuantizer 的 5-bit RGB 中值切分量化器
  *
- * 使用 32³ 色彩直方图和按颜色空间体积优先切分的 Vbox，避免引入平台图像 API。
+ * 使用 32³ 色彩直方图和按颜色空间体积优先切分的 Vbox，避免引入平台图像 API
  */
 internal class ColorCutQuantizer(
     pixels: IntArray,
@@ -62,9 +58,11 @@ internal class ColorCutQuantizer(
         }
 
         val boxes = mutableListOf(Vbox(0, colors.lastIndex))
+
         while (boxes.size < maximumColorCount) {
             var largestIndex = -1
             var largestVolume = Int.MIN_VALUE
+
             for (index in boxes.indices) {
                 val box = boxes[index]
                 if (box.volume > largestVolume) {
@@ -74,6 +72,7 @@ internal class ColorCutQuantizer(
             }
 
             if (largestIndex < 0) break
+
             val box = boxes.removeAt(largestIndex)
             if (!box.canSplit) {
                 boxes += box
@@ -100,10 +99,7 @@ internal class ColorCutQuantizer(
         return false
     }
 
-    private inner class Vbox(
-        private var lowerIndex: Int,
-        private var upperIndex: Int,
-    ) {
+    private inner class Vbox(private var lowerIndex: Int, private var upperIndex: Int) {
         private var population = 0
         private var minimumRed = 0
         private var maximumRed = 0
@@ -112,11 +108,9 @@ internal class ColorCutQuantizer(
         private var minimumBlue = 0
         private var maximumBlue = 0
 
-        val volume: Int
-            get() = (maximumRed - minimumRed + 1) * (maximumGreen - minimumGreen + 1) * (maximumBlue - minimumBlue + 1)
+        val volume: Int get() = (maximumRed - minimumRed + 1) * (maximumGreen - minimumGreen + 1) * (maximumBlue - minimumBlue + 1)
 
-        val canSplit: Boolean
-            get() = upperIndex > lowerIndex
+        val canSplit: Boolean get() = upperIndex > lowerIndex
 
         init {
             fitBox()
@@ -139,12 +133,12 @@ internal class ColorCutQuantizer(
                 val green = quantizedGreen(color)
                 val blue = quantizedBlue(color)
 
-                minRed = min(minRed, red)
-                minGreen = min(minGreen, green)
-                minBlue = min(minBlue, blue)
-                maxRed = max(maxRed, red)
-                maxGreen = max(maxGreen, green)
-                maxBlue = max(maxBlue, blue)
+                minRed = minOf(minRed, red)
+                minGreen = minOf(minGreen, green)
+                minBlue = minOf(minBlue, blue)
+                maxRed = maxOf(maxRed, red)
+                maxGreen = maxOf(maxGreen, green)
+                maxBlue = maxOf(maxBlue, blue)
             }
 
             minimumRed = minRed
@@ -168,12 +162,8 @@ internal class ColorCutQuantizer(
 
         private fun findSplitPoint(): Int {
             val longestDimension = when {
-                maximumRed - minimumRed >= maximumGreen - minimumGreen &&
-                    maximumRed - minimumRed >= maximumBlue - minimumBlue -> COMPONENT_RED
-
-                maximumGreen - minimumGreen >= maximumRed - minimumRed &&
-                    maximumGreen - minimumGreen >= maximumBlue - minimumBlue -> COMPONENT_GREEN
-
+                maximumRed - minimumRed >= maximumGreen - minimumGreen && maximumRed - minimumRed >= maximumBlue - minimumBlue -> COMPONENT_RED
+                maximumGreen - minimumGreen >= maximumRed - minimumRed && maximumGreen - minimumGreen >= maximumBlue - minimumBlue -> COMPONENT_GREEN
                 else -> COMPONENT_BLUE
             }
 
@@ -183,10 +173,12 @@ internal class ColorCutQuantizer(
 
             val midpoint = population / 2
             var count = 0
+
             for (index in lowerIndex..upperIndex) {
                 count += histogram[colors[index]]
-                if (count >= midpoint) return min(upperIndex - 1, index)
+                if (count >= midpoint) return minOf(upperIndex - 1, index)
             }
+
             return lowerIndex
         }
 
@@ -208,6 +200,7 @@ internal class ColorCutQuantizer(
             val red = redSum / totalPopulation
             val green = greenSum / totalPopulation
             val blue = blueSum / totalPopulation
+
             return Palette.Swatch(approximateToRgb888(red, green, blue), totalPopulation)
         }
     }
@@ -220,21 +213,17 @@ internal class ColorCutQuantizer(
     }
 
     private fun approximateToRgb888(color: Int): Int = approximateToRgb888(
-        quantizedRed(color),
-        quantizedGreen(color),
-        quantizedBlue(color),
+        red = quantizedRed(color),
+        green = quantizedGreen(color),
+        blue = quantizedBlue(color),
     )
 
-    private fun approximateToRgb888(red: Int, green: Int, blue: Int): Int =
-        0xFF000000.toInt() or
-            (modifyWordWidth(red, QUANTIZE_WORD_WIDTH, 8) shl 16) or
-            (modifyWordWidth(green, QUANTIZE_WORD_WIDTH, 8) shl 8) or
-            modifyWordWidth(blue, QUANTIZE_WORD_WIDTH, 8)
+    private fun approximateToRgb888(red: Int, green: Int, blue: Int): Int = 0xFF000000.toInt() or (modifyWordWidth(red, QUANTIZE_WORD_WIDTH) shl 16) or (modifyWordWidth(green, QUANTIZE_WORD_WIDTH) shl 8) or modifyWordWidth(blue, QUANTIZE_WORD_WIDTH)
 
-    private fun modifyWordWidth(value: Int, currentWidth: Int, targetWidth: Int): Int {
-        val shifted = if (targetWidth > currentWidth) value shl (targetWidth - currentWidth)
-        else value shr (currentWidth - targetWidth)
-        return shifted and ((1 shl targetWidth) - 1)
+    private fun modifyWordWidth(value: Int, currentWidth: Int): Int {
+        val shifted = if (WORD_WIDTH > currentWidth) value shl (WORD_WIDTH - currentWidth)
+        else value shr (currentWidth - WORD_WIDTH)
+        return shifted and ((1 shl WORD_WIDTH) - 1)
     }
 
     private fun quantizedRed(color: Int): Int = (color shr (QUANTIZE_WORD_WIDTH * 2)) and QUANTIZE_WORD_MASK
@@ -243,16 +232,13 @@ internal class ColorCutQuantizer(
 
     private fun modifySignificantOctet(array: IntArray, dimension: Int, lower: Int, upper: Int) {
         when (dimension) {
-            COMPONENT_GREEN -> for (index in lower..upper) {
+            COMPONENT_GREEN -> for (index in lower .. upper) {
                 val color = array[index]
-                array[index] = (quantizedGreen(color) shl (QUANTIZE_WORD_WIDTH * 2)) or
-                    (quantizedRed(color) shl QUANTIZE_WORD_WIDTH) or quantizedBlue(color)
+                array[index] = (quantizedGreen(color) shl (QUANTIZE_WORD_WIDTH * 2)) or (quantizedRed(color) shl QUANTIZE_WORD_WIDTH) or quantizedBlue(color)
             }
-
-            COMPONENT_BLUE -> for (index in lower..upper) {
+            COMPONENT_BLUE -> for (index in lower .. upper) {
                 val color = array[index]
-                array[index] = (quantizedBlue(color) shl (QUANTIZE_WORD_WIDTH * 2)) or
-                    (quantizedGreen(color) shl QUANTIZE_WORD_WIDTH) or quantizedRed(color)
+                array[index] = (quantizedBlue(color) shl (QUANTIZE_WORD_WIDTH * 2)) or (quantizedGreen(color) shl QUANTIZE_WORD_WIDTH) or quantizedRed(color)
             }
         }
     }
@@ -263,5 +249,6 @@ internal class ColorCutQuantizer(
         const val COMPONENT_RED = -3
         const val COMPONENT_GREEN = -2
         const val COMPONENT_BLUE = -1
+        const val WORD_WIDTH = 8
     }
 }

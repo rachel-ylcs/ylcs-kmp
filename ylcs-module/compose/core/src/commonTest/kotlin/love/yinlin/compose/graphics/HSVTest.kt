@@ -43,7 +43,7 @@ class HSVTest {
         ]
 
         for (color in colors) {
-            val restored = color.hsv.color
+            val restored = HSV(color).color
             assertEquals(color.red, restored.red, 0.00001f)
             assertEquals(color.green, restored.green, 0.00001f)
             assertEquals(color.blue, restored.blue, 0.00001f)

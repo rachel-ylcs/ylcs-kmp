@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package love.yinlin.compose.ui.container
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
+@Stable
 internal object PaletteColorUtils {
     fun rgbToHsl(rgb: Int): FloatArray = FloatArray(3).also { rgbToHsl(rgb, it) }
 
@@ -60,14 +61,6 @@ internal object PaletteColorUtils {
         blue = (argb and 0xFF) / 255f,
         alpha = ((argb ushr 24) and 0xFF) / 255f,
     )
-
-    fun toArgb(color: Color): Int {
-        val alpha = (color.alpha * 255f + 0.5f).toInt().coerceIn(0, 255)
-        val red = (color.red * 255f + 0.5f).toInt().coerceIn(0, 255)
-        val green = (color.green * 255f + 0.5f).toInt().coerceIn(0, 255)
-        val blue = (color.blue * 255f + 0.5f).toInt().coerceIn(0, 255)
-        return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
-    }
 
     fun calculateMinimumAlpha(foreground: Int, background: Int, minimumContrast: Float): Int {
         if ((background ushr 24) != 0xFF) return -1
@@ -117,16 +110,10 @@ internal object PaletteColorUtils {
         fun compositeComponent(foregroundShift: Int): Int {
             val foregroundComponent = (foreground shr foregroundShift) and 0xFF
             val backgroundComponent = (background shr foregroundShift) and 0xFF
-            return (
-                foregroundComponent * foregroundAlpha * 255 +
-                    backgroundComponent * backgroundAlpha * (255 - foregroundAlpha)
-                ) / (outputAlpha * 255)
+            return (foregroundComponent * foregroundAlpha * 255 + backgroundComponent * backgroundAlpha * (255 - foregroundAlpha)) / (outputAlpha * 255)
         }
 
-        return (outputAlpha shl 24) or
-            (compositeComponent(16) shl 16) or
-            (compositeComponent(8) shl 8) or
-            compositeComponent(0)
+        return (outputAlpha shl 24) or (compositeComponent(16) shl 16) or (compositeComponent(8) shl 8) or compositeComponent(0)
     }
 
     private fun setAlpha(color: Int, alpha: Int): Int = (color and 0x00FFFFFF) or (alpha shl 24)
