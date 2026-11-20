@@ -1,0 +1,2941 @@
+{
+    "id": "2033",
+    "duration": 295171,
+    "chorus": [
+        {
+            "start": 66190,
+            "end": 66190
+        },
+        {
+            "start": 135800,
+            "end": 135800
+        },
+        {
+            "start": 200940,
+            "end": 200940
+        },
+        {
+            "start": 248440,
+            "end": 248440
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "梦独吟 - 银临",
+            "start": 0,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1465,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 2930,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吟",
+                    "end": 4395,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "-",
+                    "end": 7325,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 10255,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 11720,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "繁花落飘零几度",
+            "start": 11728,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "繁",
+                    "end": 278,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 573,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 815,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飘",
+                    "end": 1286,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "零",
+                    "end": 1664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 2036,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "度",
+                    "end": 2642,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "昨夜梦回首衣轻拂",
+            "start": 14377,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "昨",
+                    "end": 527,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 832,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1205,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 1583,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "首",
+                    "end": 1986,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "衣",
+                    "end": 2285,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 2705,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "拂",
+                    "end": 3204,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "残叶舞纷飞何处",
+            "start": 17796,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叶",
+                    "end": 525,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "舞",
+                    "end": 763,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "纷",
+                    "end": 1167,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 1522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1950,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2647,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "夕暮照古城人空无",
+            "start": 20450,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "夕",
+                    "end": 341,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "暮",
+                    "end": 735,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1127,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "古",
+                    "end": 1466,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 1854,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2267,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 2605,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3049,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "是你轻言低语",
+            "start": 23507,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 365,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 754,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 977,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "言",
+                    "end": 1481,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "低",
+                    "end": 1758,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "语",
+                    "end": 2502,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "风呢喃惹愁绪",
+            "start": 26597,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "呢",
+                    "end": 527,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "喃",
+                    "end": 855,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1270,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "愁",
+                    "end": 1627,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "绪",
+                    "end": 2932,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "裙袂扬红衣轻舞",
+            "start": 32479,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "裙",
+                    "end": 310,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "袂",
+                    "end": 583,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "扬",
+                    "end": 892,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 1312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "衣",
+                    "end": 1661,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 2144,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "舞",
+                    "end": 2713,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "晓月残荒城旧梦入",
+            "start": 35199,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "晓",
+                    "end": 383,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 762,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 1137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "荒",
+                    "end": 1492,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 1875,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旧",
+                    "end": 2227,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2603,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 3265,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "断垣横孤藤已枯",
+            "start": 38472,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "断",
+                    "end": 269,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "垣",
+                    "end": 548,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "横",
+                    "end": 819,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "孤",
+                    "end": 1353,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "藤",
+                    "end": 1624,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1945,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "枯",
+                    "end": 2736,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "枫婆娑楚厉迷魂逐",
+            "start": 41215,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "枫",
+                    "end": 369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "婆",
+                    "end": 766,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "娑",
+                    "end": 1047,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "楚",
+                    "end": 1435,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "厉",
+                    "end": 1821,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "迷",
+                    "end": 2150,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "魂",
+                    "end": 2562,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逐",
+                    "end": 3039,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "是你轻笑低语",
+            "start": 44262,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 318,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 680,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 964,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 1400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "低",
+                    "end": 1655,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "语",
+                    "end": 2365,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "血挥落沾夜暮",
+            "start": 47355,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "血",
+                    "end": 270,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "挥",
+                    "end": 537,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 826,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "沾",
+                    "end": 1217,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 1561,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "暮",
+                    "end": 2759,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "今昔又何昔",
+            "start": 53393,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 365,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 709,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 999,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1476,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 2409,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梦空留残影",
+            "start": 56296,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 860,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 1256,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 1569,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 2406,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 3037,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "昔月照何昔",
+            "start": 59338,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 709,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1111,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1384,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 2271,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "看天青云散",
+            "start": 61968,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 293,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 661,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 1054,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 1399,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 3863,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "月阴晴圆缺变幻皆是你容颜",
+            "start": 66470,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 425,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阴",
+                    "end": 704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "晴",
+                    "end": 1016,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "圆",
+                    "end": 1329,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "缺",
+                    "end": 1693,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "变",
+                    "end": 2069,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "幻",
+                    "end": 2486,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2818,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3182,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4404,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "容",
+                    "end": 4737,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 6297,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "独酌苦笑叹",
+            "start": 73252,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 313,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "酌",
+                    "end": 550,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "苦",
+                    "end": 818,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 1283,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叹",
+                    "end": 2357,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梦悄然已飞散",
+            "start": 76178,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 317,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "悄",
+                    "end": 568,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 933,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1319,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 1732,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 2215,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "风吹过吹落满地皆是前尘念",
+            "start": 78399,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 277,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 660,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 993,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 1291,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1661,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "满",
+                    "end": 2048,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 2439,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2756,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3114,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 4220,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 4574,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 6300,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "啊",
+            "start": 85260,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 4729,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "琴声幽幽几生渡",
+            "start": 102308,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "琴",
+                    "end": 273,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 458,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "幽",
+                    "end": 697,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "幽",
+                    "end": 1172,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 1479,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 1840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渡",
+                    "end": 2467,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "折桂嗅前尘是何途",
+            "start": 104946,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "折",
+                    "end": 312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "桂",
+                    "end": 665,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "嗅",
+                    "end": 993,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 1408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 1908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2588,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "途",
+                    "end": 3054,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梵音袅袅引归路",
+            "start": 108176,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梵",
+                    "end": 214,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 463,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "袅",
+                    "end": 674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "袅",
+                    "end": 1196,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "引",
+                    "end": 1485,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1834,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 2365,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "踟躇叹今世是何故",
+            "start": 110862,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "踟",
+                    "end": 356,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "躇",
+                    "end": 737,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叹",
+                    "end": 1013,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 1391,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 1790,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2163,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2601,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 3052,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "是你彷徨行路",
+            "start": 113922,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 287,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 882,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "彷",
+                    "end": 1090,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "徨",
+                    "end": 1405,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "行",
+                    "end": 1653,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 2285,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "一步一念一顾",
+            "start": 117007,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 222,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "步",
+                    "end": 514,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 802,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 1246,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1569,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "顾",
+                    "end": 2842,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "今昔是何昔",
+            "start": 123085,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 341,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 662,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1100,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1453,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 2286,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "残香影云乱",
+            "start": 125930,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 928,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "香",
+                    "end": 1224,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 1639,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 2415,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "乱",
+                    "end": 2861,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "昔月映何昔",
+            "start": 129045,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 422,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 662,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 1082,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1355,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 2122,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "看夕照变迁",
+            "start": 131600,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夕",
+                    "end": 709,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1150,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "变",
+                    "end": 1415,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "迁",
+                    "end": 3876,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "疾雨落落遍千山皆是你笑颜",
+            "start": 136134,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "疾",
+                    "end": 240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 683,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 965,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1366,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "遍",
+                    "end": 1736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 2104,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 2472,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2821,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3189,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4347,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 4728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 6259,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "独酌轻笑叹",
+            "start": 142823,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 409,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "酌",
+                    "end": 654,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 938,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 1326,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叹",
+                    "end": 2505,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "忆往事已成烟",
+            "start": 145955,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "忆",
+                    "end": 195,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "往",
+                    "end": 455,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 763,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1215,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 1539,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 2098,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梦飞散散落天涯都是心痴念",
+            "start": 148059,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 263,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 586,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 943,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 1299,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1702,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2069,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 2413,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 2763,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3059,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 4339,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 4636,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 6312,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "啊",
+            "start": 154992,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 4846,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "寻青踏归路",
+            "start": 186883,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "寻",
+                    "end": 291,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 572,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 929,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1330,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 2295,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "可随忘芳菲",
+            "start": 189657,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "可",
+                    "end": 704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 1118,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "忘",
+                    "end": 1619,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "芳",
+                    "end": 2279,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "菲",
+                    "end": 2850,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "月冷灯已昏",
+            "start": 192721,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 416,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "冷",
+                    "end": 643,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 1061,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1342,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "昏",
+                    "end": 2391,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "待前缘映证",
+            "start": 195375,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "待",
+                    "end": 284,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 667,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "缘",
+                    "end": 993,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 1417,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "证",
+                    "end": 5499,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "月阴晴圆缺变幻皆是你容颜",
+            "start": 201334,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 255,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阴",
+                    "end": 604,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "晴",
+                    "end": 937,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "圆",
+                    "end": 1282,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "缺",
+                    "end": 1728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "变",
+                    "end": 2074,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "幻",
+                    "end": 2434,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2809,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4292,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "容",
+                    "end": 4713,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 5871,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "独酌苦笑叹",
+            "start": 208082,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 365,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "酌",
+                    "end": 578,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "苦",
+                    "end": 817,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 1295,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叹",
+                    "end": 2316,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梦悄然已飞散",
+            "start": 211032,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 293,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "悄",
+                    "end": 541,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 896,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1282,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 1652,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 2157,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "风吹过吹落满地皆是前尘念",
+            "start": 213195,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 252,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 587,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 938,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 1302,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1690,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "满",
+                    "end": 2058,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 2436,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2778,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3044,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 4133,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 4631,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 5894,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "啊",
+            "start": 220055,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 4428,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "疾雨落落遍千山",
+            "start": 225074,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "疾",
+                    "end": 259,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 548,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 897,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1324,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "遍",
+                    "end": 1664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 2078,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 2472,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "皆是你笑颜独酌轻笑叹",
+            "start": 227553,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 335,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 697,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 1855,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2179,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 4436,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 4657,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "酌",
+                    "end": 4858,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 5092,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 5522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "叹",
+                    "end": 6666,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "忆往事已成烟梦飞散",
+            "start": 234857,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "忆",
+                    "end": 200,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "往",
+                    "end": 447,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1151,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 1531,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 1920,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2349,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 2741,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 3084,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "散落天涯都是心痴念",
+            "start": 237950,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "散",
+                    "end": 307,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 633,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1043,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 1431,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 1772,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2169,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 3273,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 3622,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 5322,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "啊",
+            "start": 243898,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 4856,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "月阴晴圆缺变换皆是你容颜",
+            "start": 248960,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阴",
+                    "end": 471,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "晴",
+                    "end": 669,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "圆",
+                    "end": 1098,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "缺",
+                    "end": 1529,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "变",
+                    "end": 1878,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "换",
+                    "end": 2298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2631,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3110,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4389,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "容",
+                    "end": 4660,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 4831,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "天涯路飘摇几生",
+            "start": 253803,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 501,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 534,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 564,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飘",
+                    "end": 595,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 628,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 658,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 689,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "昨夜梦回首已终场",
+            "start": 254499,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "昨",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 62,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 93,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 124,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "首",
+                    "end": 280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "终",
+                    "end": 784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "场",
+                    "end": 906,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "残烛曳灯尽无声",
+            "start": 255413,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 114,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烛",
+                    "end": 216,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曳",
+                    "end": 371,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 506,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 722,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 1225,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 1835,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "古月照荒城人空无",
+            "start": 257588,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "古",
+                    "end": 302,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 631,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1092,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "荒",
+                    "end": 1428,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 1801,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2281,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 2725,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3140,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "疾雨落落遍千山皆是你笑颜",
+            "start": 260736,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "疾",
+                    "end": 334,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 886,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 1281,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "遍",
+                    "end": 1519,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 1953,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 2278,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "皆",
+                    "end": 2710,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 3170,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4267,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 4583,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颜",
+                    "end": 4798,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "繁花落琴声如故",
+            "start": 265546,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "繁",
+                    "end": 499,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 531,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 561,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "琴",
+                    "end": 592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 623,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 653,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 686,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "折桂嗅今生是何途",
+            "start": 266239,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "折",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "桂",
+                    "end": 63,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "嗅",
+                    "end": 94,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 126,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 157,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 188,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 220,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "途",
+                    "end": 566,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "梵音乱血染青衣",
+            "start": 266813,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梵",
+                    "end": 208,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 445,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "乱",
+                    "end": 674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "血",
+                    "end": 981,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "染",
+                    "end": 1370,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 1739,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "衣",
+                    "end": 2505,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "此生尽已成殇",
+            "start": 269325,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 362,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 711,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 1167,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1571,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 1878,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "殇",
+                    "end": 3533,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "徒留一池悲寂",
+            "start": 281520,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "徒",
+                    "end": 356,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1239,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "池",
+                    "end": 1892,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 2541,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寂",
+                    "end": 5842,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

@@ -1,0 +1,1637 @@
+{
+    "id": "4026",
+    "duration": 245766,
+    "chorus": [
+        {
+            "start": 59820,
+            "end": 59820
+        },
+        {
+            "start": 167790,
+            "end": 167790
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "惊鸿 - 银临/逆水寒/雷火音频",
+            "start": 133,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 265,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "-",
+                    "end": 519,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 896,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 1064,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逆",
+                    "end": 1232,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 1568,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 1736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 1904,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 2072,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 2240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 2408,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "词：曹植 (魏)",
+            "start": 2541,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "词",
+                    "end": 400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曹",
+                    "end": 632,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "植",
+                    "end": 736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "(",
+                    "end": 841,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "魏",
+                    "end": 1105,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": ")",
+                    "end": 1105,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "曲：周俊成 @雷火音频",
+            "start": 3646,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 500,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 500,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "周",
+                    "end": 533,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "俊",
+                    "end": 566,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 582,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "@",
+                    "end": 598,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 631,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 697,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 731,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "演唱：银临",
+            "start": 4377,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "演",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "唱",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 132,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "编曲：周俊成 @雷火音频",
+            "start": 4509,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "编",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "周",
+                    "end": 99,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "俊",
+                    "end": 408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 658,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "@",
+                    "end": 908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 941,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 973,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 1006,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 1039,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "混音/母带：全相彦",
+            "start": 5548,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "混",
+                    "end": 34,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "母",
+                    "end": 130,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "带",
+                    "end": 369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "全",
+                    "end": 537,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 1037,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "彦",
+                    "end": 1070,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "人声录音：1NewStudio异新录音棚",
+            "start": 6618,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "录",
+                    "end": 99,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "1",
+                    "end": 164,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "N",
+                    "end": 167,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 171,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 175,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "S",
+                    "end": 178,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 182,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 186,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 189,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 193,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "异",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 265,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "录",
+                    "end": 297,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 330,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "棚",
+                    "end": 363,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "配唱制作人：九渊@雷火音频",
+            "start": 6981,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "配",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "唱",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "制",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 165,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 165,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "九",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渊",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "@",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 264,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 297,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 329,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 362,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "制作人：银临",
+            "start": 7343,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "制",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 398,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 598,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 598,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 774,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 982,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "出品：逆水寒手游/雷火音频",
+            "start": 8325,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "品",
+                    "end": 369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逆",
+                    "end": 544,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 912,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 1072,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 1248,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 1248,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 1504,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 1672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 1848,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 2388,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "翩若惊鸿",
+            "start": 10713,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 1640,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 2273,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 3896,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "婉若游龙",
+            "start": 16458,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "婉",
+                    "end": 720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 2072,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 2528,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "龙",
+                    "end": 4528,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "荣曜秋菊",
+            "start": 22146,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "荣",
+                    "end": 920,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曜",
+                    "end": 2168,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 2792,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "菊",
+                    "end": 5296,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华茂春松",
+            "start": 28282,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 912,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茂",
+                    "end": 1976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 4416,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "翩若惊鸿",
+            "start": 33730,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 1456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 2512,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 3240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 5464,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "婉若游龙",
+            "start": 40114,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "婉",
+                    "end": 1096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 2184,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 2808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "龙",
+                    "end": 5080,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "荣曜秋菊",
+            "start": 46386,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "荣",
+                    "end": 960,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曜",
+                    "end": 1890,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 2520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "菊",
+                    "end": 4728,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华茂春松",
+            "start": 52154,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 1168,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茂",
+                    "end": 2352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2904,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 5600,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "仿佛兮若轻云之蔽月",
+            "start": 60087,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "仿",
+                    "end": 265,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "佛",
+                    "end": 592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "兮",
+                    "end": 2696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 3176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 4048,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 5808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 6400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "蔽",
+                    "end": 7560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 8984,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "飘飖兮若流风之回雪",
+            "start": 71785,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "飘",
+                    "end": 840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飖",
+                    "end": 1184,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "兮",
+                    "end": 3184,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 3720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 6088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 6680,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 7112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雪",
+                    "end": 9920,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "远而望之",
+            "start": 83969,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 544,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 1032,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 1688,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2408,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "皎若太阳升 朝霞",
+            "start": 87273,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "皎",
+                    "end": 872,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 1312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "太",
+                    "end": 1776,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阳",
+                    "end": 2081,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "升",
+                    "end": 2904,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "朝",
+                    "end": 3552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "霞",
+                    "end": 6176,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "迫而察之",
+            "start": 95969,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "迫",
+                    "end": 504,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 920,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "察",
+                    "end": 1616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2968,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "灼若芙蕖出渌波",
+            "start": 99398,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "灼",
+                    "end": 304,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "芙",
+                    "end": 1048,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "蕖",
+                    "end": 1792,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 3088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渌",
+                    "end": 3616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 6336,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "翩若惊鸿",
+            "start": 142542,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 688,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 1944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 2424,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 5064,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "婉若游龙",
+            "start": 148399,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "婉",
+                    "end": 591,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 2135,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 2655,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "龙",
+                    "end": 4823,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "荣曜秋菊",
+            "start": 154198,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "荣",
+                    "end": 864,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曜",
+                    "end": 2256,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 2736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "菊",
+                    "end": 4824,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华茂春松",
+            "start": 160398,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茂",
+                    "end": 1976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 5024,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "仿佛兮若轻云之蔽月",
+            "start": 167838,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "仿",
+                    "end": 568,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "佛",
+                    "end": 984,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "兮",
+                    "end": 2696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 3512,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 4096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 6088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 6656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "蔽",
+                    "end": 7760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 8688,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "飘飖兮若流风之回雪",
+            "start": 179687,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "飘",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "飖",
+                    "end": 1128,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "兮",
+                    "end": 3168,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 3808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4193,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 6272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 6800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 7208,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雪",
+                    "end": 10329,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "远而望之",
+            "start": 191783,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 1152,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 1896,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2752,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "皎若太阳升 朝霞",
+            "start": 195583,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "皎",
+                    "end": 544,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "太",
+                    "end": 1352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阳",
+                    "end": 1768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "升",
+                    "end": 2728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "朝",
+                    "end": 3400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "霞",
+                    "end": 5944,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "迫而察之",
+            "start": 204007,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "迫",
+                    "end": 456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "察",
+                    "end": 1552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2920,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "灼若芙蕖出渌波",
+            "start": 207459,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "灼",
+                    "end": 272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 576,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "芙",
+                    "end": 1216,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "蕖",
+                    "end": 1944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 2696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渌",
+                    "end": 3352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 8464,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

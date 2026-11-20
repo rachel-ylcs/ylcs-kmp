@@ -1,0 +1,1641 @@
+{
+    "id": "1101",
+    "duration": 262805,
+    "chorus": [
+        {
+            "start": 61180,
+            "end": 61180
+        },
+        {
+            "start": 171360,
+            "end": 171360
+        },
+        {
+            "start": 211430,
+            "end": 211430
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "瓦砾生出的花朵",
+            "start": 33900,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "瓦",
+                    "end": 225,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "砾",
+                    "end": 405,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 583,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 857,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1123,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 1368,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "朵",
+                    "end": 1828,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "被火吞没来不及凋落",
+            "start": 37177,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 205,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 484,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "吞",
+                    "end": 775,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 3247,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 3473,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3670,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "及",
+                    "end": 4171,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "凋",
+                    "end": 4833,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 5462,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "侵蚀的苍穹轮廓",
+            "start": 43641,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "侵",
+                    "end": 207,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "蚀",
+                    "end": 403,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 757,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "苍",
+                    "end": 1162,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "穹",
+                    "end": 1458,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "轮",
+                    "end": 1808,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "廓",
+                    "end": 2333,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "锈迹斑驳藏匿起群星线索",
+            "start": 46990,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "锈",
+                    "end": 230,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "迹",
+                    "end": 529,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "斑",
+                    "end": 829,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "驳",
+                    "end": 3143,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 3451,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "匿",
+                    "end": 3811,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 4084,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "群",
+                    "end": 4368,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "星",
+                    "end": 4681,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "线",
+                    "end": 5011,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "索",
+                    "end": 5474,
+                    "scale": [
+                        8,
+                        7
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "红的雨在烧灼",
+            "start": 53905,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 244,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 940,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 2106,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 2664,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烧",
+                    "end": 3033,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "灼",
+                    "end": 3749,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "无处闪躲",
+            "start": 58570,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 388,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 1040,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "闪",
+                    "end": 1668,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "躲",
+                    "end": 2787,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "声嘶力竭向悲泣的虚空",
+            "start": 61737,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 301,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "嘶",
+                    "end": 997,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "力",
+                    "end": 1853,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "竭",
+                    "end": 3399,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "向",
+                    "end": 3644,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 4509,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泣",
+                    "end": 5514,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 5938,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "虚",
+                    "end": 6951,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 7741,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "祈祷至最后",
+            "start": 70096,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "祈",
+                    "end": 352,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "祷",
+                    "end": 1040,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "至",
+                    "end": 1313,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 1938,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 2401,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "神为何依然残酷冷漠",
+            "start": 72942,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "神",
+                    "end": 994,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "为",
+                    "end": 1940,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2477,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "依",
+                    "end": 3176,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 3570,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 4300,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "酷",
+                    "end": 4689,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "冷",
+                    "end": 6070,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "漠",
+                    "end": 6980,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "天国或地狱也奢求你无垢眼眸",
+            "start": 83121,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 751,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "国",
+                    "end": 1984,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "或",
+                    "end": 2268,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 3074,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "狱",
+                    "end": 4170,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 4717,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "奢",
+                    "end": 5572,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "求",
+                    "end": 7026,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 7343,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 7894,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "垢",
+                    "end": 8363,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 8945,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "眸",
+                    "end": 9307,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "就让我再次被你拯救",
+            "start": 92803,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 872,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "让",
+                    "end": 1939,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2418,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 3119,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "次",
+                    "end": 3698,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 4347,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4998,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "拯",
+                    "end": 6183,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "救",
+                    "end": 6621,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "屈从命运的人偶",
+            "start": 143683,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "屈",
+                    "end": 247,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "从",
+                    "end": 451,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "命",
+                    "end": 1034,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "运",
+                    "end": 1228,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1439,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 1712,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "偶",
+                    "end": 2292,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "神色空洞墙角下蜷缩",
+            "start": 147050,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "神",
+                    "end": 231,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "色",
+                    "end": 491,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "空",
+                    "end": 768,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "洞",
+                    "end": 3192,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "墙",
+                    "end": 3424,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "角",
+                    "end": 3999,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 4383,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "蜷",
+                    "end": 4961,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "缩",
+                    "end": 5427,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "宇宙陷入了沉默",
+            "start": 153615,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "宇",
+                    "end": 191,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "宙",
+                    "end": 400,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "陷",
+                    "end": 720,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1009,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1312,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "沉",
+                    "end": 1662,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "默",
+                    "end": 2145,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "无声颤抖黎明请将它温热",
+            "start": 157137,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 235,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 467,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "颤",
+                    "end": 1038,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "抖",
+                    "end": 3098,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "黎",
+                    "end": 3347,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 3702,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "请",
+                    "end": 3910,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 4133,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "它",
+                    "end": 4465,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "温",
+                    "end": 4864,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "热",
+                    "end": 5525,
+                    "scale": [
+                        8,
+                        7
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "红的夜在烧灼",
+            "start": 163770,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 258,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1039,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 1638,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 2622,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烧",
+                    "end": 3147,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "灼",
+                    "end": 3667,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "快要沉没",
+            "start": 168587,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "快",
+                    "end": 550,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 1106,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "沉",
+                    "end": 1609,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 2587,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "伤痕累累满是泪水的手",
+            "start": 171849,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "伤",
+                    "end": 356,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "痕",
+                    "end": 1125,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "累",
+                    "end": 1491,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "累",
+                    "end": 3358,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "满",
+                    "end": 3578,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4202,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泪",
+                    "end": 5374,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 5739,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "的",
+                    "end": 6846,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 7237,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "已不再孱弱",
+            "start": 180199,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 213,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 711,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 1137,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "孱",
+                    "end": 1802,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "弱",
+                    "end": 2298,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "神为何要将一切夺走",
+            "start": 182812,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "神",
+                    "end": 855,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "为",
+                    "end": 1966,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2585,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 3089,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 3593,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 4262,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "切",
+                    "end": 4971,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夺",
+                    "end": 6162,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 6788,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "日月同星辰都陨落时间的尽头",
+            "start": 193154,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "日",
+                    "end": 544,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 1852,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "同",
+                    "end": 2204,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "星",
+                    "end": 3092,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "辰",
+                    "end": 4058,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 4726,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "陨",
+                    "end": 5646,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 7068,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 7324,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 7742,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 8198,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 8820,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "头",
+                    "end": 9166,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "就让我再次被你拯救",
+            "start": 202843,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 1102,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "让",
+                    "end": 1902,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2572,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 3163,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "次",
+                    "end": 3780,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 4220,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4700,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "拯",
+                    "end": 5992,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "救",
+                    "end": 6754,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "声嘶力竭向悲泣的虚空",
+            "start": 212506,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 346,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "嘶",
+                    "end": 1147,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "力",
+                    "end": 1448,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "竭",
+                    "end": 2503,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "向",
+                    "end": 2808,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 3601,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泣",
+                    "end": 4679,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 5035,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "虚",
+                    "end": 6126,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 6630,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "祈祷至最后",
+            "start": 220163,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "祈",
+                    "end": 293,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "祷",
+                    "end": 843,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "至",
+                    "end": 1278,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 1794,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 2155,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "神为何依然残酷冷漠",
+            "start": 222769,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "神",
+                    "end": 688,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "为",
+                    "end": 1857,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2666,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "依",
+                    "end": 3099,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 3621,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 4437,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "酷",
+                    "end": 4795,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "冷",
+                    "end": 6224,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "漠",
+                    "end": 6654,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "天国或地狱也奢求你无垢眼眸",
+            "start": 233152,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 500,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "国",
+                    "end": 1949,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "或",
+                    "end": 2166,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 2998,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "狱",
+                    "end": 4128,
+                    "scale": [
+                        10,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 4533,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "奢",
+                    "end": 5418,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "求",
+                    "end": 7028,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 7286,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 7738,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "垢",
+                    "end": 8144,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 8798,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "眸",
+                    "end": 9150,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "就让我再次被你拯救",
+            "start": 242726,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 1269,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "让",
+                    "end": 1693,
+                    "scale": [
+                        10,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2753,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 3277,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "次",
+                    "end": 3591,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 4385,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 4918,
+                    "scale": 13
+                },
+                {
+                    "type": "Slur",
+                    "ch": "拯",
+                    "end": 6144,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "救",
+                    "end": 17199,
+                    "scale": 9
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

@@ -1,0 +1,2172 @@
+{
+    "id": "3012",
+    "duration": 212659,
+    "chorus": [
+        {
+            "start": 63810,
+            "end": 63810
+        },
+        {
+            "start": 134910,
+            "end": 134910
+        },
+        {
+            "start": 158610,
+            "end": 158610
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "阳光熟睡在房间一角",
+            "start": 16776,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "阳",
+                    "end": 162,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 335,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "熟",
+                    "end": 515,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "睡",
+                    "end": 728,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1016,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "房",
+                    "end": 1489,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 1838,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2048,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "角",
+                    "end": 2924,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "你的手指温暖的线条",
+            "start": 19754,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 210,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 381,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 535,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "指",
+                    "end": 781,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "温",
+                    "end": 1080,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "暖",
+                    "end": 1503,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1677,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "线",
+                    "end": 2087,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "条",
+                    "end": 2757,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "我假装低头思考 近距离偷瞄",
+            "start": 22738,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 188,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "假",
+                    "end": 357,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "装",
+                    "end": 602,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "低",
+                    "end": 786,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "头",
+                    "end": 1124,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 1366,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "考",
+                    "end": 2183,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "近",
+                    "end": 2551,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "距",
+                    "end": 2728,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "离",
+                    "end": 3128,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "偷",
+                    "end": 3547,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞄",
+                    "end": 4664,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "你的眼神专注而深奧",
+            "start": 28688,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 186,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 339,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 486,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "神",
+                    "end": 786,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "专",
+                    "end": 1000,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "注",
+                    "end": 1385,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 1759,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "深",
+                    "end": 2039,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "奧",
+                    "end": 2997,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "彷彿看透所有预兆",
+            "start": 31685,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "彷",
+                    "end": 170,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "彿",
+                    "end": 337,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 717,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "透",
+                    "end": 993,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "所",
+                    "end": 1341,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 1725,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "预",
+                    "end": 2066,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "兆",
+                    "end": 2737,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "呼吸乱了调",
+            "start": 34586,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "呼",
+                    "end": 188,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "吸",
+                    "end": 331,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "乱",
+                    "end": 524,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 715,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "调",
+                    "end": 1426,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "画面柔了焦 表情很微妙",
+            "start": 36012,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "画",
+                    "end": 181,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "面",
+                    "end": 358,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "柔",
+                    "end": 548,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 744,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "焦",
+                    "end": 1510,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "表",
+                    "end": 1706,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 1894,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "很",
+                    "end": 2332,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 2663,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "妙",
+                    "end": 3881,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "微风凝固的这一秒",
+            "start": 40899,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 195,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 605,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "凝",
+                    "end": 970,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "固",
+                    "end": 1366,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1739,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 2161,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2943,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "秒",
+                    "end": 4815,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "爱被巨细靡遗素描",
+            "start": 46835,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "爱",
+                    "end": 231,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 568,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "巨",
+                    "end": 998,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "细",
+                    "end": 1328,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "靡",
+                    "end": 1724,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "遗",
+                    "end": 2206,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "素",
+                    "end": 2872,
+                    "scale": [
+                        21,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "描",
+                    "end": 4185,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "窗外的候鸟 我的心跳",
+            "start": 52715,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "窗",
+                    "end": 345,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "外",
+                    "end": 706,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1078,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "候",
+                    "end": 1458,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸟",
+                    "end": 1860,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2040,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2242,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 2471,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "跳",
+                    "end": 3123,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "都赖不掉 都忘不了",
+            "start": 56094,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 266,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "赖",
+                    "end": 598,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 962,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "掉",
+                    "end": 1355,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 1663,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "忘",
+                    "end": 1829,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 2010,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 2958,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "依稀还能听得到",
+            "start": 59396,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "依",
+                    "end": 175,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "稀",
+                    "end": 529,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 882,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "能",
+                    "end": 1429,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 1764,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "得",
+                    "end": 2420,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 3843,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "时间 甜蜜讨好",
+            "start": 64151,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 302,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 745,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "甜",
+                    "end": 1077,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "蜜",
+                    "end": 1486,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "讨",
+                    "end": 1875,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2246,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "偷吻那些 手绘的美好",
+            "start": 66416,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "偷",
+                    "end": 312,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 655,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 1073,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "些",
+                    "end": 1474,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 1779,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "绘",
+                    "end": 1991,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2348,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "美",
+                    "end": 2746,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 3895,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "就在我梦里 慢慢烘烤",
+            "start": 70464,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 346,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 705,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1107,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1474,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 1844,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 2187,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 2550,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烘",
+                    "end": 2973,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烤",
+                    "end": 5003,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "多少 的问号",
+            "start": 76063,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 264,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 1096,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1418,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 1766,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "号",
+                    "end": 2208,
+                    "scale": 4
+                }
+            ]
+        },
+        {
+            "text": "没说出口 也不重要",
+            "start": 78271,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 305,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 663,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 1032,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "口",
+                    "end": 1429,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 1768,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 2119,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 2482,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 3463,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "只要一想到 就傻傻的笑",
+            "start": 82012,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 232,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 633,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 974,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 1228,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 1799,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 2195,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "傻",
+                    "end": 2503,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "傻",
+                    "end": 2855,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3497,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 5443,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "你的味道把回忆轻烙",
+            "start": 99822,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 183,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 353,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "味",
+                    "end": 531,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "道",
+                    "end": 753,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 1022,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 1363,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "忆",
+                    "end": 1640,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 1966,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "烙",
+                    "end": 2750,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "像佐着诗句的原稿",
+            "start": 102701,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 180,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "佐",
+                    "end": 391,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 749,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "诗",
+                    "end": 1078,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "句",
+                    "end": 1446,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1728,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 2005,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "稿",
+                    "end": 2786,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "感觉碰了巧",
+            "start": 105658,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "感",
+                    "end": 174,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "觉",
+                    "end": 402,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "碰",
+                    "end": 601,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 783,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "巧",
+                    "end": 1484,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "思绪潦了草 烦恼太微妙",
+            "start": 107142,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 173,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "绪",
+                    "end": 347,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "潦",
+                    "end": 547,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "草",
+                    "end": 1458,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烦",
+                    "end": 1664,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "恼",
+                    "end": 1878,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "太",
+                    "end": 2280,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 2581,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "妙",
+                    "end": 3638,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "心跳凝固的这一秒",
+            "start": 111973,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 320,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "跳",
+                    "end": 682,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "凝",
+                    "end": 1014,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "固",
+                    "end": 1419,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1849,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 2179,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3007,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "秒",
+                    "end": 5824,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "爱被巨细靡遗素描",
+            "start": 117951,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "爱",
+                    "end": 193,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 579,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "巨",
+                    "end": 941,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "细",
+                    "end": 1360,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "靡",
+                    "end": 1698,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "遗",
+                    "end": 2071,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "素",
+                    "end": 2817,
+                    "scale": [
+                        21,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "描",
+                    "end": 4509,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "肩上的外套 热的饮料",
+            "start": 123771,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "肩",
+                    "end": 329,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 662,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1037,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "外",
+                    "end": 1427,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "套",
+                    "end": 1881,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 2081,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2292,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "饮",
+                    "end": 2505,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "料",
+                    "end": 3372,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "不打自招 露出马脚",
+            "start": 127143,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 289,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "打",
+                    "end": 664,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 1001,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "招",
+                    "end": 1437,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "露",
+                    "end": 1650,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 1839,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "马",
+                    "end": 2062,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "脚",
+                    "end": 3170,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "或许你早就知道",
+            "start": 130509,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "或",
+                    "end": 186,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "许",
+                    "end": 513,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "你",
+                    "end": 918,
+                    "scale": [
+                        3,
+                        4
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "早",
+                    "end": 1357,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "就",
+                    "end": 1772,
+                    "scale": [
+                        3,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 2432,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "道",
+                    "end": 3825,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "时间 甜蜜讨好",
+            "start": 135239,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 409,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 745,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "甜",
+                    "end": 1069,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "蜜",
+                    "end": 1443,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "讨",
+                    "end": 1836,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2294,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "偷吻那些 手绘的美好",
+            "start": 137533,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "偷",
+                    "end": 298,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 754,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 1050,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "些",
+                    "end": 1420,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 1710,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "绘",
+                    "end": 1967,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2356,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "美",
+                    "end": 2721,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 3741,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "就在我梦里 慢慢烘烤",
+            "start": 141545,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 313,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 710,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1012,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1461,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 1871,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 2204,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 2573,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烘",
+                    "end": 2932,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烤",
+                    "end": 5280,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "多少 的问号",
+            "start": 147143,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 284,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 991,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1413,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 1771,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "号",
+                    "end": 2219,
+                    "scale": 4
+                }
+            ]
+        },
+        {
+            "text": "没说出口 也不重要",
+            "start": 149362,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 312,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 669,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 987,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "口",
+                    "end": 1361,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 1773,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 2146,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 2533,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 3644,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "只要一想到 就傻傻的笑",
+            "start": 153006,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 332,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 734,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1159,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 1352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 1903,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 2240,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "傻",
+                    "end": 2508,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "傻",
+                    "end": 2868,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3557,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 5935,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "时间 蹦蹦跳跳",
+            "start": 158941,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 318,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 795,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "蹦",
+                    "end": 1137,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "蹦",
+                    "end": 1472,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "跳",
+                    "end": 1839,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "跳",
+                    "end": 2272,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "唱着那些 手绘的美好",
+            "start": 161213,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "唱",
+                    "end": 326,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 712,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 1041,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "些",
+                    "end": 1494,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 1799,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "绘",
+                    "end": 2034,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2445,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "美",
+                    "end": 2828,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 4155,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "就在我心里 暖暖闪耀",
+            "start": 165368,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 321,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 681,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1068,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 1394,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 1732,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "暖",
+                    "end": 2101,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "暖",
+                    "end": 2516,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "闪",
+                    "end": 2882,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "耀",
+                    "end": 5004,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "喜欢 的拥抱",
+            "start": 170829,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "喜",
+                    "end": 269,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欢",
+                    "end": 1030,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1413,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "拥",
+                    "end": 1797,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "抱",
+                    "end": 2107,
+                    "scale": 4
+                }
+            ]
+        },
+        {
+            "text": "不要迟到 不准逃跑",
+            "start": 173065,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 314,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 683,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "迟",
+                    "end": 1036,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 1442,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 1783,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "准",
+                    "end": 2150,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "逃",
+                    "end": 2539,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "跑",
+                    "end": 3589,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "幸福下一秒 就一起到老",
+            "start": 176654,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "幸",
+                    "end": 393,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "福",
+                    "end": 760,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 1109,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1367,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "秒",
+                    "end": 1820,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 2264,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2609,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 3008,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 3615,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "老",
+                    "end": 5832,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

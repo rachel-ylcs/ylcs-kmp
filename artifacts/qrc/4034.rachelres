@@ -1,0 +1,1305 @@
+{
+    "id": "4034",
+    "duration": 241052,
+    "chorus": [
+        {
+            "start": 2870,
+            "end": 2870
+        },
+        {
+            "start": 70300,
+            "end": 70300
+        },
+        {
+            "start": 125090,
+            "end": 125090
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "船儿摇过海 - 银临/郭逸鸿/逆水寒/雷火音频",
+            "start": 59,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "船",
+                    "end": 44,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 88,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 220,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "-",
+                    "end": 308,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 396,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 484,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "郭",
+                    "end": 528,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逸",
+                    "end": 572,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 660,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逆",
+                    "end": 704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 748,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 792,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 836,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 880,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 924,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 968,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 1012,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "词：冉语优",
+            "start": 1150,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "词",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "冉",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "语",
+                    "end": 99,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "优",
+                    "end": 133,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "曲：夏欣怡/九渊/银临/哈时奇",
+            "start": 1283,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夏",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欣",
+                    "end": 100,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "怡",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "九",
+                    "end": 165,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渊",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 230,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 264,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 264,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "哈",
+                    "end": 297,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 329,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "奇",
+                    "end": 363,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "编曲：周俊成",
+            "start": 1646,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "编",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "周",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "俊",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 165,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "混音：沙栩帆",
+            "start": 1811,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "混",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "沙",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "栩",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "帆",
+                    "end": 165,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "人声录音：异新音乐",
+            "start": 1976,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 33,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 66,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "录",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "异",
+                    "end": 164,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 230,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "乐",
+                    "end": 264,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "出品：雷火音频/逆水寒手游",
+            "start": 2240,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 32,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "品",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 65,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 98,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 132,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 165,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "频",
+                    "end": 198,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 198,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "逆",
+                    "end": 231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 263,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 297,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "手",
+                    "end": 331,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 736,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "船儿摇过海 风吹海水岸",
+            "start": 2976,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "船",
+                    "end": 520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 1144,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 1624,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 2184,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 4256,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 4784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 5272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 5824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 6352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "岸",
+                    "end": 7560,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "随浪淘金沙 何处是港湾",
+            "start": 11152,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 889,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "浪",
+                    "end": 1376,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "淘",
+                    "end": 1856,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "金",
+                    "end": 2400,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "沙",
+                    "end": 4432,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 4976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 5488,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 6008,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "港",
+                    "end": 6632,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "湾",
+                    "end": 7968,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "船儿摇过海 天清明无限",
+            "start": 19832,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "船",
+                    "end": 560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 1024,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 1520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 2120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 4304,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 4800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "清",
+                    "end": 5288,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 5824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 6360,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "限",
+                    "end": 7400,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "小心风台天 身仔微微寒",
+            "start": 27992,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 1329,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 1848,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "台",
+                    "end": 2368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 4448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 5040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "仔",
+                    "end": 5600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 6120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 6659,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 7873,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "问伊去倒落 茫茫不见影",
+            "start": 70482,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 512,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "伊",
+                    "end": 944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 1416,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 2024,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 4081,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 4633,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 5112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 5664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 6169,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 7328,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "月儿照晚眠 空空无朗看",
+            "start": 78482,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 851,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 1369,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1888,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 2401,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "眠",
+                    "end": 4449,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 5112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 5592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 6096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "朗",
+                    "end": 6608,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 7424,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "问伊伫倒落 日头渐落山",
+            "start": 87359,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "伊",
+                    "end": 912,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "伫",
+                    "end": 1456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 2113,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 4272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "日",
+                    "end": 4720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "头",
+                    "end": 5368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渐",
+                    "end": 5840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 6696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 7576,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "阮去问海水 海水不应阮",
+            "start": 95695,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "阮",
+                    "end": 640,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 1136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 1688,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 2183,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 4184,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 4800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 5240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 5816,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "应",
+                    "end": 6296,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阮",
+                    "end": 7680,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "船儿摇过海 风吹海水影",
+            "start": 125194,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "船",
+                    "end": 511,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 1111,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 1575,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 2111,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 4127,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 4711,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "吹",
+                    "end": 5231,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 5735,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 6263,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 7351,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "茫茫听浪声 随处是港湾",
+            "start": 133401,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 776,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 1240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 1712,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "浪",
+                    "end": 2344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 4288,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 4840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 5392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 5937,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "港",
+                    "end": 6504,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "湾",
+                    "end": 7560,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "心内如有梦 免惊要去何",
+            "start": 141777,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "内",
+                    "end": 1296,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 1824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4320,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "免",
+                    "end": 4928,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 5448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 5992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 6528,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 7424,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "哪时又落雨 月娘会照路",
+            "start": 150114,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "哪",
+                    "end": 783,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 1351,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 1943,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 2559,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 4495,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 5103,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "娘",
+                    "end": 5743,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "会",
+                    "end": 6239,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 6704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 8111,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

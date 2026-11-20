@@ -1,0 +1,3258 @@
+{
+    "id": "1110",
+    "duration": 243264,
+    "chorus": [
+        {
+            "start": 54317,
+            "end": 78806
+        },
+        {
+            "start": 127823,
+            "end": 151972
+        },
+        {
+            "start": 172891,
+            "end": 194487
+        },
+        {
+            "start": 201324,
+            "end": 227189
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "笔下十三行告白",
+            "start": 4909,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "笔",
+                    "end": 303,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 624,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "十",
+                    "end": 946,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "三",
+                    "end": 1179,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "行",
+                    "end": 1613,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "告",
+                    "end": 2164,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "白",
+                    "end": 3929,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "藏在花花世界外",
+            "start": 10925,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 216,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 537,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 868,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 1088,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "世",
+                    "end": 1540,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "界",
+                    "end": 2088,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "外",
+                    "end": 3661,
+                    "scale": [
+                        17,
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "总有些情怀痴心又老派",
+            "start": 16154,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "总",
+                    "end": 202,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 373,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "些",
+                    "end": 565,
+                    "scale": 15
+                },
+                {
+                    "type": "Slur",
+                    "ch": "情",
+                    "end": 897,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "怀",
+                    "end": 2508,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 2768,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 3234,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 3462,
+                    "scale": 15
+                },
+                {
+                    "type": "Slur",
+                    "ch": "老",
+                    "end": 3952,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "派",
+                    "end": 4610,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "等你带着我去流浪北海",
+            "start": 21396,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 184,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 454,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "带",
+                    "end": 655,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 1066,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2037,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 2493,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 2734,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浪",
+                    "end": 3085,
+                    "scale": [
+                        17,
+                        17
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "北",
+                    "end": 3687,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 5058,
+                    "scale": 16
+                }
+            ]
+        },
+        {
+            "text": "披荆斩棘地赴爱",
+            "start": 28892,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "披",
+                    "end": 204,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "荆",
+                    "end": 455,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "斩",
+                    "end": 885,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "棘",
+                    "end": 1189,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "地",
+                    "end": 1512,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "赴",
+                    "end": 2182,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "爱",
+                    "end": 3860,
+                    "scale": [
+                        17,
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "等你身骑白马或脚踏云彩",
+            "start": 34837,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 218,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 593,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 939,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "骑",
+                    "end": 1171,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 1578,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "马",
+                    "end": 2202,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "或",
+                    "end": 2863,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "脚",
+                    "end": 3639,
+                    "scale": [
+                        1,
+                        21
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 3993,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 4205,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "彩",
+                    "end": 4593,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "童话偏爱痴情安排",
+            "start": 39660,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "童",
+                    "end": 259,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "话",
+                    "end": 1013,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "偏",
+                    "end": 1437,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "爱",
+                    "end": 2996,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 3318,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 3992,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "安",
+                    "end": 4451,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "排",
+                    "end": 5640,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "假意掩盖惺惺作态",
+            "start": 45700,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "假",
+                    "end": 199,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "意",
+                    "end": 410,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "掩",
+                    "end": 997,
+                    "scale": [
+                        1,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "盖",
+                    "end": 1804,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "惺",
+                    "end": 2278,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "惺",
+                    "end": 2926,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 3269,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "态",
+                    "end": 6066,
+                    "scale": [
+                        2,
+                        1,
+                        21
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "喝卑微的毒药饮鸩止渴一秒",
+            "start": 54317,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "喝",
+                    "end": 162,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "卑",
+                    "end": 318,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 462,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "毒",
+                    "end": 904,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "药",
+                    "end": 1372,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "饮",
+                    "end": 1530,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸩",
+                    "end": 1689,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "止",
+                    "end": 1843,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "渴",
+                    "end": 2047,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2224,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "秒",
+                    "end": 2461,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "甘之如饴踏碎骄傲",
+            "start": 57066,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "甘",
+                    "end": 169,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 341,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 507,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "饴",
+                    "end": 741,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 924,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "碎",
+                    "end": 1274,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "骄",
+                    "end": 1642,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "傲",
+                    "end": 2439,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "把全世界颠倒",
+            "start": 59850,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 160,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "全",
+                    "end": 306,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 452,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "界",
+                    "end": 687,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颠",
+                    "end": 883,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "倒",
+                    "end": 1182,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "钟情的戏自演自导",
+            "start": 61222,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "钟",
+                    "end": 160,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 765,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 961,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "戏",
+                    "end": 1346,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "自",
+                    "end": 1859,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "演",
+                    "end": 2909,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3141,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "导",
+                    "end": 3954,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "落幕后的独角粉身碎骨也好",
+            "start": 65477,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 177,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "幕",
+                    "end": 330,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 490,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 701,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 901,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "角",
+                    "end": 1307,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "粉",
+                    "end": 1476,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 1653,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "碎",
+                    "end": 1829,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "骨",
+                    "end": 2109,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 2300,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "好",
+                    "end": 2580,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "至少卸下伪装",
+            "start": 68297,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "至",
+                    "end": 162,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 317,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "卸",
+                    "end": 485,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 772,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "伪",
+                    "end": 976,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "装",
+                    "end": 1369,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "能像孩子一样大哭大笑",
+            "start": 69672,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "能",
+                    "end": 419,
+                    "scale": [
+                        4,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 1231,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "孩",
+                    "end": 1823,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "子",
+                    "end": 2624,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "一",
+                    "end": 3270,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "样",
+                    "end": 3670,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 3883,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "哭",
+                    "end": 4252,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 4535,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 5456,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "最后把你忘掉",
+            "start": 75512,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 268,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 760,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 926,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "你",
+                    "end": 1356,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "忘",
+                    "end": 2103,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "掉",
+                    "end": 3294,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "我以为填山移海",
+            "start": 83901,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 200,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "以",
+                    "end": 391,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "为",
+                    "end": 787,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "填",
+                    "end": 986,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "山",
+                    "end": 1372,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "移",
+                    "end": 1865,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 3816,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "才有资格配称爱",
+            "start": 89272,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "才",
+                    "end": 216,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 637,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "资",
+                    "end": 992,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "格",
+                    "end": 1213,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "配",
+                    "end": 1587,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "称",
+                    "end": 2083,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "爱",
+                    "end": 3644,
+                    "scale": [
+                        17,
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你吻过玫瑰也吻过秋槐",
+            "start": 94116,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 168,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 375,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 691,
+                    "scale": 15
+                },
+                {
+                    "type": "Slur",
+                    "ch": "玫",
+                    "end": 1165,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "瑰",
+                    "end": 2609,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 2904,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 3397,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3600,
+                    "scale": 15
+                },
+                {
+                    "type": "Slur",
+                    "ch": "秋",
+                    "end": 4011,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "槐",
+                    "end": 4739,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "而我不过是可笑的替代",
+            "start": 99250,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 183,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 476,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1216,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1986,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "可",
+                    "end": 2288,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2549,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "的",
+                    "end": 2988,
+                    "scale": [
+                        17,
+                        17
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "替",
+                    "end": 3467,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "代",
+                    "end": 4425,
+                    "scale": 16
+                }
+            ]
+        },
+        {
+            "text": "在这片谎言地带",
+            "start": 106246,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 233,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 620,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "片",
+                    "end": 987,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "谎",
+                    "end": 1178,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "言",
+                    "end": 1596,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 2074,
+                    "scale": 18
+                },
+                {
+                    "type": "Slur",
+                    "ch": "带",
+                    "end": 4104,
+                    "scale": [
+                        17,
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "在这个多情时代痴人说爱",
+            "start": 111901,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 223,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 565,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 975,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 1177,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "情",
+                    "end": 1559,
+                    "scale": [
+                        19,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 2137,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "代",
+                    "end": 2798,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "痴",
+                    "end": 3440,
+                    "scale": [
+                        1,
+                        21
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 3741,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 3968,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "爱",
+                    "end": 4399,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我是俗世眼中的怪",
+            "start": 116311,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 421,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 857,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "俗",
+                    "end": 1440,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "世",
+                    "end": 2996,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 3246,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 3825,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "的",
+                    "end": 4357,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "怪",
+                    "end": 5333,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "何必要你惺惺作态",
+            "start": 122122,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 178,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "必",
+                    "end": 363,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "要",
+                    "end": 1035,
+                    "scale": [
+                        1,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 1732,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "惺",
+                    "end": 2224,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "惺",
+                    "end": 2673,
+                    "scale": [
+                        20,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 3074,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "态",
+                    "end": 5693,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "喝卑微的毒药饮鸩止渴一秒",
+            "start": 127823,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "喝",
+                    "end": 162,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "卑",
+                    "end": 313,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 462,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 655,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "毒",
+                    "end": 924,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "药",
+                    "end": 1283,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "饮",
+                    "end": 1449,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸩",
+                    "end": 1600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "止",
+                    "end": 1760,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "渴",
+                    "end": 1983,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2171,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "秒",
+                    "end": 2601,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "甘之如饴踏碎骄傲",
+            "start": 130436,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "甘",
+                    "end": 168,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 328,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 507,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "饴",
+                    "end": 770,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 974,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "碎",
+                    "end": 1343,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "骄",
+                    "end": 1722,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "傲",
+                    "end": 2293,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "把全世界颠倒",
+            "start": 133273,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 162,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "全",
+                    "end": 330,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 488,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "界",
+                    "end": 745,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颠",
+                    "end": 938,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "倒",
+                    "end": 1320,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "钟情的戏自演自导",
+            "start": 134599,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "钟",
+                    "end": 167,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 680,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 970,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "戏",
+                    "end": 1453,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "自",
+                    "end": 1856,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "演",
+                    "end": 2961,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3179,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "导",
+                    "end": 4045,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "落幕后的独角粉身碎骨也好",
+            "start": 138923,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 154,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "幕",
+                    "end": 321,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 481,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 732,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 927,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "角",
+                    "end": 1493,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "粉",
+                    "end": 1699,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 1881,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "碎",
+                    "end": 2078,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "骨",
+                    "end": 2278,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 2440,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "好",
+                    "end": 2735,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "至少卸下伪装",
+            "start": 141670,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "至",
+                    "end": 158,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 323,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "卸",
+                    "end": 501,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 742,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "伪",
+                    "end": 951,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "装",
+                    "end": 1370,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "能像孩子一样大哭大笑",
+            "start": 143046,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "能",
+                    "end": 538,
+                    "scale": [
+                        4,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 1204,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "孩",
+                    "end": 1916,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "子",
+                    "end": 2646,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "一",
+                    "end": 3316,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "样",
+                    "end": 3604,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 3877,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "哭",
+                    "end": 4221,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 4521,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 5516,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "最后把你忘掉",
+            "start": 148892,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 181,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 654,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 857,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "你",
+                    "end": 1293,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "忘",
+                    "end": 1747,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "掉",
+                    "end": 3080,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "轰轰烈烈大败爱的虔诚姿态",
+            "start": 151978,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "轰",
+                    "end": 216,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "轰",
+                    "end": 404,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "烈",
+                    "end": 580,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烈",
+                    "end": 1184,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 1364,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "败",
+                    "end": 2815,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "爱",
+                    "end": 2987,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3212,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "虔",
+                    "end": 3417,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "诚",
+                    "end": 3977,
+                    "scale": [
+                        7,
+                        7
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "姿",
+                    "end": 4173,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "态",
+                    "end": 6432,
+                    "scale": [
+                        3,
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "故事写在情书题外",
+            "start": 158734,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 164,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 323,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "写",
+                    "end": 499,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 1521,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "书",
+                    "end": 1700,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "题",
+                    "end": 1883,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "外",
+                    "end": 2356,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "托青鸟寄给茫茫人海",
+            "start": 161340,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "托",
+                    "end": 203,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 565,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸟",
+                    "end": 1897,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "寄",
+                    "end": 2078,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "给",
+                    "end": 2324,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 2553,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "茫",
+                    "end": 2899,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 3346,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "海",
+                    "end": 9581,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "那卑微多可笑以为天荒地老",
+            "start": 172891,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 168,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "卑",
+                    "end": 306,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 439,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 662,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "可",
+                    "end": 853,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 1243,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "以",
+                    "end": 1405,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "为",
+                    "end": 1564,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1760,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "荒",
+                    "end": 2038,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 2246,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "老",
+                    "end": 2669,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "把痴傻信仰当解药",
+            "start": 175572,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 170,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 333,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "傻",
+                    "end": 499,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "信",
+                    "end": 759,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "仰",
+                    "end": 987,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "当",
+                    "end": 1382,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "解",
+                    "end": 1708,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "药",
+                    "end": 2286,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "爱过的疼多少",
+            "start": 178388,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "爱",
+                    "end": 176,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 324,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 486,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "疼",
+                    "end": 768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 949,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "少",
+                    "end": 1384,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "就像疤痕刻在眉梢",
+            "start": 179778,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "就",
+                    "end": 194,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 715,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "疤",
+                    "end": 996,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "痕",
+                    "end": 1329,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "刻",
+                    "end": 1832,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 2963,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "眉",
+                    "end": 3241,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "梢",
+                    "end": 4013,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "但你也该知道镜中的自己啊",
+            "start": 184266,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "但",
+                    "end": 162,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 472,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "该",
+                    "end": 694,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 895,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "道",
+                    "end": 1327,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "镜",
+                    "end": 1485,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1661,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1842,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 2112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "己",
+                    "end": 2305,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "啊",
+                    "end": 2553,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "远比这世间所有的美梦成真",
+            "start": 187037,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 168,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "比",
+                    "end": 305,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 497,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 778,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 985,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "所",
+                    "end": 1350,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "有",
+                    "end": 1857,
+                    "scale": [
+                        4,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2714,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "美",
+                    "end": 3366,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4154,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "成",
+                    "end": 4806,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "真",
+                    "end": 5345,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "还要更好",
+            "start": 192394,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 188,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "要",
+                    "end": 501,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 858,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "好",
+                    "end": 2093,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "喝卑微的毒药饮鸩止渴一秒",
+            "start": 201324,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "喝",
+                    "end": 182,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "卑",
+                    "end": 335,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 467,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 658,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "毒",
+                    "end": 863,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "药",
+                    "end": 1346,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "饮",
+                    "end": 1508,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸩",
+                    "end": 1654,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "止",
+                    "end": 1824,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "渴",
+                    "end": 2059,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2260,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "秒",
+                    "end": 2511,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "甘之如饴踏碎骄傲",
+            "start": 203997,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "甘",
+                    "end": 161,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 326,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 510,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "饴",
+                    "end": 823,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 1035,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "碎",
+                    "end": 1439,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "骄",
+                    "end": 1826,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "傲",
+                    "end": 2622,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "把全世界颠倒",
+            "start": 206882,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 170,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "全",
+                    "end": 334,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 520,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "界",
+                    "end": 769,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "颠",
+                    "end": 985,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "倒",
+                    "end": 1239,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "钟情的戏自演自导",
+            "start": 208310,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "钟",
+                    "end": 198,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 687,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 947,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "戏",
+                    "end": 1425,
+                    "scale": [
+                        21,
+                        21
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "自",
+                    "end": 1877,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "演",
+                    "end": 3068,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3296,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "导",
+                    "end": 3972,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "落幕后的独角粉身碎骨也好",
+            "start": 212507,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 162,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "幕",
+                    "end": 322,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 502,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 785,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "独",
+                    "end": 977,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "角",
+                    "end": 1423,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "粉",
+                    "end": 1599,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 1759,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "碎",
+                    "end": 1937,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "骨",
+                    "end": 2219,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 2440,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "好",
+                    "end": 2877,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "至少卸下伪装",
+            "start": 215396,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "至",
+                    "end": 175,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "卸",
+                    "end": 520,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 761,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "伪",
+                    "end": 960,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "装",
+                    "end": 1376,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "能像孩子一样大哭大笑",
+            "start": 216778,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "能",
+                    "end": 420,
+                    "scale": [
+                        4,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 1140,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "孩",
+                    "end": 1828,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "子",
+                    "end": 2539,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "一",
+                    "end": 3281,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "样",
+                    "end": 3537,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 3835,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "哭",
+                    "end": 4141,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 4499,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 5466,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "最后把你忘掉",
+            "start": 222593,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 186,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 593,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 799,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "你",
+                    "end": 1216,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "忘",
+                    "end": 2128,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "掉",
+                    "end": 4596,
+                    "scale": 1
+                }
+            ]
+        }
+    ]
+}

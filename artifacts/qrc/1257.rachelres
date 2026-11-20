@@ -1,0 +1,5619 @@
+{
+    "id": "1257",
+    "duration": 217105,
+    "chorus": [
+        {
+            "start": 66700,
+            "end": 66700
+        },
+        {
+            "start": 120550,
+            "end": 120550
+        },
+        {
+            "start": 171600,
+            "end": 171600
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "Drive Until Sunset - 银临",
+            "start": 0,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "D",
+                    "end": 34,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 69,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 104,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "v",
+                    "end": 139,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "U",
+                    "end": 208,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 243,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 278,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 313,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "S",
+                    "end": 372,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 397,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 422,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 447,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 472,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 497,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "-",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 870,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "词：沃特艾文儿",
+            "start": 870,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "词",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "沃",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "特",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "艾",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "文",
+                    "end": 1044,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "儿",
+                    "end": 1219,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "曲：银临",
+            "start": 2089,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 696,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "编曲Arranger：灰原穷",
+            "start": 2785,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "编",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "A",
+                    "end": 367,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 386,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 406,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 425,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 444,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 464,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 483,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 502,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灰",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "穷",
+                    "end": 1044,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "制作人Producer：银临",
+            "start": 3829,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "制",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "P",
+                    "end": 541,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 580,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 599,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 618,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 657,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 676,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 1044,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "混音Mixing：灰原穷",
+            "start": 4873,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "混",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "M",
+                    "end": 372,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 397,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "x",
+                    "end": 422,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 447,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 472,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 497,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灰",
+                    "end": 697,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 871,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "穷",
+                    "end": 1045,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "和声Backing Vocal：WH宇恒",
+            "start": 5918,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "和",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "B",
+                    "end": 372,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 397,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 422,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 447,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 472,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 497,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "V",
+                    "end": 551,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 580,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 609,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 667,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 783,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "H",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "宇",
+                    "end": 1044,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "恒",
+                    "end": 1218,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "配唱Vocal Producer：灰原穷",
+            "start": 7136,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "配",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "唱",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "V",
+                    "end": 382,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 417,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 452,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 487,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "P",
+                    "end": 541,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 580,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 599,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 618,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 657,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 676,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灰",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 1044,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "穷",
+                    "end": 1218,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "录音师Recording：沙栩帆",
+            "start": 8354,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "录",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "师",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "R",
+                    "end": 539,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 556,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 574,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 591,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 609,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 626,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 643,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 661,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 678,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "沙",
+                    "end": 871,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "栩",
+                    "end": 1045,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "帆",
+                    "end": 1219,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "录音棚Recording Studio：杭州栩栩如声Studio",
+            "start": 9573,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "录",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "棚",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "R",
+                    "end": 541,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 580,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 599,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 618,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 657,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 676,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "S",
+                    "end": 720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 745,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 770,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 795,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 820,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 845,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 870,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "杭",
+                    "end": 1044,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "州",
+                    "end": 1218,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "栩",
+                    "end": 1392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "栩",
+                    "end": 1566,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 1740,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 1914,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "S",
+                    "end": 1943,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1972,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 2001,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 2030,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2059,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2088,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "统筹Coordinator：大周",
+            "start": 11661,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "统",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "筹",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "C",
+                    "end": 362,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 377,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 391,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 406,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 420,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 435,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 449,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 464,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 478,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 493,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 507,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "大",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "周",
+                    "end": 870,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "OP：异新音乐",
+            "start": 12532,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "O",
+                    "end": 58,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "P",
+                    "end": 116,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "异",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "乐",
+                    "end": 870,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "SP：万象凡音",
+            "start": 13402,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "S",
+                    "end": 58,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "P",
+                    "end": 116,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 174,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "万",
+                    "end": 348,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "象",
+                    "end": 522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "凡",
+                    "end": 696,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "音",
+                    "end": 870,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "We drive until sunset",
+            "start": 14272,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 336,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 848,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1024,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1200,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "v",
+                    "end": 1376,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1659,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1766,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1873,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1980,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2572,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3056,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3540,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4024,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4508,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 4992,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "But how far can we get",
+            "start": 20448,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "B",
+                    "end": 266,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 533,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 1101,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1402,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 1819,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1934,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2050,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 2156,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2262,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2557,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2746,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 3532,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4318,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5104,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "On this lifetime endless highway",
+            "start": 26512,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "O",
+                    "end": 216,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 432,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 686,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 940,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1194,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1657,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1866,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2075,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2284,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2493,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2702,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 2911,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3301,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3483,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 3665,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 3846,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4028,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4210,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 4714,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 5036,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 5358,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 5681,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 6003,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 6325,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 6648,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "There is no place to stay",
+            "start": 33160,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "T",
+                    "end": 68,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 206,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 275,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 648,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 952,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1268,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1584,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 1667,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1750,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1833,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 1916,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2000,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2273,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2928,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3584,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 4240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 4896,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Landscapes on the long road",
+            "start": 39544,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "L",
+                    "end": 154,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 308,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 463,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 617,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 772,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 926,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1080,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 1235,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1389,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1544,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1864,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1973,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2082,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2294,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2396,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2498,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 2600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3236,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3872,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 4508,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 5144,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Flashing by our window",
+            "start": 45760,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "F",
+                    "end": 197,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 394,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 591,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 788,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 985,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1182,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1379,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 1576,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 1808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 2040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2141,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 2243,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2345,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2794,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 3243,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3692,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 4141,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 4590,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 5040,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Good times are like running in a match",
+            "start": 51696,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "G",
+                    "end": 130,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 260,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 390,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 747,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 974,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 1201,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1428,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1960,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2366,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2620,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 2874,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3128,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3323,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3518,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3713,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4103,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 4298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 4493,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4713,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 4933,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 5629,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 6253,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 6877,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 7501,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 8125,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 8749,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Running too fast to catch",
+            "start": 60749,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "R",
+                    "end": 60,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 121,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 181,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 242,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 302,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 363,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 424,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 525,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 626,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 816,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 904,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1080,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1320,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1560,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 1990,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2420,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2851,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 3281,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 3712,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Do you know where are we heading to",
+            "start": 67133,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "D",
+                    "end": 296,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 592,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 821,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1050,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 1468,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1844,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2032,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2208,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2296,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2384,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2472,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2602,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2733,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2864,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 3064,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3264,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 3459,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3654,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 3850,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 4045,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4241,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 4436,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 4632,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5452,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 6272,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Will there be flowers and songs too",
+            "start": 73405,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 544,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 670,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 796,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 923,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1049,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 1552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1928,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2051,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2175,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2299,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2423,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2547,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2671,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2795,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2916,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3038,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 3160,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3417,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3675,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3932,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 4190,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5085,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 5722,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 6360,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "How many loves and hates would be enough",
+            "start": 79765,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "H",
+                    "end": 192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 384,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 576,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 862,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1148,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1434,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 1720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1860,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2001,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "v",
+                    "end": 2142,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2283,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2424,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2549,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 2800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2873,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2947,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3020,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3094,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3168,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 3405,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3642,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3879,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4116,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 4353,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 4484,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4814,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 5013,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 5212,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 5410,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 5609,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 5808,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "To firm our fragile life",
+            "start": 85573,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "T",
+                    "end": 228,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1064,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 1672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1794,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1917,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2282,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2524,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2766,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 3009,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 3251,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 3493,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3736,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4204,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 5140,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5608,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "It's a matter of time",
+            "start": 93269,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "I",
+                    "end": 146,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 292,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "'",
+                    "end": 438,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 585,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1496,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 1553,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1610,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1667,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1724,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1781,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1838,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1951,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2065,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2764,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 3463,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 4162,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4862,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "To know there's no sublime",
+            "start": 99462,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "T",
+                    "end": 386,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 773,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 983,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1193,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1403,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1613,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1663,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 1713,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1763,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1813,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1863,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "'",
+                    "end": 1913,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1964,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2309,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3371,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 3903,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4434,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4966,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 5497,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 6029,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "We all fly low but dream pretty high",
+            "start": 105491,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 237,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 474,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 732,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 991,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1250,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 1484,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1719,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 1954,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2314,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 3034,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 3210,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3386,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3563,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 3735,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4080,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 4253,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 4426,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 4620,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 4815,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5010,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5204,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5399,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 5594,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 6434,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 7274,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 8114,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 8955,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Never stop asking why",
+            "start": 114446,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "N",
+                    "end": 84,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 169,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "v",
+                    "end": 253,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 338,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 423,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 515,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 607,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 699,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 791,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 915,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 1164,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1289,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1413,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 1538,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2262,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2987,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 3712,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Do you know where are we heading to",
+            "start": 120817,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "D",
+                    "end": 262,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 525,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 770,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1015,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1261,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 1429,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1597,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1765,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1933,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2035,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2342,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2445,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2543,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2641,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2740,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3149,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 3366,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3583,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 3800,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 4017,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4234,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 4451,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 4669,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5454,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 6239,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Will there be flowers and songs too",
+            "start": 127056,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 168,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 336,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 504,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 774,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 876,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 978,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1080,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1182,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 1575,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1969,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2101,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2233,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2365,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2497,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2629,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2761,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2893,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 3000,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3107,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 3214,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3444,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3675,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3905,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 4136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4367,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 5028,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 5689,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 6350,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "How many smiles and tears would be enough",
+            "start": 133406,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "H",
+                    "end": 226,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 452,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 679,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 1005,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1332,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1658,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 1985,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2063,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 2141,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2220,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2376,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2455,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2552,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2649,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 2747,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2828,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2909,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2991,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3072,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3154,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 3404,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3655,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3906,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4157,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 4408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 4520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4632,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4847,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 5063,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 5279,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 5495,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 5711,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 5927,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "To fill our empty life",
+            "start": 139333,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "T",
+                    "end": 124,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 248,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 574,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 900,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1226,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1553,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1737,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1922,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2107,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 2709,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 3010,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3311,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 3612,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4135,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4659,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 5183,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5707,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Why we're always curious",
+            "start": 146264,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 619,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 1238,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 1857,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1933,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2010,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "'",
+                    "end": 2086,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2163,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2381,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2522,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 2664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2805,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 2946,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 3483,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3879,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 4275,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4670,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 5066,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 5462,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 5858,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "About things with no true answers",
+            "start": 152122,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "A",
+                    "end": 68,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 205,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 274,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 343,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 422,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 502,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 582,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 662,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 742,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 822,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1060,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 1298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1536,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 1775,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2083,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2391,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2921,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3186,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3451,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 3827,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 4203,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4579,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 4955,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5331,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 5707,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 6083,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "It's still early",
+            "start": 158205,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "I",
+                    "end": 45,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 91,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "'",
+                    "end": 136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 182,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 239,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 297,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 355,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 413,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 471,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 871,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1271,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1671,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 2071,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 2471,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Long before the sunset",
+            "start": 160676,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "L",
+                    "end": 73,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 147,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 221,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 295,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 435,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 575,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 715,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 855,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 995,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1136,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1538,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 1941,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 2856,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3368,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3624,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3880,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "How should we spend the rest of life",
+            "start": 164556,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "H",
+                    "end": 79,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 159,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 239,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 276,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 314,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 351,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 389,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 426,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 464,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 829,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1195,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 1333,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 1471,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1610,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 1748,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 1887,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1956,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2026,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2252,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2564,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3167,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 3615,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 4063,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4511,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 4959,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5407,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Would you ever choose to compromise",
+            "start": 171502,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 79,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 158,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 238,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 317,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 397,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 613,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 829,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 1045,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1331,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "v",
+                    "end": 1617,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1903,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 2189,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 2241,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 2293,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2345,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2397,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2449,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2501,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2713,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 2926,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 3240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3554,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 3869,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 4183,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 4498,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 4812,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "m",
+                    "end": 5126,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 5441,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 5755,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 6070,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "While the world keeps spinning in our eyes",
+            "start": 177572,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 110,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 220,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 330,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 551,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 764,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 978,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1342,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 1492,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 1642,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1792,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 1943,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 2026,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2109,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 2275,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2359,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 2406,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 2454,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2502,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2550,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2597,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2645,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2693,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "g",
+                    "end": 2741,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 3075,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "o",
+                    "end": 3496,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3917,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 4339,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4825,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "y",
+                    "end": 5312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5799,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 6286,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "What will we find after the sunrise",
+            "start": 183858,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 141,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 282,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 423,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 565,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 723,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 882,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 1199,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "w",
+                    "end": 1590,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1981,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2079,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 2177,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 2275,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "d",
+                    "end": 2373,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2536,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "f",
+                    "end": 2699,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 2862,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 3025,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3189,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 3563,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 3937,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 4311,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 4545,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 4779,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "n",
+                    "end": 5013,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 5247,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 5481,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 5715,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5949,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "Will that be a surprise",
+            "start": 189807,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "W",
+                    "end": 78,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 156,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 234,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "l",
+                    "end": 312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 626,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "h",
+                    "end": 940,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 1254,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "t",
+                    "end": 1568,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "b",
+                    "end": 1724,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 1880,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2833,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 3180,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "u",
+                    "end": 3527,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 3874,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "p",
+                    "end": 4221,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "r",
+                    "end": 4568,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "i",
+                    "end": 4915,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "s",
+                    "end": 5262,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 5609,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

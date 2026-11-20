@@ -1,0 +1,2393 @@
+{
+    "id": "1254",
+    "duration": 216190,
+    "chorus": [
+        {
+            "start": 55190,
+            "end": 86985
+        },
+        {
+            "start": 133203,
+            "end": 163155
+        },
+        {
+            "start": 178692,
+            "end": 196137
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "乘小舟水波轻轻荡",
+            "start": 23254,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "乘",
+                    "end": 223,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 487,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "舟",
+                    "end": 928,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1170,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 1427,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 1818,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "轻",
+                    "end": 2276,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "荡",
+                    "end": 2743,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "倒影里竟好像回到了故乡",
+            "start": 25997,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 243,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 513,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 1011,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "竟",
+                    "end": 1239,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 1500,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 1992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 2233,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 2450,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 2844,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 3224,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "乡",
+                    "end": 3963,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我摇晃着船桨",
+            "start": 30772,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 344,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 878,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "晃",
+                    "end": 1346,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 1821,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "船",
+                    "end": 2289,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "桨",
+                    "end": 3057,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "拨动起一段如烟过往",
+            "start": 33829,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "拨",
+                    "end": 253,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 451,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 817,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1060,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "段",
+                    "end": 1339,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 1670,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 1879,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 2146,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "往",
+                    "end": 3298,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "许多事早已渐渐忘",
+            "start": 38440,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "许",
+                    "end": 233,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 522,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 937,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "早",
+                    "end": 1170,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 1434,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "渐",
+                    "end": 1813,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渐",
+                    "end": 2255,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "忘",
+                    "end": 2928,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "眼睛里装不下从前的理想",
+            "start": 41550,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 190,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "睛",
+                    "end": 399,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 758,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "装",
+                    "end": 969,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 1209,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 1674,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "从",
+                    "end": 1921,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 2125,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2359,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "理",
+                    "end": 2835,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "想",
+                    "end": 4003,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "仰着头望一望",
+            "start": 46047,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "仰",
+                    "end": 436,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 880,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "头",
+                    "end": 1370,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 1721,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2192,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "望",
+                    "end": 2825,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "还有团圆的月亮",
+            "start": 48872,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 243,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 517,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "团",
+                    "end": 890,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "圆",
+                    "end": 1316,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1813,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2331,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "亮",
+                    "end": 4361,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你看那天上白月光",
+            "start": 55190,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 179,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "看",
+                    "end": 423,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 912,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1326,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1791,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 2144,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2595,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "光",
+                    "end": 3537,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "照啊照映在心上",
+            "start": 58728,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "照",
+                    "end": 511,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 1036,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1517,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 2019,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "在",
+                    "end": 2375,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 2813,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 3616,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "恍一地的白霜透出我想象",
+            "start": 62633,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "恍",
+                    "end": 200,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 550,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 747,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 916,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 1159,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "霜",
+                    "end": 1779,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "透",
+                    "end": 2073,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "出",
+                    "end": 2287,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2516,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "想",
+                    "end": 3098,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "象",
+                    "end": 3567,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "和每个熟悉脸庞",
+            "start": 66422,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "和",
+                    "end": 193,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "每",
+                    "end": 411,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "个",
+                    "end": 743,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "熟",
+                    "end": 1083,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "悉",
+                    "end": 1417,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "脸",
+                    "end": 1942,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "庞",
+                    "end": 3147,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "你听啊听那歌声唱",
+            "start": 70101,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 268,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "听",
+                    "end": 688,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 1133,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 1588,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 2080,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "歌",
+                    "end": 2385,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 2852,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "唱",
+                    "end": 3878,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "哎呀嘿呀多悠扬",
+            "start": 73979,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "哎",
+                    "end": 258,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "呀",
+                    "end": 780,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "嘿",
+                    "end": 1339,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "呀",
+                    "end": 1836,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "多",
+                    "end": 2324,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "悠",
+                    "end": 2768,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "扬",
+                    "end": 3539,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "轻拂过我耳旁诉说着情长",
+            "start": 77894,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 210,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "拂",
+                    "end": 554,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 766,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 975,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "耳",
+                    "end": 1486,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 1952,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "诉",
+                    "end": 2147,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "说",
+                    "end": 2381,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 2737,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "情",
+                    "end": 3129,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 3582,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "和它珍藏的旧时光",
+            "start": 81760,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "和",
+                    "end": 273,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "它",
+                    "end": 603,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "珍",
+                    "end": 1115,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "藏",
+                    "end": 1684,
+                    "scale": [
+                        6,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2853,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "旧",
+                    "end": 3315,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 3713,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "光",
+                    "end": 5225,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "再回到曾经的地方",
+            "start": 101306,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 235,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 489,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 930,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 1179,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "经",
+                    "end": 1430,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1788,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "地",
+                    "end": 2249,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "方",
+                    "end": 2779,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "又想起记忆中模糊的景象",
+            "start": 104084,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 228,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 483,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 947,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "记",
+                    "end": 1160,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "忆",
+                    "end": 1409,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1885,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "模",
+                    "end": 2142,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "糊",
+                    "end": 2411,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2725,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "景",
+                    "end": 3157,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "象",
+                    "end": 3897,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "灯火穿过街巷",
+            "start": 108778,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 362,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 675,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "穿",
+                    "end": 1072,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1532,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "街",
+                    "end": 2099,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "巷",
+                    "end": 2680,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "那时候梦比长夜更长",
+            "start": 111738,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 206,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 428,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "候",
+                    "end": 931,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "比",
+                    "end": 1453,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 1765,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 2126,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 2338,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "长",
+                    "end": 3691,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "背起了成长的行囊",
+            "start": 116519,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "背",
+                    "end": 223,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 443,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 844,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "成",
+                    "end": 1088,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 1361,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1666,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "行",
+                    "end": 2177,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "囊",
+                    "end": 2891,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "不知道是翱翔还是去流浪",
+            "start": 119554,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 201,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 390,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "道",
+                    "end": 778,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1007,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "翱",
+                    "end": 1328,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "翔",
+                    "end": 1807,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 2134,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2383,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 2638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 3010,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浪",
+                    "end": 4126,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "回头望我身后",
+            "start": 124061,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 439,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "头",
+                    "end": 955,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 1384,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1833,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 2276,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "后",
+                    "end": 2988,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "有个等我的月亮",
+            "start": 127049,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 209,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 506,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 924,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1311,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1835,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2322,
+                    "scale": 4
+                },
+                {
+                    "type": "Slur",
+                    "ch": "亮",
+                    "end": 4528,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你看那天上白月光",
+            "start": 133203,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 204,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "看",
+                    "end": 498,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 965,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1395,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1841,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 2207,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2660,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "光",
+                    "end": 3687,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "照啊照映在心上",
+            "start": 136889,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "照",
+                    "end": 475,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 958,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1441,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 1854,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "在",
+                    "end": 2313,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 2745,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 3626,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "恍一地的白霜透出我想象",
+            "start": 140708,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "恍",
+                    "end": 289,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 537,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 751,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 966,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 1361,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "霜",
+                    "end": 1742,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "透",
+                    "end": 2019,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "出",
+                    "end": 2326,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2693,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "想",
+                    "end": 3219,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "象",
+                    "end": 3709,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "和每个熟悉脸庞",
+            "start": 144417,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "和",
+                    "end": 248,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "每",
+                    "end": 548,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "个",
+                    "end": 955,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "熟",
+                    "end": 1260,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "悉",
+                    "end": 1593,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "脸",
+                    "end": 1890,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "庞",
+                    "end": 3129,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "你听啊听那歌声唱",
+            "start": 148155,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 332,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "听",
+                    "end": 779,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 1253,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 1716,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 2129,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "歌",
+                    "end": 2546,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 2966,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "唱",
+                    "end": 3882,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "哎呀嘿呀多悠扬",
+            "start": 152037,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "哎",
+                    "end": 524,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "呀",
+                    "end": 938,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "嘿",
+                    "end": 1471,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "呀",
+                    "end": 1927,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "多",
+                    "end": 2376,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "悠",
+                    "end": 2810,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "扬",
+                    "end": 3529,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "轻拂过我耳旁诉说着情长",
+            "start": 155923,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 236,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "拂",
+                    "end": 589,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 774,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1011,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "耳",
+                    "end": 1410,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 1852,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "诉",
+                    "end": 2133,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "说",
+                    "end": 2451,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 2864,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "情",
+                    "end": 3282,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 3756,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "还是当初模样",
+            "start": 159679,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 458,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "是",
+                    "end": 867,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "当",
+                    "end": 1319,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 1627,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "模",
+                    "end": 2008,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "样",
+                    "end": 3476,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "高山长流水流淌",
+            "start": 163711,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "高",
+                    "end": 863,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "山",
+                    "end": 1720,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 3620,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "流",
+                    "end": 4703,
+                    "scale": [
+                        1,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 5178,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 5597,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "淌",
+                    "end": 6755,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "那里藏着谁的情郎",
+            "start": 171196,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 238,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 675,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 989,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "着",
+                    "end": 1713,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 2148,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2483,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 2792,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "郎",
+                    "end": 3870,
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "和谁小小的愿望",
+            "start": 175066,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "和",
+                    "end": 484,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 715,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 900,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 1106,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1453,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "愿",
+                    "end": 1807,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "望",
+                    "end": 3006,
+                    "scale": [
+                        3,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你看那天上白月光",
+            "start": 178692,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 344,
+                    "scale": 19
+                },
+                {
+                    "type": "Slur",
+                    "ch": "看",
+                    "end": 736,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 1096,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1599,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 2078,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "白",
+                    "end": 2434,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2875,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "光",
+                    "end": 3631,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "照啊照映在心上",
+            "start": 182593,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "照",
+                    "end": 416,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 967,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 1486,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 1905,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "在",
+                    "end": 2382,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 2821,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 3453,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "难忘不是故乡是当时寻常",
+            "start": 186384,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "难",
+                    "end": 231,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "忘",
+                    "end": 524,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 777,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1011,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "故",
+                    "end": 1404,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "乡",
+                    "end": 1826,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2107,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "当",
+                    "end": 2366,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 2782,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "寻",
+                    "end": 3191,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "常",
+                    "end": 3764,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "再也回不去的时光",
+            "start": 190148,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 468,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 934,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "回",
+                    "end": 1359,
+                    "scale": [
+                        5,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "不",
+                    "end": 1941,
+                    "scale": [
+                        6,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 3083,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3549,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 3945,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "光",
+                    "end": 5989,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        }
+    ]
+}

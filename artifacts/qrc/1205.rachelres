@@ -1,0 +1,1744 @@
+{
+    "id": "1205",
+    "duration": 227055,
+    "chorus": [
+        {
+            "start": 58359,
+            "end": 85973
+        },
+        {
+            "start": 126558,
+            "end": 149771
+        },
+        {
+            "start": 176304,
+            "end": 212889
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "我不羡鲲鹏击九万里苍穹",
+            "start": 16098,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 232,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 445,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "羡",
+                    "end": 929,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "鲲",
+                    "end": 1561,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "鹏",
+                    "end": 3276,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "击",
+                    "end": 3549,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "九",
+                    "end": 3870,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "万",
+                    "end": 4103,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 4331,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "苍",
+                    "end": 4785,
+                    "scale": [
+                        9,
+                        6
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "穹",
+                    "end": 6199,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "却衔来高峰远征日月星空",
+            "start": 22689,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "却",
+                    "end": 205,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "衔",
+                    "end": 529,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 1047,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "高",
+                    "end": 1828,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "峰",
+                    "end": 2663,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 2900,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "征",
+                    "end": 3240,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "日",
+                    "end": 3529,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 3890,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "星",
+                    "end": 4196,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "空",
+                    "end": 6020,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "既然我曾经被沉溺于噩梦",
+            "start": 29241,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "既",
+                    "end": 237,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 572,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 853,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "曾",
+                    "end": 1705,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "经",
+                    "end": 3382,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 3632,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "沉",
+                    "end": 3884,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "溺",
+                    "end": 4188,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 4408,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "噩",
+                    "end": 5009,
+                    "scale": [
+                        9,
+                        6
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "梦",
+                    "end": 6339,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "必将重生苏醒于骇浪中",
+            "start": 35986,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "必",
+                    "end": 213,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 991,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 1709,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 2783,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "苏",
+                    "end": 2999,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "醒",
+                    "end": 3219,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 3564,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "骇",
+                    "end": 4121,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "浪",
+                    "end": 4502,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "中",
+                    "end": 6471,
+                    "scale": [
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "啊啊天地汹涌",
+            "start": 43074,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 533,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "啊",
+                    "end": 3156,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 3569,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 4449,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "汹",
+                    "end": 5380,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "涌",
+                    "end": 6051,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "才敢与我相逢",
+            "start": 49478,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "才",
+                    "end": 665,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "敢",
+                    "end": 2883,
+                    "scale": [
+                        8,
+                        8
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "与",
+                    "end": 3505,
+                    "scale": [
+                        9,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 4250,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 4625,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "逢",
+                    "end": 8617,
+                    "scale": [
+                        10,
+                        17
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁来过我来过撼岳扬波",
+            "start": 58359,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 231,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 477,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1520,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1740,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 1959,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3229,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "撼",
+                    "end": 3458,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "岳",
+                    "end": 4688,
+                    "scale": 10
+                },
+                {
+                    "type": "Slur",
+                    "ch": "扬",
+                    "end": 5318,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 6231,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "像一粒沙奔赴潮汐漩涡",
+            "start": 64590,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 267,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 527,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "粒",
+                    "end": 781,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "沙",
+                    "end": 1960,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "奔",
+                    "end": 2188,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "赴",
+                    "end": 2493,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "潮",
+                    "end": 2991,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "汐",
+                    "end": 3900,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "漩",
+                    "end": 4648,
+                    "scale": [
+                        8,
+                        9
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "涡",
+                    "end": 6648,
+                    "scale": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁见过我见过",
+            "start": 71612,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 181,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 380,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1347,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1582,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 1865,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3292,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "看深渊仍壮阔",
+            "start": 74904,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 284,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "深",
+                    "end": 1261,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "渊",
+                    "end": 2016,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "仍",
+                    "end": 2271,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "壮",
+                    "end": 2572,
+                    "scale": 10
+                },
+                {
+                    "type": "Slur",
+                    "ch": "阔",
+                    "end": 3561,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "别笑我寂寞不肯坠落",
+            "start": 78465,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "别",
+                    "end": 235,
+                    "scale": 12
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 1491,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1815,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "寂",
+                    "end": 2007,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "寞",
+                    "end": 2784,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3020,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "肯",
+                    "end": 3527,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "坠",
+                    "end": 5227,
+                    "scale": [
+                        9,
+                        3
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "落",
+                    "end": 7508,
+                    "scale": [
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "既然我已经比长风更轻盈",
+            "start": 112635,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "既",
+                    "end": 243,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 907,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1166,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "已",
+                    "end": 1775,
+                    "scale": [
+                        7,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "经",
+                    "end": 3421,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "比",
+                    "end": 3629,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 3944,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 4150,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 4464,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "轻",
+                    "end": 5002,
+                    "scale": [
+                        9,
+                        6
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "盈",
+                    "end": 6356,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "区区山海又如何不可平",
+            "start": 119358,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "区",
+                    "end": 201,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "区",
+                    "end": 923,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1689,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 2669,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 2941,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 3196,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 3473,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3924,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "可",
+                    "end": 4284,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "平",
+                    "end": 6967,
+                    "scale": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁来过我来过撼岳扬波",
+            "start": 126558,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 221,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 440,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1663,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1895,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2125,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3296,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "撼",
+                    "end": 3829,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "岳",
+                    "end": 4698,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "扬",
+                    "end": 5538,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 6252,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "像一粒沙奔赴潮汐漩涡",
+            "start": 132810,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 259,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 524,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "粒",
+                    "end": 783,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "沙",
+                    "end": 1906,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "奔",
+                    "end": 2280,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "赴",
+                    "end": 2641,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "潮",
+                    "end": 3241,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "汐",
+                    "end": 3911,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "漩",
+                    "end": 4767,
+                    "scale": [
+                        8,
+                        9
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "涡",
+                    "end": 6669,
+                    "scale": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁见过我见过",
+            "start": 139919,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 213,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 463,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1581,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1809,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 2042,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3263,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "看深渊仍壮阔",
+            "start": 143182,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 225,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "深",
+                    "end": 855,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "渊",
+                    "end": 1901,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "仍",
+                    "end": 2321,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "壮",
+                    "end": 2603,
+                    "scale": 10
+                },
+                {
+                    "type": "Slur",
+                    "ch": "阔",
+                    "end": 3518,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "别笑我着魔",
+            "start": 146700,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "别",
+                    "end": 231,
+                    "scale": 12
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 1531,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1951,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 2135,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "魔",
+                    "end": 3071,
+                    "scale": 9
+                }
+            ]
+        },
+        {
+            "text": "有多少烟涛填不满",
+            "start": 151191,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 550,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 904,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 1908,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烟",
+                    "end": 2299,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "涛",
+                    "end": 3574,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "填",
+                    "end": 3809,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 4312,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "满",
+                    "end": 5387,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "有多少蜃楼望不穿",
+            "start": 157546,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 517,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 1017,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 2039,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "蜃",
+                    "end": 2758,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "楼",
+                    "end": 3617,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3905,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 4336,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "穿",
+                    "end": 6210,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "有多少天涯走不完",
+            "start": 164392,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 648,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 916,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "少",
+                    "end": 1592,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2419,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 3476,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 3977,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 4305,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "完",
+                    "end": 4880,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "我才是沧流中无际彼岸",
+            "start": 169827,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 276,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "才",
+                    "end": 719,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1369,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "沧",
+                    "end": 1780,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 2029,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 3142,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3427,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "际",
+                    "end": 3657,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "彼",
+                    "end": 3951,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "岸",
+                    "end": 6477,
+                    "scale": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁来过我来过风暴磅礴",
+            "start": 176304,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 333,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 642,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1829,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2058,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2363,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3566,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 3776,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "暴",
+                    "end": 4384,
+                    "scale": 10
+                },
+                {
+                    "type": "Slur",
+                    "ch": "磅",
+                    "end": 5314,
+                    "scale": [
+                        9,
+                        8
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "礴",
+                    "end": 6586,
+                    "scale": 8
+                }
+            ]
+        },
+        {
+            "text": "像一株花飞渡百川之末",
+            "start": 182890,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 236,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 518,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "株",
+                    "end": 876,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 1926,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 2247,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "渡",
+                    "end": 2491,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "百",
+                    "end": 2964,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "川",
+                    "end": 3911,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "之",
+                    "end": 4729,
+                    "scale": [
+                        8,
+                        9
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "末",
+                    "end": 6847,
+                    "scale": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁见过我见过",
+            "start": 189996,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 201,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 432,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 1251,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1498,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 1807,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3207,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "看轮回正鲸落",
+            "start": 193203,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 253,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "轮",
+                    "end": 1017,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 1951,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "正",
+                    "end": 2239,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "鲸",
+                    "end": 2619,
+                    "scale": 10
+                },
+                {
+                    "type": "Slur",
+                    "ch": "落",
+                    "end": 3513,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "别笑我执着不肯停泊",
+            "start": 196716,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "别",
+                    "end": 280,
+                    "scale": 12
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 1333,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1749,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "执",
+                    "end": 1956,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "着",
+                    "end": 2832,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3105,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "肯",
+                    "end": 3639,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "停",
+                    "end": 5333,
+                    "scale": [
+                        9,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "泊",
+                    "end": 6509,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "桑田来临前不肯解脱",
+            "start": 203513,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "桑",
+                    "end": 246,
+                    "scale": 12
+                },
+                {
+                    "type": "Slur",
+                    "ch": "田",
+                    "end": 1387,
+                    "scale": [
+                        13,
+                        13
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 1803,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 2006,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 2711,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3040,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "肯",
+                    "end": 3520,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "解",
+                    "end": 5335,
+                    "scale": [
+                        9,
+                        10
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "脱",
+                    "end": 9376,
+                    "scale": [
+                        10,
+                        10
+                    ]
+                }
+            ]
+        }
+    ]
+}

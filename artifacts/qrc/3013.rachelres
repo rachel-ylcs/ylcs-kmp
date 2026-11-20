@@ -1,0 +1,1635 @@
+{
+    "id": "3013",
+    "duration": 234219,
+    "chorus": [
+        {
+            "start": 77790,
+            "end": 77790
+        },
+        {
+            "start": 175110,
+            "end": 175110
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "寒江渡白鹤",
+            "start": 39263,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "寒",
+                    "end": 252,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "江",
+                    "end": 513,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "渡",
+                    "end": 798,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "白",
+                    "end": 1432,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "鹤",
+                    "end": 2875,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "流淌一身星河",
+            "start": 43660,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 321,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "淌",
+                    "end": 581,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 836,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 1806,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "星",
+                    "end": 2239,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "河",
+                    "end": 3433,
+                    "scale": 15
+                }
+            ]
+        },
+        {
+            "text": "我是惆怅客",
+            "start": 48266,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 269,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 530,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "惆",
+                    "end": 790,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "怅",
+                    "end": 1358,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "客",
+                    "end": 2752,
+                    "scale": 18
+                }
+            ]
+        },
+        {
+            "text": "你是我的因果",
+            "start": 51700,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 225,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 2127,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2316,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2605,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "因",
+                    "end": 3173,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "果",
+                    "end": 4247,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "月光游山河",
+            "start": 57366,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 249,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 516,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "游",
+                    "end": 807,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1421,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "河",
+                    "end": 3488,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "像思念在漂泊",
+            "start": 61764,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 258,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 561,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "念",
+                    "end": 949,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1800,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "漂",
+                    "end": 2212,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "泊",
+                    "end": 3241,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "几回茫茫人海里沉默",
+            "start": 65245,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 231,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 1067,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 1404,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 2255,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2575,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 3606,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 4490,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "沉",
+                    "end": 5192,
+                    "scale": 16
+                },
+                {
+                    "type": "Slur",
+                    "ch": "默",
+                    "end": 7172,
+                    "scale": [
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我等在光影斑斓的初春",
+            "start": 77963,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 285,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 508,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 772,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 1078,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 1383,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "斑",
+                    "end": 1906,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "斓",
+                    "end": 2243,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2818,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 3393,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 4505,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "杏花微雨中遇见一个人",
+            "start": 82468,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "杏",
+                    "end": 210,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 517,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 807,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 1101,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1405,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "遇",
+                    "end": 2040,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 2279,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3209,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 3425,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "人",
+                    "end": 4600,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "与你遥遥对望一瞬",
+            "start": 87289,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "与",
+                    "end": 234,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 517,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "遥",
+                    "end": 780,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "遥",
+                    "end": 1763,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "对",
+                    "end": 1989,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 2599,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3169,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "瞬",
+                    "end": 4842,
+                    "scale": [
+                        2,
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "一瞬惊动整个红尘",
+            "start": 92418,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 217,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞬",
+                    "end": 1121,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 1382,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 1957,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "整",
+                    "end": 2166,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2428,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 2988,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "尘",
+                    "end": 3929,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "也许前路是千山层层",
+            "start": 96347,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 240,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "许",
+                    "end": 499,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 768,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 1045,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1545,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 1903,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 2493,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "层",
+                    "end": 3045,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "层",
+                    "end": 3897,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "将我拦在没有你的黄昏",
+            "start": 100663,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 207,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 461,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "拦",
+                    "end": 730,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1005,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 1290,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 1782,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2161,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2939,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "黄",
+                    "end": 3297,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "昏",
+                    "end": 4657,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "当飞雪翩然落双唇",
+            "start": 105320,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "当",
+                    "end": 276,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 554,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雪",
+                    "end": 872,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 1770,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 2128,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 2623,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "双",
+                    "end": 3227,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "唇",
+                    "end": 4565,
+                    "scale": [
+                        2,
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "地老天荒一个吻 万物温存",
+            "start": 110457,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 261,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "老",
+                    "end": 1187,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1441,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "荒",
+                    "end": 2053,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2267,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2816,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 5861,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "万",
+                    "end": 6115,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "物",
+                    "end": 7086,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "温",
+                    "end": 7430,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "存",
+                    "end": 10498,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "长空云影过",
+            "start": 136658,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 200,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 416,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 686,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 1305,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 3491,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "徒留天地寥廓",
+            "start": 141046,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "徒",
+                    "end": 247,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 537,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 801,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 1664,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "寥",
+                    "end": 2248,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "廓",
+                    "end": 3337,
+                    "scale": 15
+                }
+            ]
+        },
+        {
+            "text": "我想起很多",
+            "start": 145586,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 245,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 528,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 813,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "很",
+                    "end": 1448,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 3226,
+                    "scale": 18
+                }
+            ]
+        },
+        {
+            "text": "杯酒倒映寂寞",
+            "start": 148983,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "杯",
+                    "end": 230,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "酒",
+                    "end": 2082,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 2306,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 2574,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "寂",
+                    "end": 3186,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "寞",
+                    "end": 4926,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "心事如琥珀",
+            "start": 154596,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 264,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 562,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 874,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "琥",
+                    "end": 1500,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "珀",
+                    "end": 4526,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "剔透却无人说",
+            "start": 159122,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "剔",
+                    "end": 274,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "透",
+                    "end": 530,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "却",
+                    "end": 820,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 1894,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2277,
+                    "scale": 16
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 3165,
+                    "scale": 17
+                }
+            ]
+        },
+        {
+            "text": "东风模糊流转的眼波",
+            "start": 162576,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "东",
+                    "end": 246,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 1248,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "模",
+                    "end": 1457,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "糊",
+                    "end": 2360,
+                    "scale": 18
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 2616,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "转",
+                    "end": 3723,
+                    "scale": 17
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 4549,
+                    "scale": 15
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 5092,
+                    "scale": 16
+                },
+                {
+                    "type": "Slur",
+                    "ch": "波",
+                    "end": 8222,
+                    "scale": [
+                        16,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我等在光影斑斓的初春",
+            "start": 175451,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 187,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 427,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 680,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 949,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "影",
+                    "end": 1285,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "斑",
+                    "end": 1781,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "斓",
+                    "end": 2092,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2633,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 3242,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 4197,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "杏花微雨中遇见一个人",
+            "start": 179862,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "杏",
+                    "end": 200,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 446,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "微",
+                    "end": 722,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 1036,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1342,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "遇",
+                    "end": 1805,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 2208,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3090,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 3396,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "人",
+                    "end": 4436,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "与你遥遥对望一瞬",
+            "start": 184535,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "与",
+                    "end": 321,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 613,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "遥",
+                    "end": 904,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "遥",
+                    "end": 1821,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "对",
+                    "end": 2091,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 2665,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3253,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "瞬",
+                    "end": 4829,
+                    "scale": [
+                        2,
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "一瞬惊动整个红尘",
+            "start": 189747,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 255,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞬",
+                    "end": 1075,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 1344,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 1986,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "整",
+                    "end": 2231,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2541,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 3121,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "尘",
+                    "end": 3957,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "也许前路是千山层层",
+            "start": 193704,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 256,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "许",
+                    "end": 523,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 798,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 1100,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 1642,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 1947,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 2553,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "层",
+                    "end": 3145,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "层",
+                    "end": 4054,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "将我拦在没有你的黄昏",
+            "start": 197995,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 217,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 435,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "拦",
+                    "end": 740,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1025,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 1367,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 1852,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2204,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2949,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "黄",
+                    "end": 3322,
+                    "scale": 21
+                },
+                {
+                    "type": "Slur",
+                    "ch": "昏",
+                    "end": 4421,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "当飞雪翩然落双唇",
+            "start": 202742,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "当",
+                    "end": 263,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "飞",
+                    "end": 530,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "雪",
+                    "end": 856,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 1498,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 2040,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 2562,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "双",
+                    "end": 3174,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "唇",
+                    "end": 4764,
+                    "scale": [
+                        2,
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "地老天荒一个吻 万物温存",
+            "start": 207820,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "地",
+                    "end": 246,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "老",
+                    "end": 1170,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1454,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "荒",
+                    "end": 2123,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2348,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2782,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "吻",
+                    "end": 3932,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "万",
+                    "end": 4522,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "物",
+                    "end": 5896,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "温",
+                    "end": 6466,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "存",
+                    "end": 10063,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

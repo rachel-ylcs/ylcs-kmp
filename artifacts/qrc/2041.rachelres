@@ -1,0 +1,2057 @@
+{
+    "id": "2041",
+    "duration": 167837,
+    "chorus": [
+        {
+            "start": 45780,
+            "end": 45780
+        },
+        {
+            "start": 124620,
+            "end": 124620
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "贺新谣 - 银临/李蚊香/Tacke竹桑/知性的小方块",
+            "start": 0,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "贺",
+                    "end": 172,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "谣",
+                    "end": 516,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "-",
+                    "end": 860,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "银",
+                    "end": 1204,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "临",
+                    "end": 1376,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 1548,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "李",
+                    "end": 1720,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "蚊",
+                    "end": 1892,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "香",
+                    "end": 2064,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 2236,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "T",
+                    "end": 2270,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "a",
+                    "end": 2304,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "c",
+                    "end": 2339,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "k",
+                    "end": 2373,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "e",
+                    "end": 2408,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 2580,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "桑",
+                    "end": 2752,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "/",
+                    "end": 2924,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 3096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "性",
+                    "end": 3268,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 3612,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "方",
+                    "end": 3784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "块",
+                    "end": 3956,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "词：原晞",
+            "start": 3960,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "词",
+                    "end": 992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 1984,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 2976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "晞",
+                    "end": 3968,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "曲：徐一",
+            "start": 7930,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 1984,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "徐",
+                    "end": 2976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3968,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "编曲：徐一",
+            "start": 11900,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "编",
+                    "end": 794,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "曲",
+                    "end": 1588,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "：",
+                    "end": 2382,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "徐",
+                    "end": 3176,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3970,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "刚出炉的热年糕",
+            "start": 15873,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "刚",
+                    "end": 450,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 981,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "炉",
+                    "end": 1378,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1752,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 2173,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "年",
+                    "end": 2482,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "糕",
+                    "end": 3334,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "馋醒了懒猫",
+            "start": 19647,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "馋",
+                    "end": 406,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "醒",
+                    "end": 885,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1214,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "懒",
+                    "end": 1614,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "猫",
+                    "end": 2348,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "门前福字要贴倒",
+            "start": 23420,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "门",
+                    "end": 442,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "前",
+                    "end": 941,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "福",
+                    "end": 1281,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "字",
+                    "end": 1704,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 2096,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "贴",
+                    "end": 2514,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 3318,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "谁在偷笑",
+            "start": 27077,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 1378,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1634,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "偷",
+                    "end": 1859,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2832,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "铜锣敲一敲花鼓摇一摇",
+            "start": 30485,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "铜",
+                    "end": 300,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "锣",
+                    "end": 509,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "敲",
+                    "end": 808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1139,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "敲",
+                    "end": 1639,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 2014,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鼓",
+                    "end": 2319,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 2725,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2989,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 3394,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "热闹瞧一瞧故事聊一聊",
+            "start": 34213,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 227,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "闹",
+                    "end": 464,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞧",
+                    "end": 891,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1131,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞧",
+                    "end": 1780,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 2030,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 2310,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "聊",
+                    "end": 2743,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "聊",
+                    "end": 3385,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "买糖葫芦先把队排好",
+            "start": 37950,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "买",
+                    "end": 210,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "糖",
+                    "end": 479,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "葫",
+                    "end": 898,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "芦",
+                    "end": 1912,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "先",
+                    "end": 2381,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 2814,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "队",
+                    "end": 3612,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "排",
+                    "end": 4151,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 6121,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华灯初上阑珊处总有人回望",
+            "start": 45804,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 523,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 731,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 998,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1499,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阑",
+                    "end": 1768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珊",
+                    "end": 2015,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2434,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "总",
+                    "end": 2662,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2911,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 3187,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 3448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3760,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "烟火盛放好梦被珍藏",
+            "start": 49564,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 496,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 737,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "盛",
+                    "end": 1030,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "放",
+                    "end": 1755,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2250,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2456,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 2671,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珍",
+                    "end": 2920,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 3310,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "走街串巷终于来到你的身旁",
+            "start": 53284,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 570,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "街",
+                    "end": 818,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "串",
+                    "end": 1061,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "巷",
+                    "end": 1576,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "终",
+                    "end": 1835,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 2247,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2486,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 2742,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2957,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3223,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 3423,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 3746,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "斟满春光彻醉何妨",
+            "start": 57151,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "斟",
+                    "end": 694,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "满",
+                    "end": 919,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 1133,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 1739,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "彻",
+                    "end": 2490,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "醉",
+                    "end": 2765,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 3022,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "妨",
+                    "end": 3316,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华灯初上阑珊处总有人回望",
+            "start": 60951,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 396,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 640,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 894,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阑",
+                    "end": 1595,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珊",
+                    "end": 1872,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2250,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "总",
+                    "end": 2471,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2685,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2929,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 3199,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3616,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "烟火盛放好梦被珍藏",
+            "start": 64750,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 391,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 646,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "盛",
+                    "end": 935,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "放",
+                    "end": 1567,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2037,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2247,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 2525,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珍",
+                    "end": 2744,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 3158,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "走街串巷终于来到你的身旁",
+            "start": 68237,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 569,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "街",
+                    "end": 816,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "串",
+                    "end": 1119,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "巷",
+                    "end": 1587,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "终",
+                    "end": 1840,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 2150,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2452,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 2757,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2992,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3241,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 3450,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 3539,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "爆竹响愿年岁无恙",
+            "start": 72138,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "爆",
+                    "end": 247,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 677,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "响",
+                    "end": 1645,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "愿",
+                    "end": 2138,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "年",
+                    "end": 2555,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "岁",
+                    "end": 3326,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3678,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "恙",
+                    "end": 6035,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "馅饼还在锅里烙",
+            "start": 94692,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "馅",
+                    "end": 444,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "饼",
+                    "end": 901,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "还",
+                    "end": 1193,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "锅",
+                    "end": 2073,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "里",
+                    "end": 2574,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烙",
+                    "end": 3350,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "粥等慢慢煲",
+            "start": 98436,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "粥",
+                    "end": 272,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "等",
+                    "end": 744,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 1250,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "慢",
+                    "end": 1685,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "煲",
+                    "end": 2907,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "青梅竹马正嬉闹",
+            "start": 102231,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 435,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梅",
+                    "end": 924,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 1211,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "马",
+                    "end": 1672,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "正",
+                    "end": 2050,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "嬉",
+                    "end": 2467,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "闹",
+                    "end": 3048,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "唱贺新谣",
+            "start": 106030,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "唱",
+                    "end": 1167,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "贺",
+                    "end": 1346,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 1579,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "谣",
+                    "end": 2502,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "铜锣敲一敲花鼓摇一摇",
+            "start": 109233,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "铜",
+                    "end": 211,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "锣",
+                    "end": 468,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "敲",
+                    "end": 768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1149,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "敲",
+                    "end": 1617,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 2001,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "鼓",
+                    "end": 2345,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 2717,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3011,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "摇",
+                    "end": 3351,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "热闹瞧一瞧故事聊一聊",
+            "start": 112857,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 323,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "闹",
+                    "end": 612,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞧",
+                    "end": 999,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1308,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "瞧",
+                    "end": 1824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 2187,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 2460,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "聊",
+                    "end": 2844,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3127,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "聊",
+                    "end": 3509,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "买糖葫芦先把队排好",
+            "start": 116710,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "买",
+                    "end": 249,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "糖",
+                    "end": 482,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "葫",
+                    "end": 1206,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "芦",
+                    "end": 1877,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "先",
+                    "end": 2365,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "把",
+                    "end": 2768,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "队",
+                    "end": 3702,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "排",
+                    "end": 4149,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 5917,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华灯初上阑珊处总有人回望",
+            "start": 124621,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 448,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 664,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 952,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1446,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阑",
+                    "end": 1693,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珊",
+                    "end": 2048,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2366,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "总",
+                    "end": 2585,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2790,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 3070,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 3298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3567,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "烟火盛放好梦被珍藏",
+            "start": 128421,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 450,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 690,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "盛",
+                    "end": 927,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "放",
+                    "end": 1616,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2048,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2301,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 2509,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珍",
+                    "end": 2748,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 3028,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "走街串巷终于来到你的身旁",
+            "start": 131893,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 577,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "街",
+                    "end": 864,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "串",
+                    "end": 1161,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "巷",
+                    "end": 1638,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "终",
+                    "end": 1911,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 2294,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2562,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 2805,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 3032,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3241,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 3489,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 3750,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "斟满春光彻醉何妨",
+            "start": 135959,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "斟",
+                    "end": 450,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "满",
+                    "end": 999,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 1218,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 1806,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "彻",
+                    "end": 2275,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "醉",
+                    "end": 2712,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2931,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "妨",
+                    "end": 3295,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "华灯初上阑珊处总有人回望",
+            "start": 139638,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 372,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 651,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 927,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 1375,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "阑",
+                    "end": 1667,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珊",
+                    "end": 2120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2357,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "总",
+                    "end": 2581,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2786,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 2996,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "回",
+                    "end": 3242,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3536,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "烟火盛放好梦被珍藏",
+            "start": 143407,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 466,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 707,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "盛",
+                    "end": 961,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "放",
+                    "end": 1454,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 2082,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2313,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "被",
+                    "end": 2553,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "珍",
+                    "end": 2784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "藏",
+                    "end": 3111,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "走街串巷终于来到你的身旁",
+            "start": 146896,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "走",
+                    "end": 668,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "街",
+                    "end": 896,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "串",
+                    "end": 1140,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "巷",
+                    "end": 1685,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "终",
+                    "end": 1973,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 2350,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 2590,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "到",
+                    "end": 2848,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 3068,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3302,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 3545,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旁",
+                    "end": 3815,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "爆竹响愿年岁无恙",
+            "start": 150984,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "爆",
+                    "end": 298,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 614,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "响",
+                    "end": 1588,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "愿",
+                    "end": 2019,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "年",
+                    "end": 2432,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "岁",
+                    "end": 3228,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3533,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "恙",
+                    "end": 6216,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

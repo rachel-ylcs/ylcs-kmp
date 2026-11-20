@@ -1,0 +1,1668 @@
+{
+    "id": "2016",
+    "duration": 183153,
+    "chorus": [
+        {
+            "start": 50540,
+            "end": 50540
+        },
+        {
+            "start": 112930,
+            "end": 112930
+        },
+        {
+            "start": 132320,
+            "end": 132320
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "推门望天边 一碗夕阳稠",
+            "start": 9269,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "推",
+                    "end": 584,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "门",
+                    "end": 1080,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 1537,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 1936,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "边",
+                    "end": 2553,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2952,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "碗",
+                    "end": 3360,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夕",
+                    "end": 3800,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "阳",
+                    "end": 4168,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "稠",
+                    "end": 4600,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "落霞笑炊烟 妆色灰旧",
+            "start": 14245,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "落",
+                    "end": 385,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "霞",
+                    "end": 840,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 1208,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "炊",
+                    "end": 1688,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 2312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "妆",
+                    "end": 2744,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "色",
+                    "end": 3064,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "灰",
+                    "end": 3344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "旧",
+                    "end": 3976,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "烂石拥苍苔 枯木馋春柳",
+            "start": 19122,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "烂",
+                    "end": 360,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "石",
+                    "end": 752,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "拥",
+                    "end": 1128,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "苍",
+                    "end": 1536,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "苔",
+                    "end": 2280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "枯",
+                    "end": 2656,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "木",
+                    "end": 3137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "馋",
+                    "end": 3584,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 3920,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "柳",
+                    "end": 4408,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "青山最长寿 睡饱千秋",
+            "start": 23947,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 384,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 799,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 1199,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 1575,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "寿",
+                    "end": 2280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "睡",
+                    "end": 2599,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "饱",
+                    "end": 2887,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 3207,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 3975,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "晚风闹归帆 樵客背星斗",
+            "start": 28617,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 520,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 1017,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "闹",
+                    "end": 1440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1824,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "帆",
+                    "end": 2440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "樵",
+                    "end": 2944,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "客",
+                    "end": 3312,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "背",
+                    "end": 3712,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "星",
+                    "end": 4128,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "斗",
+                    "end": 4632,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "人间正安稳 忽生烦忧",
+            "start": 33569,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 264,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 792,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "正",
+                    "end": 1272,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "安",
+                    "end": 1648,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "稳",
+                    "end": 2336,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "忽",
+                    "end": 2656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 2993,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "烦",
+                    "end": 3561,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "忧",
+                    "end": 4400,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "转身奔入夜 月光似好酒",
+            "start": 38369,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "转",
+                    "end": 336,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 768,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "奔",
+                    "end": 1112,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1656,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 2328,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2792,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 3192,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "似",
+                    "end": 3664,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "好",
+                    "end": 4145,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "酒",
+                    "end": 4680,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "谁有不平事 敞开喝一口",
+            "start": 43313,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 632,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 968,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "平",
+                    "end": 1496,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 2152,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "敞",
+                    "end": 2608,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "开",
+                    "end": 3104,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "喝",
+                    "end": 3632,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 4033,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "口",
+                    "end": 4688,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "空山新雨后 天气晚来秋",
+            "start": 50565,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 352,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 608,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 992,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "雨",
+                    "end": 1592,
+                    "scale": [
+                        3,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 2312,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2608,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "气",
+                    "end": 2896,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 3424,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "来",
+                    "end": 3936,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 4424,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "明月松间照 清泉石上流",
+            "start": 55357,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 304,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 585,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 920,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "间",
+                    "end": 1544,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 2336,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "清",
+                    "end": 2664,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "泉",
+                    "end": 2976,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "石",
+                    "end": 3560,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 4112,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4632,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "竹喧归浣女 莲动下渔舟",
+            "start": 60278,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 255,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "喧",
+                    "end": 527,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 959,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浣",
+                    "end": 1560,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "女",
+                    "end": 2223,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "莲",
+                    "end": 2544,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 2831,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 3367,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "渔",
+                    "end": 3855,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "舟",
+                    "end": 4391,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "随意春芳歇 王孙自可留",
+            "start": 65013,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 240,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "意",
+                    "end": 528,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 936,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "芳",
+                    "end": 1416,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "歇",
+                    "end": 2264,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "王",
+                    "end": 2576,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "孙",
+                    "end": 2864,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3448,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "可",
+                    "end": 3976,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 4608,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "红尘翻筋斗 白云小花狗",
+            "start": 91102,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 720,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "翻",
+                    "end": 1248,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "筋",
+                    "end": 1728,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "斗",
+                    "end": 2352,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "白",
+                    "end": 2912,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 3217,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "小",
+                    "end": 3672,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 4112,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "狗",
+                    "end": 4632,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "光阴潺潺去 不必强留",
+            "start": 95860,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "光",
+                    "end": 392,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "阴",
+                    "end": 840,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "潺",
+                    "end": 1344,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "潺",
+                    "end": 1850,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 2440,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 2808,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "必",
+                    "end": 3097,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "强",
+                    "end": 3600,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 4432,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "近看凡尘苦 远望俱风流",
+            "start": 100716,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "近",
+                    "end": 360,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 768,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "凡",
+                    "end": 1168,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 1600,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "苦",
+                    "end": 2273,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 2809,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "望",
+                    "end": 3234,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "俱",
+                    "end": 3616,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 4032,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "流",
+                    "end": 4608,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "余生归何处 尽兴卧云丘",
+            "start": 105732,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "余",
+                    "end": 344,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 662,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1008,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 1392,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 2112,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 2561,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "兴",
+                    "end": 2992,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "卧",
+                    "end": 3456,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 3840,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "丘",
+                    "end": 4745,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "空山新雨后 天气晚来秋",
+            "start": 112959,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 368,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 624,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 984,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "雨",
+                    "end": 1633,
+                    "scale": [
+                        3,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 2248,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2608,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "气",
+                    "end": 3000,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 3441,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "来",
+                    "end": 3986,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 4536,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "明月松间照 清泉石上流",
+            "start": 117783,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 296,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 568,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 888,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "间",
+                    "end": 1560,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 2201,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "清",
+                    "end": 2568,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "泉",
+                    "end": 2905,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "石",
+                    "end": 3392,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 3968,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4472,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "竹喧归浣女 莲动下渔舟",
+            "start": 122583,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 264,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "喧",
+                    "end": 569,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1064,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浣",
+                    "end": 1673,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "女",
+                    "end": 2312,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "莲",
+                    "end": 2633,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 2968,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 3528,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "渔",
+                    "end": 4024,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "舟",
+                    "end": 4512,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "随意春芳歇 王孙自可留",
+            "start": 127391,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 280,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "意",
+                    "end": 528,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 880,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "芳",
+                    "end": 1488,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "歇",
+                    "end": 2312,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "王",
+                    "end": 2640,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "孙",
+                    "end": 2945,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3417,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "可",
+                    "end": 4032,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 4672,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "空山新雨后 天气晚来秋",
+            "start": 132519,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 224,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 408,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "新",
+                    "end": 697,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "雨",
+                    "end": 1200,
+                    "scale": [
+                        3,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 1960,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2248,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "气",
+                    "end": 2538,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 3024,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "来",
+                    "end": 3664,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "秋",
+                    "end": 4240,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "明月松间照 清泉石上流",
+            "start": 137057,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 238,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 454,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "松",
+                    "end": 846,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "间",
+                    "end": 1359,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 2183,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "清",
+                    "end": 2479,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "泉",
+                    "end": 2774,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "石",
+                    "end": 3280,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 3854,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4446,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "竹喧归浣女 莲动下渔舟",
+            "start": 141799,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "竹",
+                    "end": 208,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "喧",
+                    "end": 472,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 952,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浣",
+                    "end": 1536,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "女",
+                    "end": 2280,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "莲",
+                    "end": 2624,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 2952,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 3537,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "渔",
+                    "end": 3992,
+                    "scale": [
+                        6,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "舟",
+                    "end": 4440,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "随意春芳歇 王孙自可留",
+            "start": 146519,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 256,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "意",
+                    "end": 584,
+                    "scale": 19
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 1024,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "芳",
+                    "end": 1552,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "歇",
+                    "end": 2264,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "王",
+                    "end": 2592,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "孙",
+                    "end": 2944,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3472,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "可",
+                    "end": 4144,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 5384,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

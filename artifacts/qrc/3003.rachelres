@@ -1,0 +1,2022 @@
+{
+    "id": "3003",
+    "duration": 245182,
+    "chorus": [
+        {
+            "start": 83150,
+            "end": 83150
+        },
+        {
+            "start": 173970,
+            "end": 173970
+        },
+        {
+            "start": 200020,
+            "end": 200020
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "天青连空往事随处席欢",
+            "start": 33469,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 203,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 586,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "连",
+                    "end": 1459,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 1889,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "往",
+                    "end": 2217,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 2650,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 2987,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 3364,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "席",
+                    "end": 3764,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欢",
+                    "end": 4805,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "梦醒闻香阶",
+            "start": 39834,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 276,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "醒",
+                    "end": 698,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "闻",
+                    "end": 1529,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "香",
+                    "end": 2350,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "阶",
+                    "end": 3872,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "仍记得随你烟雨翩翩",
+            "start": 46169,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "仍",
+                    "end": 420,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "记",
+                    "end": 807,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "得",
+                    "end": 1719,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 2041,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2450,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 2902,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 3648,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 4024,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "翩",
+                    "end": 4928,
+                    "scale": [
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "几度歌阙未渐",
+            "start": 52263,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 392,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "度",
+                    "end": 772,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "歌",
+                    "end": 1176,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "阙",
+                    "end": 2378,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "未",
+                    "end": 2897,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渐",
+                    "end": 4780,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "只想细说的锦绣看边霞暮远",
+            "start": 57582,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 370,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 784,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "细",
+                    "end": 1590,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 2057,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2369,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "锦",
+                    "end": 2798,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "绣",
+                    "end": 3194,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 3610,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "边",
+                    "end": 4030,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "霞",
+                    "end": 5030,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "暮",
+                    "end": 5568,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 6233,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "不尽誓盟映时节",
+            "start": 65724,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 357,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "誓",
+                    "end": 1277,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "盟",
+                    "end": 1577,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 1985,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 2432,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "节",
+                    "end": 4188,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "天涯路因为相携才能够相约",
+            "start": 70596,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 340,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 748,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 1662,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "因",
+                    "end": 2375,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "为",
+                    "end": 2758,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 3118,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "携",
+                    "end": 3572,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "才",
+                    "end": 3976,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "能",
+                    "end": 4781,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "够",
+                    "end": 5172,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 5640,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "约",
+                    "end": 6639,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "此情恍犹初见",
+            "start": 78223,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 383,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 751,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "恍",
+                    "end": 1169,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "犹",
+                    "end": 2427,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 3256,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 4798,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "若露水惹了花眉",
+            "start": 83495,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 414,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "露",
+                    "end": 796,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1219,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1650,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1986,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 2410,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眉",
+                    "end": 3006,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若萤火惹了春夜",
+            "start": 86803,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 311,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "萤",
+                    "end": 717,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 1120,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1534,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1892,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2279,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夜",
+                    "end": 2969,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是你欣然一笑惹眷恋",
+            "start": 90057,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 329,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 729,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欣",
+                    "end": 1156,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 1550,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1925,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2338,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 3214,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眷",
+                    "end": 3961,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "恋",
+                    "end": 6138,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若风月惹了天边",
+            "start": 96493,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 332,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 746,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 1100,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1515,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1899,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2357,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "边",
+                    "end": 2929,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若心沿惹了琴弦",
+            "start": 99757,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 311,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 749,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "沿",
+                    "end": 1120,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1521,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1928,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "琴",
+                    "end": 2316,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "弦",
+                    "end": 2887,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是相思入梦令惹情绵",
+            "start": 103383,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 378,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 793,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 1205,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1561,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1996,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "令",
+                    "end": 2573,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 2879,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 3233,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "绵",
+                    "end": 5899,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "天青连空往事随处席欢",
+            "start": 124121,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 313,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 708,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "连",
+                    "end": 1559,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "空",
+                    "end": 1986,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "往",
+                    "end": 2320,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "事",
+                    "end": 2721,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 3132,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 3472,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "席",
+                    "end": 3908,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欢",
+                    "end": 5035,
+                    "scale": 20
+                }
+            ]
+        },
+        {
+            "text": "梦醒闻香阶",
+            "start": 130522,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 352,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "醒",
+                    "end": 748,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "闻",
+                    "end": 1668,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "香",
+                    "end": 2449,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "阶",
+                    "end": 4103,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "仍记得随你烟雨翩翩",
+            "start": 136965,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "仍",
+                    "end": 381,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "记",
+                    "end": 818,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "得",
+                    "end": 1677,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "随",
+                    "end": 2082,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 2470,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 2848,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 3598,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "翩",
+                    "end": 4013,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "翩",
+                    "end": 4951,
+                    "scale": [
+                        1,
+                        20
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "几度歌阙未渐",
+            "start": 143034,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 386,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "度",
+                    "end": 785,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "歌",
+                    "end": 1196,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "阙",
+                    "end": 2442,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "未",
+                    "end": 2858,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "渐",
+                    "end": 4723,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "只想细说的锦绣看边霞暮远",
+            "start": 148356,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 379,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "想",
+                    "end": 791,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "细",
+                    "end": 1665,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 2072,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2403,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "锦",
+                    "end": 2834,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "绣",
+                    "end": 3210,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "看",
+                    "end": 3601,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "边",
+                    "end": 3996,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "霞",
+                    "end": 4979,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "暮",
+                    "end": 5600,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "远",
+                    "end": 6291,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "不尽誓盟映时节",
+            "start": 156460,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 392,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 795,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "誓",
+                    "end": 1361,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "盟",
+                    "end": 1561,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 2003,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 2461,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "节",
+                    "end": 4131,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "天涯路因为相携才能够相约",
+            "start": 161337,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 379,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "涯",
+                    "end": 830,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 2283,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "因",
+                    "end": 2515,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "为",
+                    "end": 2872,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 3139,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "携",
+                    "end": 3782,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "才",
+                    "end": 4070,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "能",
+                    "end": 4850,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "够",
+                    "end": 5194,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 5711,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "约",
+                    "end": 7376,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "此情恍犹初见",
+            "start": 169051,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 392,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 773,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "恍",
+                    "end": 1188,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "犹",
+                    "end": 1922,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 3266,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 5056,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "若露水惹了花眉",
+            "start": 174464,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 266,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "露",
+                    "end": 640,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1056,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1456,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1818,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 2217,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眉",
+                    "end": 2906,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若萤火惹了春夜",
+            "start": 177642,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 337,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "萤",
+                    "end": 738,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 1146,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1509,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1877,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2271,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夜",
+                    "end": 2886,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是你欣然一笑惹眷恋",
+            "start": 180846,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 356,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 750,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欣",
+                    "end": 1110,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 1546,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1934,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2356,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 3199,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眷",
+                    "end": 3951,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "恋",
+                    "end": 6218,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若风月惹了天边",
+            "start": 187316,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 400,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 786,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 1206,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1562,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1982,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2389,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "边",
+                    "end": 2993,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若心沿惹了琴弦",
+            "start": 190578,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 347,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 736,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "沿",
+                    "end": 1133,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1527,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1923,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "琴",
+                    "end": 2332,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "弦",
+                    "end": 2937,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是相思入梦令惹情绵",
+            "start": 194202,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 353,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 732,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 1165,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1542,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 1973,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "令",
+                    "end": 2596,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 2851,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 3236,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "绵",
+                    "end": 5790,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若露水惹了花眉",
+            "start": 200401,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 305,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "露",
+                    "end": 727,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1086,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1501,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1873,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "花",
+                    "end": 2293,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眉",
+                    "end": 2940,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若萤火惹了春夜",
+            "start": 203604,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 319,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "萤",
+                    "end": 731,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 1118,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1520,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1888,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 2297,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夜",
+                    "end": 2938,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是你欣然一笑惹眷恋",
+            "start": 206830,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 362,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "欣",
+                    "end": 1148,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "然",
+                    "end": 1554,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 1912,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "笑",
+                    "end": 2325,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 3163,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "眷",
+                    "end": 3977,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "恋",
+                    "end": 6197,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若风月惹了天边",
+            "start": 213310,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 333,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 760,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 1194,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1564,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "了",
+                    "end": 1924,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 2329,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "边",
+                    "end": 2965,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "若心沿惹了琴弦",
+            "start": 216563,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "若",
+                    "end": 359,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 747,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "沿",
+                    "end": 1133,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 1543,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "了",
+                    "end": 1905,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "琴",
+                    "end": 2320,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "弦",
+                    "end": 3511,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是相思入梦令惹情绵",
+            "start": 220178,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 370,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 769,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 1189,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1575,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2010,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "令",
+                    "end": 2574,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 2856,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 3237,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "绵",
+                    "end": 5705,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "是相思入梦令惹情绵",
+            "start": 226724,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 385,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 772,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "思",
+                    "end": 1222,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1641,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 2038,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "令",
+                    "end": 2767,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "惹",
+                    "end": 3305,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 5608,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "绵",
+                    "end": 9506,
+                    "scale": 2
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

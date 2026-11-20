@@ -1,0 +1,2456 @@
+{
+    "id": "1301",
+    "duration": 225306,
+    "chorus": [
+        {
+            "start": 103800,
+            "end": 103800
+        },
+        {
+            "start": 182210,
+            "end": 182210
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "要脚踏珠履 身披雪浪锦衣堆",
+            "start": 27450,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "要",
+                    "end": 118,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "脚",
+                    "end": 342,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "踏",
+                    "end": 690,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "珠",
+                    "end": 780,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "履",
+                    "end": 1194,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 1461,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "披",
+                    "end": 1810,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "雪",
+                    "end": 2294,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "浪",
+                    "end": 2747,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "锦",
+                    "end": 3107,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "衣",
+                    "end": 3415,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "堆",
+                    "end": 4250,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "再各自蹈赴在春冰虎尾",
+            "start": 34083,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "再",
+                    "end": 85,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "各",
+                    "end": 309,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 615,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "蹈",
+                    "end": 743,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "赴",
+                    "end": 1062,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 1424,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 1795,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "冰",
+                    "end": 2275,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "虎",
+                    "end": 2569,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "尾",
+                    "end": 3629,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "认定你我都绝非",
+            "start": 40509,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "认",
+                    "end": 284,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "定",
+                    "end": 703,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 868,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1198,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 1566,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "绝",
+                    "end": 1890,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "非",
+                    "end": 2583,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "倒悬江河中泛泛之辈",
+            "start": 43649,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 339,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "悬",
+                    "end": 760,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "江",
+                    "end": 1048,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "河",
+                    "end": 1319,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1672,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "泛",
+                    "end": 1924,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "泛",
+                    "end": 2484,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2797,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "辈",
+                    "end": 3660,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "是重名的乱世萍水",
+            "start": 47309,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 199,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 478,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "名",
+                    "end": 774,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1216,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "乱",
+                    "end": 1661,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 2064,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "萍",
+                    "end": 2858,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 3807,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "像春风夜雨谈及东海有惊雷",
+            "start": 53686,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "像",
+                    "end": 72,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 296,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 577,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "夜",
+                    "end": 797,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 1088,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "谈",
+                    "end": 1322,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "及",
+                    "end": 1706,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "东",
+                    "end": 2098,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 2587,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 3012,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "惊",
+                    "end": 3387,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "雷",
+                    "end": 4014,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "又相见恨晚于华灯鼎沸",
+            "start": 60152,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 59,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 285,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 617,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "恨",
+                    "end": 856,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "晚",
+                    "end": 1181,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 1439,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 1740,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "灯",
+                    "end": 2264,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "鼎",
+                    "end": 2538,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "沸",
+                    "end": 3745,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "原来我们遴选过",
+            "start": 66726,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 199,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 592,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 907,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "们",
+                    "end": 1209,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "遴",
+                    "end": 1503,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "选",
+                    "end": 1790,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 2395,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "心有灵犀的某个称谓",
+            "start": 69788,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "心",
+                    "end": 331,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 732,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "灵",
+                    "end": 904,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "犀",
+                    "end": 1258,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1599,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "某",
+                    "end": 1904,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2385,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "称",
+                    "end": 2660,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "谓",
+                    "end": 3383,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "署名在动荡的年岁",
+            "start": 73648,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "署",
+                    "end": 80,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "名",
+                    "end": 332,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 692,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "动",
+                    "end": 1052,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "荡",
+                    "end": 1411,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1836,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "年",
+                    "end": 2522,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "岁",
+                    "end": 3768,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "时人争羡我哭我笑",
+            "start": 78211,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 141,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 379,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "争",
+                    "end": 674,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "羡",
+                    "end": 825,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1077,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "哭",
+                    "end": 1529,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1773,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "笑",
+                    "end": 2256,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我在风雨如晦中吟哦着诗文",
+            "start": 80468,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 157,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 561,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 666,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "雨",
+                    "end": 923,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 1174,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "晦",
+                    "end": 1490,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 1810,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "吟",
+                    "end": 2249,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "哦",
+                    "end": 2579,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "着",
+                    "end": 3063,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "诗",
+                    "end": 3498,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "文",
+                    "end": 3922,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "猜测有多风流 有多桀骜 又奋不顾身",
+            "start": 84869,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "猜",
+                    "end": 419,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "测",
+                    "end": 730,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 975,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 1226,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 1353,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 1864,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 1957,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 2254,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "桀",
+                    "end": 2482,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "骜",
+                    "end": 3198,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 3628,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "奋",
+                    "end": 4006,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 5085,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "顾",
+                    "end": 5445,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "身",
+                    "end": 6080,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "世间传闻你爱你恨",
+            "start": 91282,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 259,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 584,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "传",
+                    "end": 667,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "闻",
+                    "end": 1003,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 1218,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "爱",
+                    "end": 1543,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 1765,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "恨",
+                    "end": 2152,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你将千金宝刀作最慷慨馈赠",
+            "start": 93435,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 142,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 550,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 774,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "金",
+                    "end": 1074,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "宝",
+                    "end": 1308,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "刀",
+                    "end": 1639,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 1970,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 2424,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "慷",
+                    "end": 2757,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "慨",
+                    "end": 3163,
+                    "scale": [
+                        8,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "馈",
+                    "end": 3518,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "赠",
+                    "end": 4344,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "从此这个名字只归属我一人",
+            "start": 97779,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "从",
+                    "end": 543,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 960,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "这",
+                    "end": 1097,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 1366,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "名",
+                    "end": 1600,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "字",
+                    "end": 2042,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 2188,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 2437,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "属",
+                    "end": 2757,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 3466,
+                    "scale": 6
+                },
+                {
+                    "type": "Slur",
+                    "ch": "一",
+                    "end": 4166,
+                    "scale": [
+                        9,
+                        7
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "人",
+                    "end": 5481,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我该如何追问 最热烈青春",
+            "start": 104060,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 394,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "该",
+                    "end": 827,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 1195,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 2354,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "追",
+                    "end": 2673,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3586,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 4086,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 4523,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "烈",
+                    "end": 5571,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 5939,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 6526,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "渡关山重洋 逐陌路的黄昏",
+            "start": 111024,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "渡",
+                    "end": 426,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "关",
+                    "end": 806,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1161,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 1403,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "洋",
+                    "end": 1996,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "逐",
+                    "end": 2343,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "陌",
+                    "end": 2730,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 3026,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3631,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "黄",
+                    "end": 4054,
+                    "scale": [
+                        9,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "昏",
+                    "end": 5238,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "茫茫碧草孤城 谁唤我一声",
+            "start": 117051,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 438,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 849,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "碧",
+                    "end": 1261,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "草",
+                    "end": 2459,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "孤",
+                    "end": 2735,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 3689,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 4160,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "唤",
+                    "end": 4551,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 5779,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 6064,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 6760,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "听鸿毛入水 沧海自起飞尘",
+            "start": 124093,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 385,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 799,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "毛",
+                    "end": 1264,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1487,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 1970,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "沧",
+                    "end": 2367,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 2785,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 2986,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 3432,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "飞",
+                    "end": 3990,
+                    "scale": [
+                        9,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 5753,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "有珠玉在侧 貂裘对酒不形秽",
+            "start": 131816,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 171,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "珠",
+                    "end": 479,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "玉",
+                    "end": 745,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 835,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "侧",
+                    "end": 1256,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "貂",
+                    "end": 1630,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "裘",
+                    "end": 1915,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "对",
+                    "end": 2300,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "酒",
+                    "end": 2791,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 3189,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "形",
+                    "end": 3477,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "秽",
+                    "end": 4202,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "如直呼一面之缘的名讳",
+            "start": 138441,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "如",
+                    "end": 141,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "直",
+                    "end": 373,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "呼",
+                    "end": 699,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 882,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "面",
+                    "end": 1206,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 1506,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "缘",
+                    "end": 1816,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 2277,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "名",
+                    "end": 2714,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "讳",
+                    "end": 4204,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "分明你我都背负",
+            "start": 144954,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "分",
+                    "end": 269,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 670,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 980,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1296,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "都",
+                    "end": 1602,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "背",
+                    "end": 1860,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "负",
+                    "end": 2699,
+                    "scale": 7
+                }
+            ]
+        },
+        {
+            "text": "不约而同的怀璧之罪",
+            "start": 148231,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 306,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "约",
+                    "end": 684,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "而",
+                    "end": 944,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "同",
+                    "end": 1224,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1601,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "怀",
+                    "end": 1801,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "璧",
+                    "end": 2229,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "之",
+                    "end": 2599,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "罪",
+                    "end": 3717,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "签订在韶华的结尾",
+            "start": 151949,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "签",
+                    "end": 165,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "订",
+                    "end": 399,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 699,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "韶",
+                    "end": 1047,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "华",
+                    "end": 1462,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1895,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "结",
+                    "end": 2681,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "尾",
+                    "end": 4059,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "我曾听说你痴你狂",
+            "start": 156774,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 116,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 358,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 429,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "说",
+                    "end": 758,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 984,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "痴",
+                    "end": 1336,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 1552,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "狂",
+                    "end": 1941,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "你在逆旅挥戈时掷下的檄文",
+            "start": 158715,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 167,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "在",
+                    "end": 581,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "逆",
+                    "end": 704,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "旅",
+                    "end": 982,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "挥",
+                    "end": 1265,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "戈",
+                    "end": 1588,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 1957,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "掷",
+                    "end": 2384,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "下",
+                    "end": 2676,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "的",
+                    "end": 3161,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "檄",
+                    "end": 3408,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "文",
+                    "end": 4312,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "字句有多温柔 有多坚韧 又无畏天真",
+            "start": 163027,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "字",
+                    "end": 570,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "句",
+                    "end": 1006,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 1156,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 1403,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "温",
+                    "end": 1657,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "柔",
+                    "end": 2099,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 2247,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "多",
+                    "end": 2501,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "坚",
+                    "end": 2765,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "韧",
+                    "end": 3429,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "又",
+                    "end": 3847,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 4260,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "畏",
+                    "end": 5449,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 5709,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "真",
+                    "end": 6097,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "你没见过我停我奔",
+            "start": 169564,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "你",
+                    "end": 265,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 503,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 649,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "过",
+                    "end": 957,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1178,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "停",
+                    "end": 1577,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 1822,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "奔",
+                    "end": 2215,
+                    "scale": [
+                        6,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我将未酬的夙愿殓入这孤坟",
+            "start": 171780,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 185,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "将",
+                    "end": 517,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "未",
+                    "end": 635,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "酬",
+                    "end": 867,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 1143,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "夙",
+                    "end": 1580,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "愿",
+                    "end": 1857,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "殓",
+                    "end": 2272,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 2695,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "这",
+                    "end": 3128,
+                    "scale": [
+                        8,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "孤",
+                    "end": 3486,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "坟",
+                    "end": 4402,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "一个名字 归属两个偶遇的灵魂",
+            "start": 176183,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 387,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 819,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "名",
+                    "end": 1061,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "字",
+                    "end": 1356,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 1588,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "属",
+                    "end": 2118,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "两",
+                    "end": 2289,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "个",
+                    "end": 2579,
+                    "scale": 4
+                },
+                {
+                    "type": "Note",
+                    "ch": "偶",
+                    "end": 2835,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "遇",
+                    "end": 3334,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3792,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "灵",
+                    "end": 4080,
+                    "scale": 7
+                },
+                {
+                    "type": "Slur",
+                    "ch": "魂",
+                    "end": 5763,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "我该凭谁相认最热烈青春",
+            "start": 182495,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 377,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "该",
+                    "end": 772,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "凭",
+                    "end": 1149,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 2322,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 2585,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "认",
+                    "end": 3434,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "最",
+                    "end": 3968,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "热",
+                    "end": 4412,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "烈",
+                    "end": 5545,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "青",
+                    "end": 5831,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "春",
+                    "end": 6468,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "渡关山重洋 逐陌路的黄昏",
+            "start": 189383,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "渡",
+                    "end": 417,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "关",
+                    "end": 758,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1165,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 1423,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "洋",
+                    "end": 2020,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "逐",
+                    "end": 2432,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "陌",
+                    "end": 2750,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "路",
+                    "end": 3022,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 3626,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "黄",
+                    "end": 4069,
+                    "scale": [
+                        9,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "昏",
+                    "end": 5341,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "茫茫碧草孤城 谁唤我一生",
+            "start": 195426,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 425,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "茫",
+                    "end": 868,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "碧",
+                    "end": 1245,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "草",
+                    "end": 2387,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "孤",
+                    "end": 2700,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 3591,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "谁",
+                    "end": 4096,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "唤",
+                    "end": 4536,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 5783,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 6075,
+                    "scale": 12
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 6649,
+                    "scale": 10
+                }
+            ]
+        },
+        {
+            "text": "听鸿毛入水 沧海自起飞尘",
+            "start": 202370,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "听",
+                    "end": 446,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "鸿",
+                    "end": 858,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "毛",
+                    "end": 1237,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1479,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 2128,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "沧",
+                    "end": 2474,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 2834,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "自",
+                    "end": 3077,
+                    "scale": 10
+                },
+                {
+                    "type": "Note",
+                    "ch": "起",
+                    "end": 3582,
+                    "scale": 9
+                },
+                {
+                    "type": "Slur",
+                    "ch": "飞",
+                    "end": 4065,
+                    "scale": [
+                        9,
+                        12
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "尘",
+                    "end": 6685,
+                    "scale": 6
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

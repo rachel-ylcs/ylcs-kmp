@@ -1,0 +1,1072 @@
+{
+    "id": "1002",
+    "duration": 303538,
+    "chorus": [
+        {
+            "start": 91690,
+            "end": 120910
+        },
+        {
+            "start": 208083,
+            "end": 267013
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "轻柔火焰流淌于重山和城阙",
+            "start": 34466,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "轻",
+                    "end": 2630,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "柔",
+                    "end": 3190,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "火",
+                    "end": 3690,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "焰",
+                    "end": 5810,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 7060,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "淌",
+                    "end": 7310,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "于",
+                    "end": 9060,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "重",
+                    "end": 9500,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 9810,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "和",
+                    "end": 10440,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 10880,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "阙",
+                    "end": 13060,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "无声嘶喊倒映入某一双泪眼",
+            "start": 48906,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 2750,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "声",
+                    "end": 3220,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "嘶",
+                    "end": 3700,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "喊",
+                    "end": 6400,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "倒",
+                    "end": 7110,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "映",
+                    "end": 7360,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 8620,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "某",
+                    "end": 9570,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 9810,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "双",
+                    "end": 10510,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泪",
+                    "end": 11000,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "眼",
+                    "end": 13560,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "我曾留恋那一段虚幻缱绻",
+            "start": 63466,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2760,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 3310,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "留",
+                    "end": 3690,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "恋",
+                    "end": 5870,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 7230,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 7470,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "段",
+                    "end": 8940,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "虚",
+                    "end": 9820,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "幻",
+                    "end": 10510,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "缱",
+                    "end": 11010,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "绻",
+                    "end": 13940,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "我也曾铭记殷红的长天",
+            "start": 78156,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2620,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 3120,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 3570,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "铭",
+                    "end": 5344,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "记",
+                    "end": 7224,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "殷",
+                    "end": 9034,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 9664,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "的",
+                    "end": 10274,
+                    "scale": [
+                        7,
+                        7
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 10714,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 13344,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "昔我沉沦后风烟破碎几遍",
+            "start": 91690,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "昔",
+                    "end": 1000,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 3620,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "沉",
+                    "end": 4060,
+                    "scale": [
+                        7,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "沦",
+                    "end": 4560,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "后",
+                    "end": 6750,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 8180,
+                    "scale": 7
+                },
+                {
+                    "type": "Slur",
+                    "ch": "烟",
+                    "end": 10420,
+                    "scale": [
+                        9,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "破",
+                    "end": 10920,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "碎",
+                    "end": 11420,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "几",
+                    "end": 11860,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "遍",
+                    "end": 13860,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "经世代变迁江山已倦",
+            "start": 106120,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "经",
+                    "end": 950,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "世",
+                    "end": 3760,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "代",
+                    "end": 4210,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "变",
+                    "end": 4640,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "迁",
+                    "end": 6880,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "江",
+                    "end": 8260,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 11000,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 11570,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "倦",
+                    "end": 14790,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "脉脉夕照曾浸没山河与残垣",
+            "start": 151133,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "脉",
+                    "end": 2310,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "脉",
+                    "end": 2750,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夕",
+                    "end": 3310,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "照",
+                    "end": 6130,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 6690,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "浸",
+                    "end": 6940,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 8640,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 9150,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "河",
+                    "end": 9450,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "与",
+                    "end": 9950,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "残",
+                    "end": 10460,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "垣",
+                    "end": 13570,
+                    "scale": 19
+                }
+            ]
+        },
+        {
+            "text": "硝烟淡处有故人在那里长眠",
+            "start": 165213,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "硝",
+                    "end": 2820,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 3250,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "淡",
+                    "end": 3690,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "处",
+                    "end": 6370,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "有",
+                    "end": 7120,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "故",
+                    "end": 7380,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 9130,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "在",
+                    "end": 9560,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "那",
+                    "end": 9820,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "里",
+                    "end": 10460,
+                    "scale": [
+                        2,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "长",
+                    "end": 10940,
+                    "scale": [
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "眠",
+                    "end": 13430,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "我曾感受熟悉的寂寥悲切",
+            "start": 179393,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 3130,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 3630,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "感",
+                    "end": 3960,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "受",
+                    "end": 6700,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "熟",
+                    "end": 7440,
+                    "scale": 21
+                },
+                {
+                    "type": "Note",
+                    "ch": "悉",
+                    "end": 7690,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "的",
+                    "end": 9510,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "寂",
+                    "end": 10010,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "寥",
+                    "end": 10820,
+                    "scale": [
+                        6,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 11380,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "切",
+                    "end": 14000,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "我也曾见证战火和永诀",
+            "start": 194353,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 2410,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "也",
+                    "end": 3160,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "曾",
+                    "end": 3590,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "见",
+                    "end": 5420,
+                    "scale": [
+                        10,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "证",
+                    "end": 7300,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "战",
+                    "end": 9110,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "火",
+                    "end": 9860,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "和",
+                    "end": 10420,
+                    "scale": [
+                        7,
+                        7
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "永",
+                    "end": 10920,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "诀",
+                    "end": 13430,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "纵我永无归泪落犹作风烟",
+            "start": 208083,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "纵",
+                    "end": 820,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 3570,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "永",
+                    "end": 4010,
+                    "scale": [
+                        7,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 4440,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 7170,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "泪",
+                    "end": 8060,
+                    "scale": 7
+                },
+                {
+                    "type": "Slur",
+                    "ch": "落",
+                    "end": 10430,
+                    "scale": [
+                        9,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "犹",
+                    "end": 10800,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 11240,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 11750,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 13940,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "承千古悲欢江山已倦",
+            "start": 222533,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "承",
+                    "end": 930,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 3620,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "古",
+                    "end": 4180,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 4560,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "欢",
+                    "end": 7230,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "江",
+                    "end": 8170,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 10920,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 11850,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "倦",
+                    "end": 14420,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "纵我永无归泪落犹作风烟",
+            "start": 237333,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "纵",
+                    "end": 620,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "我",
+                    "end": 3370,
+                    "scale": 8
+                },
+                {
+                    "type": "Slur",
+                    "ch": "永",
+                    "end": 3870,
+                    "scale": [
+                        7,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 4310,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "归",
+                    "end": 6620,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "泪",
+                    "end": 7930,
+                    "scale": 7
+                },
+                {
+                    "type": "Slur",
+                    "ch": "落",
+                    "end": 10250,
+                    "scale": [
+                        9,
+                        9
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "犹",
+                    "end": 10690,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "作",
+                    "end": 11180,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "风",
+                    "end": 11740,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "烟",
+                    "end": 13370,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "承千古悲欢江山已倦",
+            "start": 251573,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "承",
+                    "end": 950,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "千",
+                    "end": 3690,
+                    "scale": 8
+                },
+                {
+                    "type": "Note",
+                    "ch": "古",
+                    "end": 4200,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "悲",
+                    "end": 4630,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "欢",
+                    "end": 7320,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "江",
+                    "end": 8260,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 10940,
+                    "scale": 9
+                },
+                {
+                    "type": "Note",
+                    "ch": "已",
+                    "end": 11880,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "倦",
+                    "end": 15440,
+                    "scale": 6
+                }
+            ]
+        }
+    ]
+}

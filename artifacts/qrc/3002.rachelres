@@ -1,0 +1,1183 @@
+{
+    "id": "3002",
+    "duration": 342471,
+    "chorus": [
+        {
+            "start": 72570,
+            "end": 72570
+        },
+        {
+            "start": 187670,
+            "end": 187670
+        },
+        {
+            "start": 236540,
+            "end": 236540
+        },
+        {
+            "start": 266430,
+            "end": 266430
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "君不见东流水",
+            "start": 12310,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "君",
+                    "end": 473,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 817,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 8120,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "东",
+                    "end": 8408,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 8879,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 11407,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "来时无踪迹一去无穷已",
+            "start": 29542,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 307,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 770,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 1258,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "踪",
+                    "end": 1759,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "迹",
+                    "end": 8147,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 8496,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 8960,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 9433,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "穷",
+                    "end": 12268,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "已",
+                    "end": 15210,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "君不见城上日",
+            "start": 48732,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "君",
+                    "end": 343,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 871,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 3847,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 4383,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 4969,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "日",
+                    "end": 7071,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "今暝没山去明朝复更出",
+            "start": 57910,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 421,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "暝",
+                    "end": 965,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 1477,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1993,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 6309,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 6613,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "朝",
+                    "end": 7029,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "复",
+                    "end": 7589,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 8159,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 10509,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 73133,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 486,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 982,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 4049,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4535,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 5056,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 7094,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "原知浮生是梦中",
+            "start": 81107,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 467,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 1048,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 2152,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4080,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4584,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 5137,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 7187,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 89379,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 432,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 977,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 4033,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4538,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 5104,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 7065,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "只此浮生是梦中",
+            "start": 97387,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 520,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 1112,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 2074,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4096,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4616,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 5147,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 7816,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "君不见东流水",
+            "start": 143090,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "君",
+                    "end": 342,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 782,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 3599,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "东",
+                    "end": 4054,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "流",
+                    "end": 4495,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 6118,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "来时无踪迹一去无穷已",
+            "start": 151382,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 434,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "时",
+                    "end": 905,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 1357,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "踪",
+                    "end": 1824,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "迹",
+                    "end": 3759,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 6065,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 6479,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 6942,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "穷",
+                    "end": 8075,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "已",
+                    "end": 10255,
+                    "scale": [
+                        5,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "君不见城上日",
+            "start": 165490,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "君",
+                    "end": 386,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 850,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "见",
+                    "end": 3627,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "城",
+                    "end": 4099,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "上",
+                    "end": 4555,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "日",
+                    "end": 6458,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "今暝没山去明朝复更出",
+            "start": 173813,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "今",
+                    "end": 456,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "暝",
+                    "end": 936,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "没",
+                    "end": 1377,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1916,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "去",
+                    "end": 5648,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "明",
+                    "end": 6086,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "朝",
+                    "end": 6556,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "复",
+                    "end": 7008,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 7847,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "出",
+                    "end": 10191,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 187901,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 414,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 927,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3751,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4208,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4656,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6607,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "原知浮生是梦中",
+            "start": 195301,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 439,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 995,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 1991,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3846,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4303,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4784,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 6873,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 202892,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 433,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 909,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3745,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4153,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4657,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6833,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "只此浮生是梦中",
+            "start": 210383,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 469,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 941,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 1908,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3733,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4221,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4713,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 6608,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 236998,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 256,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 608,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3376,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 3778,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4229,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6168,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "原知浮生是梦中",
+            "start": 244106,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 420,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 892,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 1953,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3716,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4164,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4716,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 6604,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 251566,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 450,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 976,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3840,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4234,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4664,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6712,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "只此浮生是梦中",
+            "start": 259062,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 472,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 976,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 1999,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3783,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4312,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4832,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 6668,
+                    "scale": 6
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 266558,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 450,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 944,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3825,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4236,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 4687,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6643,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "原知浮生是梦中",
+            "start": 274094,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "原",
+                    "end": 439,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 944,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 1963,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3743,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4215,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4703,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 7063,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "何须问浮生情",
+            "start": 281494,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 448,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "须",
+                    "end": 991,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "问",
+                    "end": 3796,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 4296,
+                    "scale": 6
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 5270,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "情",
+                    "end": 6685,
+                    "scale": 3
+                }
+            ]
+        },
+        {
+            "text": "只此浮生是梦中",
+            "start": 289057,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "只",
+                    "end": 453,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 996,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "浮",
+                    "end": 2043,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 3819,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "是",
+                    "end": 4299,
+                    "scale": 7
+                },
+                {
+                    "type": "Note",
+                    "ch": "梦",
+                    "end": 4948,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 6828,
+                    "scale": 6
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}

@@ -1,0 +1,955 @@
+{
+    "id": "1312",
+    "duration": 204500,
+    "chorus": [
+        {
+            "start": 1280,
+            "end": 1280
+        },
+        {
+            "start": 81660,
+            "end": 81660
+        }
+    ],
+    "lyrics": [
+        {
+            "text": "人间四月芳菲尽",
+            "start": 1424,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "人",
+                    "end": 635,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "间",
+                    "end": 1383,
+                    "scale": [
+                        17,
+                        16
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "四",
+                    "end": 2179,
+                    "scale": [
+                        17,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "月",
+                    "end": 2959,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "芳",
+                    "end": 3730,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "菲",
+                    "end": 4498,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "尽",
+                    "end": 5280,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "山寺桃花始盛开",
+            "start": 7577,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 776,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "寺",
+                    "end": 1478,
+                    "scale": [
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "桃",
+                    "end": 2219,
+                    "scale": [
+                        1,
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "花",
+                    "end": 3038,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "始",
+                    "end": 3837,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "盛",
+                    "end": 4670,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "开",
+                    "end": 5523,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "长恨春归无觅处",
+            "start": 13874,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "长",
+                    "end": 733,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "恨",
+                    "end": 1467,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "春",
+                    "end": 2265,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "归",
+                    "end": 3051,
+                    "scale": [
+                        2,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3896,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "觅",
+                    "end": 4650,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "处",
+                    "end": 5835,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "不知转入此中来",
+            "start": 20137,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "不",
+                    "end": 580,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "知",
+                    "end": 780,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "转",
+                    "end": 1128,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "入",
+                    "end": 1515,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "此",
+                    "end": 2319,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "中",
+                    "end": 3195,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "来",
+                    "end": 5004,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "一道残阳铺水中",
+            "start": 26929,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 712,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "道",
+                    "end": 1454,
+                    "scale": [
+                        17,
+                        16
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "残",
+                    "end": 2289,
+                    "scale": [
+                        17,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "阳",
+                    "end": 3102,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "铺",
+                    "end": 3899,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "水",
+                    "end": 4690,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "中",
+                    "end": 5524,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "半江瑟瑟半江红",
+            "start": 33281,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "半",
+                    "end": 664,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "江",
+                    "end": 1385,
+                    "scale": [
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "瑟",
+                    "end": 2120,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "瑟",
+                    "end": 2901,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "半",
+                    "end": 3661,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "江",
+                    "end": 4436,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "红",
+                    "end": 5314,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "可怜九月初三夜",
+            "start": 39241,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "可",
+                    "end": 705,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "怜",
+                    "end": 1459,
+                    "scale": [
+                        19,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "九",
+                    "end": 2185,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2917,
+                    "scale": 5
+                },
+                {
+                    "type": "Note",
+                    "ch": "初",
+                    "end": 3677,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "三",
+                    "end": 4458,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "夜",
+                    "end": 5508,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "露似真珠月似弓",
+            "start": 45311,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "露",
+                    "end": 332,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "似",
+                    "end": 686,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "真",
+                    "end": 1006,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "珠",
+                    "end": 1433,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "月",
+                    "end": 2198,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "似",
+                    "end": 3095,
+                    "scale": [
+                        19,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "弓",
+                    "end": 5218,
+                    "scale": 1
+                }
+            ]
+        },
+        {
+            "text": "天平山上白云泉",
+            "start": 81718,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "天",
+                    "end": 500,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "平",
+                    "end": 1225,
+                    "scale": [
+                        17,
+                        16
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "山",
+                    "end": 1943,
+                    "scale": [
+                        17,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "上",
+                    "end": 2703,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "白",
+                    "end": 3429,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "云",
+                    "end": 4228,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "泉",
+                    "end": 5106,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "云自无心水自闲",
+            "start": 87546,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "云",
+                    "end": 634,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "自",
+                    "end": 1374,
+                    "scale": [
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "无",
+                    "end": 2087,
+                    "scale": [
+                        1,
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "心",
+                    "end": 2895,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "水",
+                    "end": 3643,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "自",
+                    "end": 4443,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "闲",
+                    "end": 5296,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "何必奔冲山下去",
+            "start": 93524,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "何",
+                    "end": 684,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "必",
+                    "end": 1456,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "奔",
+                    "end": 2201,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "冲",
+                    "end": 2957,
+                    "scale": [
+                        2,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 3711,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "下",
+                    "end": 4471,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "去",
+                    "end": 5528,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "更添波浪向人间",
+            "start": 99551,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "更",
+                    "end": 514,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "添",
+                    "end": 733,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "波",
+                    "end": 1102,
+                    "scale": 20
+                },
+                {
+                    "type": "Note",
+                    "ch": "浪",
+                    "end": 1475,
+                    "scale": 1
+                },
+                {
+                    "type": "Note",
+                    "ch": "向",
+                    "end": 2216,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "人",
+                    "end": 3053,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "间",
+                    "end": 4816,
+                    "scale": 2
+                }
+            ]
+        },
+        {
+            "text": "一泊沙来一泊去",
+            "start": 105490,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 734,
+                    "scale": 17
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泊",
+                    "end": 1462,
+                    "scale": [
+                        17,
+                        16
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "沙",
+                    "end": 2242,
+                    "scale": [
+                        17,
+                        19
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "来",
+                    "end": 2970,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3717,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "泊",
+                    "end": 4441,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "去",
+                    "end": 6143,
+                    "scale": [
+                        3,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "一重浪灭一重生",
+            "start": 111633,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 554,
+                    "scale": 1
+                },
+                {
+                    "type": "Slur",
+                    "ch": "重",
+                    "end": 1295,
+                    "scale": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "浪",
+                    "end": 2039,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "灭",
+                    "end": 2813,
+                    "scale": [
+                        20,
+                        19
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 3601,
+                    "scale": 5
+                },
+                {
+                    "type": "Slur",
+                    "ch": "重",
+                    "end": 4350,
+                    "scale": [
+                        5,
+                        6
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "生",
+                    "end": 5308,
+                    "scale": 5
+                }
+            ]
+        },
+        {
+            "text": "相搅相淘无歇日",
+            "start": 117595,
+            "theme": [
+                {
+                    "type": "Slur",
+                    "ch": "相",
+                    "end": 642,
+                    "scale": [
+                        20,
+                        1
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "搅",
+                    "end": 1343,
+                    "scale": [
+                        19,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "相",
+                    "end": 2083,
+                    "scale": 2
+                },
+                {
+                    "type": "Slur",
+                    "ch": "淘",
+                    "end": 2861,
+                    "scale": [
+                        2,
+                        5
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "无",
+                    "end": 3620,
+                    "scale": 3
+                },
+                {
+                    "type": "Slur",
+                    "ch": "歇",
+                    "end": 4358,
+                    "scale": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "type": "Slur",
+                    "ch": "日",
+                    "end": 5586,
+                    "scale": [
+                        2,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "text": "会教山海一时平",
+            "start": 123609,
+            "theme": [
+                {
+                    "type": "Note",
+                    "ch": "会",
+                    "end": 387,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "教",
+                    "end": 772,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "山",
+                    "end": 1221,
+                    "scale": 3
+                },
+                {
+                    "type": "Note",
+                    "ch": "海",
+                    "end": 1743,
+                    "scale": 2
+                },
+                {
+                    "type": "Note",
+                    "ch": "一",
+                    "end": 2591,
+                    "scale": 20
+                },
+                {
+                    "type": "Slur",
+                    "ch": "时",
+                    "end": 4229,
+                    "scale": [
+                        19,
+                        20
+                    ]
+                },
+                {
+                    "type": "Note",
+                    "ch": "平",
+                    "end": 7667,
+                    "scale": 1
+                }
+            ]
+        }
+    ],
+    "offset": 0
+}
