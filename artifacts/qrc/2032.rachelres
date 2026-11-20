@@ -13,189 +13,9 @@
     ],
     "lyrics": [
         {
-            "text": "山海侧-银临",
-            "start": 60,
-            "theme": [
-                {
-                    "type": "Note",
-                    "ch": "山",
-                    "end": 168,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "海",
-                    "end": 327,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "侧",
-                    "end": 486,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "-",
-                    "end": 652,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 1003,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "临",
-                    "end": 1233,
-                    "scale": 1
-                }
-            ]
-        },
-        {
-            "text": "词：若紫鸢",
-            "start": 1300,
-            "theme": [
-                {
-                    "type": "Note",
-                    "ch": "词",
-                    "end": 231,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 415,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "若",
-                    "end": 590,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "紫",
-                    "end": 772,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "鸢",
-                    "end": 947,
-                    "scale": 1
-                }
-            ]
-        },
-        {
-            "text": "曲：银临/灰原穷",
-            "start": 2252,
-            "theme": [
-                {
-                    "type": "Note",
-                    "ch": "曲",
-                    "end": 199,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 383,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 573,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "临",
-                    "end": 740,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "/",
-                    "end": 924,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "灰",
-                    "end": 1099,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "原",
-                    "end": 1258,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "穷",
-                    "end": 1450,
-                    "scale": 1
-                }
-            ]
-        },
-        {
-            "text": "编曲：小慕",
-            "start": 3710,
-            "theme": [
-                {
-                    "type": "Note",
-                    "ch": "编",
-                    "end": 206,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "曲",
-                    "end": 380,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 542,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "小",
-                    "end": 922,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "慕",
-                    "end": 1265,
-                    "scale": 1
-                }
-            ]
-        },
-        {
-            "text": "银：我所知最老的传言",
+            "text": "我所知最老的传言",
             "start": 43349,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 308,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 2868,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "我",
@@ -421,21 +241,9 @@
             ]
         },
         {
-            "text": "塔：似有逆风而来的吟唱",
+            "text": "似有逆风而来的吟唱",
             "start": 74275,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 154,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 569,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "似",
@@ -583,21 +391,9 @@
             ]
         },
         {
-            "text": "银：穿越三千年林野青苍",
+            "text": "穿越三千年林野青苍",
             "start": 89108,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 223,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 603,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "穿",
@@ -715,21 +511,9 @@
             ]
         },
         {
-            "text": "银：天色无边",
+            "text": "天色无边",
             "start": 103652,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 479,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 974,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "天",
@@ -757,21 +541,9 @@
             ]
         },
         {
-            "text": "塔：浪涛席卷",
+            "text": "浪涛席卷",
             "start": 108178,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 208,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 439,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "浪",
@@ -799,21 +571,9 @@
             ]
         },
         {
-            "text": "合：便知哪一个都不容逾越",
+            "text": "便知哪一个都不容逾越",
             "start": 111924,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "合",
-                    "end": 206,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 389,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "便",
@@ -877,21 +637,9 @@
             ]
         },
         {
-            "text": "塔：世代交替",
+            "text": "世代交替",
             "start": 119400,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 199,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 391,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "世",
@@ -919,21 +667,9 @@
             ]
         },
         {
-            "text": "银：辗转变迁",
+            "text": "辗转变迁",
             "start": 122824,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 199,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 486,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "辗",
@@ -961,21 +697,9 @@
             ]
         },
         {
-            "text": "合：总还会记得那份冥顽的妄念",
+            "text": "总还会记得那份冥顽的妄念",
             "start": 126944,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "合",
-                    "end": 224,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 390,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "总",
@@ -1051,21 +775,9 @@
             ]
         },
         {
-            "text": "塔：我所见最美的裁决",
+            "text": "我所见最美的裁决",
             "start": 165619,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 235,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 526,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "我",
@@ -1291,21 +1003,9 @@
             ]
         },
         {
-            "text": "银：似有漂浮游离的吟唱",
+            "text": "似有漂浮游离的吟唱",
             "start": 194227,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 215,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 496,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "似",
@@ -1453,21 +1153,9 @@
             ]
         },
         {
-            "text": "塔：人们迁徙到一方梦乡",
+            "text": "人们迁徙到一方梦乡",
             "start": 209414,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 83,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 267,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "人",
@@ -1585,21 +1273,9 @@
             ]
         },
         {
-            "text": "银：天色无边",
+            "text": "天色无边",
             "start": 224330,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 54,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 334,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "天",
@@ -1627,21 +1303,9 @@
             ]
         },
         {
-            "text": "塔：浪涛席卷",
+            "text": "浪涛席卷",
             "start": 228177,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 207,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 446,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "浪",
@@ -1669,21 +1333,9 @@
             ]
         },
         {
-            "text": "合：原来哪一个都不用逾越",
+            "text": "原来哪一个都不用逾越",
             "start": 231881,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "合",
-                    "end": 175,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 343,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "原",
@@ -1747,21 +1399,9 @@
             ]
         },
         {
-            "text": "塔：识花认雪",
+            "text": "识花认雪",
             "start": 239337,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "塔",
-                    "end": 186,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 350,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "识",
@@ -1789,21 +1429,9 @@
             ]
         },
         {
-            "text": "银：眼底千年",
+            "text": "眼底千年",
             "start": 243065,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "银",
-                    "end": 192,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 366,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "眼",
@@ -1831,21 +1459,9 @@
             ]
         },
         {
-            "text": "合：总还会以别样面目迢迢相见",
+            "text": "总还会以别样面目迢迢相见",
             "start": 246551,
             "theme": [
-                {
-                    "type": "Note",
-                    "ch": "合",
-                    "end": 193,
-                    "scale": 1
-                },
-                {
-                    "type": "Note",
-                    "ch": "：",
-                    "end": 593,
-                    "scale": 1
-                },
                 {
                     "type": "Note",
                     "ch": "总",
