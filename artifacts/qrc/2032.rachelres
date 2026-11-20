@@ -1,7 +1,16 @@
 {
     "id": "2032",
-    "duration": 0,
-    "chorus": [],
+    "duration": 277617,
+    "chorus": [
+        {
+            "start": 104440,
+            "end": 104440
+        },
+        {
+            "start": 224440,
+            "end": 224440
+        }
+    ],
     "lyrics": [
         {
             "text": "山海侧-银临",
