@@ -125,7 +125,7 @@ jobs:
       native: true
       submodules: 'false'
       artifact-name: ylcs-mod-manager-{0}
-      artifact-path: outputs/*ModManager*.zip
+      artifact-path: outputs/*ModManager.zip
 
   package-nativeDesktop:
     name: Package Native Desktop

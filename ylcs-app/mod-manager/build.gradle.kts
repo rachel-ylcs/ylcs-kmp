@@ -49,14 +49,14 @@ rachel {
         }
 
         artifacts {
-            val (target, platform) = when (C.platform) {
-                BuildPlatform.Windows -> "windows" to "WindowsNative"
-                BuildPlatform.Linux -> "linux" to "LinuxNative"
-                BuildPlatform.Mac -> "macos" to "macOSNative"
+            val target = when (C.platform) {
+                BuildPlatform.Windows -> "windows"
+                BuildPlatform.Linux -> "linux"
+                BuildPlatform.Mac -> "macos"
             }
             val archive = nativeDesktopReleaseArchive
             copy("modManagerArtifact", archive, C.root.outputs, "ylcs-mod-manager-$target.zip", "打包MOD编辑器工件")
-            copy("modManagerPublish", archive, C.root.outputs, "[$platform]ModManager${C.versionName}.zip", "发布MOD编辑器")
+            copy("modManagerPublish", archive, C.root.outputs, "[$target]ModManager.zip", "发布MOD编辑器")
         }
 
         runs {
