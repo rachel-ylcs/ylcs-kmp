@@ -221,9 +221,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 if (!closeRequested) destroyPoolBefore()
             }) {
                 cleaning(::destroyPool) {
-                    cleaning(mainScope::cancel) {
-                        exitProcess(0)
-                    }
+                    mainScope.cancel()
+                    exitProcess(0)
                 }
             }
         }
