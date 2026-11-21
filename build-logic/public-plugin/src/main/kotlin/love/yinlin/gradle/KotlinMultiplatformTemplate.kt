@@ -525,6 +525,8 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
                             modules(*dpkg.jvmModules.toTypedArray())
 
+                            stripJreFonts = dpkg.useJreFonts
+
                             appResourcesRootDir.set(project.packageResourcesDir)
 
                             val targetList = mutableListOf<TargetFormat>()

@@ -11,6 +11,7 @@ class DesktopPackage {
     var jvmArgs: List<String> = emptyList()
     var jvmModules: List<String> = emptyList()
     var useAOT: Boolean = false
+    var useJreFonts: Boolean = false
 
     internal var windowsSettings: (WindowsPlatformSettings.() -> Unit)? = null
     internal var linuxSettings: (LinuxPlatformSettings.() -> Unit)? = null
