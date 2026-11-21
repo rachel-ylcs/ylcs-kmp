@@ -13,7 +13,7 @@ rachelMinimumCode = "370"
 # ----- [Plugin] ----- #
 
 kotlin = "2.5.0-RC"
-agp = "9.3.3"
+agp = "9.4.1"
 cmp = "1.13.0-rc01"
 mavenPublish = "0.37.0"
 dokka = "2.3.0"
