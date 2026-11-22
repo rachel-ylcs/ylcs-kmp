@@ -25,7 +25,7 @@ internal class NativeSceneFixture(val window: TestNativeWindowScope = TestNative
         Snapshot.sendApplyNotifications()
         time += 16_666_667L
         surface.canvas.clear(org.jetbrains.skia.Color.TRANSPARENT)
-        host.render(surface.canvas, 96, 64, time)
+        host.render(surface.canvas, window.pixelWidth, window.pixelHeight, time)
     }
 
     fun pixel(x: Int, y: Int): Int = Bitmap().use { bitmap ->

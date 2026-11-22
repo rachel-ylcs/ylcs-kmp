@@ -119,7 +119,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         textInput.attach(window)
         refreshEnvironment()
         info.isWindowFocused = true
-        updateGeometry(window.pixelWidth, window.pixelHeight)
+        updateGeometry(window)
         owner.setLifecycleState(Lifecycle.State.RESUMED)
         dropObserver.start()
         window.setDropTarget { types, x, y -> queryDrop(types, x, y) }
@@ -138,7 +138,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
 
     fun render(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         check(!closed)
-        updateGeometry(width, height)
+        window?.let { updateGeometry(it, IntSize(width, height)) }
         dispatcher.runCurrent()
         windowContext?.updateNativeFocus()
         with(rendering) {
@@ -154,7 +154,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         dispatcher.runCurrent()
         if (event == NativeWindowEvent.Wake) return
         if ((event is NativeWindowEvent.Key || event is NativeWindowEvent.TextInput || event is NativeWindowEvent.TextEditing) && windowContext?.hasNativeKeyboardFocus() == true) return
-        window?.let { updateGeometry(it.pixelWidth, it.pixelHeight) }
+        window?.let { updateGeometry(it) }
         when (event) {
             NativeWindowEvent.Wake, is NativeWindowEvent.WindowStateChanged -> Unit
             NativeWindowEvent.CloseRequested -> if (onCloseRequest()) window?.close()
@@ -242,7 +242,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
             return 0
         }
         val attached = window ?: return 0
-        updateGeometry(attached.pixelWidth, attached.pixelHeight)
+        updateGeometry(attached)
         dispatcher.runCurrent()
         scene.measureAndLayout()
         val position = Offset(x, y)
@@ -298,9 +298,12 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         locales.value = if (preferred.isEmpty()) LocaleList.current else LocaleList(preferred.joinToString(","))
     }
 
-    private fun updateGeometry(width: Int, height: Int) {
-        val size = IntSize(width, height)
-        scene.density = Density(window?.displayScale ?: 1f)
+    private fun updateGeometry(window: NativeWindowScope, frameSize: IntSize? = null) {
+        // A minimized window can report transient client dimensions. Keep the last layout until it is restored.
+        if (window.state.minimized) return
+        val size = frameSize ?: IntSize(window.pixelWidth, window.pixelHeight)
+        if (size.width <= 0 || size.height <= 0) return
+        scene.density = Density(window.displayScale)
         scene.size = size
         info.containerSize = size
         info.containerDpSize = size.toSize().toDpSize(scene.density)

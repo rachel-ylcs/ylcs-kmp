@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -117,6 +119,46 @@ class NativeSceneTest {
             fixture.render()
             assertEquals(2f, density)
             assertEquals(IntSize(96, 64), size)
+        }
+    }
+
+    @Test
+    fun minimizingPreservesLayoutAndCompositionUntilTheWindowIsRestored() {
+        NativeSceneFixture().use { fixture ->
+            var windowSize = DpSize.Zero
+            var measured = IntSize.Zero
+            var disposals = 0
+            val placementChanged = NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Placement)
+            fixture.content {
+                windowSize = LocalWindowInfo.current.containerDpSize
+                if (windowSize.width > windowSize.height) {
+                    DisposableEffect(Unit) { onDispose { disposals++ } }
+                }
+                Layout(content = {}) { _, constraints ->
+                    measured = IntSize(constraints.maxWidth, constraints.maxHeight)
+                    layout(measured.width, measured.height) {}
+                }
+            }
+            fixture.render()
+            assertEquals(DpSize(96.dp, 64.dp), windowSize)
+            assertEquals(IntSize(96, 64), measured)
+
+            fixture.window.setMinimized(true)
+            fixture.window.setSize(24, 32)
+            fixture.host.onEvent(NativeWindowEvent.Focus(false))
+            fixture.host.onEvent(placementChanged)
+            fixture.render()
+            assertEquals(DpSize(96.dp, 64.dp), windowSize)
+            assertEquals(IntSize(96, 64), measured)
+            assertEquals(0, disposals)
+
+            fixture.window.setSize(88, 60)
+            fixture.window.setMinimized(false)
+            fixture.host.onEvent(placementChanged)
+            fixture.render()
+            assertEquals(DpSize(88.dp, 60.dp), windowSize)
+            assertEquals(IntSize(88, 60), measured)
+            assertEquals(0, disposals)
         }
     }
 

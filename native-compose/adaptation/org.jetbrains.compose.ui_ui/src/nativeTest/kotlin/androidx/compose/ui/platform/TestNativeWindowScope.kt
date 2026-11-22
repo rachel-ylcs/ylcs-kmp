@@ -8,9 +8,12 @@ import org.jetbrains.skiko.window.NativeWindowState
 import org.jetbrains.skiko.window.NativeTray
 
 internal class TestNativeWindowScope(override val displayScale: Float = 1f, override val pixelDensity: Float = 1f) : NativeWindowScope {
-    override val pixelWidth = 96
-    override val pixelHeight = 64
-    override val state get() = NativeWindowState("", pixelWidth, pixelHeight)
+    override var pixelWidth = 96
+        private set
+    override var pixelHeight = 64
+        private set
+    private var minimized = false
+    override val state get() = NativeWindowState("", pixelWidth, pixelHeight, minimized = minimized)
     override val displayBounds get() = NativeWindowBounds(0, 0, pixelWidth, pixelHeight)
     override val windowHandle: Long? get() = null
     override val displayHandle: Long? get() = null
@@ -22,7 +25,10 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     var inputArea: List<Int> = []
     override fun invalidate() { invalidations++ }
     override fun close() { closes++ }
-    override fun setSize(width: Int, height: Int) = Unit
+    override fun setSize(width: Int, height: Int) {
+        pixelWidth = width
+        pixelHeight = height
+    }
     override fun setPosition(x: Int, y: Int): Boolean = true
     override fun setTitle(title: String) = Unit
     override fun setMinimumSize(width: Int, height: Int) = Unit
@@ -39,7 +45,7 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override fun startDrag(): Boolean = true
     override fun setVisible(visible: Boolean) = Unit
     override fun setAlwaysOnTop(alwaysOnTop: Boolean) = Unit
-    override fun setMinimized(minimized: Boolean) = Unit
+    override fun setMinimized(minimized: Boolean) { this.minimized = minimized }
     override fun setMaximized(maximized: Boolean) = Unit
     override fun setFullscreen(fullscreen: Boolean) = Unit
     override fun setCursor(cursor: NativeWindowCursor) = Unit
