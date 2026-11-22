@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.concert.Concert
+import love.yinlin.data.rachel.concert.ConcertPhoto
 import love.yinlin.data.rachel.concert.ConcertSong
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -150,14 +151,22 @@ val ApiBackupDownloadPlaylist by API.post.i<String>().o<JsonObject>()
 
 // Concert
 
-@APIDoc("获取完整演出、歌曲目录及当前用户点亮的演出，不分页")
 @APIParam("token")
 @APIReturn("concerts", description = "全部演出，按 cid 升序")
 @APIReturn("songs", description = "全部演出歌曲，按 sid 升序")
 @APIReturn("attendedConcerts", description = "当前用户点亮的演出 cid 列表")
 val ApiConcertGetConcerts by API.post.i<String>().o<List<Concert>, List<ConcertSong>, List<Int>>()
 
-@APIDoc("设置当前用户是否看过某场演出，重复设置同一状态不会重复添加记录")
+@APIParam("token")
+@APIReturn("photos")
+val ApiConcertGetPhotos by API.post.i<String>().o<List<ConcertPhoto>>()
+
+@APIParam("token")
+@APIParam("cid")
+@APIParam("poster")
+@APIParam("songs")
+val ApiConcertUpdate by API.post.i<String, Int, String, List<Int>>().o()
+
 @APIParam("token")
 @APIParam("cid")
 @APIParam("attended", description = "true 点亮，false 取消点亮")

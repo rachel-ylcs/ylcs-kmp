@@ -38,7 +38,7 @@ object DataSourceAccount {
                     app.config.userToken = it
                 } is UnauthorizedException
             } else { // 校验 Token
-                ApiAccountValidateToken.request(token).getOrNull()?.o1 == false
+                ApiAccountValidateToken.requestNull(token)?.o1 == false
             }
             if (isExpired) cleanUserToken() // 清理 Token
             !isExpired

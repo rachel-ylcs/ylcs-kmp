@@ -61,7 +61,7 @@ class ScreenModCenter : Screen() {
 
     override fun initialize() {
         launch {
-            val result = ApiSongGetSongLibrary.requestNull()!!.o1
+            val [result] = ApiSongGetSongLibrary.requestNull() ?: return@launch
             if (result.isNotEmpty()) {
                 baseLibrary = result
                 currentLibrary = result

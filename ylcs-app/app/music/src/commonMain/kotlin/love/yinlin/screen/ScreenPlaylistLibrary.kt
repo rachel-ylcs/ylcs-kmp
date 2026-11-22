@@ -207,8 +207,8 @@ class ScreenPlaylistLibrary : Screen() {
     private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? {
         if (app.config.userToken.isEmpty()) slot.tip.warning("请先登录")
         else {
-            ApiBackupDownloadPlaylist.request(app.config.userToken).onSuccess {
-                val playlist = catchingNull { decodePlaylist(it.o1.to()) }
+            ApiBackupDownloadPlaylist.request(app.config.userToken).onSuccess { [items] ->
+                val playlist = catchingNull { decodePlaylist(items.to()) }
                 if (playlist == null) slot.tip.error("云端歌单存在异常")
                 return playlist
             }.exceptionOrNull().errorTip

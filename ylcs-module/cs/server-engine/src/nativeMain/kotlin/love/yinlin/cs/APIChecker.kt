@@ -38,6 +38,7 @@ abstract class APIChecker {
     fun <T : Comparable<T>> AtLeast(value: T) = define<T>("AtLeast") { it >= value }
 
     val NotEmpty by define<String> { it.isNotEmpty() }
+    val CollectionNotEmpty by define<Collection<*>> { it.isNotEmpty() }
 
     val Positive by define<Number> { it.toLong() > 0L }
 

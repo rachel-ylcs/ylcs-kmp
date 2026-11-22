@@ -63,14 +63,14 @@ class ScreenCommunity : Screen() {
     private suspend fun requestNewData(loading: Boolean) {
         provider.withLoading(loading) {
             val page = DataSourceDiscovery.page
-            val result = when (val section = DataSourceDiscovery.currentSection) {
+            val [items] = when (val section = DataSourceDiscovery.currentSection) {
                 DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.requestNull(page.default, page.pageNum)
                 DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.requestNull(page.default, page.pageNum)
                 DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.default1, page.default, page.pageNum)
                 else -> ApiTopicGetSectionTopics.requestNull(section, page.default, page.pageNum)
             }!!
             gridState.requestScrollToItem(0)
-            page.newData(result.o1)
+            page.newData(items)
         }
     }
 
@@ -81,7 +81,7 @@ class ScreenCommunity : Screen() {
             DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.requestNull(page.offset, page.pageNum)
             DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.arg1, page.offset, page.pageNum)
             else -> ApiTopicGetSectionTopics.requestNull(section, page.offset, page.pageNum)
-        }?.then { page.moreData(it.o1) }
+        }?.then { [items] -> page.moreData(items) }
     }
 
     override fun initialize() {

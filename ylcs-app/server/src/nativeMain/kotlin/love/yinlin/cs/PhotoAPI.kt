@@ -8,7 +8,7 @@ fun ServerScope.photoAPI() {
         val photos = if (keyword == null) mysql.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo
-           WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?))
+            WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?))
             ORDER BY ts DESC, aid DESC
             LIMIT ?
         """, ts, ts, aid, num.coercePageNum) else mysql.throwQuerySQL("""
