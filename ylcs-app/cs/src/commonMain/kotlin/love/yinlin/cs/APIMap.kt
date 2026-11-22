@@ -5,7 +5,6 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.concert.Concert
-import love.yinlin.data.rachel.concert.ConcertPhoto
 import love.yinlin.data.rachel.concert.ConcertSong
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -156,16 +155,6 @@ val ApiBackupDownloadPlaylist by API.post.i<String>().o<JsonObject>()
 @APIReturn("songs", description = "全部演出歌曲，按 sid 升序")
 @APIReturn("attendedConcerts", description = "当前用户点亮的演出 cid 列表")
 val ApiConcertGetConcerts by API.post.i<String>().o<List<Concert>, List<ConcertSong>, List<Int>>()
-
-@APIParam("token")
-@APIReturn("photos")
-val ApiConcertGetPhotos by API.post.i<String>().o<List<ConcertPhoto>>()
-
-@APIParam("token")
-@APIParam("cid")
-@APIParam("poster")
-@APIParam("songs")
-val ApiConcertUpdate by API.post.i<String, Int, String, List<Int>>().o()
 
 @APIParam("token")
 @APIParam("cid")

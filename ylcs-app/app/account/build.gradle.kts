@@ -22,7 +22,6 @@ rachel {
                     projects.ylcsApp.app.activity,
                     projects.ylcsApp.app.community,
                     projects.ylcsApp.app.viewer,
-                    projects.ylcsApp.app.world,
 
                     projects.ylcsModule.compose.components.paginationLayout,
                     projects.ylcsModule.compose.components.qrcode,

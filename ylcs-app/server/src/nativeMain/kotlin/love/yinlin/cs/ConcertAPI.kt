@@ -5,8 +5,6 @@ import love.yinlin.cs.service.throwQuerySQL
 import love.yinlin.cs.service.throwQuerySQLSingle
 import love.yinlin.data.rachel.concert.Concert
 import love.yinlin.data.rachel.concert.ConcertSong
-import love.yinlin.data.rachel.profile.UserPrivilege
-import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 
@@ -30,31 +28,6 @@ fun ServerScope.concertAPI() {
                 "SELECT concerts FROM user_data WHERE uid = ?", uid
             )["concerts"]!!.to<List<Int>>()
             result(concerts, songs, attendedConcerts)
-        }
-    }
-
-    ApiConcertGetPhotos.response { token ->
-        val uid = AN.throwExpireToken(token)
-        mysql.throwTransaction { transaction ->
-            val user = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)
-            if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
-            val photos = transaction.throwQuerySQL("SELECT name, title, picNum from photo")
-            photos.to()
-        }
-    }
-
-    ApiConcertUpdate.response { token, cid, poster, songs ->
-        checker {
-            ID check cid
-            NotEmpty check poster
-            CollectionNotEmpty check songs
-        }
-
-        val uid = AN.throwExpireToken(token)
-        mysql.throwTransaction { transaction ->
-            val user = transaction.throwQuerySQLSingle("SELECT privilege FROM user WHERE uid = ? FOR SHARE", uid)
-            if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
-            transaction.throwExecuteSQL("UPDATE concert SET poster = ? , songs = ? WHERE cid = ?", poster, songs.toJsonString(), cid)
         }
     }
 
