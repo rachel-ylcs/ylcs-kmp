@@ -24,6 +24,7 @@ interface NativeWindowScope {
     fun createTray(tooltip: String = ""): NativeTray?
     fun setDragArea(hitTest: ((Float, Float) -> Boolean)?)
     fun addDragArea(hitTest: (Float, Float) -> Boolean?): AutoCloseable
+    fun setMaximizeButtonBounds(left: Float, top: Float, right: Float, bottom: Float) = Unit
     fun startDrag(): Boolean
     fun setVisible(visible: Boolean)
     fun setAlwaysOnTop(alwaysOnTop: Boolean)

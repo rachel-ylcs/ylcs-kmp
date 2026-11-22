@@ -65,7 +65,7 @@ diff --git a/include/SDL3/SDL_rachelwindow.h b/include/SDL3/SDL_rachelwindow.h
 new file mode 100644
 --- /dev/null
 +++ b/include/SDL3/SDL_rachelwindow.h
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,47 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -95,6 +95,7 @@ new file mode 100644
 +#include "SDL_begin_code.h"
 +
 +#define RACHEL_SDL_MOUSE_PASSTHROUGH "rachel.window.mouse_passthrough"
++#define RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS "rachel.window.maximize_button_bounds"
 +
 +#ifdef __cplusplus
 +extern "C" {
@@ -1027,3 +1028,61 @@ diff --git a/src/video/x11/SDL_x11sym.h b/src/video/x11/SDL_x11sym.h
  SDL_X11_SYM(void,XShapeCombineMask,(Display *dpy,Window dest,int dest_kind,int x_off,int y_off,Pixmap src,int op))
  SDL_X11_SYM(void,XShapeCombineRegion,(Display *a,Window b,int c,int d,int e,Region f,int g))
  #endif
+diff --git a/src/video/windows/SDL_windowsevents.c b/src/video/windows/SDL_windowsevents.c
+--- a/src/video/windows/SDL_windowsevents.c
++++ b/src/video/windows/SDL_windowsevents.c
+@@ -23,6 +23,7 @@
+ #ifdef SDL_VIDEO_DRIVER_WINDOWS
+ 
+ #include "SDL_windowsvideo.h"
++#include <SDL3/SDL_rachelwindow.h>
+ #include "../../events/SDL_events_c.h"
+ #include "../../events/SDL_touch_c.h"
+ #include "../../events/scancodes_windows.h"
+@@ -1680,8 +1681,24 @@
+         break;
+ #endif // WM_INPUTLANGCHANGE
+ 
++    case WM_NCLBUTTONDBLCLK:
++    case WM_NCLBUTTONUP:
+     case WM_NCLBUTTONDOWN:
+     {
++        if (wParam == HTMAXBUTTON && (data->window->flags & SDL_WINDOW_BORDERLESS) &&
++            SDL_GetPointerProperty(SDL_GetWindowProperties(data->window), RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS, NULL)) {
++            // The custom control handles the click. SDL's mouse capture delivers a client release.
++            POINT point = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
++            if (ScreenToClient(hwnd, &point)) {
++                const Uint64 timestamp = WIN_GetEventTimestamp();
++                SDL_SendMouseMotion(timestamp, data->window, SDL_GLOBAL_MOUSE_ID, false, (float)point.x, (float)point.y);
++                SDL_SendMouseButton(timestamp, data->window, SDL_GLOBAL_MOUSE_ID, SDL_BUTTON_LEFT, msg != WM_NCLBUTTONUP);
++                return 0;
++            }
++        }
++        if (msg != WM_NCLBUTTONDOWN) {
++            break;
++        }
+         data->in_title_click = true;
+ 
+         // Fix for 500ms hang after user clicks on the title bar, but before moving mouse
+@@ -2313,6 +2330,21 @@
+ 
+         if (window->flags & SDL_WINDOW_TOOLTIP) {
+             return HTTRANSPARENT;
++        }
++
++        if ((window->flags & (SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN)) ==
++            (SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE) && !RachelSDL_WindowMousePassthrough(window)) {
++            const SDL_FRect *bounds = SDL_GetPointerProperty(SDL_GetWindowProperties(window), RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS, NULL);
++            if (bounds && WIN_IsWindows11OrGreater()) {
++                POINT point = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
++                if (ScreenToClient(hwnd, &point)) {
++                    // Win32 client coordinates and SDL's Windows window pixels share the same units.
++                    if (point.x >= bounds->x && point.x < bounds->x + bounds->w &&
++                        point.y >= bounds->y && point.y < bounds->y + bounds->h) {
++                        return HTMAXBUTTON;
++                    }
++                }
++            }
+         }
+ 
+         if (window->hit_test) {

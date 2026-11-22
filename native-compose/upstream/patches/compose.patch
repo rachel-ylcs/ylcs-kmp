@@ -922,3 +922,28 @@ index d0e956c9373..00000000000
 -    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
 -    return kotlinx.atomicfu.locks.synchronized(lock, block)
 -}
+diff --git a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/HostDefaultProviderImpl.kt b/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/HostDefaultProviderImpl.kt
+--- a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/HostDefaultProviderImpl.kt
++++ b/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/HostDefaultProviderImpl.kt
+@@ -18,8 +18,10 @@
+ 
+ import androidx.compose.runtime.HostDefaultKey
+ import androidx.compose.runtime.HostDefaultProvider
++import androidx.lifecycle.compose.LifecycleOwnerHostDefaultKey
+ import androidx.lifecycle.viewmodel.compose.ViewModelStoreOwnerHostDefaultKey
+ import androidx.navigationevent.compose.NavigationEventDispatcherOwnerHostDefaultKey
++import androidx.savedstate.compose.SavedStateRegistryOwnerHostDefaultKey
+ 
+ internal class HostDefaultProviderImpl(
+     private val platformContext: PlatformContext
+@@ -28,6 +30,10 @@
+     // Potentially unsafe casts are intentional here.
+     @Suppress("UNCHECKED_CAST")
+     override fun <T> getHostDefault(key: HostDefaultKey<T>): T = when (key) {
++        LifecycleOwnerHostDefaultKey ->
++            platformContext.architectureComponentsOwner.lifecycleOwner
++        SavedStateRegistryOwnerHostDefaultKey ->
++            platformContext.architectureComponentsOwner.savedStateRegistryOwner
+         NavigationEventDispatcherOwnerHostDefaultKey ->
+             platformContext.architectureComponentsOwner.navigationEventDispatcherOwner
+         ViewModelStoreOwnerHostDefaultKey ->

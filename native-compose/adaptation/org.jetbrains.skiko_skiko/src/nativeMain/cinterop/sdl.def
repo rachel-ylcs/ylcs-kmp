@@ -165,6 +165,31 @@ static inline void RachelSDL_DestroyWindowHitTest(void *window, void *test) {
     SDL_SetWindowHitTest((SDL_Window *)window, NULL, NULL);
     SDL_free(test);
 }
+#if defined(SDL_PLATFORM_WINDOWS)
+static void SDLCALL RachelSDL_FreeMaximizeButtonBounds(void *userdata, void *value) {
+    (void)userdata;
+    SDL_free(value);
+}
+#endif
+static inline bool RachelSDL_SetMaximizeButtonBounds(void *window, float left, float top, float right, float bottom) {
+#if defined(SDL_PLATFORM_WINDOWS)
+    const SDL_PropertiesID props = SDL_GetWindowProperties((SDL_Window *)window);
+    if (!(right > left && bottom > top)) {
+        return SDL_ClearProperty(props, RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS);
+    }
+    SDL_FRect *bounds = SDL_GetPointerProperty(props, RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS, NULL);
+    if (bounds) {
+        *bounds = (SDL_FRect){left, top, right - left, bottom - top};
+        return true;
+    }
+    bounds = (SDL_FRect *)SDL_malloc(sizeof(*bounds));
+    if (!bounds) return false;
+    *bounds = (SDL_FRect){left, top, right - left, bottom - top};
+    return SDL_SetPointerPropertyWithCleanup(props, RACHEL_SDL_MAXIMIZE_BUTTON_BOUNDS, bounds, RachelSDL_FreeMaximizeButtonBounds, NULL);
+#else
+    return true;
+#endif
+}
 static inline bool RachelSDL_SetWindowVisible(void *window, bool visible) {
     return visible ? SDL_ShowWindow((SDL_Window *)window) : SDL_HideWindow((SDL_Window *)window);
 }

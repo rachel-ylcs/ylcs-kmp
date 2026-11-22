@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalAtomicApi::class)
-
 package org.jetbrains.skiko.window
 
 import kotlinx.cinterop.*
@@ -226,6 +225,14 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
     override fun startDrag(): Boolean {
         checkHostThread()
         return RachelSDL_StartDrag(window)
+    }
+
+    override fun setMaximizeButtonBounds(left: Float, top: Float, right: Float, bottom: Float) {
+        if (!active.load()) return
+        checkHostThread()
+        check(RachelSDL_SetMaximizeButtonBounds(window, left, top, right, bottom)) {
+            SDL_GetError()?.toKString() ?: "Unable to set the native maximize button bounds"
+        }
     }
 
     private fun updateDragAreas() {

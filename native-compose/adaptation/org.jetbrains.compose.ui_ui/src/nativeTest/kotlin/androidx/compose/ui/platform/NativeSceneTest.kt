@@ -14,8 +14,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LifecycleOwnerHostDefaultKey
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.savedstate.compose.LocalSavedStateRegistryOwner
+import androidx.savedstate.compose.SavedStateRegistryOwnerHostDefaultKey
 import kotlinx.coroutines.awaitCancellation
 import org.jetbrains.skiko.window.NativeWindowEvent
 import kotlin.test.*
@@ -125,6 +128,10 @@ class NativeSceneTest {
         try {
             fixture.content {
                 owner = LocalLifecycleOwner.current
+                val hostDefaults = checkNotNull(LocalHostDefaultProvider.current)
+                assertSame(owner, hostDefaults.getHostDefault(LifecycleOwnerHostDefaultKey))
+                assertSame(LocalSavedStateRegistryOwner.current, hostDefaults.getHostDefault(SavedStateRegistryOwnerHostDefaultKey))
+                assertTrue(LocalSavedStateRegistryOwner.current.savedStateRegistry.isRestored)
                 val store = checkNotNull(LocalViewModelStoreOwner.current).viewModelStore
                 DisposableEffect(store) {
                     store.put("test", object : ViewModel() {
