@@ -8,6 +8,8 @@ import kotlinx.io.IOException
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.buffered
 import kotlinx.io.files.FileMetadata
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.asArray
@@ -22,6 +24,8 @@ private fun createOption(): JsAny = js("({ create: true })")
 private fun recursiveOption(): JsAny = js("({ recursive: true })")
 private fun writeOption(append: Boolean): JsAny = js("({ keepExistingData: append, mode: 'exclusive' })")
 private fun fileArrayBuffer(file: org.w3c.files.File): Promise<ArrayBuffer> = js("file.arrayBuffer()")
+
+suspend fun org.w3c.files.File.openSource(): Source = ArrayBufferSource(fileArrayBuffer(this).await()).buffered()
 
 private suspend fun FileSystemDirectoryHandle.directory(name: String): FileSystemDirectoryHandle? = lookupEntry(getDirectoryHandle(name)).await()
 

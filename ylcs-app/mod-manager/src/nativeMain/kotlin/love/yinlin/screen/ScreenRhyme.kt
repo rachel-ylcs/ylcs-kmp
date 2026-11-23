@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import app
+import kotlinx.io.readByteArray
 import kotlinx.serialization.json.Json
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -66,6 +67,7 @@ import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod_manager.resources.Res
 import love.yinlin.mod_manager.resources.music
+import love.yinlin.uri.RegularUri
 import love.yinlin.util.QrcDecrypter
 import kotlin.collections.plusAssign
 
@@ -512,13 +514,14 @@ class ScreenRhyme(private val path: String?) : Screen() {
                     when (selectedTab) {
                         0 -> {
                             Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
-                                catchingError {
-                                    launch {
-                                        val data = (dropResult as DropResult.File).path.first().readByteArray()!!
+                                val file = (dropResult as? DropResult.File)?.files?.firstOrNull()
+                                if (file != null) launch {
+                                    catchingError {
+                                        val data = file.read { it.readByteArray() }
                                         val qrc = Coroutines.cpu { QrcDecrypter.decrypt(data)!! }
                                         parseQrc(qrc)
-                                    }
-                                }?.then { slot.tip.error("解析失败") }
+                                    }?.then { slot.tip.error("解析失败") }
+                                }
                             }) {
                                 ContextMenuProvider({
                                     item(text = "全选自动复制") {
@@ -543,7 +546,8 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         }
                         1 -> {
                             Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
-                                catching { notationImage = (dropResult as DropResult.File).path.first() }
+                                val file = (dropResult as? DropResult.File)?.files?.firstOrNull() as? RegularUri
+                                if (file != null) notationImage = File(file.path)
                             }) {
                                 val showImage = notationImage
                                 if (showImage != null) {

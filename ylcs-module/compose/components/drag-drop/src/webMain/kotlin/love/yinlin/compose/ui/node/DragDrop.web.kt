@@ -14,7 +14,7 @@ import androidx.compose.ui.draganddrop.domDataTransferOrNull
 import love.yinlin.data.MimeType
 import love.yinlin.extension.asArray
 import love.yinlin.extension.cast
-import love.yinlin.fs.File
+import love.yinlin.uri.WebFileUri
 import org.w3c.files.get
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsString
@@ -38,13 +38,13 @@ actual fun Modifier.dragDrop(
                         val types = transferData.types.asArray { s: JsString -> s.cast.lowercase() }
                         if ("files" in types && (currentFlag and DragFlag.File == DragFlag.File)) {
                             val files = transferData.files
-                            val len = files.length
-                            val paths: MutableList<File> = []
-                            for (i in 0 ..< len) paths += File(files[i]?.name ?: "")
-                            onDropFunc(DropResult.File(paths))
-                            return true
+                            val dropped = (0 ..< files.length).mapNotNull { files[it]?.let(::WebFileUri) }
+                            if (dropped.isNotEmpty()) {
+                                onDropFunc(DropResult.File(dropped))
+                                return true
+                            }
                         }
-                        else if (MimeType.TEXT in types && (currentFlag and DragFlag.Text == DragFlag.Text)) {
+                        if (MimeType.TEXT in types && (currentFlag and DragFlag.Text == DragFlag.Text)) {
                             onDropFunc(DropResult.Text(transferData.getData(MimeType.TEXT)))
                             return true
                         }

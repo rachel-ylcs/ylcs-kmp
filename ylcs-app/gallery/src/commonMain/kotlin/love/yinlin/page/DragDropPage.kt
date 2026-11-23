@@ -44,7 +44,7 @@ object DragDropPage : Page(
     @Composable
     override fun Content() {
         ComponentColumn {
-            GalleryParagraph("桌面端可拖入文件和文本。Web 端的文件结果只显示文件名，Android 和 iOS 暂不支持拖入。")
+            GalleryParagraph("桌面和 Web 可拖入文件和文本。两端都能读取拖入的文件，本示例只展示文件名或路径。Android 和 iOS 暂不支持拖入。")
 
             Component(demoFileDrop) {
                 DropExample(DragFlag.File, "将一个或多个文件拖到这里")
@@ -107,9 +107,9 @@ object DragDropPage : Page(
 
         when (val received = result) {
             is DropResult.File -> {
-                GalleryCaption("文件 · ${received.path.size} 个")
-                for (file in received.path.take(20)) Text(file.path)
-                if (received.path.size > 20) GalleryCaption("仅展示前 20 个文件")
+                GalleryCaption("文件 · ${received.files.size} 个")
+                for (file in received.files.take(20)) Text(file.path)
+                if (received.files.size > 20) GalleryCaption("仅展示前 20 个文件")
             }
             is DropResult.Text -> {
                 GalleryCaption("文本 · ${received.text.length} 个字符")

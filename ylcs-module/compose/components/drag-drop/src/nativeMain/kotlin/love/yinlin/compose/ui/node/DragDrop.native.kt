@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
-import love.yinlin.fs.File
+import love.yinlin.uri.RegularUri
 
 @Stable
 actual fun Modifier.dragDrop(
@@ -27,7 +27,7 @@ actual fun Modifier.dragDrop(
                     val data = event.transferData
                     val text = data.text
                     if (data.files.isNotEmpty() && (currentFlag and DragFlag.File == DragFlag.File)) {
-                        onDropFunc(DropResult.File(data.files.map { File(it) }))
+                        onDropFunc(DropResult.File(data.files.map(::RegularUri)))
                         return true
                     }
                     else if (text != null && (currentFlag and DragFlag.Text == DragFlag.Text)) {

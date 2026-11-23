@@ -27,7 +27,6 @@ import love.yinlin.extension.then
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
-import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
 
 @Stable
@@ -141,9 +140,9 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
                 enabled = step is Step.Initial || step is Step.Prepare,
                 flag = DragFlag.File,
                 onDrop = {
-                    val files = (it as? DropResult.File)?.path
+                    val files = (it as? DropResult.File)?.files
                     if (files != null) {
-                        if (files.size == 1) step = Step.Prepare(RegularUri(files[0].path))
+                        if (files.size == 1) step = Step.Prepare(files[0])
                         else slot.tip.warning("最多一次只能导入一个MOD")
                     }
                 }

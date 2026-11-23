@@ -196,7 +196,7 @@ Palette.from(bitmap) {
 | `media` | 未启用桌面 Native；JVM 的 Linux/macOS 视频后端可能为空实现 |
 | `webview` | Android、iOS、Web 有视图实现；JVM 显示不支持占位；桌面 Native 未启用 |
 | `qrcode` | 所有目标可生成二维码。Android、iOS 和 Web 支持相机扫码与选图识别。Web 相机需要安全上下文和用户授权，选图识别在浏览器本地完成。 |
-| `drag-drop` | iOS 当前返回原 Modifier；桌面 Native 使用 SDL 与 Compose 命中检查 |
+| `drag-drop` | 桌面和 Web 支持拖入文件和纯文本。文件通过 `DropResult.File.files` 返回 `ImplicitUri`，使用 `read` 读取。Web 保留浏览器授予的只读文件引用，`path` 用于展示文件名。Android 和 iOS 当前返回原 Modifier。 |
 | `platform-view` | 公共状态层包含桌面 Native，但尚无原生控件嵌入 Host |
 
 平台声明不保证权限、外部服务或运行资源已经就绪。媒体与系统视图的原生资源由对应所有者释放。

@@ -52,6 +52,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
+import love.yinlin.uri.ImplicitUri
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -402,15 +403,15 @@ class ScreenMain : BasicScreen() {
         override fun Content() {
             Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragDrop(!isRunning, DragFlag.File) { dropResult ->
                 if (dropResult is DropResult.File) {
-                    val paths = dropResult.path
-                    if (paths.size == 1) {
+                    val files = dropResult.files
+                    if (files.size == 1) {
                         launch {
                             if (isRunning) return@launch
                             reset()
                             isRunning = true
                             cleaning({
                                 catchingError {
-                                    result = paths[0].read { source -> ModFactory.Preview(source).process() }
+                                    result = files[0].read { source -> ModFactory.Preview(source).process() }
                                     statusText = ""
                                 }?.then { statusText = it.message ?: "未知错误" }
                             }) {
@@ -468,8 +469,8 @@ class ScreenMain : BasicScreen() {
             statusText = ""
         }
 
-        private suspend fun runReleaseTask(path: File, onProcess: (index: Int, total: Int, id: String) -> Unit) {
-            path.read { source ->
+        private suspend fun runReleaseTask(file: ImplicitUri, onProcess: (index: Int, total: Int, id: String) -> Unit) {
+            file.read { source ->
                 ModFactory.Release(source, app.libraryPath).process(onProcess)
             }
         }
@@ -478,16 +479,16 @@ class ScreenMain : BasicScreen() {
         override fun Content() {
             Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragDrop(!isRunning, DragFlag.File) { dropResult ->
                 if (dropResult is DropResult.File) {
-                    val paths = dropResult.path
-                    if (paths.isNotEmpty()) {
+                    val files = dropResult.files
+                    if (files.isNotEmpty()) {
                         launch {
                             if (isRunning) return@launch
                             isRunning = true
                             cleaning({
                                 catchingError {
                                     Coroutines.io {
-                                        for (path in paths) {
-                                            runReleaseTask(path) { index, total, id ->
+                                        for (file in files) {
+                                            runReleaseTask(file) { index, total, id ->
                                                 statusText = "[$index/$total] -> $id"
                                             }
                                         }

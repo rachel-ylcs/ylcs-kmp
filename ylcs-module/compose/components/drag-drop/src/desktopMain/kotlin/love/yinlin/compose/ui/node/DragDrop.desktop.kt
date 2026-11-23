@@ -11,7 +11,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
-import love.yinlin.fs.File
+import love.yinlin.uri.RegularUri
 import java.awt.datatransfer.DataFlavor
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -31,7 +31,7 @@ actual fun Modifier.dragDrop(
                     val transferable = event.awtTransferable
                     if ((currentFlag and DragFlag.File == DragFlag.File) && transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                         val list = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                        onDropFunc(DropResult.File(list.map { File((it as java.io.File).absolutePath) }))
+                        onDropFunc(DropResult.File(list.map { RegularUri((it as java.io.File).absolutePath) }))
                         return true
                     }
                     else if ((currentFlag and DragFlag.Text == DragFlag.Text) && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {

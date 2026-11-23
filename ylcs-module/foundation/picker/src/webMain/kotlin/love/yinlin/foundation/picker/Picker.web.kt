@@ -10,7 +10,6 @@ import kotlinx.io.Buffer
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import love.yinlin.data.MimeType
 import love.yinlin.extension.catchingError
@@ -18,11 +17,11 @@ import love.yinlin.extension.cleaning
 import love.yinlin.extension.createElement
 import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.fs.FileSystemFileHandle
+import love.yinlin.fs.openSource
 import love.yinlin.fs.write
-import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.Sources
 import love.yinlin.uri.ImplicitUri
-import org.khronos.webgl.ArrayBuffer
+import love.yinlin.uri.WebFileUri
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.toInt8Array
 import org.w3c.dom.HTMLAnchorElement
@@ -34,7 +33,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.js.Promise
 
-private fun selectedFileBytes(file: File): Promise<ArrayBuffer> = js("file.arrayBuffer()")
 private fun downloadBlob(bytes: Int8Array, mime: String): Blob = js("new Blob([bytes], { type: mime })")
 private fun hasSavePicker(): Boolean = js("typeof window.showSaveFilePicker === 'function'")
 private fun setPickerCancel(input: HTMLInputElement, handler: (() -> Unit)?): Unit = js("{ input.oncancel = handler; }")
@@ -60,8 +58,6 @@ private fun String.fileExtension(): String? = removePrefix("*").takeIf { value -
 
 private fun acceptTypes(mimeType: List<String>, filter: List<String>): String = (mimeType.filter { it.isNotBlank() && it != MimeType.ANY } + filter.mapNotNull { it.fileExtension() }).distinct().joinToString(",")
 
-private suspend fun File.openSource(): Source = ArrayBufferSource(selectedFileBytes(this).await()).buffered()
-
 private fun download(filename: String, mime: String, buffer: Buffer) {
     val blob = downloadBlob(buffer.readByteArray().toInt8Array(), mime)
     val url = URL.createObjectURL(blob)
@@ -77,12 +73,6 @@ private fun download(filename: String, mime: String, buffer: Buffer) {
             null
         }, 1000)
     }
-}
-
-private class PickedFileUri(private val file: File) : ImplicitUri {
-    override val path: String get() = file.name
-    override suspend fun <R> read(block: suspend (Source) -> R): R = file.openSource().use { block(it) }
-    override suspend fun write(block: suspend (Sink) -> Unit): Unit = throw IOException("The browser grants read access to this file")
 }
 
 private class SaveFileUri(private val handle: FileSystemFileHandle) : ImplicitUri {
@@ -163,7 +153,7 @@ actual class Picker actual constructor(context: PlatformContextProvider) : AutoC
 
     actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = selectFiles(1, acceptTypes(mimeType, filter))?.firstOrNull()?.openSource()
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = selectFiles(1, acceptTypes(mimeType, filter))?.firstOrNull()?.let(::PickedFileUri)
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = selectFiles(1, acceptTypes(mimeType, filter))?.firstOrNull()?.let(::WebFileUri)
 
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? {
         if (closed) return null
