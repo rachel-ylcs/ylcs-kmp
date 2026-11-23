@@ -1,22 +1,57 @@
+@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
 package love.yinlin.foundation.exception
 
 import kotlinx.browser.window
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ThrowableCompatible
-import love.yinlin.extension.raw
-import kotlin.js.ExperimentalWasmJsInterop
+import org.w3c.dom.ErrorEvent
+import org.w3c.dom.PromiseRejectionEvent
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.EventTarget
 
-@OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
-internal actual fun setupPlatformExceptionHandler(crashKey: String, handler: ExceptionHandler): AutoCloseable {
-    val previous = window.onerror
-    window.onerror = { message, source, lineno, colno, error ->
-        val e = ThrowableCompatible(error).build() ?: Throwable(message?.toString() ?: "error")
-        val errorString = "$source - $lineno - $colno\n$message\n${e.stackTraceToString()}"
-        handler.handle(crashKey, e, errorString)
-        false.raw
+private fun listener(callback: (Event) -> Unit): EventListener = js("({ handleEvent: callback })")
+private fun reasonToString(reason: JsAny?): String = js("""
+    (function() {
+        try { return String(reason); }
+        catch (error) { return 'Unknown rejection reason'; }
+    })()
+""")
+private fun reasonStack(reason: JsAny?): String? = js("""
+    (function() {
+        try {
+            const stack = reason == null ? null : reason.stack;
+            return typeof stack === 'string' ? stack : null;
+        }
+        catch (error) { return null; }
+    })()
+""")
+
+internal actual fun setupPlatformExceptionHandler(crashKey: String, handler: ExceptionHandler): AutoCloseable = window.observeBrowserExceptions(crashKey, handler)
+
+internal fun EventTarget.observeBrowserExceptions(crashKey: String, handler: ExceptionHandler): AutoCloseable {
+    val errorListener = listener { event ->
+        if (event is ErrorEvent) {
+            val cause = event.error
+            val error = ThrowableCompatible(cause).build() ?: Throwable(event.message)
+            val stack = reasonStack(cause) ?: error.stackTraceToString()
+            handler.handle(crashKey, error, "${event.filename} - ${event.lineno} - ${event.colno}\n${event.message}\n$stack")
+        }
     }
-    val installed = window.onerror
+    val rejectionListener = listener { event ->
+        if (event is PromiseRejectionEvent) {
+            val reason = event.reason
+            val message = "Unhandled promise rejection: ${reasonToString(reason)}"
+            val error = ThrowableCompatible(reason).build() ?: Throwable(message)
+            val stack = reasonStack(reason) ?: error.stackTraceToString()
+            handler.handle(crashKey, error, "$message\n$stack")
+        }
+    }
+
+    addEventListener("error", errorListener)
+    addEventListener("unhandledrejection", rejectionListener)
     return AutoCloseable {
-        if (window.onerror === installed) window.onerror = previous
+        removeEventListener("error", errorListener)
+        removeEventListener("unhandledrejection", rejectionListener)
     }
 }
