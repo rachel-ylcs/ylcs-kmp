@@ -5,6 +5,7 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import love.yinlin.gradle.task.GenerateCodeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
@@ -156,6 +157,13 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
     // 引入依赖
     fun npm(name: String, version: Provider<String>): NpmInfo = NpmInfo(name, version.get())
     fun npm(name: String, version: String): NpmInfo = NpmInfo(name, version)
+    fun npm(dependency: Provider<out MinimalExternalModuleDependency>): NpmInfo {
+        val entry = dependency.get()
+        require(entry.module.group == "npm") { "Expected an npm catalog entry: ${entry.module}" }
+        val version = entry.versionConstraint.strictVersion.ifEmpty { entry.versionConstraint.requiredVersion }
+        require(version.isNotBlank()) { "Missing npm version for ${entry.module.name}" }
+        return npm(entry.module.name, version)
+    }
 
     fun HasKotlinDependencies.lib(vararg libs: Any) {
         dependencies {
