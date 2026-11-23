@@ -288,18 +288,20 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
 
                 val immersivePadding = rememberImmersivePadding()
                 CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
-                    NavDisplay(
-                        backStack = manager.backStack,
-                        modifier = modifier,
-                        onBack = manager::pop,
-                        transitionSpec = transitionSpecProvider,
-                        popTransitionSpec = transitionSpecProvider,
-                        entryDecorators = [
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                            rememberViewModelStoreNavEntryDecorator(manager.store.provider),
-                        ],
-                        entryProvider = { manager.navEntry(it) }
-                    )
+                    ScreenNavigationHost(manager) {
+                        NavDisplay(
+                            backStack = manager.backStack,
+                            modifier = modifier,
+                            onBack = manager::pop,
+                            transitionSpec = transitionSpecProvider,
+                            popTransitionSpec = transitionSpecProvider,
+                            entryDecorators = [
+                                rememberSaveableStateHolderNavEntryDecorator(),
+                                rememberViewModelStoreNavEntryDecorator(manager.store.provider),
+                            ],
+                            entryProvider = { manager.navEntry(it) }
+                        )
+                    }
                 }
             }
         }

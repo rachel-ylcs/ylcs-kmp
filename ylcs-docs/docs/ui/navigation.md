@@ -78,6 +78,8 @@ class ScreenDetails(private val initialId: String) : Screen() {
 
 普通 `pop()` 返回旧页面不调用 `resume()`。页面被覆盖不代表已经清理；离栈条目可能因转场仍被持有，最后一个引用释放后才结束 ViewModel 生命周期。
 
+在 Web 上，浏览器后退会在根导航宿主可返回时调用同一个 `pop()`，沿用其 200ms 防抖。退到根页后，浏览器后退按站点历史继续。浏览器前进不会恢复已经离栈的页面，页面参数也不会写入浏览器历史。
+
 !!! note "monitor 只观察快照状态"
     `monitor(state, action)` 内部使用 `snapshotFlow(state).collectLatest(action)`。普通变量若未参与 Compose 快照，不会被转换为可观察状态。
 
