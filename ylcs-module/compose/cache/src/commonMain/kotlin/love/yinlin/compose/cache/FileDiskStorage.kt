@@ -2,7 +2,6 @@ package love.yinlin.compose.cache
 
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import kotlinx.io.buffered
 import kotlinx.io.writeString
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
@@ -10,7 +9,7 @@ import love.yinlin.extension.cleaning
 import love.yinlin.fs.File
 
 /**
- * 同目录临时文件、关闭流后原子 rename、读取与提交互斥。每个目录只允许一个实例拥有。
+ * 同目录临时文件、提交后 rename、读取与提交互斥。每个目录只允许一个实例拥有。
  * 写入回调不持有元数据锁，已有条目可在其他下载期间命中；删除和清理仍与写入互斥。
  * Persistent 保留原文件名并可读取旧 DiskCache 数据；Lru 目录必须独占。
  * Lru 以小型访问日志恢复重启后的顺序，日志定期压缩，容量预算计算数据文件。
@@ -70,7 +69,7 @@ class FileDiskStorage(
         val temporary = File(directory, ".lru.tmp")
         val text = entries.keys.joinToString(separator = "\n", postfix = if (entries.isEmpty()) "" else "\n")
 
-        temporary.writeSync { it.writeString(text) }
+        temporary.write { it.writeString(text) }
         temporary.move(journal)
         check(!temporary.exists() && journal.fileSize() == text.encodeToByteArray().size.toLong()) { "Cache index rename failed" }
         journalLines = entries.size
@@ -82,7 +81,7 @@ class FileDiskStorage(
         bytes += size
 
         if (policy is DiskPolicy.Lru) {
-            journal.rawSink(append = true).buffered().use { it.writeString("$key\n") }
+            journal.write(append = true) { it.writeString("$key\n") }
             journalLines++
             if (journalLines > entries.size * 2 + 64) compactJournal()
         }

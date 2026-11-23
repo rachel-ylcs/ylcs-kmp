@@ -7,3 +7,6 @@ import kotlinx.io.RawSink
  */
 @PublishedApi
 internal expect suspend fun awaitFileSinkClosed(sink: RawSink, failure: Throwable?)
+
+@PublishedApi
+internal expect fun manageFileSink(sink: RawSink)

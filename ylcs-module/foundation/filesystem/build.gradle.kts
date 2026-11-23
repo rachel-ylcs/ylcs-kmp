@@ -15,8 +15,6 @@ rachel {
     multiplatform {
         nativeDesktopTarget = true
 
-        webTestHeadless = false
-
         interop {
             native {
                 windows {
@@ -61,6 +59,12 @@ rachel {
             jsMain(webMain)
 
             wasmJsMain(webMain)
+
+            webTest(commonTest)
+
+            jsTest(webTest)
+
+            wasmJsTest(webTest)
 
             windowsMain(nativeMain)
 

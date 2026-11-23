@@ -1,4 +1,3 @@
-@file:JsModule("opfs")
 @file:OptIn(ExperimentalWasmJsInterop::class)
 @file:Suppress("FunctionName", "PropertyName", "ConstPropertyName")
 package love.yinlin.fs
@@ -49,6 +48,7 @@ external interface FileSystemWritableFileStream : JsAny {
     fun write(data: Blob): Promise<JsAny?>
     fun write(data: JsString): Promise<JsAny?>
     fun close(): Promise<JsAny?>
+    fun abort(): Promise<JsAny?>
 }
 
 external interface FileSystemFileHandle : FileSystemHandle {

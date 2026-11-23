@@ -2,25 +2,28 @@ package love.yinlin.io
 
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
-import love.yinlin.extension.asByteArray
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
+import org.khronos.webgl.toByteArray
 
 class ArrayBufferSource(buffer: ArrayBuffer) : RawSource {
+    private var buffer: ArrayBuffer? = buffer
     private var position = 0
-    private val bytes by lazy { buffer.asByteArray }
 
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
+        val data = checkNotNull(buffer) { "Source is closed" }
         if (byteCount == 0L) return 0L
         require(byteCount >= 0L) { "byteCount $byteCount < 0" }
-        val endPos = position + minOf(byteCount, (bytes.size - position).toLong()).toInt()
-        val readTotal = endPos - position
-        if (readTotal == 0) return -1L
-        sink.write(bytes, position, endPos)
-        position = endPos
-        return readTotal.toLong()
+        val count = minOf(byteCount, (data.byteLength - position).toLong(), 64L * 1024).toInt()
+        if (count == 0) return -1L
+        sink.write(Int8Array(data, position, count).toByteArray())
+        position += count
+        return count.toLong()
     }
 
-    override fun close() {}
+    override fun close() {
+        buffer = null
+    }
 
     override fun toString(): String = "ArrayBufferSource"
 }

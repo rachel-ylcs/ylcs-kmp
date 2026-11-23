@@ -34,11 +34,11 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
         ClientEngine.init(Local.API_BASE_URL)
 
         async {
-            dataPath.mkdirSync()
-            cachePath.mkdirSync()
-            configPath.mkdirSync()
-            modPath.mkdirSync()
-            radioPath.mkdirSync()
+            dataPath.mkdir()
+            cachePath.mkdir()
+            configPath.mkdir()
+            modPath.mkdir()
+            radioPath.mkdir()
         }
     }
 

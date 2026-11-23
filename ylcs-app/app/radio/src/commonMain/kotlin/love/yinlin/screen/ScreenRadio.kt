@@ -217,9 +217,10 @@ class ScreenRadio : Screen() {
                 val cookie = RadioAPI.generateCookie() ?: return@catchingDefault false
                 val audio = RadioAPI.requestAudio(program.audioId, cookie) ?: return@catchingDefault false
                 // 再下载，输出流关闭后才标记成功
-                path.bufferedSink().use { sink ->
-                    downloadDialog.download(audio.url, sink) { }
+                path.write { sink ->
+                    check(Coroutines.main { downloadDialog.download(audio.url, sink) { } })
                 }
+                true
             }
             return downloaded
         }) {

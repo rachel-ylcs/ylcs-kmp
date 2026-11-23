@@ -1,5 +1,6 @@
 package love.yinlin.fs
 
+import kotlinx.coroutines.ensureActive
 import kotlinx.io.*
 import kotlinx.io.files.FileMetadata
 import kotlinx.serialization.Serializable
@@ -321,11 +322,19 @@ abstract class File {
      * 写文件
      */
     @IOCoroutine
-    suspend inline fun write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
-        val raw = rawSink()
+    suspend inline fun write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = write(append = false, block)
+
+    /** 写入完成后再返回。append 为 true 时保留原有内容并从文件末尾写入。 */
+    @IOCoroutine
+    suspend inline fun write(append: Boolean, @IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
+        val raw = rawSink(append)
+        manageFileSink(raw)
         var failure: Throwable? = null
         try {
-            raw.buffered().use { block(it) }
+            raw.buffered().use {
+                block(it)
+                ensureActive()
+            }
         }
         catch (error: Throwable) {
             failure = error
@@ -342,7 +351,10 @@ abstract class File {
      * 写文本文件
      */
     @IOCoroutine
-    suspend fun writeText(text: String): Boolean = Coroutines.io { writeTextSync(text) }
+    suspend fun writeText(text: String): Boolean = catchingDefault(false) {
+        write { it.writeString(text) }
+        true
+    }
 
     fun writeTextSync(text: String): Boolean = catchingDefault(false) {
         writeSync { it.writeString(text) }
@@ -353,7 +365,10 @@ abstract class File {
      * 写字节文件
      */
     @IOCoroutine
-    suspend fun writeByteArray(data: ByteArray): Boolean = Coroutines.io { writeByteArraySync(data) }
+    suspend fun writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
+        write { it.write(data) }
+        true
+    }
 
     fun writeByteArraySync(data: ByteArray): Boolean = catchingDefault(false) {
         writeSync { it.write(data) }
@@ -364,7 +379,12 @@ abstract class File {
      * 写入文件
      */
     @IOCoroutine
-    suspend fun writeTo(other: File): Boolean = Coroutines.io { writeToSync(other) }
+    suspend fun writeTo(other: File): Boolean = catchingDefault(false) {
+        read { source ->
+            other.write { sink -> source.transferTo(sink) }
+        }
+        true
+    }
 
     fun writeToSync(other: File): Boolean = catchingDefault(false) {
         readSync { source ->
