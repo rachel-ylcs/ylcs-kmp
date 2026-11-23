@@ -193,7 +193,7 @@ Palette.from(bitmap) {
 
 | 模块 | 当前边界 |
 | --- | --- |
-| `media` | 未启用桌面 Native；JVM 的 Linux/macOS 视频后端可能为空实现 |
+| `media` | Web 支持播放 OPFS 中的音频、音效和视频。曲目及视频的字符串地址也可以是浏览器可访问的 URL。无协议的地址先在 OPFS 查找，再按网页相对地址解析。浏览器可能要求用户操作后才允许有声播放。JVM 的 Linux/macOS 视频后端可能为空实现。 |
 | `webview` | Android、iOS、Web 有视图实现；JVM 显示不支持占位；桌面 Native 未启用 |
 | `qrcode` | 所有目标可生成二维码。Android、iOS 和 Web 支持相机扫码与选图识别。Web 相机需要安全上下文和用户授权，选图识别在浏览器本地完成。 |
 | `drag-drop` | 桌面和 Web 支持拖入文件和纯文本。文件通过 `DropResult.File.files` 返回 `ImplicitUri`，使用 `read` 读取。Web 保留浏览器授予的只读文件引用，`path` 用于展示文件名。Android 和 iOS 当前返回原 Modifier。 |

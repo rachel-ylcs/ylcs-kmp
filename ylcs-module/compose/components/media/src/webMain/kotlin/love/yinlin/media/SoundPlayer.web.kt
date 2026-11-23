@@ -1,50 +1,69 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
-@file:Suppress("unused")
 package love.yinlin.media
 
-import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.await
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
-import love.yinlin.extension.then
 import love.yinlin.fs.File
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.toInt8Array
-import kotlin.js.ExperimentalWasmJsInterop
-import kotlin.js.JsAny
 import kotlin.js.Promise
-import kotlin.js.js
 
 private fun newAudioContext(): JsAny = js("new (window.AudioContext || window.webkitAudioContext)()")
 private fun decodeAudioData(context: JsAny, buffer: ArrayBuffer): Promise<JsAny> = js("context.decodeAudioData(buffer)")
-private fun playAudioBuffer(context: JsAny, audioBuffer: JsAny): JsAny = js("""
-{
-    const source = context.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(context.destination);
-    source.start(0.0);
-}
+private fun playAudioBuffer(context: JsAny, audioBuffer: JsAny): Promise<JsAny?> = js("""
+    context.resume().then(function () {
+        if (context.state !== 'running') return null;
+        const source = context.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(context.destination);
+        source.onended = function () { source.disconnect(); };
+        source.start();
+        return null;
+    })
 """)
+
+private fun closeAudioContext(context: JsAny): Promise<JsAny?> = js("context.close()")
 
 actual class SoundPlayer {
     private var caches: List<JsAny> = []
-    private val context = newAudioContext()
+    private var context: JsAny? = null
+    private var revision = 0L
+    private var released = false
 
-    actual suspend fun loadFromByteArray(data: List<ByteArray>) {
+    private suspend fun load(count: Int, read: suspend (Int) -> ArrayBuffer) {
+        if (released) return
+        val request = ++revision
         catching {
-            caches = Coroutines.io {
-                data.fastMap { bytes ->
-                    decodeAudioData(context, bytes.toInt8Array().buffer).await()
+            val decoded = ArrayList<JsAny>(count)
+            if (count > 0) {
+                val active = context ?: newAudioContext().also { context = it }
+                for (index in 0 ..< count) {
+                    val bytes = read(index)
+                    if (request != revision) return@catching
+                    decoded += decodeAudioData(active, bytes).await()
+                    if (request != revision) return@catching
                 }
             }
+            caches = decoded
         }
     }
 
-    actual suspend fun loadFromPath(data: List<File>) { }
+    actual suspend fun loadFromByteArray(data: List<ByteArray>) = load(data.size) { data[it].toInt8Array().buffer }
+
+    actual suspend fun loadFromPath(data: List<File>) = load(data.size) { data[it].readWebMediaBuffer() }
 
     actual fun play(index: Int) {
-        caches.getOrNull(index)?.then { buffer -> playAudioBuffer(context, buffer) }
+        val active = context ?: return
+        val buffer = caches.getOrNull(index) ?: return
+        val _ = playAudioBuffer(active, buffer).catch { null }
     }
 
-    actual fun release() { }
+    actual fun release() {
+        released = true
+        revision++
+        caches = []
+        val active = context ?: return
+        context = null
+        val _ = closeAudioContext(active).catch { null }
+    }
 }
