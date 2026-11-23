@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
@@ -6,14 +7,18 @@ import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.await
 import kotlinx.coroutines.cancel
 import love.yinlin.extension.BaseLazyReference
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
-import kotlin.js.ExperimentalWasmJsInterop
+import org.w3c.dom.COMPLETE
+import org.w3c.dom.DocumentReadyState
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -29,44 +34,40 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     fun run() {
         val mainScope = MainScope()
-        initApplication(scope = mainScope)
-
-        // 有待考证
-        window.onload = {
-            initPoolLater(mainScope)
-        }
-
-        // 有待考证
-        window.onclose = {
-            cleaning(::destroyPoolBefore) {
-                cleaning(::destroyPool, mainScope::cancel)
+        val lifecycle = WebPageLifecycle(
+            window,
+            onReady = { initPoolLater(mainScope) },
+            onClose = {
+                cleaning(::destroyPoolBefore) {
+                    cleaning(::destroyPool, mainScope::cancel)
+                }
             }
-        }
+        )
 
-        ComposeViewport(
-            viewportContainer = document.body!!,
-            configure = {
-                isA11YEnabled = enableAccessibility
+        catchingError {
+            initApplication(scope = mainScope)
+            lifecycle.bind(document.readyState == DocumentReadyState.COMPLETE)
+            ComposeViewport(configure = { isA11YEnabled = enableAccessibility }) {
+                ComposedLayout {
+                    BeginContent()
+                    Content()
+                }
             }
-        ) {
-            ComposedLayout {
-                BeginContent()
-                Content()
-            }
+        }?.let { error ->
+            catchingError { lifecycle.close() }?.let { if (it !== error) error.addSuppressed(it) }
+            throw error
         }
     }
 
     actual fun backHome() { }
 
-    actual suspend fun openUri(uri: String): Boolean {
-        window.open(uri, "_blank")
-        return true
+    actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {
+        window.open(uri, "_blank") != null
     }
 
-    @OptIn(ExperimentalWasmJsInterop::class)
-    actual suspend fun copyText(text: String): Boolean {
-        window.navigator.clipboard.writeText(text)
-        return true
+    actual suspend fun copyText(text: String): Boolean = catchingDefault(false) {
+        window.navigator.clipboard.writeText(text).await()
+        true
     }
 
     actual fun implicitFileUri(uri: Uri): ImplicitUri = RegularUri(uri.toString())
