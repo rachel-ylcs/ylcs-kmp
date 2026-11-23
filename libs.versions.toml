@@ -204,6 +204,8 @@ skiko-lottie-awt = { module = "org.jetbrains.skiko:skiko-skottie-awt-runtime-all
 
 # ----- [Web] ----- #
 
+npm-jsqr = { module = "npm:jsqr", version = "1.4.0" }
+
 # kotlinx
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 

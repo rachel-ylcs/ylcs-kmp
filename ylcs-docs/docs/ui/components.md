@@ -195,7 +195,7 @@ Palette.from(bitmap) {
 | --- | --- |
 | `media` | 未启用桌面 Native；JVM 的 Linux/macOS 视频后端可能为空实现 |
 | `webview` | Android、iOS、Web 有视图实现；JVM 显示不支持占位；桌面 Native 未启用 |
-| `qrcode` | 所有目标可生成二维码；扫码界面仅移动端有实现 |
+| `qrcode` | 所有目标可生成二维码。Android、iOS 和 Web 支持相机扫码与选图识别。Web 相机需要安全上下文和用户授权，选图识别在浏览器本地完成。 |
 | `drag-drop` | iOS 当前返回原 Modifier；桌面 Native 使用 SDL 与 Compose 命中检查 |
 | `platform-view` | 公共状态层包含桌面 Native，但尚无原生控件嵌入 Host |
 

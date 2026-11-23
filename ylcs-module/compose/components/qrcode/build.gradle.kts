@@ -50,7 +50,9 @@ rachel {
 
             macosMain(nativeMain)
 
-            webMain(commonMain)
+            webMain(commonMain) {
+                lib(npm(libs.npm.jsqr))
+            }
 
             jsMain(webMain)
 

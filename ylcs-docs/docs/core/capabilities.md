@@ -21,7 +21,7 @@ description: foundation 模块提供的上下文、文件、网络、启动、�
 | `parser/lrc` | 歌词与时间戳 | `love.yinlin.foundation.parser.lrc` |
 | `parser/markdown`、`toml`、`yaml` | 文档模型、解析、写入与 DSL | `love.yinlin.foundation.parser.<格式>` |
 | `kv` | 跨平台键值存储 | `love.yinlin.kv` |
-| `picker` | 系统文件与媒体选择器 | `love.yinlin.picker` |
+| `picker` | 系统文件与媒体选择器 | `love.yinlin.foundation.picker` |
 | `exception` | 未处理异常收集 | `love.yinlin.foundation.exception` |
 
 ## 上下文与文件
@@ -34,6 +34,12 @@ val cachePath = PlatformFileSystem.cachePath(rawContext, "example")
 ```
 
 数据目录保存需要保留的内容，缓存目录保存可重建数据。安装目录或可执行文件位置不是默认可写目录。文件 API 包含元数据、遍历、创建、删除、复制、移动以及字节与文本读写；带 `Sync` 后缀的接口执行同步操作。
+
+### 文件选择器
+
+各平台通过 `Picker.pickPicture()` 或 `Picker.pickFile()` 获取 `Source`。Web 从用户在系统选择器中选中的文件读取内容。二维码组件通过同一个 `pickPicture()` 入口选图，在浏览器本地识别。
+
+需要稍后读取内容时，用 `pickPath()` 获取 `ImplicitUri`，再调用 `read`。Web 的 `path` 是供展示的文件名，引用可读取所选文件。导出时，通过 `savePath()` 获取目标，再调用 `write`。支持保存对话框的浏览器可让用户指定目标，其他浏览器由下载功能接收内容。下载目标只支持写入。Web 上的 OPFS 属于当前站点，框架的 `File` 用它管理应用自己的文件。
 
 ## 网络
 
