@@ -6,17 +6,21 @@ import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 actual class KV actual constructor(context: PlatformContext, initPath: File) : AutoCloseable {
+    private val keyPrefix = initPath.path.trimStart('/').let { "kv:${it.length}:$it:" }
+
     actual override fun close() { }
+
+    private fun storageKey(key: String): String = keyPrefix + key
 
     private fun setItem(key: String, value: String, expire: Int) {
         val time = if (expire == KVExpire.NEVER) expire else (DateEx.CurrentLong / 1000L).toInt() + expire
-        localStorage.setItem(key, makeArray {
+        localStorage.setItem(storageKey(key), makeArray {
             add(time)
             add(value)
         }.toJsonString())
     }
 
-    fun getItem(key: String): String? = localStorage.getItem(key)?.let {
+    fun getItem(key: String): String? = localStorage.getItem(storageKey(key))?.let {
         catchingNull {
             val arr = it.parseJson.Array
             val time = arr[0].Int
@@ -24,7 +28,7 @@ actual class KV actual constructor(context: PlatformContext, initPath: File) : A
             val current = (DateEx.CurrentLong / 1000L).toInt()
             if (time == KVExpire.NEVER || current <= time) value
             else {
-                localStorage.removeItem(key)
+                remove(key)
                 null
             }
         }
@@ -47,5 +51,5 @@ actual class KV actual constructor(context: PlatformContext, initPath: File) : A
         }
     }
     actual operator fun contains(key: String): Boolean = getItem(key) != null
-    actual fun remove(key: String) { localStorage.removeItem(key) }
+    actual fun remove(key: String) { localStorage.removeItem(storageKey(key)) }
 }
