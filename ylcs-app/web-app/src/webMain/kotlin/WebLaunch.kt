@@ -7,8 +7,11 @@ import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.WebFileUri
 import org.w3c.dom.url.URL
+import org.w3c.files.File
 
 private val protocolScheme = Scheme("web+rachel")
+
+private fun receiveSharedMod(onFile: (File) -> Unit): Unit = js("window.rachelReceiveSharedMod && window.rachelReceiveSharedMod(onFile)")
 
 private fun registerLaunchConsumer(initialUrl: String, onLink: (String) -> Unit, onFile: (FileSystemFileHandle) -> Unit): Unit = js("""
     {
@@ -33,6 +36,7 @@ internal fun listenForWebLaunches() {
     registerLaunchConsumer(initialUrl, ::forwardLink) { handle ->
         DeepLink.navigate(WebFileUri.registerLaunch(handle))
     }
+    receiveSharedMod { file -> DeepLink.navigate(WebFileUri.registerLaunch(file)) }
 }
 
 private fun forwardLink(targetUrl: String) {

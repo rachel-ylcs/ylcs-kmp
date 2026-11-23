@@ -10,7 +10,7 @@ import love.yinlin.fs.openSource
 import org.w3c.files.File
 import kotlin.uuid.Uuid
 
-/** 浏览器通过选取、拖放或系统文件关联交给应用的只读文件。 */
+/** 浏览器通过选取、拖放、文件关联或分享交给应用的只读文件。 */
 class WebFileUri private constructor(override val path: String, private val getFile: suspend () -> File) : ImplicitUri {
     constructor(file: File) : this(file.name, { file })
     constructor(handle: FileSystemFileHandle) : this(handle.name, { handle.getFile().await() })
@@ -23,10 +23,14 @@ class WebFileUri private constructor(override val path: String, private val getF
         private const val LAUNCH_AUTHORITY = "web-file"
         private var pendingLaunch: Pair<Uri, WebFileUri>? = null
 
-        /** 为系统文件启动生成可传入导航的临时标识。 */
-        fun registerLaunch(handle: FileSystemFileHandle): Uri {
+        fun registerLaunch(handle: FileSystemFileHandle): Uri = registerLaunch(WebFileUri(handle))
+
+        fun registerLaunch(file: File): Uri = registerLaunch(WebFileUri(file))
+
+        /** 为浏览器交付的文件生成可传入导航的临时标识。 */
+        private fun registerLaunch(file: WebFileUri): Uri {
             val uri = Uri(Scheme.Content, host = LAUNCH_AUTHORITY, path = "/${Uuid.generateV7()}")
-            pendingLaunch = uri to WebFileUri(handle)
+            pendingLaunch = uri to file
             return uri
         }
 
