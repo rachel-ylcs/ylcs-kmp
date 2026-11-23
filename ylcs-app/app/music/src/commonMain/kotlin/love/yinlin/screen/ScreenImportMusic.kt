@@ -93,7 +93,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     override fun initialize() {
         val uri = deeplink ?: return
         catchingError {
-            step = Step.Prepare(app.implicitFileUri(uri))
+            step = Step.Prepare(app.resolveModImport(uri))
         }?.then {
             step = Step.Initial(it.message ?: "未知错误", isError = true)
         }

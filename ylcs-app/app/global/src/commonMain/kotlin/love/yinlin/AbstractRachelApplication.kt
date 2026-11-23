@@ -20,6 +20,8 @@ import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import love.yinlin.platform.Platform
 import love.yinlin.startup.*
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
@@ -71,6 +73,8 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     override val mainFontResource: FontResource = Res.font.xwwk
     override val animationTheme: AnimationTheme get() = AnimationTheme.Default.copy(duration = DurationTheme.Default.clone(config.animationSpeed.value))
     override val toolingTheme: ToolingTheme get() = ToolingTheme(enableBallonTip = config.enabledTip)
+
+    open fun resolveModImport(uri: Uri): ImplicitUri = implicitFileUri(uri)
 
     /**
      * 目录操作
