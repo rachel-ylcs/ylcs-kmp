@@ -7,6 +7,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.io.IOException
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import kotlinx.io.Sink
 import kotlinx.io.files.FileMetadata
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.asArray
@@ -226,3 +227,7 @@ private class WebFile private constructor(private val uri: String, private val s
 
 actual fun buildFile(uri: String): File = WebFile.from(uri)
 actual fun buildFile(parent: File, vararg parts: String): File = WebFile.from(([parent.path] + parts).filter { it.isNotEmpty() }.joinToString("/"))
+
+suspend fun FileSystemFileHandle.write(block: suspend (Sink) -> Unit) = Coroutines.io {
+    writeFileSink(WebFileSink(openWritable()), block)
+}

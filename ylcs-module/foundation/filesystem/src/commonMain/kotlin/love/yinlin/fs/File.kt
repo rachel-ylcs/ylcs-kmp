@@ -1,5 +1,6 @@
 package love.yinlin.fs
 
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.io.*
 import kotlinx.io.files.FileMetadata
@@ -10,6 +11,7 @@ import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.StringSerializer
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.cleaning
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.reflect.metaClassName
@@ -327,22 +329,7 @@ abstract class File {
     /** 写入完成后再返回。append 为 true 时保留原有内容并从文件末尾写入。 */
     @IOCoroutine
     suspend inline fun write(append: Boolean, @IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
-        val raw = rawSink(append)
-        manageFileSink(raw)
-        var failure: Throwable? = null
-        try {
-            raw.buffered().use {
-                block(it)
-                ensureActive()
-            }
-        }
-        catch (error: Throwable) {
-            failure = error
-            throw error
-        }
-        finally {
-            awaitFileSinkClosed(raw, failure)
-        }
+        writeFileSink(rawSink(append)) { block(it) }
     }
 
     inline fun writeSync(@IOCoroutine crossinline block: (Sink) -> Unit) = bufferedSinkSync().use { block(it) }
@@ -393,6 +380,27 @@ abstract class File {
             }
         }
         true
+    }
+}
+
+@PublishedApi
+internal suspend fun writeFileSink(raw: RawSink, block: suspend (Sink) -> Unit) {
+    manageFileSink(raw)
+    var failure: Throwable? = null
+    cleaning({
+        try {
+            raw.buffered().use {
+                currentCoroutineContext().ensureActive()
+                block(it)
+                currentCoroutineContext().ensureActive()
+            }
+        }
+        catch (error: Throwable) {
+            failure = error
+            throw error
+        }
+    }) {
+        awaitFileSinkClosed(raw, failure)
     }
 }
 
