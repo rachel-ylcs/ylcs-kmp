@@ -10,6 +10,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class PersistentCacheBrowserTest {
     @Test
@@ -31,7 +32,7 @@ class PersistentCacheBrowserTest {
                 assertEquals("legacy-fixture", cache.load("source")?.use { it.readString() })
                 assertEquals(0, fetches)
             }) {
-                directory.delete()
+                assertTrue(directory.deleteRecursively())
             }
         }
     }
