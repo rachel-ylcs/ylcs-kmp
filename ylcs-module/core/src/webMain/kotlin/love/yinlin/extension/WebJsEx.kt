@@ -19,11 +19,14 @@ expect val JsBigInt.cast: Long
 expect val JsString.cast: String
 
 expect inline fun <reified T : JsAny, reified R> JsArray<out JsAny>.asArray(block: (T) -> R): Array<R>
-expect val JsArray<JsNumber>.asShortArray: ShortArray
-expect val JsArray<JsNumber>.asIntArray: IntArray
-expect val JsArray<JsNumber>.asFloatArray: FloatArray
-expect val JsArray<JsNumber>.asLongArray: LongArray
-expect val JsArray<JsNumber>.asDoubleArray: DoubleArray
+
+private fun JsArray<JsNumber>.numberAt(index: Int): Double = requireNotNull(this[index]) { "Missing number at index $index" }.cast
+
+val JsArray<JsNumber>.asShortArray: ShortArray get() = ShortArray(length) { index -> numberAt(index).toInt().toShort() }
+val JsArray<JsNumber>.asIntArray: IntArray get() = IntArray(length) { index -> numberAt(index).toInt() }
+val JsArray<JsNumber>.asFloatArray: FloatArray get() = FloatArray(length) { index -> numberAt(index).toFloat() }
+val JsArray<JsNumber>.asLongArray: LongArray get() = LongArray(length) { index -> numberAt(index).toLong() }
+val JsArray<JsNumber>.asDoubleArray: DoubleArray get() = DoubleArray(length) { index -> numberAt(index) }
 expect val JsArray<JsString>.asArray: Array<String>
 
 expect fun jsArrayOf(vararg value: JsAny): JsArray<JsAny>

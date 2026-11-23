@@ -80,6 +80,12 @@ rachel {
             jsMain(webMain)
 
             wasmJsMain(webMain)
+
+            webTest(commonTest)
+
+            jsTest(webTest)
+
+            wasmJsTest(webTest)
         }
     }
 }
