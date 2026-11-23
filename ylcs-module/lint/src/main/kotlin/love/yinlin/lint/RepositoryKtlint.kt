@@ -17,7 +17,7 @@ internal object RepositoryKtlint {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val (repositoryPath, reportsPath, xlsxWriterPath, sourceListPath) = args
+        val [repositoryPath, reportsPath, xlsxWriterPath, sourceListPath] = args
         val root = File(repositoryPath)
         val reports = File(reportsPath)
         val sources = File(sourceListPath).readLines()
@@ -32,10 +32,10 @@ internal object RepositoryKtlint {
         }
 
         val ruleOverrides = providers.map { provider ->
-            val execution = if (rules[provider.ruleId.value]?.enabled == true) RuleExecution.enabled else RuleExecution.disabled
+            val execution = if (rules[provider.ruleId.value]?.enabled == true) RuleExecution.ENABLED else RuleExecution.DISABLED
             provider.ruleId.createRuleExecutionEditorConfigProperty() to execution
         }
-        val executionOverrides = ruleOverrides + (ALL_RULES_EXECUTION_PROPERTY to RuleExecution.enabled)
+        val executionOverrides = ruleOverrides + (ALL_RULES_EXECUTION_PROPERTY to RuleExecution.ENABLED)
         val engine = KtLintRuleEngine(
             ruleProviders = providers,
             editorConfigOverride = RepositoryKtlintRules.options.plus(*executionOverrides.toTypedArray())
@@ -43,11 +43,11 @@ internal object RepositoryKtlint {
 
         val findings = mutableListOf<Finding>()
         var engineErrors = 0
+
         for (path in sources) {
             try {
                 engine.lint(Code.fromFile(root.resolve(path))) { error ->
                     val rule = rules[error.ruleId.value]
-                    // 抑制规则由 ktlint 始终执行，enabled 只控制其诊断是否进入报告。
                     if (rule?.enabled == true) {
                         findings.add(Finding(path, error.line, error.col, rule.name, rule.severity, error.detail))
                     }
