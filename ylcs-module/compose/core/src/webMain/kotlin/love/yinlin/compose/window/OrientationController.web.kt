@@ -36,6 +36,7 @@ actual class OrientationController {
 
         val root = document.documentElement ?: return
         if (changing || document.fullscreenElement != null || !document.fullscreenEnabled) return
+
         change {
             catching {
                 root.requestFullscreen().await()
@@ -49,6 +50,7 @@ actual class OrientationController {
 
     actual fun rotate(context: PlatformContextProvider) {
         if (changing) return
+
         val target = if (getOrientation(context) == Orientation.Horizontal) Orientation.Vertical else Orientation.Horizontal
         setOrientation(context, target)
     }
@@ -60,6 +62,7 @@ actual class OrientationController {
 
     private fun change(block: suspend () -> Unit) {
         if (changing) return
+
         changing = true
         // 在用户点击回调内发出 requestFullscreen，保留瞬时用户激活
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
@@ -85,7 +88,9 @@ actual class OrientationController {
 
     private fun updateFullscreen() {
         val fullscreen = ownedFullscreen ?: return
+
         if (document.fullscreenElement === fullscreen) return
+
         ownedFullscreen = null
         document.removeEventListener("fullscreenchange", onFullscreenChange)
     }

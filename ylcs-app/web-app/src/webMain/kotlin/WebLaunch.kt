@@ -30,15 +30,6 @@ private fun registerLaunchConsumer(initialUrl: String, onLink: (String) -> Unit,
     }
 """)
 
-internal fun listenForWebLaunches() {
-    val initialUrl = window.location.href
-    forwardLink(initialUrl)
-    registerLaunchConsumer(initialUrl, ::forwardLink) { handle ->
-        DeepLink.navigate(WebFileUri.registerLaunch(handle))
-    }
-    receiveSharedMod { file -> DeepLink.navigate(WebFileUri.registerLaunch(file)) }
-}
-
 private fun forwardLink(targetUrl: String) {
     val url = URL(targetUrl)
     if (url.origin != window.location.origin) return
@@ -46,4 +37,13 @@ private fun forwardLink(targetUrl: String) {
     if (uri.scheme == protocolScheme || uri.scheme == Scheme.Rachel) {
         DeepLink.navigate(uri.copy(scheme = Scheme.Rachel))
     }
+}
+
+internal fun listenForWebLaunches() {
+    val initialUrl = window.location.href
+    forwardLink(initialUrl)
+    registerLaunchConsumer(initialUrl, ::forwardLink) { handle ->
+        DeepLink.navigate(WebFileUri.registerLaunch(handle))
+    }
+    receiveSharedMod { file -> DeepLink.navigate(WebFileUri.registerLaunch(file)) }
 }

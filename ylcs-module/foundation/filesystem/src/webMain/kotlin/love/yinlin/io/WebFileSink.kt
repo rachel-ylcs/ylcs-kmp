@@ -29,8 +29,11 @@ class WebFileSink(private val stream: FileSystemWritableFileStream) : RawSink {
 
     override fun write(source: Buffer, byteCount: Long) {
         require(byteCount in 0L .. source.size)
+
         check(!closed) { "Sink is closed" }
+
         var remaining = byteCount
+
         while (remaining > 0) {
             val count = minOf(remaining, 64L * 1024)
             lastWrite = observe(stream.write(source.readByteArray(count.toInt()).toInt8Array()))
@@ -55,12 +58,13 @@ class WebFileSink(private val stream: FileSystemWritableFileStream) : RawSink {
 
     internal fun abort() {
         if (closing != null) return
+
         closed = true
         lastWrite = null
         closing = observe(stream.abort())
     }
 
-    /** 在 [close] 之后等待 OPFS 提交并传播写入失败。 */
+    // 在 [close] 之后等待 OPFS 提交并传播写入失败
     suspend fun awaitClosed() {
         val completion = checkNotNull(closing) { "Close the sink before awaiting its completion" }
         val failure = catchingError { completion.await() } ?: return

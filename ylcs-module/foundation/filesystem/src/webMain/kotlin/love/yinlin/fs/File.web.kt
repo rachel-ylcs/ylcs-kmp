@@ -14,6 +14,7 @@ import kotlinx.io.files.FileMetadata
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.asArray
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.WebFileSink
 import love.yinlin.platform.unsupportedPlatform
@@ -60,7 +61,8 @@ private class WebFile private constructor(private val uri: String, private val s
         fun from(path: String): WebFile {
             val separators = path.replace('\\', '/')
             val absolute = separators.startsWith('/')
-            val segments = mutableListOf<String>()
+            val segments: MutableList<String> = []
+
             for (part in separators.split('/')) {
                 when (part) {
                     "", "." -> {}
@@ -71,14 +73,18 @@ private class WebFile private constructor(private val uri: String, private val s
                     else -> segments.add(part)
                 }
             }
+
             val prefix = if (absolute) "/" else ""
+
             return WebFile(prefix + segments.joinToString("/"), segments)
         }
     }
 
     private suspend fun resolve(parts: List<String>): FileSystemDirectoryHandle? {
         var directory = openOpfs().await()
+
         for (part in parts) directory = directory.directory(part) ?: return null
+
         return directory
     }
 
@@ -94,6 +100,7 @@ private class WebFile private constructor(private val uri: String, private val s
 
     override suspend fun metadata(): FileMetadata? = Coroutines.io {
         val parent = parentHandle() ?: return@io null
+
         if (segments.isEmpty()) return@io FileMetadata(isRegularFile = false, isDirectory = true)
 
         val handle = parent.file(name)
@@ -105,10 +112,11 @@ private class WebFile private constructor(private val uri: String, private val s
         else null
     }
 
-    override fun metadataSync(): FileMetadata? = unsupportedPlatform()
+    override fun metadataSync(): FileMetadata = unsupportedPlatform()
 
     override suspend fun delete(): Unit = Coroutines.io {
         require(segments.isNotEmpty()) { "Cannot delete the OPFS root" }
+
         val parent = parentHandle() ?: return@io
         ignoreMissingEntry(parent.removeEntry(name)).await()
     }
@@ -117,6 +125,7 @@ private class WebFile private constructor(private val uri: String, private val s
 
     override suspend fun mkdir(): Unit = Coroutines.io {
         var directory = openOpfs().await()
+
         for (part in segments) directory = directory.getDirectoryHandle(part, createOption()).await()
     }
 
@@ -125,33 +134,44 @@ private class WebFile private constructor(private val uri: String, private val s
     override suspend fun move(dst: File): Unit = Coroutines.io {
         val target = from(dst.path)
         require(segments.isNotEmpty() && target.segments.isNotEmpty()) { "Cannot move the OPFS root" }
+
         val sourceParent = parentHandle() ?: throw IOException("Source not found: $uri")
+
         val sourceFile = sourceParent.file(name)
         val sourceDirectory = if (sourceFile == null) sourceParent.directory(name) else null
+
         if (sourceFile == null && sourceDirectory == null) throw IOException("Source not found: $uri")
+
         if (segments == target.segments) return@io
+
         require(sourceDirectory == null || target.segments.take(segments.size) != segments) { "Cannot move a directory into itself" }
 
         val targetParent = target.parentHandle() ?: throw IOException("Destination parent not found: ${target.path}")
         val targetName = target.name
+
         if (sourceFile != null) {
             if (moveOpfsFile(sourceFile, targetParent, targetName).await().toBoolean()) return@io
             copyFile(sourceFile, targetParent, targetName)
         }
         else {
             check(targetParent.file(targetName) == null && targetParent.directory(targetName) == null) { "Destination already exists: ${target.path}" }
+
             val targetDirectory = Coroutines.wait { targetParent.getDirectoryHandle(targetName, createOption()).await() }
-            val copiedEntries = mutableListOf<Pair<FileSystemDirectoryHandle, String>>()
-            try {
+            val copiedEntries: MutableList<Pair<FileSystemDirectoryHandle, String>> = []
+
+            catchingError {
                 copyDirectory(checkNotNull(sourceDirectory), targetDirectory, copiedEntries)
-            }
-            catch (error: Throwable) {
+            }?.then { error ->
                 cleanupCopy(targetParent, targetName, error)
                 throw error
             }
+
             // 按从叶到根的顺序删除已复制条目，保留移动期间新建的其他条目
-            for ([directory, entry] in copiedEntries) ignoreMissingEntry(directory.removeEntry(entry)).await()
+            for ([directory, entry] in copiedEntries) {
+                ignoreMissingEntry(directory.removeEntry(entry)).await()
+            }
         }
+
         // 保留已经提交的目标，即使删除源失败
         sourceParent.removeEntry(name).await()
     }
@@ -163,12 +183,14 @@ private class WebFile private constructor(private val uri: String, private val s
     ) {
         for (name in source.names()) {
             val file = source.file(name)
+
             if (file != null) copyFile(file, target, name)
             else {
                 val directory = source.getDirectoryHandle(name).await()
                 val child = target.getDirectoryHandle(name, createOption()).await()
                 copyDirectory(directory, child, copiedEntries)
             }
+
             copiedEntries.add(source to name)
         }
     }
@@ -177,20 +199,20 @@ private class WebFile private constructor(private val uri: String, private val s
         val snapshot = source.getFile().await()
         val existing = parent.file(name)
         val target = existing ?: Coroutines.wait { parent.getFileHandle(name, createOption()).await() }
-        try {
+
+        catchingError {
             currentCoroutineContext().ensureActive()
             val stream = target.openWritable()
-            try {
+
+            catchingError {
                 stream.write(snapshot).await()
                 currentCoroutineContext().ensureActive()
                 Coroutines.wait { stream.close().await() }
-            }
-            catch (error: Throwable) {
+            }?.then { error ->
                 stream.abortAfter(error)
                 throw error
             }
-        }
-        catch (error: Throwable) {
+        }?.then { error ->
             if (existing == null) cleanupCopy(parent, name, error)
             throw error
         }
@@ -218,8 +240,11 @@ private class WebFile private constructor(private val uri: String, private val s
 
     override suspend fun rawSink(append: Boolean): RawSink {
         require(segments.isNotEmpty()) { "Cannot write to the OPFS root" }
+
         val parent = parentHandle() ?: throw IOException("Parent directory not found: $uri")
+
         val file = parent.getFileHandle(name, createOption()).await()
+
         return WebFileSink(file.openWritable(append))
     }
 
@@ -236,7 +261,6 @@ private class WebFile private constructor(private val uri: String, private val s
 actual fun buildFile(uri: String): File = WebFile.from(uri)
 actual fun buildFile(parent: File, vararg parts: String): File = WebFile.from(([parent.path] + parts).filter { it.isNotEmpty() }.joinToString("/"))
 
-/** 获取 OPFS 文件的浏览器快照。自定义 [File] 仍通过它自己的读取接口访问。 */
 suspend fun File.browserSnapshot(): org.w3c.files.File? = Coroutines.io {
     (this@browserSnapshot as? WebFile)?.snapshot()
 }

@@ -44,10 +44,12 @@ actual fun Modifier.dragDrop(
                                 return true
                             }
                         }
+
                         if (MimeType.TEXT in types && (currentFlag and DragFlag.Text == DragFlag.Text)) {
                             onDropFunc(DropResult.Text(transferData.getData(MimeType.TEXT)))
                             return true
                         }
+
                         return false
                     }
                     return false

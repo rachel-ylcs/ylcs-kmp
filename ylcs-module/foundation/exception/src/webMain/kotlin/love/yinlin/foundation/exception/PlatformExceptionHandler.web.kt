@@ -17,6 +17,7 @@ private fun reasonToString(reason: JsAny?): String = js("""
         catch (error) { return 'Unknown rejection reason'; }
     })()
 """)
+@Suppress("RedundantNullableReturnType")
 private fun reasonStack(reason: JsAny?): String? = js("""
     (function() {
         try {
@@ -38,6 +39,7 @@ internal fun EventTarget.observeBrowserExceptions(crashKey: String, handler: Exc
             handler.handle(crashKey, error, "${event.filename} - ${event.lineno} - ${event.colno}\n${event.message}\n$stack")
         }
     }
+
     val rejectionListener = listener { event ->
         if (event is PromiseRejectionEvent) {
             val reason = event.reason
@@ -50,6 +52,7 @@ internal fun EventTarget.observeBrowserExceptions(crashKey: String, handler: Exc
 
     addEventListener("error", errorListener)
     addEventListener("unhandledrejection", rejectionListener)
+
     return AutoCloseable {
         removeEventListener("error", errorListener)
         removeEventListener("unhandledrejection", rejectionListener)

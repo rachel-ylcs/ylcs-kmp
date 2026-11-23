@@ -26,16 +26,6 @@ import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
-private data class WebVideoParameters(
-    val source: String? = null,
-    val loadVersion: Long = 0L,
-    val playing: Boolean = false,
-    val commandVersion: Long = 0L,
-    val seekPosition: Long = 0L,
-    val seekVersion: Long = 0L,
-)
-
-@Stable
 @OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
 private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     private var request by mutableRefStateOf(WebVideoParameters())
@@ -44,6 +34,7 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
     private var mediaSource: WebMediaSource? = null
     private var resumePosition = 0L
     private var released = false
+
     private val viewState = object : PlatformViewState<HTMLVideoElement, WebVideoParameters>() {
         private var latestView: HTMLVideoElement? = null
         private val pendingSeek = mutableMapOf<HTMLVideoElement, Long>()
@@ -61,6 +52,7 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
 
         override fun attach(view: HTMLVideoElement) {
             latestView = view
+
             view.onplay = {
                 onCurrentSource(view) {
                     isPlaying = !it.paused
@@ -68,13 +60,20 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
                     if (!it.paused && !request.playing) request = request.copy(playing = true)
                 }
             }
+
             view.onpause = {
                 onCurrentSource(view) {
                     isPlaying = !it.paused
                     if (it.paused && it.readyState > 0 && request.playing) request = request.copy(playing = false)
                 }
             }
-            view.ondurationchange = { onCurrentSource(view) { duration = it.duration.mediaMilliseconds() } }
+
+            view.ondurationchange = {
+                onCurrentSource(view) {
+                    duration = it.duration.mediaMilliseconds()
+                }
+            }
+
             view.ontimeupdate = {
                 onCurrentSource(view) {
                     if (it.readyState <= 0) return@onCurrentSource
@@ -82,17 +81,24 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
                     resumePosition = position
                 }
             }
+
             view.onloadedmetadata = {
-                onCurrentSource(view) { pendingSeek.remove(it)?.let { target -> it.currentTime = target / 1000.0 } }
+                onCurrentSource(view) {
+                    pendingSeek.remove(it)?.let { target -> it.currentTime = target / 1000.0 }
+                }
             }
+
             view.onerror = { message, _, _, _, failure ->
-                onCurrentSource(view) { error = ThrowableCompatible(failure).build() ?: Throwable(mediaErrorMessage(it) ?: message?.toString() ?: "Video playback failed") }
+                onCurrentSource(view) {
+                    error = ThrowableCompatible(failure).build() ?: Throwable(mediaErrorMessage(it) ?: message?.toString() ?: "Video playback failed")
+                }
                 false.raw
             }
         }
 
         override fun synchronize(view: HTMLVideoElement, previous: WebVideoParameters?, next: WebVideoParameters) {
             val changedSource = previous == null || previous.loadVersion != next.loadVersion || previous.source != next.source
+
             if (changedSource) {
                 pendingSeek.remove(view)
                 if (next.source == null) view.clearWebMedia()
@@ -101,11 +107,13 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
                     view.load()
                 }
             }
+
             if (next.source != null && (changedSource || previous.seekVersion != next.seekVersion)) {
                 val target = if (changedSource) resumePosition else next.seekPosition
                 if (view.readyState > 0) view.currentTime = target / 1000.0
                 else pendingSeek[view] = target
             }
+
             if (changedSource || previous.commandVersion != next.commandVersion) {
                 if (next.source != null && next.playing) {
                     val _ = view.play().catch { failure ->
@@ -126,7 +134,9 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
                 latestView = null
                 if (request.source != null && view.hasAttribute("src")) resumePosition = view.currentTime.mediaMilliseconds()
             }
+
             pendingSeek.remove(view)
+
             cleanup({
                 view.onplay = null
                 view.onpause = null
@@ -167,6 +177,7 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
         mediaSource = null
         val version = request.loadVersion + 1L
         request = request.copy(source = null, loadVersion = version, playing = true, seekPosition = 0L)
+
         loadJob = scope.launch {
             val failure = catchingError {
                 val source = WebMediaSource.resolve(path)
@@ -190,6 +201,7 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
 
     override fun stop() {
         if (released) return
+
         loadJob?.cancel()
         mediaSource?.release()
         mediaSource = null

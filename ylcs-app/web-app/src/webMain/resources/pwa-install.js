@@ -1,6 +1,7 @@
 (() => {
     let pendingPrompt;
     let installed = false;
+
     const notify = () => window.dispatchEvent(new Event("rachel-pwa-install-change"));
     const canInstall = () => !installed && (pendingPrompt != null || typeof navigator.install === "function");
     const reportFailure = error => {

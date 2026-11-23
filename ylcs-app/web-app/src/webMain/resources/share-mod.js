@@ -10,7 +10,6 @@
         const token = page.searchParams.get("sharedMod");
         if (!token) return;
 
-        // Remove the one-time token from this history entry before opening the import screen.
         page.searchParams.delete("sharedMod");
         history.replaceState(history.state, "", page);
 

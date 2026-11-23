@@ -3,4 +3,4 @@ package love.yinlin.compose.screen
 import androidx.compose.runtime.Composable
 
 @Composable
-internal actual fun ScreenNavigationHost(manager: ScreenManager, content: @Composable () -> Unit) = content()
+internal actual inline fun ScreenNavigationHost(manager: ScreenManager, crossinline content: @Composable () -> Unit) = content()

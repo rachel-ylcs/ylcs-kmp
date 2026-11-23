@@ -54,7 +54,7 @@ async function acceptSharedMod(request, url) {
     try {
         const form = await request.formData();
         const file = form.getAll("mods").find(part => part instanceof File && /\.rachel$/i.test(part.name));
-        if (!file) return new Response("分享内容中没有 .rachel MOD 文件。", { status: 400 });
+        if (!file) return new Response("分享内容中没有 MOD 文件。", { status: 400 });
         const token = crypto.randomUUID();
         await updateShares(store => store.add({ file, expires: Date.now() + MOD_SHARE_LIFETIME }, token));
         const destination = new URL("/", url);
@@ -63,7 +63,7 @@ async function acceptSharedMod(request, url) {
     }
     catch (error) {
         console.warn("Unable to save the shared MOD", error);
-        return new Response("无法接收分享的 MOD 文件，请重新分享。", { status: 500 });
+        return new Response("无法接收分享的 MOD 文件", { status: 500 });
     }
 }
 

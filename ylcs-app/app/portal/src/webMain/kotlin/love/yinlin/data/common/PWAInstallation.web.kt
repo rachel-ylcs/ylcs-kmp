@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
-package love.yinlin.screen
+package love.yinlin.data.common
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +11,8 @@ private fun shouldSuggestPwaInstall(): Boolean = js("window.rachelPwaInstall && 
 private fun canPromptPwaInstall(): Boolean = js("window.rachelPwaInstall && window.rachelPwaInstall.canInstall() || false")
 private fun promptPwaInstall(): Unit = js("window.rachelPwaInstall.prompt()")
 
-internal actual object PwaInstallation {
+@Stable
+internal actual object PWAInstallation {
     private var canInstall by mutableStateOf(canPromptPwaInstall())
 
     init {

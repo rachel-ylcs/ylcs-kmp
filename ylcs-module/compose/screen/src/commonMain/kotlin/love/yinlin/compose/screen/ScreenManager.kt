@@ -31,8 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
 /**
- * 页面导航管理器，所有 navigate 重载与 pop 共用 200ms 窗口，窗口内后续请求直接忽略。
- * 导航操作应在界面线程串行执行。
+ * 页面导航管理器
  */
 @OptIn(CompatibleRachelApi::class)
 @Suppress("unused")

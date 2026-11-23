@@ -160,8 +160,10 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
     fun npm(dependency: Provider<out MinimalExternalModuleDependency>): NpmInfo {
         val entry = dependency.get()
         require(entry.module.group == "npm") { "Expected an npm catalog entry: ${entry.module}" }
+
         val version = entry.versionConstraint.strictVersion.ifEmpty { entry.versionConstraint.requiredVersion }
         require(version.isNotBlank()) { "Missing npm version for ${entry.module.name}" }
+
         return npm(entry.module.name, version)
     }
 
@@ -172,11 +174,11 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
                 when {
                     item is ExportLib -> isExport = true
                     isExport -> {
-                        if (item is NpmInfo) api(npm(item.name, item.version))
+                        if (item is NpmInfo) this@dependencies.npm(item.name, item.version)
                         else api(item)
                     }
                     else -> {
-                        if (item is NpmInfo) implementation(npm(item.name, item.version))
+                        if (item is NpmInfo) this@dependencies.npm(item.name, item.version)
                         else implementation(item)
                     }
                 }

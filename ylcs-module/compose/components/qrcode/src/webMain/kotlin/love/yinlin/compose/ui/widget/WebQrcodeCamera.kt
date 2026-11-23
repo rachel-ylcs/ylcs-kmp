@@ -32,5 +32,4 @@ internal fun hasQrTorch(video: HTMLVideoElement): Boolean = js("""
     }
 """)
 
-internal fun setQrTorch(video: HTMLVideoElement, enabled: Boolean): Promise<JsAny?> =
-    js("video.srcObject.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: enabled }] })")
+internal fun setQrTorch(video: HTMLVideoElement, enabled: Boolean): Promise<JsAny?> = js("video.srcObject.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: enabled }] })")

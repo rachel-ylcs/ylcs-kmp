@@ -10,8 +10,10 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.StringSerializer
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.cleaning
+import love.yinlin.extension.then
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.reflect.metaClassName
@@ -326,7 +328,11 @@ abstract class File {
     @IOCoroutine
     suspend inline fun write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = write(append = false, block)
 
-    /** 写入完成后再返回。append 为 true 时保留原有内容并从文件末尾写入。 */
+    /**
+     * 写入完成后再返回
+     *
+     * @param append 为 true 时保留原有内容并从文件末尾写入
+     */
     @IOCoroutine
     suspend inline fun write(append: Boolean, @IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
         writeFileSink(rawSink(append)) { block(it) }
@@ -386,16 +392,17 @@ abstract class File {
 @PublishedApi
 internal suspend fun writeFileSink(raw: RawSink, block: suspend (Sink) -> Unit) {
     manageFileSink(raw)
+
     var failure: Throwable? = null
+
     cleaning({
-        try {
+        catchingError {
             raw.buffered().use {
                 currentCoroutineContext().ensureActive()
                 block(it)
                 currentCoroutineContext().ensureActive()
             }
-        }
-        catch (error: Throwable) {
+        }?.then { error ->
             failure = error
             throw error
         }

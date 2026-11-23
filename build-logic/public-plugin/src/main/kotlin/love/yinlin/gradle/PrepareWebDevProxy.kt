@@ -10,6 +10,10 @@ import org.gradle.work.DisableCachingByDefault
 
 @DisableCachingByDefault(because = "Writing a small local webpack configuration is cheaper than retrieving it from a build cache")
 abstract class PrepareWebDevProxy : DefaultTask() {
+    companion object {
+        internal const val PROXY_JS_NAME: String = "web-dev-proxy"
+    }
+
     @get:Input
     abstract val script: Property<String>
 
@@ -20,6 +24,6 @@ abstract class PrepareWebDevProxy : DefaultTask() {
     fun prepare() {
         val folder = outputDirectory.get().asFile
         folder.mkdirs()
-        folder.resolve("web-dev-proxy.js").writeText(script.get())
+        folder.resolve("$PROXY_JS_NAME.js").writeText(script.get())
     }
 }

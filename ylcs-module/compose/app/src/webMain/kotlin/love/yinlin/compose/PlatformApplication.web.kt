@@ -28,12 +28,13 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     constructor(self: BaseLazyReference<A>) : this(self, PlatformContext.Instance)
 
     @Composable
-    protected open fun BeginContent() {}
+    protected open fun BeginContent() { }
 
     protected open val enableAccessibility: Boolean = true
 
     fun run() {
         val mainScope = MainScope()
+
         val lifecycle = WebPageLifecycle(
             window,
             onReady = { initPoolLater(mainScope) },
@@ -46,7 +47,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
         catchingError {
             initApplication(scope = mainScope)
+
             lifecycle.bind(document.readyState == DocumentReadyState.COMPLETE)
+
             ComposeViewport(configure = { isA11YEnabled = enableAccessibility }) {
                 ComposedLayout {
                     BeginContent()

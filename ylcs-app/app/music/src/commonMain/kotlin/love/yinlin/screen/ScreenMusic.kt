@@ -376,11 +376,7 @@ class ScreenMusic : BasicScreen() {
                 player.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = player.engineHost)
             }
         }
-        else {
-            Box(modifier = modifier, contentAlignment = Alignment.Center) {
-                SimpleEllipsisText(text = "银临茶舍, 畅听未来", color = Theme.color.onSurfaceVariant)
-            }
-        }
+        else Box(modifier = modifier)
     }
 
     @Composable

@@ -21,8 +21,11 @@ rachel {
 
         sources {
             commonMain {
+                lib(libs.compose.resources)
+            }
+
+            nativeMain(commonMain) {
                 lib(
-                    libs.compose.resources,
                     projects.ylcsModule.foundation.compression,
                     projects.ylcsApp.mod,
                     projects.ylcsModule.compose.app,
@@ -31,8 +34,6 @@ rachel {
                     projects.ylcsModule.compose.components.image,
                 )
             }
-
-            nativeMain(commonMain)
 
             windowsMain(nativeMain)
 

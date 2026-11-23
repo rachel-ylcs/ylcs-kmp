@@ -2,6 +2,7 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.MainScope
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
@@ -10,6 +11,7 @@ import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toNSUrl
+import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSURL
 import platform.UIKit.*
 
@@ -37,9 +39,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     fun run() = initApplication(scope = scope)
 
+    @OptIn(ExperimentalForeignApi::class)
     actual fun backHome() {
         // suspend 是 UIApplication 的私有选择器。iOS 没有允许普通应用主动返回系统主屏幕的公开 API
-        // UIApplication.sharedApplication.performSelector(platform.Foundation.NSSelectorFromString("suspend"))
+        UIApplication.sharedApplication.performSelector(NSSelectorFromString("suspend"))
     }
 
     actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {

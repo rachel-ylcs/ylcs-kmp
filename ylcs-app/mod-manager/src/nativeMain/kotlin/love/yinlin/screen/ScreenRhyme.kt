@@ -515,12 +515,14 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         0 -> {
                             Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
                                 val file = (dropResult as? DropResult.File)?.files?.firstOrNull()
-                                if (file != null) launch {
-                                    catchingError {
-                                        val data = file.read { it.readByteArray() }
-                                        val qrc = Coroutines.cpu { QrcDecrypter.decrypt(data)!! }
-                                        parseQrc(qrc)
-                                    }?.then { slot.tip.error("解析失败") }
+                                if (file != null) {
+                                    launch {
+                                        catchingError {
+                                            val data = file.read { it.readByteArray() }
+                                            val qrc = Coroutines.cpu { QrcDecrypter.decrypt(data)!! }
+                                            parseQrc(qrc)
+                                        }?.then { slot.tip.error("解析失败") }
+                                    }
                                 }
                             }) {
                                 ContextMenuProvider({

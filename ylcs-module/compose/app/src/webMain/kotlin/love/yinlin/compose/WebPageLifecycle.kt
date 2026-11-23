@@ -28,6 +28,7 @@ internal class WebPageLifecycle(
 
     private fun start() {
         if (ready || closed) return
+
         ready = true
         target.removeEventListener("load", loadListener)
         onReady()
@@ -35,6 +36,7 @@ internal class WebPageLifecycle(
 
     fun close() {
         if (closed) return
+
         closed = true
         target.removeEventListener("load", loadListener)
         target.removeEventListener("pagehide", pageHideListener)

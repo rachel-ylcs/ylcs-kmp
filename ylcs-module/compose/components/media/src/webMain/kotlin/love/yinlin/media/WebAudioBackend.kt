@@ -11,6 +11,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.cleaning
 import love.yinlin.extension.createElement
 import love.yinlin.extension.raw
+import love.yinlin.extension.then
 import org.w3c.dom.HTMLAudioElement
 
 internal class WebAudioBackend(
@@ -28,6 +29,7 @@ internal class WebAudioBackend(
     private var closed = false
     private var wantsPlay = false
     private var pendingSeek: Long? = null
+
     var revision = 0L
         private set
     var isInit = false
@@ -41,25 +43,34 @@ internal class WebAudioBackend(
 
     suspend fun load(playing: Boolean, resolve: suspend () -> WebMediaSource) = Coroutines.mainImmediate {
         check(isInit) { "Audio player is not initialized" }
+
         val request = ++revision
         wantsPlay = playing
         pendingSeek = null
         clearPlayback()
+
         val source = resolve()
         var current: Playback? = null
         var loaded = false
+
         cleaning({
             currentCoroutineContext().ensureActive()
             if (revision != request) throw CancellationException("Audio load superseded")
+
             val session = Playback(source)
             current = session
             playback = session
             bind(session, request)
             session.element.src = source.url
             session.ready.await()
+
             if (revision != request) throw CancellationException("Audio load superseded")
-            pendingSeek?.let { applySeek(session, it) }
+
+            pendingSeek?.then {
+                applySeek(session, it)
+            }
             pendingSeek = null
+
             if (wantsPlay) start(session)
             loaded = true
             onStateChanged()
@@ -72,21 +83,36 @@ internal class WebAudioBackend(
     }
 
     private fun bind(session: Playback, request: Long) = with(session.element) {
-        onloadedmetadata = { session.ready.complete(Unit) }
-        ondurationchange = { if (playback === session) onStateChanged() }
-        onplay = { if (playback === session) onStateChanged() }
-        onpause = { if (playback === session) onStateChanged() }
-        onseeked = { if (playback === session) onStateChanged() }
+        onloadedmetadata = {
+            session.ready.complete(Unit)
+        }
+
+        ondurationchange = {
+            if (playback === session) onStateChanged()
+        }
+
+        onplay = {
+            if (playback === session) onStateChanged()
+        }
+
+        onpause = {
+            if (playback === session) onStateChanged()
+        }
+
+        onseeked = {
+            if (playback === session) onStateChanged()
+        }
+
         onended = {
             if (playback === session) {
                 onStateChanged()
                 onEnded(request)
             }
         }
+
         onerror = { message, _, _, _, failure ->
             if (playback === session) {
-                val error = ThrowableCompatible(failure).build()
-                    ?: IllegalStateException(mediaErrorMessage(this) ?: message?.toString() ?: "Audio playback failed")
+                val error = ThrowableCompatible(failure).build() ?: IllegalStateException(mediaErrorMessage(this) ?: message?.toString() ?: "Audio playback failed")
                 if (!session.ready.completeExceptionally(error)) onError(error)
             }
             false.raw
@@ -95,9 +121,11 @@ internal class WebAudioBackend(
 
     private fun start(session: Playback) {
         val attempt = ++session.playAttempt
+
         val _ = session.element.play().catch { failure ->
             if (playback === session && attempt == session.playAttempt && wantsPlay && session.element.paused) {
                 onStateChanged()
+                @Suppress("ThrowableNotThrown")
                 onError(ThrowableCompatible(failure).build() ?: IllegalStateException("Audio playback was rejected"))
             }
             null
@@ -106,12 +134,14 @@ internal class WebAudioBackend(
 
     fun play() {
         wantsPlay = true
-        playback?.let { if (it.element.readyState > 0) start(it) }
+        playback?.then {
+            if (it.element.readyState > 0) start(it)
+        }
     }
 
     fun pause() {
         wantsPlay = false
-        playback?.let {
+        playback?.then {
             it.playAttempt++
             it.element.pause()
         }
@@ -120,8 +150,10 @@ internal class WebAudioBackend(
     fun seekTo(position: Long) {
         val target = position.coerceAtLeast(0L)
         val session = playback
+
         if (session == null || session.element.readyState <= 0) pendingSeek = target
         else applySeek(session, target)
+
         play()
     }
 
@@ -133,6 +165,7 @@ internal class WebAudioBackend(
         revision++
         wantsPlay = false
         pendingSeek = null
+
         clearPlayback()
     }
 
@@ -140,6 +173,7 @@ internal class WebAudioBackend(
         val session = playback ?: return
         playback = null
         session.ready.cancel()
+
         with(session.element) {
             onloadedmetadata = null
             ondurationchange = null
@@ -148,8 +182,10 @@ internal class WebAudioBackend(
             onseeked = null
             onended = null
             onerror = null
-            cleaning({ clearWebMedia() }, session.source::release)
+
+            cleaning(::clearWebMedia, session.source::release)
         }
+
         onStateChanged()
     }
 

@@ -32,6 +32,7 @@ actual class SoundPlayer {
 
     private suspend fun load(count: Int, read: suspend (Int) -> ArrayBuffer) {
         if (released) return
+
         val request = ++revision
         catching {
             val decoded = ArrayList<JsAny>(count)
