@@ -204,10 +204,14 @@ private class WebFile private constructor(private val uri: String, private val s
 
     override fun moveSync(dst: File): Unit = unsupportedPlatform()
 
-    override suspend fun rawSource(): RawSource = Coroutines.io {
+    suspend fun snapshot(): org.w3c.files.File? {
         val file = if (segments.isEmpty()) null else parentHandle()?.file(name)
-        if (file == null) throw IOException("Not a file: $uri")
-        ArrayBufferSource(fileArrayBuffer(file.getFile().await()).await())
+        return file?.getFile()?.await()
+    }
+
+    override suspend fun rawSource(): RawSource = Coroutines.io {
+        val file = snapshot() ?: throw IOException("Not a file: $uri")
+        ArrayBufferSource(fileArrayBuffer(file).await())
     }
 
     override fun rawSourceSync(): RawSource = unsupportedPlatform()
@@ -231,6 +235,11 @@ private class WebFile private constructor(private val uri: String, private val s
 
 actual fun buildFile(uri: String): File = WebFile.from(uri)
 actual fun buildFile(parent: File, vararg parts: String): File = WebFile.from(([parent.path] + parts).filter { it.isNotEmpty() }.joinToString("/"))
+
+/** 获取 OPFS 文件的浏览器快照。自定义 [File] 仍通过它自己的读取接口访问。 */
+suspend fun File.browserSnapshot(): org.w3c.files.File? = Coroutines.io {
+    (this@browserSnapshot as? WebFile)?.snapshot()
+}
 
 suspend fun FileSystemFileHandle.write(block: suspend (Sink) -> Unit) = Coroutines.io {
     writeFileSink(WebFileSink(openWritable()), block)
