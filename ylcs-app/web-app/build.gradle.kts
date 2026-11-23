@@ -1,6 +1,5 @@
 import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     install(
@@ -27,20 +26,7 @@ rachel {
             wasmJsMain(webMain)
         }
 
-        webpack {
-            outputFileName = "${C.app.projectName}.js"
-
-            devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                port = C.web.webServerPort
-                client?.overlay = false
-                proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
-                    context = mutableListOf(),
-                    target = C.cs.apiUrl,
-                    changeOrigin = true,
-                    secure = false,
-                ))
-            }
-        }
+        webDevProxy(port = C.web.webServerPort, outputFileName = "${C.app.projectName}.js")
 
         artifacts {
             val wasm = browserDistribution(BrowserArtifactTarget.Wasm)

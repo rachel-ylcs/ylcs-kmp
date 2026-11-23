@@ -1,6 +1,5 @@
 import love.yinlin.gradle.BrowserArtifactTarget
 import love.yinlin.repository.C
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     install(
@@ -49,14 +48,7 @@ rachel {
             displayName = "Rachel Modern Screen"
         }
 
-        webpack {
-            outputFileName = "$uniqueSafeModuleName.js"
-
-            devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                port = C.web.webServerPort
-                client?.overlay = false
-            }
-        }
+        webDevProxy(port = C.web.webServerPort, outputFileName = "$uniqueSafeModuleName.js")
 
         artifacts {
             sync("modernScreenPublish", browserDistribution(BrowserArtifactTarget.Wasm), C.root.docs.modernScreen, "发布网页版ModernScreen")

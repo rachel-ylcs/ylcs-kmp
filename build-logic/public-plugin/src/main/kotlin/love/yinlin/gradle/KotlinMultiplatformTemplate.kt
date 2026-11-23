@@ -196,6 +196,26 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     }
     internal fun KotlinWebpackConfig.webpack() { webpackBlock(this) }
 
+    /** 在两个 Web 开发任务中为跨域 HTTP 请求启用本机代理。 */
+    fun webDevProxy(port: Int, outputFileName: String) {
+        val proxy = owner.tasks.register("prepareWebDevProxy", PrepareWebDevProxy::class.java) {
+            script.set(checkNotNull(PrepareWebDevProxy::class.java.getResource("web-dev-proxy.js")).readText())
+            outputDirectory.set(owner.layout.buildDirectory.dir("web-dev-proxy"))
+        }
+        val directory = proxy.flatMap { it.outputDirectory }
+        owner.tasks.matching { it.name in listOf("jsBrowserDevelopmentRun", "wasmJsBrowserDevelopmentRun") }.configureEach {
+            dependsOn(proxy)
+        }
+        webpack {
+            this.outputFileName = outputFileName
+            devServer?.let { server ->
+                server.port = port
+                server.client?.overlay = false
+                configDirectory = directory.get().asFile
+            }
+        }
+    }
+
     // DesktopNative
     private var composeDesktopPackageBlock: (NativeDesktopDistribution.() -> Unit)? = null
 
