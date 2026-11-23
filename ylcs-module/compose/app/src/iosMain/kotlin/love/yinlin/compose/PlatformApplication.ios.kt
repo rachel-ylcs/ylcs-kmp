@@ -37,7 +37,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     fun run() = initApplication(scope = scope)
 
-    actual fun backHome() { }
+    actual fun backHome() {
+        // suspend 是 UIApplication 的私有选择器。iOS 没有允许普通应用主动返回系统主屏幕的公开 API
+        // UIApplication.sharedApplication.performSelector(platform.Foundation.NSSelectorFromString("suspend"))
+    }
 
     actual suspend fun openUri(uri: String): Boolean = catchingDefault(false) {
         val application = UIApplication.sharedApplication
