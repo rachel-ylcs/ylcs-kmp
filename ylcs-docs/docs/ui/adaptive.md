@@ -214,6 +214,10 @@ class ScreenWebpage(url: String) : Screen() {
 
 WebView 通过 `state.url = newUrl` 发起导航，通过 `goBack()`、`goForward()`、`evaluateJavaScript()` 执行命令；原生状态通过 `loadingState`、`title`、`icon`、`canGoBack`、`canGoForward` 与 `error` 读取。网页内部跳转产生的输出不能直接反馈成新的加载命令。
 
+Web 使用 `iframe` 内嵌 HTTP(S) 网页，相对地址以宿主页面的基础 URL 解析。同源时可同步实际 URL、标题和由页面声明的同源站点图标，浏览器公开 HTTP 错误状态时也会更新 `error`。前进和后退依赖浏览器的 Navigation API，只操作内嵌页面的同源历史。脚本执行同时要求启用 JavaScript 和同源访问。
+
+跨源页面仍可在目标站点允许时展示。此时 `url` 保留最近一次已知地址，其余文档信息不可读。`Finished` 表示浏览器发出了 iframe 加载事件。浏览器即使阻止内嵌也可能发出该事件。关闭 `enableDomStorage` 会移除 iframe 的同源权限，文档信息也随之不可读。同源且启用脚本的页面应由应用方信任。
+
 JVM 的 WebView 当前仅显示不支持占位，桌面 Native 没有启用该模块。业务如果需要系统浏览器打开，应在平台层显式处理。
 
 ## 从旧接口迁移
