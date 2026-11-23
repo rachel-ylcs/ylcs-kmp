@@ -43,9 +43,29 @@ rachel {
                 )
             }
 
-            iosMain(commonMain)
+            clientMain(commonMain)
+
+            androidMain(clientMain)
+
+            desktopMain(clientMain)
+
+            nativeMain(clientMain)
+
+            iosMain(nativeMain)
 
             iosMainList(iosMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
 
         actions {

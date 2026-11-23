@@ -32,6 +32,7 @@ import love.yinlin.compose.ui.common.PlayControlUI
 import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.floating.DialogTemplate
 import love.yinlin.compose.ui.floating.Flyout
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
@@ -41,9 +42,11 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.SecondaryTextButton
+import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Grid
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.widget.Calendar
 import love.yinlin.compose.ui.widget.CalendarState
@@ -64,6 +67,10 @@ class ScreenMain : BasicScreen() {
     }
 
     override fun initialize() {
+        Platform.use(*Platform.Web) {
+            if (PwaInstallation.shouldSuggest) webAppInstallDialog.open()
+        }
+
         launch {
             val token = app.config.userToken
 
@@ -73,6 +80,48 @@ class ScreenMain : BasicScreen() {
                 }
 
                 this.launch { DataSourceActivity.requestNewActivity(token) } // 加载轮播图
+            }
+        }
+    }
+
+    private val webAppInstallDialog = this land object : DialogTemplate<Unit>() {
+        override val icon = Icons.Download
+
+        fun open() = openFloating(Unit)
+
+        override val actions: @Composable RowScope.() -> Unit = {
+            val install = PwaInstallation.installAction
+            TextButton(text = if (install == null) "继续浏览" else "暂不安装", onClick = ::close)
+            if (install != null) {
+                PrimaryButton(text = "安装应用", onClick = {
+                    close()
+                    install()
+                })
+            }
+        }
+
+        @Composable
+        override fun Land() {
+            LandDialogTemplate("安装银临茶舍") {
+                Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)) {
+                    Text("PWA（渐进式网页应用）让你把银临茶舍网页安装成设备上的应用。")
+                    Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v10)) {
+                        InstallBenefit("从桌面或主屏幕图标直接打开")
+                        InstallBenefit("在独立窗口里使用，省去浏览器的标签栏")
+                        InstallBenefit("在支持的设备上，用银临茶舍打开 .rachel MOD 文件")
+                    }
+                    if (PwaInstallation.installAction == null) {
+                        Text("也可以在浏览器菜单查找「安装应用」或「添加到主屏幕」。", style = Theme.typography.v8)
+                    }
+                }
+            }
+        }
+
+        @Composable
+        private fun InstallBenefit(text: String) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)) {
+                Icon(icon = Icons.Check, color = Theme.color.primary)
+                Text(text)
             }
         }
     }

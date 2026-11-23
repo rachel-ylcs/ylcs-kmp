@@ -15,8 +15,8 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
-import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
+import love.yinlin.uri.WebFileUri
 import org.w3c.dom.COMPLETE
 import org.w3c.dom.DocumentReadyState
 
@@ -70,5 +70,5 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         true
     }
 
-    actual fun implicitFileUri(uri: Uri): ImplicitUri = RegularUri(uri.toString())
+    actual fun implicitFileUri(uri: Uri): ImplicitUri = WebFileUri.resolve(uri)
 }

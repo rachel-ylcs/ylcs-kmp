@@ -1,5 +1,7 @@
+import love.yinlin.RachelApplication
+import love.yinlin.foundation.PlatformContext
+
 fun main() {
-    val app = WebRachelApplication()
-    app.run()
-    app.listenForLaunches()
+    object : RachelApplication(PlatformContext.Instance) {}.run()
+    listenForWebLaunches()
 }
