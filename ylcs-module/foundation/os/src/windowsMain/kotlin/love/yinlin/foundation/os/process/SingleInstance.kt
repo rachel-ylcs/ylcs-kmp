@@ -1,6 +1,7 @@
-package love.yinlin.foundation.os
+package love.yinlin.foundation.os.process
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import love.yinlin.platform.platform
 import platform.windows.CloseHandle
 import platform.windows.CreateEventW
 import platform.windows.ERROR_ALREADY_EXISTS
@@ -14,7 +15,7 @@ actual object SingleInstance {
 
     actual fun run(key: String): Boolean {
         if (appEvent != null || key.isEmpty() || '\u0000' in key) return false
-        val event = CreateEventW(null, FALSE, FALSE, key) ?: return false
+        val event = CreateEventW(null, FALSE, FALSE, "$key.${platform.name}") ?: return false
         if (GetLastError() == ERROR_ALREADY_EXISTS.toUInt()) {
             CloseHandle(event)
             return false

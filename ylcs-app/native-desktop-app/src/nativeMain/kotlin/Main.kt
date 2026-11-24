@@ -13,7 +13,7 @@ import love.yinlin.compose.WindowController
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.foundation.PlatformContext
-import love.yinlin.foundation.os.SingleInstance
+import love.yinlin.foundation.os.process.SingleInstance
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.system.exitProcess
 

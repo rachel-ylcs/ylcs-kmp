@@ -1,6 +1,7 @@
-package love.yinlin.foundation.os
+package love.yinlin.foundation.os.process
 
 import kotlinx.cinterop.*
+import love.yinlin.platform.platform
 import platform.linux.flock
 import platform.posix.*
 
@@ -10,7 +11,7 @@ actual object SingleInstance {
 
     actual fun run(key: String): Boolean {
         if (appLockFd >= 0 || key.isEmpty() || '\u0000' in key || '/' in key) return false
-        val descriptor = open("/tmp/$key", O_CREAT or O_RDWR or O_CLOEXEC or O_NOFOLLOW, 438u)
+        val descriptor = open("/tmp/$key.${platform.name}", O_CREAT or O_RDWR or O_CLOEXEC or O_NOFOLLOW, 438u)
         if (descriptor < 0) return false
         if (flock(descriptor, LOCK_EX or LOCK_NB) != 0 || ftruncate(descriptor, 0) != 0) {
             close(descriptor)

@@ -3,28 +3,28 @@ package love.yinlin.platform
 import love.yinlin.extension.cleaning
 import love.yinlin.platform.ffi.*
 
-private object WindowsNativeWindow : User32Library() {
+private object WindowsNativeWindow {
     fun updateClickThrough(handle: Long, enabled: Boolean) {
         val hwnd = handle.asAddress
-        var exStyle = GetWindowLongW(hwnd, Win32.GWL_EXSTYLE) as Int
+        var exStyle = FFI.user32.GetWindowLongW(hwnd, Win32.GWL_EXSTYLE) as Int
         exStyle = exStyle or Win32.WS_EX_TOOLWINDOW
         exStyle = if (enabled) exStyle or Win32.WS_EX_TRANSPARENT else exStyle and Win32.WS_EX_TRANSPARENT.inv()
-        SetWindowLongW(hwnd, Win32.GWL_EXSTYLE, exStyle)
+        FFI.user32.SetWindowLongW(hwnd, Win32.GWL_EXSTYLE, exStyle)
     }
 }
 
-private object MacOSNativeWindow : ObjCLibrary() {
+private object MacOSNativeWindow {
     fun updateClickThrough(handle: Long, enabled: Boolean) {
-        val pool = objc_autoreleasePoolPush()
+        val pool = FFI.objc.objc_autoreleasePoolPush()
         cleaning({
             val windowPtr = Address.ofAddress(handle)
             useMemory { arena ->
                 val selName = arena.allocateFrom("setIgnoresMouseEvents:")
-                val sel = sel_registerName(selName) as Address
-                objc_msgSend(windowPtr, sel, enabled)
+                val sel = FFI.objc.sel_registerName(selName) as Address
+                FFI.objc.objcVoidMessageWithBoolean(windowPtr, sel, enabled)
             }
         }) {
-            objc_autoreleasePoolPop(pool)
+            FFI.objc.objc_autoreleasePoolPop(pool)
         }
     }
 }
