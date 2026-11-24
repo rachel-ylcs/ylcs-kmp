@@ -5,11 +5,16 @@ import love.yinlin.foundation.PlatformContext
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-
 class TestBatteryManager {
     @Test
     fun readsActualBatteryLevel() = runTest {
         val level = BatteryManager.getBatteryLevel(PlatformContext.Instance)
-        assertBatteryLevelResult(level, allowUnsupported = true)
+        assertTrue(
+            when (level) {
+                is BatteryLevel.Value -> level.percent in 0 .. 100
+                BatteryLevel.NoBattery, BatteryLevel.Unknown, BatteryLevel.Unsupported -> true
+            },
+            "Unexpected battery level: $level",
+        )
     }
 }

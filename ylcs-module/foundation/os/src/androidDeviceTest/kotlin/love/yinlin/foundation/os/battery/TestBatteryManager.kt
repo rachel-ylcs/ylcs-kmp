@@ -6,7 +6,6 @@ import love.yinlin.foundation.PlatformContext
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-
 class TestBatteryManager {
     @Test
     fun readsActualBatteryLevel() = runTest {
