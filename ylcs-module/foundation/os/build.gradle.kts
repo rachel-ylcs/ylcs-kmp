@@ -24,12 +24,6 @@ rachel {
             }
         }
 
-        android {
-            withHostTest {
-                isIncludeAndroidResources = true
-            }
-        }
-
         sources {
             commonMain {
                 lib(
@@ -38,21 +32,13 @@ rachel {
                 )
             }
 
-            commonTest {
-                lib(libs.test, libs.kotlinx.coroutines.test)
-            }
-
             pcMain(commonMain)
-
-            desktopTest(commonTest)
 
             androidMain(commonMain)
 
             iosMain(commonMain)
 
             iosMainList(iosMain)
-            iosTest(commonTest)
-            iosTestList(iosTest)
 
             desktopMain(pcMain) {
                 lib(
@@ -65,25 +51,16 @@ rachel {
             nativeMain(pcMain)
 
             windowsMain(nativeMain)
-            windowsTest(commonTest)
 
             linuxMain(nativeMain)
-            linuxTest(commonTest)
 
             macosMain(nativeMain)
-            macosTest(commonTest)
 
             webMain(commonMain)
 
             jsMain(webMain)
-            jsTest(commonTest)
 
             wasmJsMain(webMain)
-            wasmJsTest(commonTest)
-
-            find("androidHostTest", commonTest) {
-                lib(libs.androidx.test.core, libs.robolectric)
-            }
         }
     }
 }

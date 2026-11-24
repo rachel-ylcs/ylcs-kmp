@@ -19,12 +19,6 @@ rachel {
                 )
             }
 
-            test {
-                lib(
-                    libs.test,
-                    libs.kotlinx.coroutines.test,
-                )
-            }
         }
     }
 }
