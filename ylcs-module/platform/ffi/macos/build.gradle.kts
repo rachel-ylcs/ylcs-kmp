@@ -18,6 +18,13 @@ rachel {
                     projects.ylcsModule.platform.ffi.core,
                 )
             }
+
+            test {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test,
+                )
+            }
         }
     }
 }
