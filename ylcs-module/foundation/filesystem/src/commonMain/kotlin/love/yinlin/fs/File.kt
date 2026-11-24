@@ -10,10 +10,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.StringSerializer
 import love.yinlin.extension.catchingDefault
-import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.cleaning
-import love.yinlin.extension.then
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.reflect.metaClassName
@@ -395,18 +392,19 @@ internal suspend fun writeFileSink(raw: RawSink, block: suspend (Sink) -> Unit) 
 
     var failure: Throwable? = null
 
-    cleaning({
-        catchingError {
-            raw.buffered().use {
-                currentCoroutineContext().ensureActive()
-                block(it)
-                currentCoroutineContext().ensureActive()
-            }
-        }?.then { error ->
-            failure = error
-            throw error
+    try {
+        raw.buffered().use {
+            currentCoroutineContext().ensureActive()
+            block(it)
+            currentCoroutineContext().ensureActive()
         }
-    }) {
+    }
+    catch (error: Throwable) {
+        // 协程取消也需要通知文件流回滚，不能按成功写入提交
+        failure = error
+        throw error
+    }
+    finally {
         awaitFileSinkClosed(raw, failure)
     }
 }
