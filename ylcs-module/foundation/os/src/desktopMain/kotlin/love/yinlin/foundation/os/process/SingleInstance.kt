@@ -3,22 +3,36 @@ package love.yinlin.foundation.os.process
 import love.yinlin.platform.Platform
 import love.yinlin.platform.ffi.*
 import love.yinlin.platform.platform
+import java.lang.foreign.Linker
 import kotlin.concurrent.thread
 
 actual object SingleInstance {
-    private object Windows {
-        var appEvent: Win32.HANDLE = Address.NULL
+    private val open by FFI.libc.func(Linker.Option.firstVariadicArg(2)) {
+        declare(NativeType.String, NativeType.Int, NativeType.Int, retType = NativeType.Int)
+    }
 
-        fun lock(key: String): Boolean = useMemory { arena ->
-            val name = arena.wstr("$key.${platform.name}")
-            appEvent = FFI.kernel32.OpenEventW(Win32.EVENT_ALL_ACCESS, Win32.FALSE, name) as Win32.HANDLE
-            if (appEvent.isNull) {
-                appEvent = FFI.kernel32.CreateEventW(Address.NULL, Win32.FALSE, Win32.FALSE, name) as Win32.HANDLE
-                true
-            }
-            else false
+    private object Windows {
+        private val CreateEventW by FFI.kernel32.errorBind {
+            declare(Win32Type.POINTER, Win32Type.BOOL, Win32Type.BOOL, NativeType.WString, retType = Win32Type.HANDLE)
         }
 
+        private var appEvent: Win32.HANDLE = Address.NULL
+
+        @Synchronized
+        fun lock(key: String): Boolean = useMemory { arena ->
+            if (appEvent.isNotNull || key.isEmpty() || '\u0000' in key) return@useMemory false
+            val name = arena.wstr("$key.${platform.name}")
+            val event = CreateEventW(arena, Address.NULL, Win32.FALSE, Win32.FALSE, name) as Win32.HANDLE
+            if (event.isNull) return@useMemory false
+            if (CreateEventW.lastError == Win32.ERROR_ALREADY_EXISTS) {
+                FFI.kernel32.CloseHandle(event)
+                return@useMemory false
+            }
+            appEvent = event
+            true
+        }
+
+        @Synchronized
         fun unlock() {
             if (appEvent.isNotNull) {
                 FFI.kernel32.CloseHandle(appEvent)
@@ -32,7 +46,7 @@ actual object SingleInstance {
 
         fun lock(key: String): Boolean = useMemory { arena ->
             val path = "/tmp/$key.${platform.name}"
-            appLockFd = FFI.libc.open(arena.astr(path), Posix.O_CREAT or Posix.O_RDWR, 438) as Int
+            appLockFd = open(arena.astr(path), Posix.O_CREAT or Posix.O_RDWR, 438) as Int
             if (appLockFd < 0) false
             else {
                 val result = FFI.libc.flock(appLockFd, Posix.LOCK_EX or Posix.LOCK_NB) as Int
@@ -71,7 +85,7 @@ actual object SingleInstance {
             if (appLockFd >= 0 || key.isEmpty() || '\u0000' in key) return@useMemory false
             val home = System.getProperty("user.home") ?: return@useMemory false
             val path = "$home/.rachel-${key.encodeToByteArray().toHexString()}.${platform.name}.lock"
-            val descriptor = FFI.libc.open(arena.astr(path), O_CREAT or Posix.O_RDWR or O_CLOEXEC or O_NOFOLLOW, 384) as Int
+            val descriptor = open(arena.astr(path), O_CREAT or Posix.O_RDWR or O_CLOEXEC or O_NOFOLLOW, 384) as Int
             if (descriptor < 0) return@useMemory false
             if ((FFI.libc.flock(descriptor, Posix.LOCK_EX or Posix.LOCK_NB) as Int) != 0) {
                 FFI.libc.close(descriptor)

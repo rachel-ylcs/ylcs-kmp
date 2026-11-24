@@ -4,9 +4,9 @@ import love.yinlin.extension.lazyName
 import java.lang.foreign.Arena
 import java.lang.foreign.FunctionDescriptor
 import java.lang.foreign.Linker
+import java.lang.foreign.MemorySegment
 import java.lang.foreign.SymbolLookup
 import java.lang.invoke.MethodHandle
-import java.nio.charset.StandardCharsets
 
 abstract class NativeLibrary(private val libName: String? = null) {
     companion object {
@@ -18,26 +18,19 @@ abstract class NativeLibrary(private val libName: String? = null) {
         else linker.defaultLookup()
     }
 
-    // 函数解析
+    protected fun lookup(name: String): MemorySegment = lookup.find(name).orElse(null) ?: throw NoSuchElementException("Could not find '$name' in ${libName ?: "Default"}")
+
+    protected fun downcall(address: MemorySegment, descriptor: FunctionDescriptor, vararg options: Linker.Option): MethodHandle = requireNotNull(linker.downcallHandle(address, descriptor, *options))
+
     fun declare(vararg type: Layout, retType: Layout? = null): FunctionDescriptor = if (retType == null) FunctionDescriptor.ofVoid(*type) else FunctionDescriptor.of(retType, *type)
 
-    fun func(vararg type: Layout, retType: Layout? = null) = lazyName { name ->
-        requireNotNull(linker.downcallHandle(lookup.find(name).get(), declare(*type, retType = retType))) {
-            "can't find function [$name] in $libName."
-        }
+    fun func(descriptor: NativeLibrary.() -> FunctionDescriptor) = lazyName { name ->
+        downcall(lookup(name), descriptor())
+    }
+
+    fun func(vararg options: Linker.Option, symbol: String? = null, descriptor: NativeLibrary.() -> FunctionDescriptor) = lazyName { name ->
+        downcall(lookup(symbol ?: name), descriptor(), *options)
     }
 
     fun upcall(handle: MethodHandle, function: FunctionDescriptor): Address = linker.upcallStub(handle, function, Arena.global())
-
-    // 内存分配
-
-    inline fun <R> useMemory(block: (Arena) -> R) = Arena.ofConfined().use(block)
-    fun Arena.astr(str: String): Address = allocateFrom(str, StandardCharsets.UTF_8)
-    fun Arena.wstr(str: String): Address = allocateFrom(str, StandardCharsets.UTF_16LE)
-
-    val Address.isNull get() = this == Address.NULL
-    val Address.isNotNull get() = this != Address.NULL
-
-    val Long.asAddress: Address get() = Address.ofAddress(this)
-    val Address.asLong: Long get() = this.address()
 }

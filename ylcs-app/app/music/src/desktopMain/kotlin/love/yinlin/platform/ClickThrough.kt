@@ -14,14 +14,15 @@ private object WindowsNativeWindow {
 }
 
 private object MacOSNativeWindow {
+    private val setIgnoresMouseEvents by FFI.objc.msgSend { declare(NativeType.Pointer, NativeType.Pointer, NativeType.Boolean) }
+
     fun updateClickThrough(handle: Long, enabled: Boolean) {
         val pool = FFI.objc.objc_autoreleasePoolPush()
         cleaning({
             val windowPtr = Address.ofAddress(handle)
             useMemory { arena ->
-                val selName = arena.allocateFrom("setIgnoresMouseEvents:")
-                val sel = FFI.objc.sel_registerName(selName) as Address
-                FFI.objc.objcVoidMessageWithBoolean(windowPtr, sel, enabled)
+                val pSetIgnoresMouseEvents = FFI.objc.sel_registerName(arena.astr("setIgnoresMouseEvents:")) as Address
+                setIgnoresMouseEvents(windowPtr, pSetIgnoresMouseEvents, enabled)
             }
         }) {
             FFI.objc.objc_autoreleasePoolPop(pool)

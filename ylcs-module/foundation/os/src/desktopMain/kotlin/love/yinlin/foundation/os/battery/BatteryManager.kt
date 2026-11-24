@@ -25,6 +25,10 @@ actual object BatteryManager {
     }
 
     private object MacOS : MacBatteryReader<Address>() {
+        private val processInfo by FFI.objc.msgSend { declare(NativeType.Pointer, NativeType.Pointer, retType = NativeType.Pointer) }
+        private val isLowPowerModeEnabled by FFI.objc.msgSend { declare(NativeType.Pointer, NativeType.Pointer, retType = NativeType.Byte) }
+        private val respondsToSelector by FFI.objc.msgSend { declare(NativeType.Pointer, NativeType.Pointer, NativeType.Pointer, retType = NativeType.Byte) }
+
         private fun <R> withString(value: String, block: (Address) -> R): R = useMemory { arena ->
             val string = FFI.coreFoundation.CFStringCreateWithCString(Address.NULL, arena.astr(value), 0x08000100) as Address
             check(string != Address.NULL)
@@ -71,15 +75,15 @@ actual object BatteryManager {
             if (cls == Address.NULL) return@useMemory null
 
             val objc = FFI.objc
-            val processInfo = objc.sel_registerName(arena.astr("processInfo")) as Address
-            val process = objc.objcPointerMessage(cls, processInfo) as Address
+            val pProcessInfo = objc.sel_registerName(arena.astr("processInfo")) as Address
+            val process = processInfo(cls, pProcessInfo) as Address
             if (process == Address.NULL) return@useMemory null
 
-            val lowPower = objc.sel_registerName(arena.astr("isLowPowerModeEnabled")) as Address
-            val responds = objc.sel_registerName(arena.astr("respondsToSelector:")) as Address
-            if ((objc.objcRespondsToSelector(process, responds, lowPower) as Byte) == 0.toByte()) return@useMemory null
+            val pIsLowPowerModeEnabled = objc.sel_registerName(arena.astr("isLowPowerModeEnabled")) as Address
+            val pRespondsToSelector = objc.sel_registerName(arena.astr("respondsToSelector:")) as Address
+            if ((respondsToSelector(process, pRespondsToSelector, pIsLowPowerModeEnabled) as Byte) == 0.toByte()) return@useMemory null
 
-            (objc.objcBooleanMessage(process, lowPower) as Byte) != 0.toByte()
+            (isLowPowerModeEnabled(process, pIsLowPowerModeEnabled) as Byte) != 0.toByte()
         }
 
         override fun release(value: Address) {
