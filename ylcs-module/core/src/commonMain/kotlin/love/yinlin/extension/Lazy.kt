@@ -1,15 +1,17 @@
 package love.yinlin.extension
 
 import kotlinx.coroutines.sync.Mutex
+import love.yinlin.concurrent.atomic
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-private class LazyName<T : Any>(initializer: (String) -> T) : ReadOnlyProperty<Any?, T> {
-    lateinit var name: String
-    val instance by lazy { initializer(name) }
+private class LazyName<T : Any>(private val initializer: (String) -> T) : ReadOnlyProperty<Any?, T> {
+    private val binding = atomic<Lazy<T>?>(null)
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        name = property.name
-        return instance
+        binding.value?.let { return it.value }
+        val candidate = lazy { initializer(property.name) }
+        return (binding.compareAndExchange(null, candidate) ?: candidate).value
     }
 }
 
