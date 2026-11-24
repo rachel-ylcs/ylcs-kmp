@@ -25,8 +25,8 @@ rachel {
         }
 
         android {
-            withDeviceTest {
-                instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            withHostTest {
+                isIncludeAndroidResources = true
             }
         }
 
@@ -81,8 +81,8 @@ rachel {
             wasmJsMain(webMain)
             wasmJsTest(commonTest)
 
-            find("androidDeviceTest", commonTest) {
-                lib(libs.androidx.test.core, libs.androidx.test.runner)
+            find("androidHostTest", commonTest) {
+                lib(libs.androidx.test.core, libs.robolectric)
             }
         }
     }
