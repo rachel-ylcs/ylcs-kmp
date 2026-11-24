@@ -2,7 +2,9 @@ package love.yinlin.fs
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.Buffer
@@ -119,6 +121,26 @@ class TestOPFS {
             raw.use { it.write(buffer, buffer.size) }
             raw.awaitClosed()
             assertEquals("kept + raw", file.readText())
+        }
+    }
+
+    @Test
+    fun cancellationAfterClosingScopedSinkPreservesCommittedData() = runTest {
+        withDirectory { directory ->
+            val file = File(directory, "closed")
+            assertTrue(file.writeText("kept"))
+            val writer = launch {
+                file.write {
+                    it.writeString("discarded")
+                    it.close()
+                    currentCoroutineContext().cancel()
+                }
+            }
+            writer.join()
+            assertTrue(writer.isCancelled)
+            assertEquals("kept", file.readText())
+            assertTrue(file.writeText("retry"))
+            assertEquals("retry", file.readText())
         }
     }
 
