@@ -45,6 +45,7 @@ rachel {
                 lib(
                     projects.ylcsModule.platform.ffi.posix,
                     projects.ylcsModule.platform.ffi.win32,
+                    projects.ylcsModule.platform.ffi.macos,
                 )
             }
 

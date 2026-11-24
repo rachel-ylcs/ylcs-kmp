@@ -1,5 +1,0 @@
-package = love.yinlin.foundation.os.internal
-language = Objective-C
-modules = IOKit.ps
-headerFilter = **/IOPowerSources.h
-linkerOpts = -framework IOKit

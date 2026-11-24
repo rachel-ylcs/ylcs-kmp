@@ -13,12 +13,7 @@ private object WindowsNativeWindow : User32Library() {
     }
 }
 
-private object MacOSNativeWindow : NativeLibrary("/usr/lib/libobjc.A.dylib") {
-    val sel_registerName by func(NativeType.Pointer, retType = NativeType.Pointer)
-    val objc_msgSend by func(NativeType.Pointer, NativeType.Pointer, NativeType.Boolean)
-    val objc_autoreleasePoolPush by func(retType = NativeType.Pointer)
-    val objc_autoreleasePoolPop by func(NativeType.Pointer)
-
+private object MacOSNativeWindow : ObjCLibrary() {
     fun updateClickThrough(handle: Long, enabled: Boolean) {
         val pool = objc_autoreleasePoolPush()
         cleaning({

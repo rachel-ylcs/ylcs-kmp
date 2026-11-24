@@ -19,8 +19,14 @@ rachel {
             native {
                 macos {
                     cpp("single_instance")
-                    cpp("battery_level")
+                    cpp("iokit")
                 }
+            }
+        }
+
+        android {
+            withDeviceTest {
+                instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
         }
 
@@ -33,10 +39,16 @@ rachel {
             }
 
             commonTest {
-                lib(libs.test)
+                lib(libs.test, libs.kotlinx.coroutines.test)
             }
 
             pcMain(commonMain)
+
+            desktopTest(commonTest)
+
+            nativeTest(commonTest)
+
+            webTest(commonTest)
 
             androidMain(commonMain)
 
@@ -44,26 +56,38 @@ rachel {
 
             iosMainList(iosMain)
 
+            iosTest(nativeTest)
+
             desktopMain(pcMain) {
                 lib(
                     projects.ylcsModule.platform.ffi.posix,
                     projects.ylcsModule.platform.ffi.win32,
+                    projects.ylcsModule.platform.ffi.macos,
                 )
             }
 
             nativeMain(pcMain)
 
             windowsMain(nativeMain)
+            windowsTest(nativeTest)
 
             linuxMain(nativeMain)
+            linuxTest(nativeTest)
 
             macosMain(nativeMain)
+            macosTest(nativeTest)
 
             webMain(commonMain)
 
             jsMain(webMain)
+            jsTest(webTest)
 
             wasmJsMain(webMain)
+            wasmJsTest(webTest)
+
+            find("androidDeviceTest", commonTest) {
+                lib(libs.androidx.test.core, libs.androidx.test.runner)
+            }
         }
     }
 }

@@ -33,6 +33,7 @@ mmkv = "2.4.3"
 # ----- [Android] ----- #
 
 androidx-activity = "1.13.0"
+androidx-test = "1.7.0"
 media3 = "1.12.0-beta01"
 
 # ----- [Native Desktop] ----- #
@@ -174,6 +175,8 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 # androidx
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
 # kotlinx
