@@ -1,3 +1,5 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -17,25 +19,40 @@ rachel {
             native {
                 macos {
                     cpp("single_instance")
+                    cpp("battery_level")
                 }
             }
         }
 
         sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.foundation.context,
+                    libs.compose.runtime,
+                )
+            }
+
+            commonTest {
+                lib(libs.test)
+            }
+
+            pcMain(commonMain)
+
             androidMain(commonMain)
 
             iosMain(commonMain)
 
             iosMainList(iosMain)
 
-            desktopMain(commonMain) {
+            desktopMain(pcMain) {
                 lib(
                     projects.ylcsModule.platform.ffi.posix,
                     projects.ylcsModule.platform.ffi.win32,
                 )
             }
 
-            nativeMain(commonMain)
+            nativeMain(pcMain)
 
             windowsMain(nativeMain)
 

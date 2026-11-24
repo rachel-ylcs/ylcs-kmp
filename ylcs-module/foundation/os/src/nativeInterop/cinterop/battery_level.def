@@ -1,0 +1,53 @@
+package = love.yinlin.foundation.os.internal
+linkerOpts = -framework IOKit -framework CoreFoundation
+---
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPSKeys.h>
+
+// -1: unknown, -2: no battery, 0-100: percentage.
+static inline int RachelBatteryLevel(void) {
+    CFTypeRef info = IOPSCopyPowerSourcesInfo();
+    if (!info) return -1;
+    CFArrayRef sources = IOPSCopyPowerSourcesList(info);
+    if (!sources) {
+        CFRelease(info);
+        return -1;
+    }
+
+    int result = -2;
+    double total = 0;
+    CFIndex count = 0;
+    for (CFIndex i = 0; i < CFArrayGetCount(sources); i++) {
+        CFDictionaryRef description = IOPSGetPowerSourceDescription(info, CFArrayGetValueAtIndex(sources, i));
+        if (!description) {
+            result = -1;
+            break;
+        }
+        CFTypeRef transport = CFDictionaryGetValue(description, CFSTR(kIOPSTransportTypeKey));
+        if (!transport) {
+            result = -1;
+            break;
+        }
+        if (!CFEqual(transport, CFSTR(kIOPSInternalType))) continue;
+        CFBooleanRef present = (CFBooleanRef)CFDictionaryGetValue(description, CFSTR(kIOPSIsPresentKey));
+        if (present && !CFBooleanGetValue(present)) continue;
+
+        CFNumberRef current = (CFNumberRef)CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey));
+        CFNumberRef maximum = (CFNumberRef)CFDictionaryGetValue(description, CFSTR(kIOPSMaxCapacityKey));
+        int currentValue = 0;
+        int maximumValue = 0;
+        if (!current || !maximum || !CFNumberGetValue(current, kCFNumberIntType, &currentValue) ||
+            !CFNumberGetValue(maximum, kCFNumberIntType, &maximumValue) ||
+            maximumValue <= 0 || currentValue < 0 || currentValue > maximumValue) {
+            result = -1;
+            break;
+        }
+        total += 100.0 * currentValue / maximumValue;
+        count++;
+    }
+    if (result != -1 && count > 0) result = (int)(total / count + 0.5);
+    CFRelease(sources);
+    CFRelease(info);
+    return result;
+}
