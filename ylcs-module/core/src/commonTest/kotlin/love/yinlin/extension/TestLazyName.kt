@@ -1,27 +1,25 @@
 package love.yinlin.extension
 
-import kotlin.reflect.KProperty
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class TestLazyName {
     private val symbol = "value"
+    private val otherSymbol = "other value"
 
     @Test
-    fun readsPropertyNameOnlyDuringInitialization() {
-        var nameReads = 0
-        val property = object : KProperty<String> by this::symbol {
-            override val name: String
-                get() {
-                    nameReads++
-                    return "symbol"
-                }
+    fun cachesValueWithFirstPropertyName() {
+        var initializations = 0
+        val delegate = lazyName { name ->
+            initializations++
+            name
         }
-        val delegate = lazyName { it }
 
-        repeat(3) { assertEquals("symbol", delegate.getValue(this, property)) }
-        assertEquals(1, nameReads)
+        assertEquals(0, initializations)
+        repeat(3) { assertEquals("symbol", delegate.getValue(this, this::symbol)) }
+        assertEquals("symbol", delegate.getValue(this, this::otherSymbol))
+        assertEquals(1, initializations)
     }
 
     @Test
