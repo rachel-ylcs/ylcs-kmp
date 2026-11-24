@@ -60,23 +60,7 @@ actual object SingleInstance {
         }
     }
 
-    private object MacOS : NativeLibrary("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
-        val CFStringCreateWithCString by func(
-            NativeType.Pointer,
-            NativeType.Pointer,
-            NativeType.Int,
-            retType = NativeType.Pointer
-        )
-        val CFMessagePortCreateLocal by func(
-            NativeType.Pointer,
-            NativeType.Pointer,
-            NativeType.Pointer,
-            NativeType.Pointer,
-            NativeType.Pointer,
-            retType = NativeType.Pointer,
-        )
-        val CFMessagePortInvalidate by func(NativeType.Pointer)
-        val CFRelease by func(NativeType.Pointer)
+    private object MacOS : CoreFoundationLibrary() {
 
         @JvmStatic
         @Suppress("FunctionName", "unused")

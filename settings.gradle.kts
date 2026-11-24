@@ -153,7 +153,7 @@ repository {
             module("platform") {
                 module("ffi") {
                     module("core")
-                    module("posix", "win32")
+                    module("posix", "win32", "macos")
                 }
 
                 module("native") {

@@ -1,3 +1,5 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -17,25 +19,36 @@ rachel {
             native {
                 macos {
                     cpp("single_instance")
+                    cpp("iokit")
                 }
             }
         }
 
         sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.foundation.context,
+                )
+            }
+
+            pcMain(commonMain)
+
             androidMain(commonMain)
 
             iosMain(commonMain)
 
             iosMainList(iosMain)
 
-            desktopMain(commonMain) {
+            desktopMain(pcMain) {
                 lib(
                     projects.ylcsModule.platform.ffi.posix,
                     projects.ylcsModule.platform.ffi.win32,
+                    projects.ylcsModule.platform.ffi.macos,
                 )
             }
 
-            nativeMain(commonMain)
+            nativeMain(pcMain)
 
             windowsMain(nativeMain)
 
