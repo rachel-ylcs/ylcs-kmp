@@ -46,17 +46,12 @@ rachel {
 
             desktopTest(commonTest)
 
-            nativeTest(commonTest)
-
-            webTest(commonTest)
-
             androidMain(commonMain)
 
             iosMain(commonMain)
 
             iosMainList(iosMain)
-
-            iosTest(nativeTest)
+            iosTest(commonTest)
 
             desktopMain(pcMain) {
                 lib(
@@ -69,21 +64,21 @@ rachel {
             nativeMain(pcMain)
 
             windowsMain(nativeMain)
-            windowsTest(nativeTest)
+            windowsTest(commonTest)
 
             linuxMain(nativeMain)
-            linuxTest(nativeTest)
+            linuxTest(commonTest)
 
             macosMain(nativeMain)
-            macosTest(nativeTest)
+            macosTest(commonTest)
 
             webMain(commonMain)
 
             jsMain(webMain)
-            jsTest(webTest)
+            jsTest(commonTest)
 
             wasmJsMain(webMain)
-            wasmJsTest(webTest)
+            wasmJsTest(commonTest)
 
             find("androidDeviceTest", commonTest) {
                 lib(libs.androidx.test.core, libs.androidx.test.runner)

@@ -3,8 +3,8 @@ package love.yinlin.foundation.os.battery
 import kotlinx.cinterop.*
 import love.yinlin.extension.cleaning
 import love.yinlin.foundation.os.iokit.IOPSCopyPowerSourcesInfo
-import love.yinlin.foundation.os.internal.IOPSCopyPowerSourcesList
-import love.yinlin.foundation.os.internal.IOPSGetPowerSourceDescription
+import love.yinlin.foundation.os.iokit.IOPSCopyPowerSourcesList
+import love.yinlin.foundation.os.iokit.IOPSGetPowerSourceDescription
 import platform.CoreFoundation.*
 
 @OptIn(ExperimentalForeignApi::class)

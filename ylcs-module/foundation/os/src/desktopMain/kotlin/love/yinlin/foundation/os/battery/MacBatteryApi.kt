@@ -1,7 +1,6 @@
 package love.yinlin.foundation.os.battery
 
 import love.yinlin.extension.cleaning
-import love.yinlin.extension.cleaning
 import love.yinlin.platform.ffi.*
 import java.lang.foreign.ValueLayout
 
@@ -9,15 +8,6 @@ internal object MacBatteryApi : MacBatteryReader<Address>() {
     private object IOKit : IOKitLibrary()
 
     private object CoreFoundation : CoreFoundationLibrary() {
-        val CFArrayGetCount by func(NativeType.Pointer, retType = NativeType.Long)
-        val CFArrayGetValueAtIndex by func(NativeType.Pointer, NativeType.Long, retType = NativeType.Pointer)
-        val CFStringCreateWithCString by func(NativeType.Pointer, NativeType.Pointer, NativeType.Int, retType = NativeType.Pointer)
-        val CFDictionaryGetValue by func(NativeType.Pointer, NativeType.Pointer, retType = NativeType.Pointer)
-        val CFEqual by func(NativeType.Pointer, NativeType.Pointer, retType = NativeType.Byte)
-        val CFBooleanGetValue by func(NativeType.Pointer, retType = NativeType.Byte)
-        val CFNumberGetValue by func(NativeType.Pointer, NativeType.Long, NativeType.Pointer, retType = NativeType.Byte)
-        val CFRelease by func(NativeType.Pointer)
-
         fun <R> withString(value: String, block: (Address) -> R): R = useMemory { arena ->
             val string = CFStringCreateWithCString(Address.NULL, arena.astr(value), 0x08000100) as Address
             check(string != Address.NULL)
