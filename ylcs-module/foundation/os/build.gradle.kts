@@ -15,15 +15,6 @@ rachel {
     multiplatform {
         nativeDesktopTarget = true
 
-        interop {
-            native {
-                macos {
-                    cpp("single_instance")
-                    cpp("iokit")
-                }
-            }
-        }
-
         sources {
             commonMain {
                 lib(

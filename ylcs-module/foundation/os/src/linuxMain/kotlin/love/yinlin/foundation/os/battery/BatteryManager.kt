@@ -4,7 +4,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.foundation.PlatformContext
 
 actual object BatteryManager {
-    actual suspend fun getBatteryLevel(context: PlatformContext): BatteryLevel = Coroutines.io {
-        LinuxBatteryApi.readLevel()
+    actual suspend fun getBatteryInfo(context: PlatformContext): BatteryInfo = Coroutines.io {
+        LinuxBatteryReader.readInfo()
     }
 }
