@@ -52,6 +52,7 @@ rachel {
 
             iosMainList(iosMain)
             iosTest(commonTest)
+            iosTestList(iosTest)
 
             desktopMain(pcMain) {
                 lib(

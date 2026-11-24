@@ -57,6 +57,19 @@ class KotlinMultiplatformSourceSetsScope(
             }
         }
     }
+    val iosTestList: List<KotlinSourceSet> by lazy {
+        buildList {
+            with(extension) {
+                add(set.iosArm64Test.get())
+                if (p.buildDefaults.platform == BuildPlatform.Mac) {
+                    when (p.buildDefaults.architecture) {
+                        BuildArchitecture.AARCH64 -> add(set.iosSimulatorArm64Test.get())
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
     val desktopTest: KotlinSourceSet by lazy { set.getByName("desktopTest") }
     val webMain: KotlinSourceSet by lazy { with(extension) { set.webMain.get() } }
