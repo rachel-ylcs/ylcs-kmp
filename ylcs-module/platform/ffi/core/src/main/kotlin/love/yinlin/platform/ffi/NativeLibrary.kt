@@ -19,8 +19,7 @@ abstract class NativeLibrary(private val libName: String? = null) {
     }
 
     // 函数解析
-    fun declare(vararg type: Layout, retType: Layout? = null): FunctionDescriptor =
-        if (retType == null) FunctionDescriptor.ofVoid(*type) else FunctionDescriptor.of(retType, *type)
+    fun declare(vararg type: Layout, retType: Layout? = null): FunctionDescriptor = if (retType == null) FunctionDescriptor.ofVoid(*type) else FunctionDescriptor.of(retType, *type)
 
     fun func(vararg type: Layout, retType: Layout? = null) = lazyName { name ->
         requireNotNull(linker.downcallHandle(lookup.find(name).get(), declare(*type, retType = retType))) {

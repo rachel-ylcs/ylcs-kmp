@@ -52,7 +52,7 @@ actual object SingleInstance {
 
         fun unlock() {
             if (appLockFd >= 0) {
-                // 保留锁文件，防止已打开旧 inode 的实例与新 inode 同时获得锁。
+                // 保留锁文件，防止已打开旧 inode 的实例与新 inode 同时获得锁
                 flock(appLockFd, Posix.LOCK_UN)
                 close(appLockFd)
                 appLockFd = -1
@@ -61,18 +61,13 @@ actual object SingleInstance {
     }
 
     private object MacOS : CoreFoundationLibrary() {
-
         @JvmStatic
         @Suppress("FunctionName", "unused")
         private fun MessageCallback(port: Address, msgid: Int, data: Address, info: Address): Address = Address.NULL
 
         var appMessagePort: Address = Address.NULL
 
-        fun lock(key: String): Boolean = useMemory { arena ->
-            val cStr = arena.astr(key)
-            val kcfStringEncodingUTF8 = 0x08000100
-            val name = CFStringCreateWithCString(Address.NULL, cStr, kcfStringEncodingUTF8) as Address
-
+        private val callback by lazy {
             val function = declare(
                 NativeType.Pointer,
                 NativeType.Int,
@@ -89,7 +84,13 @@ actual object SingleInstance {
                     Address::class.java,
                 )
             )
-            val callback = upcall(handle, function)
+            upcall(handle, function)
+        }
+
+        fun lock(key: String): Boolean = useMemory { arena ->
+            val cStr = arena.astr(key)
+            val kcfStringEncodingUTF8 = 0x08000100
+            val name = CFStringCreateWithCString(Address.NULL, cStr, kcfStringEncodingUTF8) as Address
             appMessagePort = CFMessagePortCreateLocal(Address.NULL, name, callback, Address.NULL, Address.NULL) as Address
             appMessagePort.isNotNull
         }
