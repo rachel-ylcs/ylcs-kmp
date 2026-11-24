@@ -400,7 +400,6 @@ internal suspend fun writeFileSink(raw: RawSink, block: suspend (Sink) -> Unit) 
         }
     }
     catch (error: Throwable) {
-        // 协程取消也需要通知文件流回滚，不能按成功写入提交
         failure = error
         throw error
     }
