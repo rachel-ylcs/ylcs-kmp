@@ -7,8 +7,6 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.ffi.*
 import love.yinlin.platform.platform
 import java.lang.foreign.ValueLayout
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 actual object BatteryManager {
     private object Windows : Kernel32Library() {
@@ -25,41 +23,12 @@ actual object BatteryManager {
         }
     }
 
-    private object MacOS {
-        private val percentPattern = Regex("""(\d+)%""")
-
-        fun readLevel(): BatteryLevel {
-            val process = ProcessBuilder("/usr/bin/pmset", "-g", "batt").redirectErrorStream(true).start()
-            try {
-                if (!process.waitFor(2, TimeUnit.SECONDS) || process.exitValue() != 0) return BatteryLevel.Unknown
-                val lines = process.inputStream.bufferedReader().use { it.readLines() }
-                if (lines.firstOrNull()?.startsWith("Now drawing from") != true) return BatteryLevel.Unknown
-                var total = 0
-                var count = 0
-                for (line in lines) {
-                    if (!line.contains("InternalBattery") || line.contains("present: false")) continue
-                    val percent = percentPattern.find(line)?.groupValues?.get(1)?.toIntOrNull() ?: return BatteryLevel.Unknown
-                    if (percent !in 0 .. 100) return BatteryLevel.Unknown
-                    total += percent
-                    count++
-                }
-                return if (count == 0) BatteryLevel.NoBattery else BatteryLevel.Value((total.toDouble() / count).roundToInt())
-            }
-            finally {
-                process.destroyForcibly()
-                process.inputStream.close()
-                process.outputStream.close()
-                process.errorStream.close()
-            }
-        }
-    }
-
     actual suspend fun getBatteryLevel(context: PlatformContext): BatteryLevel = Coroutines.io {
         catchingDefault<BatteryLevel>(BatteryLevel.Unknown) {
             when (platform) {
                 Platform.Windows -> Windows.readLevel()
                 Platform.Linux -> LinuxBatteryReader.readLevel()
-                Platform.MacOS -> MacOS.readLevel()
+                Platform.MacOS -> MacBatteryApi.readLevel()
                 else -> BatteryLevel.Unsupported
             }
         }

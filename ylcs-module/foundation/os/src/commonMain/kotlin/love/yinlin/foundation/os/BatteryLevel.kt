@@ -1,9 +1,7 @@
 package love.yinlin.foundation.os
 
-import androidx.compose.runtime.Stable
 import kotlin.math.roundToInt
 
-@Stable
 sealed interface BatteryLevel {
     /** 电量百分比，取值范围为 0 到 100。 */
     data class Value(val percent: Int) : BatteryLevel {

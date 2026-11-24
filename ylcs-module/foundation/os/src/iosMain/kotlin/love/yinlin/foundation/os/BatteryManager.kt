@@ -1,19 +1,22 @@
 package love.yinlin.foundation.os
 
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import platform.UIKit.UIDevice
 
 actual object BatteryManager {
     actual suspend fun getBatteryLevel(context: PlatformContext): BatteryLevel = Coroutines.main {
-        val device = UIDevice.currentDevice
-        val monitoring = device.batteryMonitoringEnabled
-        try {
-            if (!monitoring) device.batteryMonitoringEnabled = true
-            BatteryLevel.fromFraction(device.batteryLevel.toDouble())
-        }
-        finally {
-            if (!monitoring) device.batteryMonitoringEnabled = false
+        catchingDefault<BatteryLevel>(BatteryLevel.Unknown) {
+            val device = UIDevice.currentDevice
+            val monitoring = device.batteryMonitoringEnabled
+            cleaning({
+                if (!monitoring) device.batteryMonitoringEnabled = true
+                BatteryLevel.fromFraction(device.batteryLevel.toDouble())
+            }) {
+                if (!monitoring) device.batteryMonitoringEnabled = false
+            }
         }
     }
 }

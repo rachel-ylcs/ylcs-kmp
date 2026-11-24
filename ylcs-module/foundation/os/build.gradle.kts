@@ -29,7 +29,6 @@ rachel {
                 lib(
                     ExportLib,
                     projects.ylcsModule.foundation.context,
-                    libs.compose.runtime,
                 )
             }
 
