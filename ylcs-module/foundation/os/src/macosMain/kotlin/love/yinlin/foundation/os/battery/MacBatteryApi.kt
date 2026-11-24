@@ -5,6 +5,7 @@ import love.yinlin.extension.cleaning
 import love.yinlin.foundation.os.iokit.IOPSCopyPowerSourcesInfo
 import love.yinlin.foundation.os.iokit.IOPSCopyPowerSourcesList
 import love.yinlin.foundation.os.iokit.IOPSGetPowerSourceDescription
+import love.yinlin.foundation.os.iokit.RachelIOKitCFStringEqual
 import platform.CoreFoundation.*
 
 @OptIn(ExperimentalForeignApi::class)
@@ -31,19 +32,19 @@ internal object MacBatteryApi : MacBatteryReader<COpaquePointer>() {
 
     override fun isInternal(source: COpaquePointer): Boolean? {
         val transport = value(source, "Transport Type") ?: return null
-        return withString("Internal") { CFEqual(transport, it).toInt() != 0 }
+        return withString("Internal") { RachelIOKitCFStringEqual(transport.reinterpret(), it) }
     }
 
     override fun isPresent(source: COpaquePointer): Boolean {
         val present = value(source, "Is Present") ?: return true
-        return CFBooleanGetValue(present.reinterpret()).toInt() != 0
+        return CFBooleanGetValue(present.reinterpret())
     }
 
     override fun number(source: COpaquePointer, key: String): Int? {
         val value = value(source, key) ?: return null
         return memScoped {
             val result = alloc<IntVar>()
-            if (CFNumberGetValue(value.reinterpret(), kCFNumberIntType, result.ptr).toInt() != 0) result.value
+            if (CFNumberGetValue(value.reinterpret(), kCFNumberIntType, result.ptr)) result.value
             else null
         }
     }
