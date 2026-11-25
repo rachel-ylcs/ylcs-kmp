@@ -31,7 +31,6 @@
         "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/cpp/Image.cc": "skiko/src/nativeJsMain/cpp/Image.cc",
         "adaptation/org.jetbrains.skiko_skiko/src/linuxMain/cpp/LinuxCxxAbi.cpp": "skiko/src/nativeJsMain/cpp/LinuxCxxAbi.cpp",
         "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/GLAssembledInterface.native.kt": "skiko/src/nativeMain/kotlin/org/jetbrains/skia/GLAssembledInterface.native.kt",
-        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt": "skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt",
         "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt": "skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt",
         "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/cpp/WindowsDirect3DBridge.cc": "skiko/src/windowsMain/cpp/WindowsDirect3DBridge.cc",
         "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/kotlin/org/jetbrains/skiko/NativeLibraries.windows.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/NativeLibraries.windows.kt",

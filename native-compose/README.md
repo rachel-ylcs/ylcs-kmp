@@ -8,6 +8,8 @@
 
 在根 [libs.versions.toml](../libs.versions.toml) 选择上游版本。Material3 主族跟随 `cmp`，四个 Adaptive 工件跟随 `material3-adaptive`，完整 ICU 数据由 `icu` 选择。Skia SDK 版本从所选 Skiko 发布源码读取。同步器计算下载内容的摘要并生成来源记录，保存在 Git 忽略的 `vendor/` 下。移植库的 Maven 版本仍采用 Rachel 的发布格式。
 
+桌面 Native Skiko 从上游的 Core、Ganesh 和 Platform 源码组装，保留 Skiko Core 与 Skottie 两个发布工件。Ganesh 提供现有 GPU 后端的绑定，Platform 提供窗口层共用声明和桌面实现。
+
 ## 目标与源码边界
 
 提供标准 Compose API、桌面 Native 窗口、资源读取与部署、Maven 发布/消费及应用目录分发。桥插件按 Native target 将官方请求重定向为 `love.yinlin.native.*` 工件；JVM、Android 等目标使用官方 Compose。KLIB 保留上游模块身份，以兼容官方 Runtime、AndroidX 等预编译依赖。

@@ -67,7 +67,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  apply<WasmImportsGeneratorCompilerPluginSupportPlugin>()
  apply<WasmImportsGeneratorForTestCompilerPluginSupportPlugin>()
-@@ -89,7 +88,7 @@ val skiko = SkikoProperties(rootProject)
+@@ -89,13 +88,14 @@ val skiko = SkikoProperties(rootProject)
  val buildType = skiko.buildType
  val targetOs = hostOs
  val targetArch = skiko.targetArch
@@ -76,7 +76,14 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  val coreDependencies: SkikoDependencyScope.() -> Unit = {
      targets {
-@@ -161,12 +160,8 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+         all {
+             staticSkiaLibs(
+                 "skia",
++                "skia_ganesh_ext",
+                 "svg",
+                 "skparagraph",
+                 "skshaper",
+@@ -156,24 +156,50 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
          }
          native {
@@ -85,21 +92,24 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 -                "dng_sdk",
 -            )
 -
++            compilerFlags("-DSK_SUPPORT_GPU=1", "-DSK_GANESH", "-DSK_GL")
              linux {
 +                staticSkiaLibs("piex", "dng_sdk")
                  // Hack to fix problem with linker not always finding certain declarations.
                  directStaticSkiaLibs(
                      "skshaper",
-@@ -175,13 +170,37 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
-                     "skia",
-                     "skia_ganesh_ext"
-                 )
--                dynamicSystemLibs("fontconfig", "GL")
+                     "skunicode_core",
+                     "skunicode_icu",
+-                    "skia"
++                    "skia",
++                    "skia_ganesh_ext"
++                )
 +                dynamicSystemLibs("fontconfig", "GL", "dl")
-                 arm64 { dynamicSystemLibs("EGL") }
-             }
- 
++                arm64 { dynamicSystemLibs("EGL") }
++            }
++
 +            windows {
++                compilerFlags("-DSK_DIRECT3D")
 +                staticSkiaLibs(
 +                    "d3d12allocator",
 +                    "raw_ptr",
@@ -117,35 +127,37 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
 +                    "dxgi",
 +                    "d3dcompiler",
 +                    "opengl32",
-+                )
-+            }
-+
+                 )
+-                dynamicSystemLibs("fontconfig")
+             }
+ 
              macos {
++                compilerFlags("-DSK_METAL", "-DSK_VULKAN")
 +                staticSkiaLibs("piex", "dng_sdk")
                  frameworks(
-                     "Metal",
++                    "Metal",
 +                    "OpenGL",
 +                    "QuartzCore",
                      "CoreGraphics",
                      "CoreText",
                      "CoreServices",
-@@ -189,6 +208,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+@@ -181,6 +207,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              ios {
 +                staticSkiaLibs("piex", "dng_sdk")
                  frameworks(
-                     "Metal",
                      "CoreGraphics",
-@@ -198,6 +218,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
+                     "CoreText",
+@@ -189,6 +216,7 @@ val coreDependencies: SkikoDependencyScope.() -> Unit = {
              }
  
              tvos {
 +                staticSkiaLibs("piex", "dng_sdk")
                  frameworks(
-                     "Metal",
                      "CoreGraphics",
-@@ -247,7 +268,7 @@ val skikoProjectContext = SkikoProjectContext(
+                     "CoreText",
+@@ -236,7 +264,7 @@ val skikoProjectContext = SkikoProjectContext(
  )
  
  allprojects {
@@ -154,7 +166,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      version = skiko.deployVersion
  
      // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
-@@ -264,30 +285,16 @@ allprojects {
+@@ -253,30 +281,16 @@ allprojects {
  
  repositories {
      mavenCentral {
@@ -188,7 +200,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  
      if (supportWeb) {
-@@ -346,35 +353,18 @@ kotlin {
+@@ -335,35 +349,18 @@ kotlin {
      }
  
      if (supportNativeMac) {
@@ -228,7 +240,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
  
      sourceSets.commonTest.dependencies {
-@@ -385,23 +375,23 @@ kotlin {
+@@ -374,23 +371,23 @@ kotlin {
  
      skikoProjectContext.jvmMainSourceSet?.dependencies {
          implementation(kotlin("stdlib"))
@@ -257,7 +269,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
  
      if (supportAndroid && supportAwt) {
-@@ -411,7 +401,7 @@ kotlin {
+@@ -400,7 +397,7 @@ kotlin {
      }
  
      skikoProjectContext.jvmTestSourceSet?.dependencies {
@@ -266,7 +278,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
          implementation(kotlin("test-junit"))
          implementation(kotlin("test"))
      }
-@@ -434,44 +424,6 @@ kotlin {
+@@ -423,44 +420,6 @@ kotlin {
  /**
   * Setup JVM benchmarks
   */
@@ -311,7 +323,19 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  afterEvaluate {
      tasks.named("clean").configure {
-@@ -503,23 +455,6 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
+@@ -478,11 +437,6 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
+     val coreObjcCompile = if (os.isMacOs) tasks.named<CompileSkikoObjCTask>("objcCompile$suffix") else null
+     val requiredSymbols = skikoProjectContext.jvmRequiredSymbolsFor(os, arch)
+     dependencies.add(requiredSymbols.name, project(":skiko-skottie"))
+-    dependencies.add(requiredSymbols.name, project(":skiko-platform"))
+-    dependencies.add(requiredSymbols.name, project(":skiko-ganesh"))
+-    if (os != OS.Android && supportAwt) {
+-        dependencies.add(requiredSymbols.name, project(":skiko-graphite"))
+-    }
+     val requiredSymbolFiles = files(requiredSymbols)
+ 
+     skikoProjectContext.configureGenerateSymbolsList(
+@@ -494,33 +448,14 @@ fun configureSymbolsFor(os: OS, arch: Arch) {
      }
  }
  
@@ -335,7 +359,17 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
  
  if (supportWeb) {
      skikoProjectContext.provideWasmTestResources()
-@@ -538,11 +473,55 @@ if (supportWeb) {
+ 
+     val linkWasmSideModules = skikoProjectContext.wasmSideModulesFor("linkWasm").also {
+-        dependencies.add(it.name, project(":skiko-ganesh"))
+         dependencies.add(it.name, project(":skiko-skottie"))
+     }
+     val linkWasmD8SideModules = skikoProjectContext.wasmSideModulesFor("linkWasmD8WithES6").also {
+-        dependencies.add(it.name, project(":skiko-ganesh"))
+         dependencies.add(it.name, project(":skiko-skottie"))
+     }
+     skikoProjectContext.configureWasmMainModuleSideModuleInputs(
+@@ -531,11 +466,55 @@ if (supportWeb) {
  
  skikoProjectContext.declarePublications()
  
@@ -393,7 +427,7 @@ diff --git a/skiko/build.gradle.kts b/skiko/build.gradle.kts
      }
      configureSignAndPublishDependencies()
  }
-@@ -592,3 +571,47 @@ tasks.register("printSkiaVersion") {
+@@ -585,3 +564,47 @@ tasks.register("printSkiaVersion") {
  }
  
  configureKotlinCompilerOptions()
@@ -527,7 +561,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
  
  private fun Project.appleToolchainOutputOrNull(vararg args: String): String? =
      runCatching {
-@@ -184,18 +187,26 @@ fun Project.configureSignAndPublishDependencies() {
+@@ -174,18 +177,26 @@ fun Project.configureSignAndPublishDependencies() {
          tasks.configureEach {
              when {
                  name.startsWith(publishLinuxX64) -> {
@@ -567,7 +601,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
  
  private val jvmTargetOsAttribute =
      Attribute.of("org.jetbrains.skiko.jvm.target-os", String::class.java)
-@@ -169,7 +170,7 @@ private fun SkikoProjectContext.createGenerateRequiredSymbolsTask(
+@@ -170,7 +171,7 @@ private fun SkikoProjectContext.createGenerateRequiredSymbolsTask(
      this.symbolExtractorCommand.set(
          when (targetOs) {
              OS.Android -> project.androidLlvmNm().map { listOf(it) }
@@ -576,7 +610,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
              else -> project.provider { listOf("nm") }
          }
      )
-@@ -436,7 +437,7 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
+@@ -451,7 +452,7 @@ fun SkikoProjectContext.configureGenerateSymbolsList(
          this.symbolExtractorCommand.set(
              when (targetOs) {
                  OS.Android -> project.androidLlvmNm().map { listOf(it) }
@@ -637,7 +671,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
                      *buildType.clangFlags,
                      *skiaPreprocessorFlags(OS.MacOS, buildType),
                      when(arch) {
-@@ -212,22 +225,53 @@ fun SkikoProjectContext.compileNativeBridgesTask(
+@@ -212,23 +225,58 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                  )
                  // Add sysroot for ARM64 cross-compilation
                  if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
@@ -678,6 +712,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
 +            }
              else -> throw GradleException("$os not yet supported")
          }
+         flags.addAll(compilerFlags(os, arch, TargetEnv.NATIVE))
  
 -        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
 -                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
@@ -685,6 +720,10 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
 +                (if (os == OS.Windows) projectDirs("src/windowsMain/cpp") else emptyList()) +
 +                (if (skiko.includeTestHelpers) projectDirs("src/nativeTest/cpp") else emptyList())
          sourceRoots.set(srcDirs)
++        if (kind == SkikoModuleKind.CORE) {
++            sourceRoots.addAll(projectDirs("skiko-ganesh/src/nativeJsMain/cpp"))
++            includeHeadersNonRecursive(projectDir.resolve("skiko-ganesh/src/commonMain/cpp/common/include"))
++        }
  
 -        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
 +        includeHeadersNonRecursive(projectDir.resolve("src/nativeMain/cpp"))
@@ -696,7 +735,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
              includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
          }
          includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
-@@ -265,12 +309,22 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -266,12 +314,22 @@ fun SkikoProjectContext.configureNativeTarget(
      arch: Arch,
      target: KotlinNativeTarget,
      coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
@@ -722,7 +761,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
      val isUikitSim = target.isUikitSimulator()
  
      val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
-@@ -279,7 +333,10 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -280,7 +338,10 @@ fun SkikoProjectContext.configureNativeTarget(
      val unpackedSkia = unzipper.get()
      val skiaDir = unpackedSkia.absolutePath
  
@@ -734,7 +773,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
      val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
  
      // For iOS/tvOS we patch every library so that public Skia symbols are
-@@ -289,17 +346,78 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -290,17 +351,78 @@ fun SkikoProjectContext.configureNativeTarget(
      // unsupported shapes fall back to a "_skiko" suffix.
      val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
      val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
@@ -819,7 +858,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
  
      val hiddenSymbolsFile = layout.buildDirectory.file(
          "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
-@@ -311,24 +429,26 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -312,24 +434,26 @@ fun SkikoProjectContext.configureNativeTarget(
      } else {
          nativeArchives
      }
@@ -859,7 +898,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
          }
          OS.IOS -> {
              // list of linker options to be included into klib, which are needed for skiko consumers
-@@ -353,23 +473,34 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -354,23 +478,34 @@ fun SkikoProjectContext.configureNativeTarget(
                  "-L/usr/lib64",
                  "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
              )
@@ -905,7 +944,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
              mutableListOfLinkerOptions(options)
          }
          else -> mutableListOf()
-@@ -386,7 +517,9 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -387,7 +522,9 @@ fun SkikoProjectContext.configureNativeTarget(
  
      // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
      target.binaries.all {
@@ -916,7 +955,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
      }
  
      target.compilations.all {
-@@ -409,13 +542,17 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -410,13 +547,17 @@ fun SkikoProjectContext.configureNativeTarget(
          }
          inputs.files(objectFiles)
          val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
@@ -935,7 +974,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
              OS.MacOS, OS.IOS, OS.TVOS -> {
                  executable = "libtool"
                  argumentProviders.add { listOf("-static", "-o", staticLib) }
-@@ -427,6 +564,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -428,6 +569,24 @@ fun SkikoProjectContext.configureNativeTarget(
          outputs.dir(outDir)
      }
  
@@ -960,7 +999,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
      // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
      val compilationDependency = if (requiresSymbolPatching) {
          val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
-@@ -439,6 +594,7 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -440,6 +599,7 @@ fun SkikoProjectContext.configureNativeTarget(
          }
          project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
              dependsOn(unzipper)
@@ -968,7 +1007,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/configurat
              dependsOn(linkTask)
              if (coreSymbolSources != null) {
                  dependsOn(coreSymbolSources)
-@@ -452,18 +608,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -453,18 +613,24 @@ fun SkikoProjectContext.configureNativeTarget(
                  configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
              }
          }
@@ -1056,7 +1095,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
  import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  import org.jetbrains.skiko.build.cpp.WindowsSdkPaths
  import org.jetbrains.skiko.build.dependencies.AdditionalRuntimeLibrary
-@@ -102,90 +99,20 @@ class SkikoProjectContext(
+@@ -105,90 +102,20 @@ class SkikoProjectContext(
      }
  }
  
@@ -1157,7 +1196,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/org/jetbrains/skiko/build/context/Sk
  }
  
  internal val Project.isInIdea: Boolean
-@@ -194,55 +121,70 @@ internal val Project.isInIdea: Boolean
+@@ -197,55 +124,70 @@ internal val Project.isInIdea: Boolean
      }
  
  val Project.supportAndroid: Boolean
@@ -1736,7 +1775,7 @@ diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
  dependencyResolutionManagement {
      versionCatalogs {
          register("libs") {
-@@ -7,19 +10,29 @@ dependencyResolutionManagement {
+@@ -7,33 +10,29 @@ dependencyResolutionManagement {
  }
  
  pluginManagement {
@@ -1759,9 +1798,23 @@ diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
 +// Rachel: import-generator is outside the core Native build.
  include("test-utils")
  include("skiko-skottie")
+-val supportAnyNativeIos = System.getProperty("idea.active")?.toBoolean() == true || listOf(
+-    "skiko.native.enabled",
+-    "skiko.native.ios.enabled",
+-    "skiko.native.ios.arm64.enabled",
+-    "skiko.native.ios.simulatorArm64.enabled",
+-    "skiko.native.ios.x64.enabled",
+-).any { providers.gradleProperty(it).orNull == "true" }
+-if (supportAnyNativeIos) {
+-    include("skiko-gpu")
+-    include("skiko-ganesh-gpu-provider")
+-    include("skiko-graphite-gpu-provider")
+-}
 -include("skiko-graphite")
 -include("runtime-publications")
-+// Rachel: skiko-graphite and runtime-publications are outside the core Native build.
+-include("skiko-platform")
+-include("skiko-ganesh")
++// The desktop port compiles the Ganesh and platform source roots in the Skiko project.
 +
 +rootProject.buildFileName = "__REPOSITORY__/native-compose/adaptation/org.jetbrains.skiko_skiko/build.gradle.kts"
 +
@@ -1772,6 +1825,825 @@ diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
 +val catalog = settingsDir.resolve("__REPOSITORY__/libs.versions.toml")
 +val catalogHash = MessageDigest.getInstance("SHA-256").digest(catalog.readBytes()).joinToString("") { "%02x".format(it) }
 +check(ready["catalogSha256"] == catalogHash) { "Prepared Skiko sources are stale; use the root build to synchronize sources" }
+diff --git a/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skia/gpu/ganesh/SurfaceFactory.kt b/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skia/gpu/ganesh/SurfaceFactory.kt
+--- a/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skia/gpu/ganesh/SurfaceFactory.kt
++++ b/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skia/gpu/ganesh/SurfaceFactory.kt
+@@ -61,7 +61,7 @@ fun Surface.Companion.makeFromBackendRenderTarget(
+                 toInterop(surfaceProps?.packToIntArray()),
+             )
+         }
+-        if (ptr == NullPointer) null else Surface(ptr, arrayOf(context, rt))
++        if (ptr == NullPointer) null else Surface(ptr, context, rt)
+     } finally {
+         reachabilityBarrier(context)
+         reachabilityBarrier(rt)
+diff --git a/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.kt b/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.kt
+--- a/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.kt
++++ b/skiko/skiko-ganesh/src/commonMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.kt
+@@ -11,5 +11,4 @@ package org.jetbrains.skiko
+  *
+  * @throws RenderException if OpenGL library can't be loaded.
+  */
+-@InternalSkikoApi
+-expect fun loadOpenGLLibrary()
++internal expect fun loadOpenGLLibrary()
+diff --git a/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt b/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
+--- a/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
++++ b/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
+@@ -44,7 +44,7 @@ private external fun _nMakeVulkanJvmAllocator(
+  * this function will fail.
+  * For more information refer to skia `GrGLMakeAssembledInterface` function.
+  */
+-fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
++actual fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
+     if (assembledInterface.nativePtr == NullPointer) throw RenderException("Interface pointer must not be null")
+     Stats.onNativeCall()
+     val ptr = _nMakeGLWithInterface(assembledInterface.nativePtr)
+diff --git a/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt b/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
+--- a/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
++++ b/skiko/skiko-ganesh/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
+@@ -6,8 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
+ import org.jetbrains.skia.impl.Stats
+ import org.jetbrains.skiko.RenderException
+ 
+-class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+-    companion object {
++actual class GLAssembledInterface actual internal constructor(ptr: NativePointer) : RefCnt(ptr) {
++    actual companion object {
+         /**
+          * Creates an OpenGL interface object.
+          *
+@@ -25,7 +25,7 @@ class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr
+          * @param fPtr    native pointer to the function that takes [ctxPtr] and the OpenGL function name,
+          *                and returns a function pointer of that OpenGL function (see skia `GrGLGetProc`).
+          */
+-        fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
++        actual fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
+             if (fPtr == NullPointer) throw RenderException("Function pointer must not be null")
+             Stats.onNativeCall()
+             val ptr = _nCreateFromNativePointers(ctxPtr, fPtr)
+diff --git a/skiko/skiko-ganesh/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/skiko-ganesh/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
+deleted file mode 100644
+--- a/skiko/skiko-ganesh/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
++++ /dev/null
+@@ -1,14 +0,0 @@
+-package org.jetbrains.skiko
+-
+-@InternalSkikoApi
+-actual fun loadOpenGLLibrary() {
+-    when (hostOs) {
+-        // It is deprecated. See https://developer.apple.com/documentation/opengles
+-        OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")
+-        // Do nothing as we don't know for sure which OS supports OpenGL.
+-        // If there is support, we assume that it is already linked.
+-        // If there is no support, there will be a native crash
+-        // (to throw a RenderException we need to investigate case by case)
+-        else -> Unit
+-    }
+-}
+diff --git a/skiko/skiko-platform/src/darwinMain/kotlin/org/jetbrains/skiko/Dispatchers.kt b/skiko/skiko-platform/src/darwinMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
+deleted file mode 100644
+--- a/skiko/skiko-platform/src/darwinMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
++++ /dev/null
+@@ -1,93 +0,0 @@
+-package org.jetbrains.skiko
+-
+-import kotlinx.cinterop.interpretCPointer
+-import kotlinx.coroutines.*
+-import platform.CoreFoundation.*
+-import platform.darwin.dispatch_async
+-import platform.darwin.dispatch_get_global_queue
+-import platform.darwin.dispatch_get_main_queue
+-import platform.darwin.dispatch_queue_t
+-import platform.posix.QOS_CLASS_BACKGROUND
+-import kotlin.coroutines.CoroutineContext
+-import kotlin.concurrent.AtomicNativePtr
+-import kotlin.native.concurrent.freeze
+-import kotlin.native.internal.NativePtr
+-
+-// This is the only dispatcher that shall be used in Skiko on iOS.
+-// Current (as of 1.5.2) dispatchers in kotlinx.coroutines are not usable
+-// for needs of Skiko.
+-object SkikoDispatchers {
+-    val Main: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
+-    val IO: CoroutineDispatcher = NsQueueDispatcher(
+-        dispatch_get_global_queue(
+-            QOS_CLASS_BACKGROUND.toLong(), 0UL)
+-    )
+-}
+-
+-@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+-internal class NsQueueDispatcher(
+-    private val dispatchQueue: dispatch_queue_t
+-) : CoroutineDispatcher(), Delay {
+-    override fun dispatch(context: CoroutineContext, block: Runnable) {
+-        dispatch_async(dispatchQueue) {
+-            block.run()
+-        }
+-    }
+-
+-    override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
+-        val timer = Timer()
+-        val timerBlock: TimerBlock = {
+-            timer.dispose()
+-            continuation.resume(Unit) { t -> t.printStackTrace() }
+-        }
+-        timer.start(timeMillis, timerBlock)
+-        continuation.disposeOnCancellation(timer)
+-    }
+-
+-    override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
+-        val timer = Timer()
+-        val timerBlock: TimerBlock = {
+-            timer.dispose()
+-            block.run()
+-        }
+-        timer.start(timeMillis, timerBlock)
+-        return timer
+-
+-    }
+-}
+-
+-internal typealias TimerBlock = (CFRunLoopTimerRef?) -> Unit
+-
+-private val TIMER_NEW = NativePtr.NULL
+-
+-private val TIMER_DISPOSED = NativePtr.NULL.plus(1)
+-
+-private class Timer : DisposableHandle {
+-    private val ref = AtomicNativePtr(TIMER_NEW)
+-
+-    fun start(timeMillis: Long, timerBlock: TimerBlock) {
+-        val fireDate = CFAbsoluteTimeGetCurrent() + timeMillis / 1000.0
+-        val timer = CFRunLoopTimerCreateWithHandler(null, fireDate, 0.0, 0u, 0, timerBlock)!!
+-        CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
+-        if (!ref.compareAndSet(TIMER_NEW, timer.rawValue)) {
+-            // dispose was already called concurrently
+-            release(timer)
+-        }
+-    }
+-
+-    override fun dispose() {
+-        while (true) {
+-            val ptr = ref.value
+-            if (ptr == TIMER_DISPOSED) return
+-            if (ref.compareAndSet(ptr, TIMER_DISPOSED)) {
+-                if (ptr != TIMER_NEW) release(interpretCPointer(ptr))
+-                return
+-            }
+-        }
+-    }
+-
+-    private fun release(timer: CFRunLoopTimerRef?) {
+-        CFRunLoopRemoveTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
+-        CFRelease(timer)
+-    }
+-}
+diff --git a/skiko/skiko-platform/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt b/skiko/skiko-platform/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
+deleted file mode 100644
+--- a/skiko/skiko-platform/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
++++ /dev/null
+@@ -1,42 +0,0 @@
+-package org.jetbrains.skiko
+-
+-import org.jetbrains.skia.Canvas
+-import org.jetbrains.skia.PixelGeometry
+-
+-actual open class SkiaLayer  {
+-    actual var renderApi: GraphicsApi
+-        get() = TODO("Not yet implemented")
+-        set(value) {}
+-    actual val contentScale: Float
+-        get() = TODO("Not yet implemented")
+-    actual var fullscreen: Boolean
+-        get() = TODO("Not yet implemented")
+-        set(value) {}
+-    actual val component: Any?
+-        get() = TODO("Not yet implemented")
+-    actual fun needRender(throttledToVsync: Boolean) {
+-        TODO("unimplemented")
+-    }
+-    @Deprecated(
+-        message = "Use needRender() instead",
+-        replaceWith = ReplaceWith("needRender()")
+-    )
+-    actual fun needRedraw() = needRender()
+-    actual fun attachTo(container: Any) {
+-        TODO("unimplemented")
+-    }
+-    actual fun detach() {
+-        TODO("unimplemented")
+-    }
+-
+-    internal actual fun draw(canvas: Canvas) {
+-        TODO("unimplemented")
+-    }
+-
+-    actual var renderDelegate: SkikoRenderDelegate? = null
+-    actual val pixelGeometry: PixelGeometry
+-        get() = TODO("Not yet implemented")
+-}
+-
+-actual val currentSystemTheme: SystemTheme
+-    get() = SystemTheme.UNKNOWN
+\ No newline at end of file
+diff --git a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
+new file mode 100644
+--- /dev/null
++++ b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
+@@ -0,0 +1,93 @@
++package org.jetbrains.skiko
++
++import kotlinx.cinterop.interpretCPointer
++import kotlinx.coroutines.*
++import platform.CoreFoundation.*
++import platform.darwin.dispatch_async
++import platform.darwin.dispatch_get_global_queue
++import platform.darwin.dispatch_get_main_queue
++import platform.darwin.dispatch_queue_t
++import platform.posix.QOS_CLASS_BACKGROUND
++import kotlin.coroutines.CoroutineContext
++import kotlin.concurrent.AtomicNativePtr
++import kotlin.native.concurrent.freeze
++import kotlin.native.internal.NativePtr
++
++// This is the only dispatcher that shall be used in Skiko on iOS.
++// Current (as of 1.5.2) dispatchers in kotlinx.coroutines are not usable
++// for needs of Skiko.
++object SkikoDispatchers {
++    val Main: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
++    val IO: CoroutineDispatcher = NsQueueDispatcher(
++        dispatch_get_global_queue(
++            QOS_CLASS_BACKGROUND.toLong(), 0UL)
++    )
++}
++
++@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
++internal class NsQueueDispatcher(
++    private val dispatchQueue: dispatch_queue_t
++) : CoroutineDispatcher(), Delay {
++    override fun dispatch(context: CoroutineContext, block: Runnable) {
++        dispatch_async(dispatchQueue) {
++            block.run()
++        }
++    }
++
++    override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
++        val timer = Timer()
++        val timerBlock: TimerBlock = {
++            timer.dispose()
++            continuation.resume(Unit) { t -> t.printStackTrace() }
++        }
++        timer.start(timeMillis, timerBlock)
++        continuation.disposeOnCancellation(timer)
++    }
++
++    override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
++        val timer = Timer()
++        val timerBlock: TimerBlock = {
++            timer.dispose()
++            block.run()
++        }
++        timer.start(timeMillis, timerBlock)
++        return timer
++
++    }
++}
++
++internal typealias TimerBlock = (CFRunLoopTimerRef?) -> Unit
++
++private val TIMER_NEW = NativePtr.NULL
++
++private val TIMER_DISPOSED = NativePtr.NULL.plus(1)
++
++private class Timer : DisposableHandle {
++    private val ref = AtomicNativePtr(TIMER_NEW)
++
++    fun start(timeMillis: Long, timerBlock: TimerBlock) {
++        val fireDate = CFAbsoluteTimeGetCurrent() + timeMillis / 1000.0
++        val timer = CFRunLoopTimerCreateWithHandler(null, fireDate, 0.0, 0u, 0, timerBlock)!!
++        CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
++        if (!ref.compareAndSet(TIMER_NEW, timer.rawValue)) {
++            // dispose was already called concurrently
++            release(timer)
++        }
++    }
++
++    override fun dispose() {
++        while (true) {
++            val ptr = ref.value
++            if (ptr == TIMER_DISPOSED) return
++            if (ref.compareAndSet(ptr, TIMER_DISPOSED)) {
++                if (ptr != TIMER_NEW) release(interpretCPointer(ptr))
++                return
++            }
++        }
++    }
++
++    private fun release(timer: CFRunLoopTimerRef?) {
++        CFRunLoopRemoveTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
++        CFRelease(timer)
++    }
++}
+diff --git a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
+new file mode 100644
+--- /dev/null
++++ b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
+@@ -0,0 +1,16 @@
++package org.jetbrains.skiko
++
++import kotlinx.cinterop.useContents
++import platform.Foundation.NSProcessInfo
++
++val hostOSVersion: OSVersion
++    get() = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
++        OSVersion(
++            majorVersion.toInt(),
++            minorVersion.toInt(),
++            patchVersion.toInt()
++        )
++    }
++
++fun available(vararg pairs: Pair<OS, OSVersion>) =
++    pairs.find { it.first == hostOs }?.let { it.second <= hostOSVersion } ?: false
+diff --git a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
+deleted file mode 100644
+--- a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
++++ /dev/null
+@@ -1,184 +0,0 @@
+-package org.jetbrains.skiko
+-
+-import kotlinx.cinterop.BetaInteropApi
+-import kotlinx.cinterop.ObjCAction
+-import kotlinx.cinterop.useContents
+-import org.jetbrains.skia.*
+-import org.jetbrains.skiko.redrawer.Redrawer
+-import platform.AppKit.*
+-import platform.Foundation.NSNotification
+-import platform.Foundation.NSNotificationCenter
+-import platform.Foundation.NSSelectorFromString
+-import platform.darwin.NSObject
+-
+-/**
+- * SkiaLayer implementation for macOS.
+- * Supports only [GraphicsApi.METAL]
+- */
+-@OptIn(BetaInteropApi::class)
+-actual open class SkiaLayer {
+-    fun isShowing(): Boolean {
+-        return true
+-    }
+-
+-    /**
+-     * [GraphicsApi.METAL] is the only GraphicsApi supported for macOS.
+-     * Setter throws an IllegalArgumentException if the value is not [GraphicsApi.METAL].
+-     */
+-    actual var renderApi: GraphicsApi = GraphicsApi.METAL
+-        set(value) {
+-            if (value != GraphicsApi.METAL) {
+-                throw IllegalArgumentException("$field is not supported in macOS")
+-            }
+-            field = value
+-        }
+-
+-    /**
+-     * The scale factor of [NSWindow]
+-     * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
+-     */
+-    actual val contentScale: Float
+-        get() = if (this::nsView.isInitialized) (nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f) else 1.0f
+-
+-    /**
+-     * Fullscreen is not supported
+-     */
+-    actual var fullscreen: Boolean
+-        get() = false
+-        set(value) {
+-            if (value) throw IllegalArgumentException("fullscreen unsupported")
+-        }
+-
+-    /**
+-     * Underlying [NSView]
+-     */
+-    lateinit var nsView: NSView
+-        private set
+-
+-    actual val component: Any?
+-        get() = this.nsView
+-
+-    /**
+-     * Implements rendering logic and events processing.
+-     */
+-    actual var renderDelegate: SkikoRenderDelegate? = null
+-
+-    internal var redrawer: Redrawer? = null
+-
+-    /**
+-     * Created/updated by recording in [update].
+-     * It's used as a source for drawing on canvas in [draw].
+-     */
+-    private var picture: PictureHolder? = null
+-    private val pictureRecorder = PictureRecorder()
+-
+-    private val nsViewObserver = object : NSObject() {
+-        @ObjCAction
+-        fun frameDidChange(notification: NSNotification) {
+-            redrawer?.syncBoundsFromPlatformComponent()
+-            redrawer?.renderImmediately()
+-        }
+-
+-        @ObjCAction
+-        fun windowDidChangeBackingProperties(notification: NSNotification) {
+-            redrawer?.syncBoundsFromPlatformComponent()
+-            redrawer?.renderImmediately()
+-        }
+-
+-        fun addObserver() {
+-            val center = NSNotificationCenter.defaultCenter()
+-            center.addObserver(
+-                    observer = this,
+-                    selector = NSSelectorFromString("frameDidChange:"),
+-                    name = NSViewFrameDidChangeNotification,
+-                    `object` = nsView,
+-                )
+-            center.addObserver(
+-                observer = this,
+-                selector = NSSelectorFromString("windowDidChangeBackingProperties:"),
+-                name = NSWindowDidChangeBackingPropertiesNotification,
+-                `object` = nsView.window,
+-            )
+-        }
+-
+-        fun removeObserver() {
+-            val center = NSNotificationCenter.defaultCenter()
+-            center.removeObserver(this)
+-        }
+-    }
+-
+-    /**
+-     * @param container - should be an instance of [NSView]
+-     */
+-    actual fun attachTo(container: Any) {
+-        check(!this::nsView.isInitialized) { "Already attached to another NSView" }
+-        check(container is NSView) { "container should be an instance of NSView" }
+-        nsView = container
+-        nsView.postsFrameChangedNotifications = true
+-        nsViewObserver.addObserver()
+-        redrawer = createNativeRedrawer(this, renderApi).apply {
+-            syncBoundsFromPlatformComponent()
+-            needRender()
+-        }
+-    }
+-
+-    actual fun detach() {
+-        nsViewObserver.removeObserver()
+-        redrawer?.dispose()
+-        redrawer = null
+-    }
+-
+-    /**
+-     * Schedules a frame to an appropriate moment.
+-     */
+-    actual fun needRender(throttledToVsync: Boolean) {
+-        redrawer?.needRender(throttledToVsync)
+-    }
+-
+-    @Deprecated(
+-        message = "Use needRender() instead",
+-        replaceWith = ReplaceWith("needRender()")
+-    )
+-    actual fun needRedraw() = needRender()
+-
+-    /**
+-     * Updates the [picture] according to current [nanoTime]
+-     */
+-    internal fun update(nanoTime: Long) {
+-        val width = nsView.frame.useContents { size.width }
+-        val height = nsView.frame.useContents { size.height }
+-
+-        val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
+-        val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
+-
+-        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth.toFloat(), pictureHeight.toFloat()).apply {
+-            clear(Color.WHITE)
+-        }
+-        renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+-
+-        val picture = pictureRecorder.finishRecordingAsPicture()
+-        this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
+-    }
+-
+-    internal actual fun draw(canvas: Canvas) {
+-        picture?.also {
+-            canvas.drawPicture(it.instance)
+-        }
+-    }
+-
+-    actual val pixelGeometry: PixelGeometry
+-        get() = PixelGeometry.UNKNOWN
+-
+-    private fun createDrawScope() = LayerDrawScope(
+-        pixelGeometry = pixelGeometry,
+-        layerWidth = nsView.frame.useContents { size.width },
+-        layerHeight = nsView.frame.useContents { size.height },
+-        scale = contentScale
+-    )
+-
+-    internal fun inDrawScope(block: LayerDrawScope.() -> Unit) {
+-        with(createDrawScope()) {
+-            block()
+-        }
+-    }
+-}
+diff --git a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt b/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
+deleted file mode 100644
+--- a/skiko/skiko-platform/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
++++ /dev/null
+@@ -1,262 +0,0 @@
+-@file:OptIn(BetaInteropApi::class)
+-
+-package org.jetbrains.skiko.redrawer
+-
+-import kotlinx.cinterop.BetaInteropApi
+-import kotlinx.cinterop.CPointer
+-import kotlinx.cinterop.IntVar
+-import kotlinx.cinterop.alloc
+-import kotlinx.cinterop.memScoped
+-import kotlinx.cinterop.ptr
+-import kotlinx.cinterop.useContents
+-import kotlinx.cinterop.value
+-import org.jetbrains.skia.BackendRenderTarget
+-import org.jetbrains.skia.Canvas
+-import org.jetbrains.skia.Color
+-import org.jetbrains.skia.ColorSpace
+-import org.jetbrains.skia.DirectContext
+-import org.jetbrains.skia.FramebufferFormat
+-import org.jetbrains.skia.Surface
+-import org.jetbrains.skia.SurfaceColorFormat
+-import org.jetbrains.skia.SurfaceOrigin
+-import org.jetbrains.skia.SurfaceProps
+-import org.jetbrains.skia.gpu.ganesh.makeFromBackendRenderTarget
+-import org.jetbrains.skia.runRestoringState
+-import org.jetbrains.skiko.FrameDispatcher
+-import org.jetbrains.skiko.LayerDrawScope
+-import org.jetbrains.skiko.RenderException
+-import org.jetbrains.skiko.SkiaLayer
+-import org.jetbrains.skiko.SkikoDispatchers
+-import org.jetbrains.skiko.currentNanoTime
+-import platform.CoreFoundation.CFTimeInterval
+-import platform.CoreGraphics.CGRectMake
+-import platform.CoreVideo.CVTimeStamp
+-import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
+-import platform.OpenGL.glGetIntegerv
+-import platform.OpenGLCommon.CGLContextObj
+-import platform.OpenGLCommon.CGLPixelFormatObj
+-import platform.OpenGLCommon.CGLSetCurrentContext
+-import platform.OpenGLCommon.GLenum
+-import platform.QuartzCore.CAOpenGLLayer
+-import platform.QuartzCore.*
+-
+-/**
+- * OpenGL [Redrawer] implementation for the native (Kotlin/Native) macOS target.
+- *
+- * Not actually used. See [SkiaLayer.renderApi]
+- */
+-internal class MacOsOpenGLRedrawer(
+-    private val skiaLayer: SkiaLayer
+-) : Redrawer {
+-    private var context: DirectContext? = null
+-    private var renderTarget: BackendRenderTarget? = null
+-    private var surface: Surface? = null
+-    private var canvas: Canvas? = null
+-
+-    private var currentWidth = 0
+-    private var currentHeight = 0
+-
+-    private val glLayer = MacosGLLayer()
+-
+-    init {
+-        glLayer.init(skiaLayer, this)
+-    }
+-
+-    override val renderInfo: String
+-        get() = "GraphicsApi: ${skiaLayer.renderApi}\nOS: macOS (native OpenGL)\n"
+-
+-    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
+-        renderImmediately()
+-    }
+-
+-    override fun dispose() {
+-        disposeSurface()
+-        context?.close()
+-        context = null
+-        glLayer.dispose()
+-    }
+-
+-    override fun syncBoundsFromPlatformComponent() {
+-        syncContentScale()
+-        skiaLayer.nsView.frame.useContents {
+-            glLayer.setFrame(
+-                origin.x.toInt(),
+-                origin.y.toInt(),
+-                size.width.toInt().coerceAtLeast(0),
+-                size.height.toInt().coerceAtLeast(0)
+-            )
+-        }
+-    }
+-
+-    private fun syncContentScale() {
+-        CATransaction.begin()
+-        CATransaction.setDisableActions(true)
+-        glLayer.contentsScale = skiaLayer.nsView.window?.backingScaleFactor ?: 1.0
+-        CATransaction.commit()
+-        CATransaction.flush()
+-    }
+-
+-    override fun update(nanoTime: Long) {
+-        skiaLayer.update(nanoTime)
+-    }
+-
+-    override fun needRender(throttledToVsync: Boolean) {
+-        frameDispatcher.scheduleFrame()
+-    }
+-
+-    override fun renderImmediately() {
+-        glLayer.setNeedsDisplay()
+-        skiaLayer.nsView.setNeedsDisplay(true)
+-    }
+-
+-    internal fun drawInLayerContext() {
+-        skiaLayer.update(currentNanoTime())
+-        skiaLayer.inDrawScope {
+-            performDraw()
+-        }
+-    }
+-
+-    private fun LayerDrawScope.performDraw() {
+-        if (!initContext()) {
+-            throw RenderException("Cannot init graphic OpenGL context")
+-        }
+-        initSurface()
+-        canvas?.runRestoringState {
+-            clear(Color.TRANSPARENT)
+-            skiaLayer.draw(this)
+-        }
+-        context?.flush()
+-    }
+-
+-    private fun initContext(): Boolean {
+-        try {
+-            if (context == null) {
+-                context = DirectContext.makeGL()
+-            }
+-        } catch (_: Exception) {
+-            println("Failed to create Skia OpenGL context!")
+-            return false
+-        }
+-        return true
+-    }
+-
+-    @ExperimentalUnsignedTypes
+-    private fun openglGetIntegerv(pname: GLenum): UInt {
+-        var result = 0U
+-        memScoped {
+-            val data = alloc<IntVar>()
+-            glGetIntegerv(pname, data.ptr)
+-            result = data.value.toUInt()
+-        }
+-        return result
+-    }
+-
+-    private fun isSizeChanged(width: Int, height: Int): Boolean {
+-        if (width != currentWidth || height != currentHeight) {
+-            currentWidth = width
+-            currentHeight = height
+-            return true
+-        }
+-        return false
+-    }
+-
+-    private fun LayerDrawScope.initSurface() {
+-        val w = scaledLayerWidth
+-        val h = scaledLayerHeight
+-        if (isSizeChanged(w, h) || surface == null) {
+-            disposeSurface()
+-            if (w <= 0 || h <= 0) return
+-            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+-            renderTarget = BackendRenderTarget.makeGL(
+-                w,
+-                h,
+-                0,
+-                8,
+-                fbId.toInt(),
+-                FramebufferFormat.GR_GL_RGBA8
+-            )
+-            surface = Surface.makeFromBackendRenderTarget(
+-                context!!,
+-                renderTarget!!,
+-                SurfaceOrigin.BOTTOM_LEFT,
+-                SurfaceColorFormat.RGBA_8888,
+-                ColorSpace.sRGB,
+-                SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
+-            ) ?: throw RenderException("Cannot create surface")
+-
+-            canvas = surface?.canvas
+-                ?: error("Could not obtain Canvas from Surface")
+-        }
+-    }
+-
+-    private fun disposeSurface() {
+-        surface?.close()
+-        surface = null
+-        renderTarget?.close()
+-        renderTarget = null
+-        canvas = null
+-    }
+-}
+-
+-internal class MacosGLLayer : CAOpenGLLayer {
+-    private lateinit var skiaLayer: SkiaLayer
+-    private lateinit var redrawer: MacOsOpenGLRedrawer
+-
+-    @OverrideInit
+-    constructor(): super()
+-    @OverrideInit
+-    constructor(layer: Any): super(layer)
+-
+-    fun init(layer: SkiaLayer, redrawer: MacOsOpenGLRedrawer) {
+-        skiaLayer = layer
+-        this.redrawer = redrawer
+-        this.setNeedsDisplayOnBoundsChange(true)
+-        this.removeAllAnimations()
+-        this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
+-        skiaLayer.nsView.layer = this
+-        skiaLayer.nsView.wantsLayer = true
+-        this.contentsGravity = kCAGravityTopLeft
+-    }
+-
+-    fun setFrame(x: Int, y: Int, width: Int, height: Int) {
+-        CATransaction.begin()
+-        CATransaction.setDisableActions(true)
+-        this.frame = CGRectMake(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
+-        CATransaction.commit()
+-        CATransaction.flush()
+-    }
+-
+-    fun dispose() {
+-        this.removeFromSuperlayer()
+-        if (this::skiaLayer.isInitialized && skiaLayer.nsView.layer == this) {
+-            skiaLayer.nsView.layer = null
+-            skiaLayer.nsView.wantsLayer = false
+-        }
+-    }
+-
+-    override fun canDrawInCGLContext(
+-        ctx: CGLContextObj?,
+-        pixelFormat: CGLPixelFormatObj?,
+-        forLayerTime: CFTimeInterval,
+-        displayTime: CPointer<CVTimeStamp>?
+-    ): Boolean {
+-        return true
+-    }
+-
+-    override fun drawInCGLContext(
+-        ctx: CGLContextObj?,
+-        pixelFormat: CGLPixelFormatObj?,
+-        forLayerTime: CFTimeInterval,
+-        displayTime: CPointer<CVTimeStamp>?
+-    ) {
+-        CGLSetCurrentContext(ctx)
+-        try {
+-            redrawer.drawInLayerContext()
+-        } catch (e: Throwable) {
+-            e.printStackTrace()
+-            throw e
+-        }
+-
+-        super.drawInCGLContext(ctx, pixelFormat, forLayerTime, displayTime)
+-    }
+-}
+diff --git a/skiko/skiko-platform/src/nativeMain/kotlin/org/jetbrains/skiko/AngleSupport.native.kt b/skiko/skiko-platform/src/nativeMain/kotlin/org/jetbrains/skiko/AngleSupport.native.kt
+deleted file mode 100644
+--- a/skiko/skiko-platform/src/nativeMain/kotlin/org/jetbrains/skiko/AngleSupport.native.kt
++++ /dev/null
+@@ -1,5 +0,0 @@
+-package org.jetbrains.skiko
+-
+-internal actual fun loadAngleLibrary() {
+-    // Nothing to do here
+-}
+diff --git a/skiko/skiko-platform/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt b/skiko/skiko-platform/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
+new file mode 100644
+--- /dev/null
++++ b/skiko/skiko-platform/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
+@@ -0,0 +1,7 @@
++package org.jetbrains.skiko
++
++internal actual fun loadAngleLibrary() = Unit
++
++internal actual fun loadOpenGLLibrary() {
++    throw RenderException("OpenGL on iOS and tvOS isn't supported")
++}
 diff --git a/skiko/skiko-skottie/build.gradle.kts b/skiko/skiko-skottie/build.gradle.kts
 --- a/skiko/skiko-skottie/build.gradle.kts
 +++ b/skiko/skiko-skottie/build.gradle.kts
@@ -2423,7 +3295,7 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt b/skiko/sr
          fun makeFromImage(image: Image): Bitmap {
              val bitmap = Bitmap()
              bitmap.allocPixels(image.imageInfo)
-@@ -31,6 +33,89 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
+@@ -22,6 +24,89 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
  
      internal var _imageInfo: ImageInfo? = null
  
@@ -2516,7 +3388,50 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Bitmap.kt b/skiko/sr
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt
-@@ -601,15 +601,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+@@ -56,6 +56,22 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+         reachabilityBarrier(bitmap)
+     }
+ 
++    /**
++     * Returns the recording context being used by this Canvas.
++     *
++     * The returned context is borrowed from the Canvas and must not be closed.
++     *
++     * @return the recording context, if available; null otherwise
++     */
++    val recordingContext: DirectContext?
++        get() = try {
++            Stats.onNativeCall()
++            val ptr = _nGetCanvasRecordingContext(_ptr)
++            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
++        } finally {
++            reachabilityBarrier(this)
++            reachabilityBarrier(_owner)
++        }
+ 
+     /**
+      * Returns the Surface this Canvas draws into.
+@@ -63,8 +79,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+      * Canvases obtained from [Surface.canvas] return that surface. Canvases that draw into
+      * a [Bitmap], a [Picture] recording or a document return null.
+      *
+-     * The returned surface is borrowed from the Canvas and must not be closed. It keeps the
+-     * Canvas owner alive for as long as the borrowed surface is reachable.
++     * The returned surface is borrowed from the Canvas and must not be closed. It carries the
++     * canvas's [recordingContext], so [Surface.flush] and [Surface.flushAndSubmit] work on it.
+      *
+      * @return the Surface backing this Canvas, if any; null otherwise
+      */
+@@ -72,7 +88,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+         get() = try {
+             Stats.onNativeCall()
+             val ptr = _nGetCanvasSurface(_ptr)
+-            if (ptr == NullPointer) null else Surface(ptr, _owner, managed = false)
++            if (ptr == NullPointer) null else Surface(ptr, recordingContext, managed = false)
+         } finally {
+             reachabilityBarrier(this)
+             reachabilityBarrier(_owner)
+@@ -586,15 +602,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
          paint: Paint?,
          strict: Boolean
      ): Canvas {
@@ -2555,7 +3470,7 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/sr
                  dstLeft,
                  dstTop,
                  dstRight,
-@@ -620,6 +638,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+@@ -605,6 +639,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                  strict
              )
          } finally {
@@ -2564,7 +3479,7 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/sr
              reachabilityBarrier(image)
              reachabilityBarrier(paint)
              reachabilityBarrier(this)
-@@ -651,6 +671,52 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
+@@ -636,6 +672,52 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
          )
      }
  
@@ -2617,6 +3532,27 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Canvas.kt b/skiko/sr
      fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
          Stats.onNativeCall()
          try {
+@@ -1665,6 +1747,13 @@ private external fun Canvas_nGetFinalizer(): NativePointer
+ @ForceNativeThreadState
+ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
+ 
++@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetRecordingContext")
++// Needs ForceNativeThreadState: follows a chain of nested canvas wrappers, so its time grows with how deeply they are
++// nested.
++// Native call path: SkPaintFilterCanvas::recordingContext -> SkPaintFilterCanvas::recordingContext
++@ForceNativeThreadState
++private external fun _nGetCanvasRecordingContext(ptr: NativePointer): NativePointer
++
+ @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSurface")
+ // No ForceNativeThreadState: returns the stored surface pointer, so it is short and cannot block.
+ // Native call path: SkCanvas::getSurface
+@@ -2107,4 +2196,4 @@ inline fun Canvas.runRestoringState(block: Canvas.() -> Unit) {
+     } finally {
+         restoreToCount(restoreCount)
+     }
+-}
++}
+\ No newline at end of file
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
 new file mode 100644
 --- /dev/null
@@ -2648,19 +3584,22 @@ new file mode 100644
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt
-@@ -3,7 +3,10 @@ package org.jetbrains.skia
- import org.jetbrains.skia.impl.*
+@@ -4,7 +4,13 @@ import org.jetbrains.skia.impl.*
  import org.jetbrains.skia.impl.Library.Companion.staticLoad
+ import org.jetbrains.skiko.InternalSkikoApi
  
--class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
+-class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
 +class Image internal constructor(
 +    ptr: NativePointer,
-+    private val sourceBitmap: Bitmap? = null,
++    private val sourceBitmap: Bitmap?,
 +) : RefCnt(ptr), IHasImageInfo {
++    @InternalSkikoApi
++    constructor(ptr: NativePointer) : this(ptr, null)
++
      companion object {
          /**
           *
-@@ -107,12 +110,14 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
+@@ -108,12 +114,14 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
           *
           * @see [https://fiddle.skia.org/c/@Image_MakeFromBitmap](https://fiddle.skia.org/c/@Image_MakeFromBitmap)
           */
@@ -2677,10 +3616,48 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src
              } finally {
                  reachabilityBarrier(bitmap)
              }
-@@ -176,6 +181,34 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
-             }
+@@ -139,6 +147,113 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
+             return Image(ptr)
          }
  
++        /**
++         * Creates GPU-backed SkImage from backendTexture associated with context.
++         *
++         * Skia will assume ownership of the resource and will release it when no longer needed.
++         * A non-null Image is returned if format of backendTexture is recognized and supported.
++         * Recognized formats vary by GPU backend.
++         *
++         * @param context         GPU context
++         * @param backendTexture  texture residing on GPU
++         * @param origin          origin of backendTexture
++         * @param colorType       color type of the resulting Image
++         * @return                created Image
++         *
++         * @throws RuntimeException - if nullPtr is returned.
++         */
++        fun adoptTextureFrom(
++            context: DirectContext,
++            backendTexture: BackendTexture,
++            origin: SurfaceOrigin,
++            colorType: ColorType,
++        ): Image {
++            return try {
++                Stats.onNativeCall()
++                val ptr = _nAdoptTextureFrom(
++                    getPtr(context),
++                    getPtr(backendTexture),
++                    origin.ordinal,
++                    colorType.ordinal
++                )
++                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
++                Image(ptr)
++            }
++            finally {
++                reachabilityBarrier(context)
++                reachabilityBarrier(backendTexture)
++            }
++        }
++
 +        /**
 +         * Wraps a GPU texture without transferring ownership to Skia.
 +         * The caller must keep the texture alive until the returned image is closed.
@@ -2709,10 +3686,104 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src
 +            }
 +        }
 +
-         /**
-          * Creates GPU-backed SkImage from backendTexture associated with context.
-          *
-@@ -440,6 +473,14 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
++        /**
++         * Creates GPU-backed SkImage from backendTexture associated with context.
++         *
++         * Skia will assume ownership of the resource and will release it when no longer needed.
++         * A non-null Image is returned if format of backendTexture is recognized and supported.
++         * Recognized formats vary by GPU backend.
++         *
++         * @param context         GPU context
++         * @param backendTexture  texture residing on GPU
++         * @param origin          origin of backendTexture
++         * @param colorType       color type of the resulting Image
++         * @param alphaType       alpha type of the resulting Image
++         * @return                created Image
++         *
++         * @throws RuntimeException - if nullPtr is returned.
++         */
++        fun adoptTextureFrom(
++            context: DirectContext,
++            backendTexture: BackendTexture,
++            origin: SurfaceOrigin,
++            colorType: ColorType,
++            alphaType: ColorAlphaType,
++        ): Image {
++            return try {
++                Stats.onNativeCall()
++                val ptr = _nAdoptTextureFromAlphaType(
++                    getPtr(context),
++                    getPtr(backendTexture),
++                    origin.ordinal,
++                    colorType.ordinal,
++                    alphaType.ordinal,
++                )
++                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromTexture")
++                Image(ptr)
++            }
++            finally {
++                reachabilityBarrier(context)
++                reachabilityBarrier(backendTexture)
++            }
++        }
++
+         init {
+             staticLoad()
+         }
+@@ -274,9 +389,21 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
+         }
+     }
+ 
+-    fun readPixels(dst: Bitmap): Boolean = readPixels(dst, 0, 0, false)
++    fun readPixels(dst: Bitmap): Boolean {
++        return readPixels(null, dst, 0, 0, false)
++    }
++
++    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int): Boolean {
++        return readPixels(null, dst, srcX, srcY, false)
++    }
++
++    fun readPixels(context: DirectContext, dst: Bitmap): Boolean {
++        return readPixels(context, dst, 0, 0, false)
++    }
+ 
+-    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int): Boolean = readPixels(dst, srcX, srcY, false)
++    fun readPixels(context: DirectContext, dst: Bitmap, srcX: Int, srcY: Int): Boolean {
++        return readPixels(context, dst, srcX, srcY, false)
++    }
+ 
+ 
+     /**
+@@ -311,17 +438,18 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
+      *
+      * If cache is true, pixels may be retained locally, otherwise pixels are not added to the local cache.
+      *
++     * @param context the DirectContext in play, if it exists
+      * @param dst     destination bitmap
+      * @param srcX    column index whose absolute value is less than getWidth()
+      * @param srcY    row index whose absolute value is less than getHeight()
+      * @param cache   whether the pixels should be cached locally
+      * @return        true if pixels are copied to dstPixels
+      */
+-    fun readPixels(dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
++    fun readPixels(context: DirectContext?, dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
+         return try {
+             _nReadPixelsBitmap(
+                 _ptr,
+-                NullPointer,
++                getPtr(context),
+                 getPtr(dst),
+                 srcX,
+                 srcY,
+@@ -329,6 +457,7 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
+             )
+         } finally {
+             reachabilityBarrier(this)
++            reachabilityBarrier(context)
+             reachabilityBarrier(dst)
+         }
+     }
+@@ -348,6 +477,14 @@ class Image @InternalSkikoApi constructor(ptr: NativePointer) : RefCnt(ptr), IHa
          }
      }
  
@@ -2727,10 +3798,32 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Image.kt b/skiko/src
      fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean {
          return try {
              _nScalePixels(
-@@ -590,3 +631,12 @@ private external fun _nAdoptTextureFromAlphaType(
-     colorType: Int,
-     alphaType: Int
- ): NativePointer
+@@ -476,3 +613,34 @@ private external fun _nReadPixelsBitmap(
+ @ForceNativeThreadState
+ private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
+ 
++@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFrom")
++// Needs ForceNativeThreadState: wraps a Metal GPU texture and reads its properties through Metal.
++// Native call path: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture
++@ForceNativeThreadState
++private external fun _nAdoptTextureFrom(
++    contextPtr: NativePointer,
++    backendTexture: NativePointer,
++    surfaceOrigin: Int,
++    colorType: Int
++): NativePointer
++
++@ExternalSymbolName("org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType")
++// Needs ForceNativeThreadState: wraps a Metal GPU texture and reads its properties through Metal.
++// Native call path: SkImages::AdoptTextureFrom -> wrapBackendTexture -> GrMtlGpu::onWrapBackendTexture
++@ForceNativeThreadState
++private external fun _nAdoptTextureFromAlphaType(
++    contextPtr: NativePointer,
++    backendTexture: NativePointer,
++    surfaceOrigin: Int,
++    colorType: Int,
++    alphaType: Int
++): NativePointer
 +
 +@ExternalSymbolName("org_jetbrains_skia_Image__1nBorrowTextureFrom")
 +private external fun _nBorrowTextureFrom(
@@ -2763,6 +3856,458 @@ diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/PathSegmentIterator.
      }
  
      private fun nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
+diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Surface.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Surface.kt
+--- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/Surface.kt
++++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/Surface.kt
+@@ -222,6 +222,114 @@ class Surface : RefCnt {
+                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
+             }
+         }
++        /**
++         *
++         * Wraps a GPU-backed buffer into [Surface].
++         *
++         *
++         * Caller must ensure backendRenderTarget is valid for the lifetime of returned [Surface].
++         *
++         *
++         * [Surface] is returned if all parameters are valid. backendRenderTarget is valid if its pixel
++         * configuration agrees with colorSpace and context;
++         * for instance, if backendRenderTarget has an sRGB configuration, then context must support sRGB,
++         * and colorSpace must be present. Further, backendRenderTarget width and height must not exceed
++         * context capabilities, and the context must be able to support back-end render targets.
++         *
++         * @param context       GPU context
++         * @param rt            texture residing on GPU
++         * @param origin        surfaceOrigin pins either the top-left or the bottom-left corner to the origin.
++         * @param colorFormat   color format
++         * @param colorSpace    range of colors; may be null
++         * @param surfaceProps  LCD striping orientation and setting for device independent fonts; may be null
++         * @return              Surface if all parameters are valid; otherwise, null
++         * @see [https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture](https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture)
++         */
++        /**
++         *
++         * Wraps a GPU-backed buffer into [Surface].
++         *
++         *
++         * Caller must ensure backendRenderTarget is valid for the lifetime of returned [Surface].
++         *
++         *
++         * [Surface] is returned if all parameters are valid. backendRenderTarget is valid if its pixel
++         * configuration agrees with colorSpace and context;
++         * for instance, if backendRenderTarget has an sRGB configuration, then context must support sRGB,
++         * and colorSpace must be present. Further, backendRenderTarget width and height must not exceed
++         * context capabilities, and the context must be able to support back-end render targets.
++         *
++         * @param context       GPU context
++         * @param rt            texture residing on GPU
++         * @param origin        surfaceOrigin pins either the top-left or the bottom-left corner to the origin.
++         * @param colorFormat   color format
++         * @param colorSpace    range of colors; may be null
++         * @return              Surface if all parameters are valid; otherwise, null
++         * @see [https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture](https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture)
++         */
++        fun makeFromBackendRenderTarget(
++            context: DirectContext,
++            rt: BackendRenderTarget,
++            origin: SurfaceOrigin,
++            colorFormat: SurfaceColorFormat,
++            colorSpace: ColorSpace?,
++            surfaceProps: SurfaceProps? = null
++        ): Surface? {
++            return try {
++                Stats.onNativeCall()
++                val ptr = interopScope {
++                    _nMakeFromBackendRenderTarget(
++                        getPtr(context),
++                        getPtr(rt),
++                        origin.ordinal,
++                        colorFormat.ordinal,
++                        getPtr(colorSpace),
++                        toInterop(surfaceProps?.packToIntArray())
++                    )
++                }
++                if (ptr == NullPointer)
++                    null
++                else
++                    Surface(ptr, context, rt)
++            } finally {
++                reachabilityBarrier(context)
++                reachabilityBarrier(rt)
++                reachabilityBarrier(colorSpace)
++            }
++        }
++
++        fun makeFromMTKView(
++            context: DirectContext,
++            mtkViewPtr: NativePointer,
++            origin: SurfaceOrigin,
++            sampleCount: Int,
++            colorFormat: SurfaceColorFormat,
++            colorSpace: ColorSpace?,
++            surfaceProps: SurfaceProps?
++        ): Surface {
++            return try {
++                Stats.onNativeCall()
++                val ptr = interopScope {
++                    _nMakeFromMTKView(
++                        getPtr(context),
++                        mtkViewPtr,
++                        origin.ordinal,
++                        sampleCount,
++                        colorFormat.ordinal,
++                        getPtr(colorSpace),
++                        toInterop(surfaceProps?.packToIntArray())
++                    )
++                }
++                require(ptr != NullPointer) {
++                    "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
++                }
++                Surface(ptr, context)
++            } finally {
++                reachabilityBarrier(context)
++                reachabilityBarrier(colorSpace)
++            }
++        }
++
+         /**
+          *
+          * Allocates raster [Surface].
+@@ -252,6 +360,164 @@ class Surface : RefCnt {
+             return Surface(ptr)
+         }
+ 
++        /**
++         *
++         * Returns Surface on GPU indicated by context. Allocates memory for
++         * pixels, based on the width, height, and ColorType in ImageInfo.
++         * describes the pixel format in ColorType, and transparency in
++         * AlphaType, and color matching in ColorSpace.
++         *
++         * @param context               GPU context
++         * @param budgeted              selects whether allocation for pixels is tracked by context
++         * @param imageInfo             width, height, ColorType, AlphaType, ColorSpace;
++         * width, or height, or both, may be zero
++         * @return                      new SkSurface
++         */
++        fun makeRenderTarget(
++            context: DirectContext,
++            budgeted: Boolean,
++            imageInfo: ImageInfo
++        ): Surface {
++            return makeRenderTarget(context, budgeted, imageInfo, 0, SurfaceOrigin.BOTTOM_LEFT, null, false)
++        }
++
++        /**
++         *
++         * Returns Surface on GPU indicated by context. Allocates memory for
++         * pixels, based on the width, height, and ColorType in ImageInfo.
++         * describes the pixel format in ColorType, and transparency in
++         * AlphaType, and color matching in ColorSpace.
++         *
++         *
++         * sampleCount requests the number of samples per pixel.
++         * Pass zero to disable multi-sample anti-aliasing.  The request is rounded
++         * up to the next supported count, or rounded down if it is larger than the
++         * maximum supported count.
++         *
++         * @param context               GPU context
++         * @param budgeted              selects whether allocation for pixels is tracked by context
++         * @param imageInfo             width, height, ColorType, AlphaType, ColorSpace;
++         * width, or height, or both, may be zero
++         * @param sampleCount           samples per pixel, or 0 to disable full scene anti-aliasing
++         * @param surfaceProps          LCD striping orientation and setting for device independent
++         * fonts; may be null
++         * @return                      new SkSurface
++         */
++        fun makeRenderTarget(
++            context: DirectContext,
++            budgeted: Boolean,
++            imageInfo: ImageInfo,
++            sampleCount: Int,
++            surfaceProps: SurfaceProps?
++        ): Surface {
++            return makeRenderTarget(
++                context,
++                budgeted,
++                imageInfo,
++                sampleCount,
++                SurfaceOrigin.BOTTOM_LEFT,
++                surfaceProps,
++                false
++            )
++        }
++
++        /**
++         *
++         * Returns Surface on GPU indicated by context. Allocates memory for
++         * pixels, based on the width, height, and ColorType in ImageInfo.
++         * describes the pixel format in ColorType, and transparency in
++         * AlphaType, and color matching in ColorSpace.
++         *
++         *
++         * sampleCount requests the number of samples per pixel.
++         * Pass zero to disable multi-sample anti-aliasing.  The request is rounded
++         * up to the next supported count, or rounded down if it is larger than the
++         * maximum supported count.
++         *
++         * @param context               GPU context
++         * @param budgeted              selects whether allocation for pixels is tracked by context
++         * @param imageInfo             width, height, ColorType, AlphaType, ColorSpace;
++         * width, or height, or both, may be zero
++         * @param sampleCount           samples per pixel, or 0 to disable full scene anti-aliasing
++         * @param origin                pins either the top-left or the bottom-left corner to the origin.
++         * @param surfaceProps          LCD striping orientation and setting for device independent
++         * fonts; may be null
++         * @return                      new SkSurface
++         */
++        fun makeRenderTarget(
++            context: DirectContext,
++            budgeted: Boolean,
++            imageInfo: ImageInfo,
++            sampleCount: Int,
++            origin: SurfaceOrigin,
++            surfaceProps: SurfaceProps?
++        ): Surface {
++            return makeRenderTarget(context, budgeted, imageInfo, sampleCount, origin, surfaceProps, false)
++        }
++
++        /**
++         *
++         * Returns Surface on GPU indicated by context. Allocates memory for
++         * pixels, based on the width, height, and ColorType in ImageInfo.
++         * describes the pixel format in ColorType, and transparency in
++         * AlphaType, and color matching in ColorSpace.
++         *
++         *
++         * sampleCount requests the number of samples per pixel.
++         * Pass zero to disable multi-sample anti-aliasing.  The request is rounded
++         * up to the next supported count, or rounded down if it is larger than the
++         * maximum supported count.
++         *
++         *
++         * shouldCreateWithMips hints that Image returned by [.makeImageSnapshot] is mip map.
++         *
++         * @param context               GPU context
++         * @param budgeted              selects whether allocation for pixels is tracked by context
++         * @param imageInfo             width, height, ColorType, AlphaType, ColorSpace;
++         * width, or height, or both, may be zero
++         * @param sampleCount           samples per pixel, or 0 to disable full scene anti-aliasing
++         * @param origin                pins either the top-left or the bottom-left corner to the origin.
++         * @param surfaceProps          LCD striping orientation and setting for device independent
++         * fonts; may be null
++         * @param shouldCreateWithMips  hint that SkSurface will host mip map images
++         * @return                      new SkSurface
++         */
++        fun makeRenderTarget(
++            context: DirectContext,
++            budgeted: Boolean,
++            imageInfo: ImageInfo,
++            sampleCount: Int,
++            origin: SurfaceOrigin,
++            surfaceProps: SurfaceProps?,
++            shouldCreateWithMips: Boolean
++        ): Surface {
++            return try {
++                Stats.onNativeCall()
++                val ptr = interopScope {
++                    _nMakeRenderTarget(
++                        getPtr(context),
++                        budgeted,
++                        imageInfo.width,
++                        imageInfo.height,
++                        imageInfo.colorInfo.colorType.ordinal,
++                        imageInfo.colorInfo.alphaType.ordinal,
++                        getPtr(imageInfo.colorInfo.colorSpace),
++                        sampleCount,
++                        origin.ordinal,
++                        toInterop(surfaceProps?.packToIntArray()),
++                        shouldCreateWithMips
++                    )
++                }
++                require(ptr != NullPointer) {
++                    "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
++                }
++                Surface(ptr, context)
++            } finally {
++                reachabilityBarrier(context)
++                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
++            }
++        }
++
+         /**
+          * Returns Surface without backing pixels. Drawing to Canvas returned from Surface
+          * has no effect. Calling makeImageSnapshot() on returned Surface returns null.
+@@ -274,8 +540,9 @@ class Surface : RefCnt {
+         }
+     }
+ 
+-    // Keeps resources owned by another module alive for as long as this Surface uses them.
+-    private val lifetimeOwner: Any?
++    internal val _context: DirectContext?
++
++    internal val _renderTarget: BackendRenderTarget?
+ 
+     /**
+      *
+@@ -359,6 +626,22 @@ class Surface : RefCnt {
+         }
+     }
+ 
++    /**
++     *
++     * Returns the recording context being used by the Surface.
++     *
++     * The returned context is borrowed from the Surface and must not be closed.
++     *
++     * @return the recording context, if available; null otherwise
++     */
++    val recordingContext: DirectContext?
++        get() = try {
++            Stats.onNativeCall()
++            val ptr = _nGetSurfaceRecordingContext(_ptr)
++            if (ptr == NullPointer) null else DirectContext(ptr, managed = false)
++        } finally {
++            reachabilityBarrier(this)
++        }
+ 
+     /**
+      *
+@@ -675,6 +958,41 @@ class Surface : RefCnt {
+         }
+     }
+ 
++    /**
++     *
++     * Call to ensure all reads/writes of the surface have been issued to the underlying 3D API.
++     *
++     *
++     * Skia will correctly order its own draws and pixel operations.
++     * This must to be used to ensure correct ordering when the surface backing store is accessed
++     * outside Skia (e.g. direct use of the 3D API or a windowing system).
++     * DirectContext has additional flush and submit methods that apply to all surfaces and images created from
++     * a DirectContext.
++     */
++    fun flushAndSubmit() {
++        _context?.flushAndSubmit(this)
++    }
++
++    /**
++     *
++     * Call to ensure all reads/writes of the surface have been issued to the underlying 3D API.
++     *
++     *
++     * Skia will correctly order its own draws and pixel operations.
++     * This must to be used to ensure correct ordering when the surface backing store is accessed
++     * outside Skia (e.g. direct use of the 3D API or a windowing system).
++     * DirectContext has additional flush and submit methods that apply to all surfaces and images created from
++     * a DirectContext.
++     *
++     * @param syncCpu a flag determining if cpu should be synced
++     */
++    fun flushAndSubmit(syncCpu: Boolean) {
++        _context?.flushAndSubmit(this, syncCpu)
++    }
++
++    fun flush() {
++        _context?.flush(this)
++    }
+ 
+     /**
+      *
+@@ -692,8 +1010,24 @@ class Surface : RefCnt {
+         }
+ 
+     @InternalSkikoApi
+-    constructor(ptr: NativePointer, lifetimeOwner: Any? = null, managed: Boolean = true) : super(ptr, managed) {
+-        this.lifetimeOwner = lifetimeOwner
++    constructor(ptr: NativePointer) : super(ptr) {
++        _context = null
++        _renderTarget = null
++    }
++
++    internal constructor(ptr: NativePointer, context: DirectContext?) : super(ptr) {
++        _context = context
++        _renderTarget = null
++    }
++
++    internal constructor(ptr: NativePointer, context: DirectContext?, managed: Boolean) : super(ptr, managed) {
++        _context = context
++        _renderTarget = null
++    }
++
++    internal constructor(ptr: NativePointer, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
++        _context = context
++        _renderTarget = renderTarget
+     }
+ }
+ 
+@@ -775,6 +1109,52 @@ private external fun _nMakeRaster(
+ @ForceNativeThreadState
+ private external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
+ 
++@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
++// Needs ForceNativeThreadState: wraps an existing Metal render target, which reads the Metal texture and builds a GPU
++// surface.
++// Native call path: SkSurfaces::WrapBackendRenderTarget -> GrProxyProvider::wrapBackendRenderTarget -> GrMtlGpu
++@ForceNativeThreadState
++private external fun _nMakeFromBackendRenderTarget(
++    pContext: NativePointer,
++    pBackendRenderTarget: NativePointer,
++    surfaceOrigin: Int,
++    colorType: Int,
++    colorSpacePtr: NativePointer,
++    surfaceProps: InteropPointer
++): NativePointer
++
++@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
++// Needs ForceNativeThreadState: sends Objective-C messages to a MetalKit view to read its pixel format and size, then
++// builds a GPU surface.
++// Native call path: SkSurfaces::WrapMTKView
++@ForceNativeThreadState
++private external fun _nMakeFromMTKView(
++    contextPtr: NativePointer,
++    mtkViewPtr: NativePointer,
++    surfaceOrigin: Int,
++    sampleCount: Int,
++    colorType: Int,
++    colorSpacePtr: NativePointer,
++    surfaceProps: InteropPointer
++): NativePointer
++
++@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
++// Needs ForceNativeThreadState: creates a GPU surface and records a command to clear it.
++// Native call path: SkSurfaces::RenderTarget -> GrRecordingContext::createDevice
++@ForceNativeThreadState
++private external fun _nMakeRenderTarget(
++    contextPtr: NativePointer,
++    budgeted: Boolean,
++    width: Int,
++    height: Int,
++    colorType: Int,
++    alphaType: Int,
++    colorSpacePtr: NativePointer,
++    sampleCount: Int,
++    surfaceOrigin: Int,
++    surfaceProps: InteropPointer,
++    shouldCreateWithMips: Boolean
++): NativePointer
+ 
+ 
+ @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
+@@ -796,6 +1176,11 @@ private external fun _nGenerationId(ptr: NativePointer): Int
+ @ForceNativeThreadState
+ private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
+ 
++@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetSurfaceRecordingContext")
++// No ForceNativeThreadState: returns a stored pointer to the recording context without doing any work, so it is short
++// and cannot block.
++// Native call path: SkSurface::recordingContext -> SkSurface_Ganesh::onGetRecordingContext
++private external fun _nGetSurfaceRecordingContext(ptr: NativePointer): NativePointer
+ 
+ @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
+ // Needs ForceNativeThreadState: with capture enabled, may grow a list that moves every tracked canvas, so its time
 diff --git a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
 --- a/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
 +++ b/skiko/src/commonMain/kotlin/org/jetbrains/skia/shaper/FontMgrRunIterator.kt
@@ -3032,89 +4577,6 @@ diff --git a/skiko/src/commonTest/kotlin/org/jetbrains/skia/BitmapTest.kt b/skik
      @Test
      fun canMakeShader() = runTest {
          val bitmap = Bitmap()
-diff --git a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
---- a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
-+++ b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/DirectContext.jvm.kt
-@@ -44,7 +44,7 @@ private external fun _nMakeVulkanJvmAllocator(
-  * this function will fail.
-  * For more information refer to skia `GrGLMakeAssembledInterface` function.
-  */
--fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
-+actual fun DirectContext.Companion.makeGLWithInterface(assembledInterface: GLAssembledInterface): DirectContext {
-     if (assembledInterface._ptr == NullPointer) throw RenderException("Interface pointer must not be null")
-     Stats.onNativeCall()
-     val ptr = _nMakeGLWithInterface(assembledInterface._ptr)
-diff --git a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
---- a/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
-+++ b/skiko/src/jvmMain/kotlin/org/jetbrains/skia/GLAssembledInterface.kt
-@@ -6,8 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
- import org.jetbrains.skia.impl.Stats
- import org.jetbrains.skiko.RenderException
- 
--class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
--    companion object {
-+actual class GLAssembledInterface actual internal constructor(ptr: NativePointer) : RefCnt(ptr) {
-+    actual companion object {
-         /**
-          * Creates an OpenGL interface object.
-          *
-@@ -25,7 +25,7 @@ class GLAssembledInterface internal constructor(ptr: NativePointer) : RefCnt(ptr
-          * @param fPtr    native pointer to the function that takes [ctxPtr] and the OpenGL function name,
-          *                and returns a function pointer of that OpenGL function (see skia `GrGLGetProc`).
-          */
--        fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
-+        actual fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
-             if (fPtr == NullPointer) throw RenderException("Function pointer must not be null")
-             Stats.onNativeCall()
-             val ptr = _nCreateFromNativePointers(ctxPtr, fPtr)
-diff --git a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt b/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
-deleted file mode 100644
---- a/skiko/src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt
-+++ /dev/null
-@@ -1,42 +0,0 @@
--package org.jetbrains.skiko
--
--import org.jetbrains.skia.Canvas
--import org.jetbrains.skia.PixelGeometry
--
--actual open class SkiaLayer  {
--    actual var renderApi: GraphicsApi
--        get() = TODO("Not yet implemented")
--        set(value) {}
--    actual val contentScale: Float
--        get() = TODO("Not yet implemented")
--    actual var fullscreen: Boolean
--        get() = TODO("Not yet implemented")
--        set(value) {}
--    actual val component: Any?
--        get() = TODO("Not yet implemented")
--    actual fun needRender(throttledToVsync: Boolean) {
--        TODO("unimplemented")
--    }
--    @Deprecated(
--        message = "Use needRender() instead",
--        replaceWith = ReplaceWith("needRender()")
--    )
--    actual fun needRedraw() = needRender()
--    actual fun attachTo(container: Any) {
--        TODO("unimplemented")
--    }
--    actual fun detach() {
--        TODO("unimplemented")
--    }
--
--    internal actual fun draw(canvas: Canvas) {
--        TODO("unimplemented")
--    }
--
--    actual var renderDelegate: SkikoRenderDelegate? = null
--    actual val pixelGeometry: PixelGeometry
--        get() = TODO("Not yet implemented")
--}
--
--actual val currentSystemTheme: SystemTheme
--    get() = SystemTheme.UNKNOWN
-\ No newline at end of file
 diff --git a/skiko/src/linuxTest/kotlin/org/jetbrains/skiko/SkiaLayerLinuxTest.kt b/skiko/src/linuxTest/kotlin/org/jetbrains/skiko/SkiaLayerLinuxTest.kt
 new file mode 100644
 --- /dev/null
@@ -3572,580 +5034,6 @@ new file mode 100644
 +    return Image(imgPtr)
 +}
 \ No newline at end of file
-diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/Dispatchers.kt
-@@ -0,0 +1,93 @@
-+package org.jetbrains.skiko
-+
-+import kotlinx.cinterop.interpretCPointer
-+import kotlinx.coroutines.*
-+import platform.CoreFoundation.*
-+import platform.darwin.dispatch_async
-+import platform.darwin.dispatch_get_global_queue
-+import platform.darwin.dispatch_get_main_queue
-+import platform.darwin.dispatch_queue_t
-+import platform.posix.QOS_CLASS_BACKGROUND
-+import kotlin.coroutines.CoroutineContext
-+import kotlin.concurrent.AtomicNativePtr
-+import kotlin.native.concurrent.freeze
-+import kotlin.native.internal.NativePtr
-+
-+// This is the only dispatcher that shall be used in Skiko on iOS.
-+// Current (as of 1.5.2) dispatchers in kotlinx.coroutines are not usable
-+// for needs of Skiko.
-+object SkikoDispatchers {
-+    val Main: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
-+    val IO: CoroutineDispatcher = NsQueueDispatcher(
-+        dispatch_get_global_queue(
-+            QOS_CLASS_BACKGROUND.toLong(), 0UL)
-+    )
-+}
-+
-+@OptIn(InternalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-+internal class NsQueueDispatcher(
-+    private val dispatchQueue: dispatch_queue_t
-+) : CoroutineDispatcher(), Delay {
-+    override fun dispatch(context: CoroutineContext, block: Runnable) {
-+        dispatch_async(dispatchQueue) {
-+            block.run()
-+        }
-+    }
-+
-+    override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
-+        val timer = Timer()
-+        val timerBlock: TimerBlock = {
-+            timer.dispose()
-+            continuation.resume(Unit) { t -> t.printStackTrace() }
-+        }
-+        timer.start(timeMillis, timerBlock)
-+        continuation.disposeOnCancellation(timer)
-+    }
-+
-+    override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
-+        val timer = Timer()
-+        val timerBlock: TimerBlock = {
-+            timer.dispose()
-+            block.run()
-+        }
-+        timer.start(timeMillis, timerBlock)
-+        return timer
-+
-+    }
-+}
-+
-+internal typealias TimerBlock = (CFRunLoopTimerRef?) -> Unit
-+
-+private val TIMER_NEW = NativePtr.NULL
-+
-+private val TIMER_DISPOSED = NativePtr.NULL.plus(1)
-+
-+private class Timer : DisposableHandle {
-+    private val ref = AtomicNativePtr(TIMER_NEW)
-+
-+    fun start(timeMillis: Long, timerBlock: TimerBlock) {
-+        val fireDate = CFAbsoluteTimeGetCurrent() + timeMillis / 1000.0
-+        val timer = CFRunLoopTimerCreateWithHandler(null, fireDate, 0.0, 0u, 0, timerBlock)!!
-+        CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
-+        if (!ref.compareAndSet(TIMER_NEW, timer.rawValue)) {
-+            // dispose was already called concurrently
-+            release(timer)
-+        }
-+    }
-+
-+    override fun dispose() {
-+        while (true) {
-+            val ptr = ref.value
-+            if (ptr == TIMER_DISPOSED) return
-+            if (ref.compareAndSet(ptr, TIMER_DISPOSED)) {
-+                if (ptr != TIMER_NEW) release(interpretCPointer(ptr))
-+                return
-+            }
-+        }
-+    }
-+
-+    private fun release(timer: CFRunLoopTimerRef?) {
-+        CFRunLoopRemoveTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes)
-+        CFRelease(timer)
-+    }
-+}
-diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/OsVersion.apple.kt
-@@ -0,0 +1,16 @@
-+package org.jetbrains.skiko
-+
-+import kotlinx.cinterop.useContents
-+import platform.Foundation.NSProcessInfo
-+
-+val hostOSVersion: OSVersion
-+    get() = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
-+        OSVersion(
-+            majorVersion.toInt(),
-+            minorVersion.toInt(),
-+            patchVersion.toInt()
-+        )
-+    }
-+
-+fun available(vararg pairs: Pair<OS, OSVersion>) =
-+    pairs.find { it.first == hostOs }?.let { it.second <= hostOSVersion } ?: false
-diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
-deleted file mode 100644
---- a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/SkiaLayer.macos.kt
-+++ /dev/null
-@@ -1,184 +0,0 @@
--package org.jetbrains.skiko
--
--import kotlinx.cinterop.BetaInteropApi
--import kotlinx.cinterop.ObjCAction
--import kotlinx.cinterop.useContents
--import org.jetbrains.skia.*
--import org.jetbrains.skiko.redrawer.Redrawer
--import platform.AppKit.*
--import platform.Foundation.NSNotification
--import platform.Foundation.NSNotificationCenter
--import platform.Foundation.NSSelectorFromString
--import platform.darwin.NSObject
--
--/**
-- * SkiaLayer implementation for macOS.
-- * Supports only [GraphicsApi.METAL]
-- */
--@OptIn(BetaInteropApi::class)
--actual open class SkiaLayer {
--    fun isShowing(): Boolean {
--        return true
--    }
--
--    /**
--     * [GraphicsApi.METAL] is the only GraphicsApi supported for macOS.
--     * Setter throws an IllegalArgumentException if the value is not [GraphicsApi.METAL].
--     */
--    actual var renderApi: GraphicsApi = GraphicsApi.METAL
--        set(value) {
--            if (value != GraphicsApi.METAL) {
--                throw IllegalArgumentException("$field is not supported in macOS")
--            }
--            field = value
--        }
--
--    /**
--     * The scale factor of [NSWindow]
--     * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
--     */
--    actual val contentScale: Float
--        get() = if (this::nsView.isInitialized) (nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f) else 1.0f
--
--    /**
--     * Fullscreen is not supported
--     */
--    actual var fullscreen: Boolean
--        get() = false
--        set(value) {
--            if (value) throw IllegalArgumentException("fullscreen unsupported")
--        }
--
--    /**
--     * Underlying [NSView]
--     */
--    lateinit var nsView: NSView
--        private set
--
--    actual val component: Any?
--        get() = this.nsView
--
--    /**
--     * Implements rendering logic and events processing.
--     */
--    actual var renderDelegate: SkikoRenderDelegate? = null
--
--    internal var redrawer: Redrawer? = null
--
--    /**
--     * Created/updated by recording in [update].
--     * It's used as a source for drawing on canvas in [draw].
--     */
--    private var picture: PictureHolder? = null
--    private val pictureRecorder = PictureRecorder()
--
--    private val nsViewObserver = object : NSObject() {
--        @ObjCAction
--        fun frameDidChange(notification: NSNotification) {
--            redrawer?.syncBoundsFromPlatformComponent()
--            redrawer?.renderImmediately()
--        }
--
--        @ObjCAction
--        fun windowDidChangeBackingProperties(notification: NSNotification) {
--            redrawer?.syncBoundsFromPlatformComponent()
--            redrawer?.renderImmediately()
--        }
--
--        fun addObserver() {
--            val center = NSNotificationCenter.defaultCenter()
--            center.addObserver(
--                    observer = this,
--                    selector = NSSelectorFromString("frameDidChange:"),
--                    name = NSViewFrameDidChangeNotification,
--                    `object` = nsView,
--                )
--            center.addObserver(
--                observer = this,
--                selector = NSSelectorFromString("windowDidChangeBackingProperties:"),
--                name = NSWindowDidChangeBackingPropertiesNotification,
--                `object` = nsView.window,
--            )
--        }
--
--        fun removeObserver() {
--            val center = NSNotificationCenter.defaultCenter()
--            center.removeObserver(this)
--        }
--    }
--
--    /**
--     * @param container - should be an instance of [NSView]
--     */
--    actual fun attachTo(container: Any) {
--        check(!this::nsView.isInitialized) { "Already attached to another NSView" }
--        check(container is NSView) { "container should be an instance of NSView" }
--        nsView = container
--        nsView.postsFrameChangedNotifications = true
--        nsViewObserver.addObserver()
--        redrawer = createNativeRedrawer(this, renderApi).apply {
--            syncBoundsFromPlatformComponent()
--            needRender()
--        }
--    }
--
--    actual fun detach() {
--        nsViewObserver.removeObserver()
--        redrawer?.dispose()
--        redrawer = null
--    }
--
--    /**
--     * Schedules a frame to an appropriate moment.
--     */
--    actual fun needRender(throttledToVsync: Boolean) {
--        redrawer?.needRender(throttledToVsync)
--    }
--
--    @Deprecated(
--        message = "Use needRender() instead",
--        replaceWith = ReplaceWith("needRender()")
--    )
--    actual fun needRedraw() = needRender()
--
--    /**
--     * Updates the [picture] according to current [nanoTime]
--     */
--    internal fun update(nanoTime: Long) {
--        val width = nsView.frame.useContents { size.width }
--        val height = nsView.frame.useContents { size.height }
--
--        val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
--        val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
--
--        val canvas = pictureRecorder.beginRecording(0f, 0f, pictureWidth.toFloat(), pictureHeight.toFloat()).apply {
--            clear(Color.WHITE)
--        }
--        renderDelegate?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
--
--        val picture = pictureRecorder.finishRecordingAsPicture()
--        this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
--    }
--
--    internal actual fun draw(canvas: Canvas) {
--        picture?.also {
--            canvas.drawPicture(it.instance)
--        }
--    }
--
--    actual val pixelGeometry: PixelGeometry
--        get() = PixelGeometry.UNKNOWN
--
--    private fun createDrawScope() = LayerDrawScope(
--        pixelGeometry = pixelGeometry,
--        layerWidth = nsView.frame.useContents { size.width },
--        layerHeight = nsView.frame.useContents { size.height },
--        scale = contentScale
--    )
--
--    internal fun inDrawScope(block: LayerDrawScope.() -> Unit) {
--        with(createDrawScope()) {
--            block()
--        }
--    }
--}
-diff --git a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt b/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
-deleted file mode 100644
---- a/skiko/src/macosMain/kotlin/org/jetbrains/skiko/redrawer/OpenGLRedrawer.macos.kt
-+++ /dev/null
-@@ -1,261 +0,0 @@
--@file:OptIn(BetaInteropApi::class)
--
--package org.jetbrains.skiko.redrawer
--
--import kotlinx.cinterop.BetaInteropApi
--import kotlinx.cinterop.CPointer
--import kotlinx.cinterop.IntVar
--import kotlinx.cinterop.alloc
--import kotlinx.cinterop.memScoped
--import kotlinx.cinterop.ptr
--import kotlinx.cinterop.useContents
--import kotlinx.cinterop.value
--import org.jetbrains.skia.BackendRenderTarget
--import org.jetbrains.skia.Canvas
--import org.jetbrains.skia.Color
--import org.jetbrains.skia.ColorSpace
--import org.jetbrains.skia.DirectContext
--import org.jetbrains.skia.FramebufferFormat
--import org.jetbrains.skia.Surface
--import org.jetbrains.skia.SurfaceColorFormat
--import org.jetbrains.skia.SurfaceOrigin
--import org.jetbrains.skia.SurfaceProps
--import org.jetbrains.skia.runRestoringState
--import org.jetbrains.skiko.FrameDispatcher
--import org.jetbrains.skiko.LayerDrawScope
--import org.jetbrains.skiko.RenderException
--import org.jetbrains.skiko.SkiaLayer
--import org.jetbrains.skiko.SkikoDispatchers
--import org.jetbrains.skiko.currentNanoTime
--import platform.CoreFoundation.CFTimeInterval
--import platform.CoreGraphics.CGRectMake
--import platform.CoreVideo.CVTimeStamp
--import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
--import platform.OpenGL.glGetIntegerv
--import platform.OpenGLCommon.CGLContextObj
--import platform.OpenGLCommon.CGLPixelFormatObj
--import platform.OpenGLCommon.CGLSetCurrentContext
--import platform.OpenGLCommon.GLenum
--import platform.QuartzCore.CAOpenGLLayer
--import platform.QuartzCore.*
--
--/**
-- * OpenGL [Redrawer] implementation for the native (Kotlin/Native) macOS target.
-- *
-- * Not actually used. See [SkiaLayer.renderApi]
-- */
--internal class MacOsOpenGLRedrawer(
--    private val skiaLayer: SkiaLayer
--) : Redrawer {
--    private var context: DirectContext? = null
--    private var renderTarget: BackendRenderTarget? = null
--    private var surface: Surface? = null
--    private var canvas: Canvas? = null
--
--    private var currentWidth = 0
--    private var currentHeight = 0
--
--    private val glLayer = MacosGLLayer()
--
--    init {
--        glLayer.init(skiaLayer, this)
--    }
--
--    override val renderInfo: String
--        get() = "GraphicsApi: ${skiaLayer.renderApi}\nOS: macOS (native OpenGL)\n"
--
--    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
--        renderImmediately()
--    }
--
--    override fun dispose() {
--        disposeSurface()
--        context?.close()
--        context = null
--        glLayer.dispose()
--    }
--
--    override fun syncBoundsFromPlatformComponent() {
--        syncContentScale()
--        skiaLayer.nsView.frame.useContents {
--            glLayer.setFrame(
--                origin.x.toInt(),
--                origin.y.toInt(),
--                size.width.toInt().coerceAtLeast(0),
--                size.height.toInt().coerceAtLeast(0)
--            )
--        }
--    }
--
--    private fun syncContentScale() {
--        CATransaction.begin()
--        CATransaction.setDisableActions(true)
--        glLayer.contentsScale = skiaLayer.nsView.window?.backingScaleFactor ?: 1.0
--        CATransaction.commit()
--        CATransaction.flush()
--    }
--
--    override fun update(nanoTime: Long) {
--        skiaLayer.update(nanoTime)
--    }
--
--    override fun needRender(throttledToVsync: Boolean) {
--        frameDispatcher.scheduleFrame()
--    }
--
--    override fun renderImmediately() {
--        glLayer.setNeedsDisplay()
--        skiaLayer.nsView.setNeedsDisplay(true)
--    }
--
--    internal fun drawInLayerContext() {
--        skiaLayer.update(currentNanoTime())
--        skiaLayer.inDrawScope {
--            performDraw()
--        }
--    }
--
--    private fun LayerDrawScope.performDraw() {
--        if (!initContext()) {
--            throw RenderException("Cannot init graphic OpenGL context")
--        }
--        initSurface()
--        canvas?.runRestoringState {
--            clear(Color.TRANSPARENT)
--            skiaLayer.draw(this)
--        }
--        context?.flush()
--    }
--
--    private fun initContext(): Boolean {
--        try {
--            if (context == null) {
--                context = DirectContext.makeGL()
--            }
--        } catch (_: Exception) {
--            println("Failed to create Skia OpenGL context!")
--            return false
--        }
--        return true
--    }
--
--    @ExperimentalUnsignedTypes
--    private fun openglGetIntegerv(pname: GLenum): UInt {
--        var result = 0U
--        memScoped {
--            val data = alloc<IntVar>()
--            glGetIntegerv(pname, data.ptr)
--            result = data.value.toUInt()
--        }
--        return result
--    }
--
--    private fun isSizeChanged(width: Int, height: Int): Boolean {
--        if (width != currentWidth || height != currentHeight) {
--            currentWidth = width
--            currentHeight = height
--            return true
--        }
--        return false
--    }
--
--    private fun LayerDrawScope.initSurface() {
--        val w = scaledLayerWidth
--        val h = scaledLayerHeight
--        if (isSizeChanged(w, h) || surface == null) {
--            disposeSurface()
--            if (w <= 0 || h <= 0) return
--            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
--            renderTarget = BackendRenderTarget.makeGL(
--                w,
--                h,
--                0,
--                8,
--                fbId.toInt(),
--                FramebufferFormat.GR_GL_RGBA8
--            )
--            surface = Surface.makeFromBackendRenderTarget(
--                context!!,
--                renderTarget!!,
--                SurfaceOrigin.BOTTOM_LEFT,
--                SurfaceColorFormat.RGBA_8888,
--                ColorSpace.sRGB,
--                SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
--            ) ?: throw RenderException("Cannot create surface")
--
--            canvas = surface?.canvas
--                ?: error("Could not obtain Canvas from Surface")
--        }
--    }
--
--    private fun disposeSurface() {
--        surface?.close()
--        surface = null
--        renderTarget?.close()
--        renderTarget = null
--        canvas = null
--    }
--}
--
--internal class MacosGLLayer : CAOpenGLLayer {
--    private lateinit var skiaLayer: SkiaLayer
--    private lateinit var redrawer: MacOsOpenGLRedrawer
--
--    @OverrideInit
--    constructor(): super()
--    @OverrideInit
--    constructor(layer: Any): super(layer)
--
--    fun init(layer: SkiaLayer, redrawer: MacOsOpenGLRedrawer) {
--        skiaLayer = layer
--        this.redrawer = redrawer
--        this.setNeedsDisplayOnBoundsChange(true)
--        this.removeAllAnimations()
--        this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
--        skiaLayer.nsView.layer = this
--        skiaLayer.nsView.wantsLayer = true
--        this.contentsGravity = kCAGravityTopLeft
--    }
--
--    fun setFrame(x: Int, y: Int, width: Int, height: Int) {
--        CATransaction.begin()
--        CATransaction.setDisableActions(true)
--        this.frame = CGRectMake(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
--        CATransaction.commit()
--        CATransaction.flush()
--    }
--
--    fun dispose() {
--        this.removeFromSuperlayer()
--        if (this::skiaLayer.isInitialized && skiaLayer.nsView.layer == this) {
--            skiaLayer.nsView.layer = null
--            skiaLayer.nsView.wantsLayer = false
--        }
--    }
--
--    override fun canDrawInCGLContext(
--        ctx: CGLContextObj?,
--        pixelFormat: CGLPixelFormatObj?,
--        forLayerTime: CFTimeInterval,
--        displayTime: CPointer<CVTimeStamp>?
--    ): Boolean {
--        return true
--    }
--
--    override fun drawInCGLContext(
--        ctx: CGLContextObj?,
--        pixelFormat: CGLPixelFormatObj?,
--        forLayerTime: CFTimeInterval,
--        displayTime: CPointer<CVTimeStamp>?
--    ) {
--        CGLSetCurrentContext(ctx)
--        try {
--            redrawer.drawInLayerContext()
--        } catch (e: Throwable) {
--            e.printStackTrace()
--            throw e
--        }
--
--        super.drawInCGLContext(ctx, pixelFormat, forLayerTime, displayTime)
--    }
--}
 diff --git a/skiko/src/macosTest/kotlin/org/jetbrains/skia/ImageTest.macos.kt b/skiko/src/macosTest/kotlin/org/jetbrains/skia/ImageTest.macos.kt
 new file mode 100644
 --- /dev/null
@@ -4210,19 +5098,17 @@ diff --git a/skiko/src/nativeJsMain/cpp/Image.cc b/skiko/src/nativeJsMain/cpp/Im
 deleted file mode 100644
 --- a/skiko/src/nativeJsMain/cpp/Image.cc
 +++ /dev/null
-@@ -1,189 +0,0 @@
+@@ -1,156 +0,0 @@
 -#include <iostream>
 -#include "SkData.h"
 -#include "SkImage.h"
 -#include "SkBitmap.h"
--#include "ganesh/GrDirectContext.h"
 -#include "SkShader.h"
 -#include "SkEncodedImageFormat.h"
 -#include "encode/SkPngEncoder.h"
 -#include "encode/SkJpegEncoder.h"
 -#include "encode/SkWebpEncoder.h"
 -#include "common.h"
--#include "include/gpu/ganesh/SkImageGanesh.h"
 -
 -
 -SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
@@ -4348,10 +5234,9 @@ deleted file mode 100644
 -SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsBitmap
 -  (KNativePointer ptr, KNativePointer contextPtr, KNativePointer bitmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
 -    SkImage* instance = reinterpret_cast<SkImage*>((ptr));
--    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
 -    SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
 -    auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
--    return instance->readPixels(context, bitmap->info(), bitmap->getPixels(), bitmap->pixmap().rowBytes(), srcX, srcY, cachingHint);
+-    return instance->readPixels(bitmap->pixmap(), srcX, srcY, cachingHint);
 -}
 -
 -SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsPixmap
@@ -4370,36 +5255,6 @@ deleted file mode 100644
 -    return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptionsVal1, samplingOptionsVal2), cachingHint);
 -}
 -
--SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFrom
--  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType) {
--    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
--    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
--
--    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
--        static_cast<GrRecordingContext*>(context),
--        *backendTexture,
--        static_cast<GrSurfaceOrigin>(surfaceOrigin),
--        static_cast<SkColorType>(colorType)
--    );
--
--    return reinterpret_cast<KNativePointer>(image.release());
--}
--
--SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nAdoptTextureFromAlphaType
--  (KNativePointer contextPtr, KNativePointer backendTexturePtr, KInt surfaceOrigin, KInt colorType, KInt alphaType) {
--    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(contextPtr);
--    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
--
--    sk_sp<SkImage> image = SkImages::AdoptTextureFrom(
--        static_cast<GrRecordingContext*>(context),
--        *backendTexture,
--        static_cast<GrSurfaceOrigin>(surfaceOrigin),
--        static_cast<SkColorType>(colorType),
--        static_cast<SkAlphaType>(alphaType)
--    );
--
--    return reinterpret_cast<KNativePointer>(image.release());
--}
 diff --git a/skiko/src/nativeMain/cpp/BBHFactory.cc b/skiko/src/nativeMain/cpp/BBHFactory.cc
 new file mode 100644
 --- /dev/null
@@ -4422,147 +5277,6 @@ new file mode 100644
 +  () {
 +    return reinterpret_cast<KNativePointer>((&deleteSkBBHFactory));
 +}
-diff --git a/skiko/src/nativeMain/cpp/BackendRenderTarget.cc b/skiko/src/nativeMain/cpp/BackendRenderTarget.cc
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/nativeMain/cpp/BackendRenderTarget.cc
-@@ -0,0 +1,92 @@
-+#include <iostream>
-+#include <stdint.h>
-+#include "ganesh/GrBackendSurface.h"
-+#include "common.h"
-+#include "ganesh/gl/GrGLDirectContext.h"
-+#include "ganesh/gl/GrGLBackendSurface.h"
-+#ifdef SK_METAL
-+#include "ganesh/mtl/GrMtlBackendSurface.h"
-+#include "ganesh/mtl/GrMtlTypes.h"
-+#endif
-+
-+#ifdef SK_VULKAN
-+#include "include/gpu/ganesh/vk/GrVkBackendSurface.h"
-+#include "include/gpu/ganesh/vk/GrVkTypes.h"
-+#endif
-+
-+static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
-+    delete rt;
-+}
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer() {
-+    return reinterpret_cast<KNativePointer>(&deleteBackendRenderTarget);
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeGL
-+  (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
-+    GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
-+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
-+    return instance;
-+}
-+
-+SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
-+  ( KInt width, KInt height, KNativePointer texturePtr) {
-+#ifdef SK_METAL
-+    GrMTLHandle texture = reinterpret_cast<GrMTLHandle>((texturePtr));
-+    GrMtlTextureInfo fbInfo;
-+    fbInfo.fTexture.retain(texture);
-+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, fbInfo);
-+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
-+    return instance;
-+#else
-+    return 0;
-+#endif
-+}
-+
-+#ifdef SK_DIRECT3D
-+#include "ganesh/d3d/GrD3DTypes.h"
-+#include "ganesh/d3d/GrD3DBackendSurface.h"
-+#endif
-+
-+SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D
-+  (KInt width, KInt height, KNativePointer texturePtr, KInt format, KInt sampleCnt, KInt levelCnt) {
-+#ifdef SK_DIRECT3D
-+    GrD3DTextureResourceInfo texResInfo = {};
-+    ID3D12Resource* resource = reinterpret_cast<ID3D12Resource*>((texturePtr));
-+    texResInfo.fResource.retain(resource);
-+    texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
-+    texResInfo.fFormat = static_cast<DXGI_FORMAT>(format);
-+    texResInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
-+    texResInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
-+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(
-+        GrBackendRenderTargets::MakeD3D(width, height, texResInfo)
-+    );
-+    return instance;
-+#else
-+    return 0;
-+#endif
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendRenderTarget__1nMakeVulkan
-+  (KInt width, KInt height, KNativePointer imagePtr, KInt imageTiling, KInt imageLayout, KInt format, KInt imageUsageFlags, KInt sampleCnt, KInt levelCnt) {
-+#ifdef SK_VULKAN
-+    GrVkImageInfo vkInfo = {};
-+    vkInfo.fImage = reinterpret_cast<VkImage>(imagePtr);
-+    vkInfo.fImageTiling = static_cast<VkImageTiling>(imageTiling);
-+    vkInfo.fImageLayout = static_cast<VkImageLayout>(imageLayout);
-+    vkInfo.fFormat = static_cast<VkFormat>(format);
-+    vkInfo.fImageUsageFlags = static_cast<VkImageUsageFlags>(imageUsageFlags);
-+    vkInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
-+    vkInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
-+
-+    GrBackendRenderTarget backendRenderTarget = GrBackendRenderTargets::MakeVk(width, height, vkInfo);
-+    if (!backendRenderTarget.isValid()) {
-+        return nullptr;
-+    }
-+
-+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(backendRenderTarget);
-+    return instance;
-+#else
-+    return nullptr;
-+#endif // SK_VULKAN
-+}
-diff --git a/skiko/src/nativeMain/cpp/BackendTexture.cc b/skiko/src/nativeMain/cpp/BackendTexture.cc
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/nativeMain/cpp/BackendTexture.cc
-@@ -0,0 +1,38 @@
-+#include <iostream>
-+#include <stdint.h>
-+#include "common.h"
-+#include "gpu/ganesh/gl/GrGLBackendSurface.h"
-+#include "include/gpu/ganesh/SkImageGanesh.h"
-+#include "include/gpu/ganesh/gl/GrGLTypes.h"
-+#include "gpu/ganesh/GrBackendSurface.h"
-+
-+static void deleteBackendTexture(GrBackendTexture* rt) {
-+    delete rt;
-+}
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendTexture__1nGetFinalizer() {
-+    return reinterpret_cast<KNativePointer>(&deleteBackendTexture);
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BackendTexture__1nMakeGL
-+  (KInt width, KInt height, KBoolean isMipmapped, KInt textureId, KInt target, KInt format) {
-+    GrGLTextureInfo textureInfo;
-+    textureInfo.fID = static_cast<GrGLuint>(textureId);
-+    textureInfo.fTarget = static_cast<GrGLenum>(target);
-+    textureInfo.fFormat = static_cast<GrGLenum>(format);
-+
-+    GrBackendTexture obj = GrBackendTextures::MakeGL(
-+        width,
-+        height,
-+        isMipmapped ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
-+        textureInfo
-+    );
-+
-+    GrBackendTexture* instance = new GrBackendTexture(obj);
-+    return instance;
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_BackendTexture__1nGLTextureParametersModified
-+  (KNativePointer backendTexturePtr) {
-+    GrBackendTexture* backendTexture = reinterpret_cast<GrBackendTexture*>(backendTexturePtr);
-+    GrBackendTextures::GLTextureParametersModified(backendTexture);
-+}
-\ No newline at end of file
 diff --git a/skiko/src/nativeMain/cpp/Bitmap.cc b/skiko/src/nativeMain/cpp/Bitmap.cc
 new file mode 100644
 --- /dev/null
@@ -5820,167 +6534,6 @@ new file mode 100644
 +    SkData* instance = reinterpret_cast<SkData*>(ptr);
 +    return reinterpret_cast<KNativePointer>(instance->writable_data());
 +}
-diff --git a/skiko/src/nativeMain/cpp/DirectContext.cc b/skiko/src/nativeMain/cpp/DirectContext.cc
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/nativeMain/cpp/DirectContext.cc
-@@ -0,0 +1,156 @@
-+#include "ganesh/GrDirectContext.h"
-+#include "ganesh/gl/GrGLInterface.h"
-+#include "common.h"
-+#include "ganesh/gl/GrGLDirectContext.h" // TODO: skia update: check if it's correct
-+
-+#ifdef SK_METAL
-+#include "ganesh/mtl/GrMtlBackendContext.h"
-+#include "ganesh/mtl/GrMtlDirectContext.h"
-+#endif
-+
-+#ifdef SK_DIRECT3D
-+#include "ganesh/d3d/GrD3DBackendContext.h"
-+#include "ganesh/d3d/GrD3DDirectContext.h"
-+#endif
-+
-+#ifdef SK_VULKAN
-+#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
-+#include "include/gpu/ganesh/vk/GrVkTypes.h"
-+#include "include/gpu/vk/VulkanBackendContext.h"
-+#include "include/gpu/vk/VulkanExtensions.h"
-+#include "include/gpu/vk/VulkanMemoryAllocator.h"
-+#include "VulkanMemoryAllocators.hh"
-+#endif // SK_VULKAN
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
-+  () {
-+    return static_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterface
-+  (KNativePointer ptr) {
-+    sk_sp<GrGLInterface> iface = sk_ref_sp(reinterpret_cast<GrGLInterface*>(ptr));
-+    return static_cast<KNativePointer>(GrDirectContexts::MakeGL(iface).release());
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
-+  (KNativePointer devicePtr, KNativePointer queuePtr) {
-+#ifdef SK_METAL
-+    GrMtlBackendContext backendContext = {};
-+    GrMTLHandle device = reinterpret_cast<GrMTLHandle>((devicePtr));
-+    GrMTLHandle queue = reinterpret_cast<GrMTLHandle>((queuePtr));
-+    backendContext.fDevice.retain(device);
-+    backendContext.fQueue.retain(queue);
-+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeMetal(backendContext);
-+    return static_cast<KNativePointer>(instance.release());
-+#else
-+    return nullptr;
-+#endif // SK_METAL
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
-+  (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
-+#ifdef SK_DIRECT3D
-+    GrD3DBackendContext backendContext = {};
-+    IDXGIAdapter1* adapter = reinterpret_cast<IDXGIAdapter1*>(adapterPtr);
-+    ID3D12Device* device = reinterpret_cast<ID3D12Device*>(devicePtr);
-+    ID3D12CommandQueue* queue = reinterpret_cast<ID3D12CommandQueue*>(queuePtr);
-+    backendContext.fAdapter.retain(adapter);
-+    backendContext.fDevice.retain(device);
-+    backendContext.fQueue.retain(queue);
-+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeD3D(backendContext);
-+    return static_cast<KNativePointer>(instance.release());
-+#else // SK_DIRECT3D
-+    return nullptr;
-+#endif // SK_DIRECT3D
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeVulkan
-+  (KNativePointer instancePtr, KNativePointer physicalDevicePtr, KNativePointer devicePtr,
-+   KNativePointer queuePtr, KInt graphicsQueueIndex,
-+   KNativePointer instanceProcAddr, KNativePointer deviceProcAddr, KInt apiVersion,
-+   KNativePointer /*allocatorPtr*/) {
-+#ifdef SK_VULKAN
-+    skgpu::VulkanBackendContext backendContext = {};
-+    backendContext.fInstance       = reinterpret_cast<VkInstance>      (instancePtr);
-+    backendContext.fPhysicalDevice = reinterpret_cast<VkPhysicalDevice>(physicalDevicePtr);
-+    backendContext.fDevice         = reinterpret_cast<VkDevice>        (devicePtr);
-+    backendContext.fQueue          = reinterpret_cast<VkQueue>         (queuePtr);
-+    backendContext.fGraphicsQueueIndex = static_cast<uint32_t>(graphicsQueueIndex);
-+    backendContext.fGetProc = [instanceProcAddr, deviceProcAddr](const char* name, VkInstance instance, VkDevice device) -> PFN_vkVoidFunction {
-+        if (device != VK_NULL_HANDLE)
-+            return reinterpret_cast<PFN_vkGetDeviceProcAddr>  (deviceProcAddr)  (device, name);
-+        return     reinterpret_cast<PFN_vkGetInstanceProcAddr>(instanceProcAddr)(instance, name);
-+    };
-+    backendContext.fMaxAPIVersion = static_cast<uint32_t>(apiVersion);
-+
-+    skgpu::VulkanExtensions extensions;
-+    extensions.init(backendContext.fGetProc, backendContext.fInstance, backendContext.fPhysicalDevice,
-+                    0, nullptr, 0, nullptr);
-+    backendContext.fVkExtensions = &extensions;
-+
-+    backendContext.fMemoryAllocator =
-+        skgpu::VulkanMemoryAllocators::Make(backendContext, skgpu::ThreadSafe::kYes);
-+
-+    sk_sp<GrDirectContext> instance = GrDirectContexts::MakeVulkan(backendContext);
-+    return static_cast<KNativePointer>(instance.release());
-+#else
-+    return nullptr;
-+#endif // SK_VULKAN
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushDefault
-+  (KNativePointer ptr) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
-+    context->flush(GrFlushInfo());
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
-+  (KNativePointer ptr, KNativePointer skSurfacePtr) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
-+    SkSurface* skSurface = reinterpret_cast<SkSurface*>(skSurfacePtr);
-+    context->flush(skSurface);
-+}
-+
-+SKIKO_EXPORT KLong org_jetbrains_skia_DirectContext__1nGetResourceCacheLimit
-+  (KNativePointer ptr) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
-+    return (KLong) context->getResourceCacheLimit();
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nSetResourceCacheLimit
-+  (KNativePointer ptr, KLong maxResourceBytes) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
-+    context->setResourceCacheLimit((size_t) maxResourceBytes);
-+}
-+
-+GrSyncCpu grSyncCpuFromBool(bool syncCpu) {
-+    if (syncCpu) return GrSyncCpu::kYes;
-+    return GrSyncCpu::kNo;
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlushAndSubmit
-+  (KNativePointer ptr, KNativePointer skSurfacePtr, KBoolean syncCpu) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(ptr);
-+    SkSurface* skSurface = reinterpret_cast<SkSurface*>(skSurfacePtr);
-+    context->flushAndSubmit(skSurface, grSyncCpuFromBool(syncCpu));
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nSubmit
-+  (KNativePointer ptr, KBoolean syncCpu) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
-+    context->submit(grSyncCpuFromBool(syncCpu));
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nReset
-+  (KNativePointer ptr, KInt flags) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
-+    context->resetContext((uint32_t) flags);
-+}
-+
-+SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nAbandon
-+  (KNativePointer ptr, KInt flags) {
-+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
-+    context->abandonContext();
-+}
-+
 diff --git a/skiko/src/nativeMain/cpp/Drawable.cc b/skiko/src/nativeMain/cpp/Drawable.cc
 new file mode 100644
 --- /dev/null
@@ -12790,67 +13343,6 @@ new file mode 100644
 +    }
 +}
 +
-diff --git a/skiko/src/nativeMain/cpp/render.cc b/skiko/src/nativeMain/cpp/render.cc
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/nativeMain/cpp/render.cc
-@@ -0,0 +1,56 @@
-+#include <ganesh/mtl/GrMtlTypes.h>
-+
-+#include "ganesh/GrBackendSurface.h"
-+#include "ganesh/GrDirectContext.h"
-+#include "common.h"
-+#include "ganesh/gl/GrGLDirectContext.h"
-+#include "ganesh/gl/GrGLBackendSurface.h"
-+#ifdef SK_METAL
-+#include "ganesh/mtl/GrMtlBackendSurface.h"
-+#endif
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTargetNative
-+    (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
-+    GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
-+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeGL(width, height, sampleCnt, stencilBits, glInfo);
-+    GrBackendRenderTarget* target = new GrBackendRenderTarget(obj);
-+    return reinterpret_cast<KNativePointer>(target);
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative() {
-+    return reinterpret_cast<KNativePointer>(GrDirectContexts::MakeGL().release());
-+}
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative
-+    (KInt width, KInt height, KInt sampleCnt) {
-+#ifdef SK_METAL
-+    // TODO: create properly.
-+    GrMtlTextureInfo mtlInfo;
-+    GrBackendRenderTarget obj = GrBackendRenderTargets::MakeMtl(width, height, mtlInfo);
-+    GrBackendRenderTarget* instance = new GrBackendRenderTarget(obj);
-+    return reinterpret_cast<KNativePointer>(instance);
-+#else
-+    return 0;
-+#endif
-+}
-+
-+
-+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
-+    () {
-+    TODO("implement org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative");
-+}
-+
-+#if 0
-+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
-+    () {
-+#ifdef SK_METAL
-+    void* device = nullptr;
-+    void* queue = nullptr;
-+    getMetalDeviceAndQueue(&device, &queue);
-+    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeMetal(device, queue).release());
-+#else
-+    return 0;
-+#endif
-+}
-+#endif
-+
 diff --git a/skiko/src/nativeMain/cpp/shaper/FontMgrRunIterator.cc b/skiko/src/nativeMain/cpp/shaper/FontMgrRunIterator.cc
 new file mode 100644
 --- /dev/null
@@ -13705,7 +14197,7 @@ new file mode 100644
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
 +++ b/skiko/src/nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt
-@@ -9,7 +9,7 @@ import org.jetbrains.skiko.ExperimentalSkikoApi
+@@ -7,7 +7,7 @@ import org.jetbrains.skia.impl.withResult
  import org.jetbrains.skiko.InternalSkikoApi
  
  internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
@@ -14077,43 +14569,6 @@ new file mode 100644
 +    }
 +}
 +
-diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt
-deleted file mode 100644
---- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Actuals.native.kt
-+++ /dev/null
-@@ -1,13 +0,0 @@
--package org.jetbrains.skiko
--
--import kotlin.time.TimeSource
--
--internal actual inline fun <R> maybeSynchronized(lock: Any, block: () -> R): R =
--    block()
--
--private val markNow = TimeSource.Monotonic.markNow()
--actual fun currentNanoTime(): Long = markNow.elapsedNow().inWholeNanoseconds
--
--internal actual fun loadAngleLibrary() {
--    // Nothing to do here
--}
-diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
-deleted file mode 100644
---- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
-+++ /dev/null
-@@ -1,13 +0,0 @@
--package org.jetbrains.skiko
--
--internal actual fun loadOpenGLLibrary() {
--    when (hostOs) {
--        // It is deprecated. See https://developer.apple.com/documentation/opengles
--        OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")
--        // Do nothing as we don't know for sure which OS supports OpenGL.
--        // If there is support, we assume that it is already linked.
--        // If there is no support, there will be a native crash
--        // (to throw a RenderException we need to investigate case by case)
--        else -> Unit
--    }
--}
-\ No newline at end of file
 diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt
 deleted file mode 100644
 --- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/Resources.native.kt
@@ -14354,18 +14809,6 @@ new file mode 100644
 +SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {}
 +SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {}
 +#endif // SKIKO_TEST_GL_INCLUDED
-diff --git a/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt b/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
-new file mode 100644
---- /dev/null
-+++ b/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/NativeLibraries.uikit.kt
-@@ -0,0 +1,7 @@
-+package org.jetbrains.skiko
-+
-+internal actual fun loadAngleLibrary() = Unit
-+
-+internal actual fun loadOpenGLLibrary() {
-+    throw RenderException("OpenGL on iOS and tvOS isn't supported")
-+}
 diff --git a/skiko/src/windowsTest/kotlin/org/jetbrains/skiko/SkiaLayerWindowsTest.kt b/skiko/src/windowsTest/kotlin/org/jetbrains/skiko/SkiaLayerWindowsTest.kt
 new file mode 100644
 --- /dev/null
