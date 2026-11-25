@@ -12,7 +12,8 @@ private suspend fun browserPlatform(): String? = js("""
     (function() {
         if (typeof navigator === 'undefined') return null;
         const userAgent = navigator.userAgent || '';
-        const clientPlatform = navigator.userAgentData?.platform;
+        const userAgentData = navigator.userAgentData;
+        const clientPlatform = userAgentData ? userAgentData.platform : '';
         if (clientPlatform) return clientPlatform;
         if (/Android/i.test(userAgent)) return 'Android';
         if (/(iPhone|iPad|iPod)/i.test(userAgent)) return 'iOS';
