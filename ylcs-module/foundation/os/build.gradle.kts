@@ -19,7 +19,7 @@ rachel {
             commonMain {
                 lib(
                     ExportLib,
-                    projects.ylcsModule.foundation.context,
+                    projects.ylcsModule.foundation.filesystem,
                 )
             }
 
