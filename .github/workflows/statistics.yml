@@ -113,7 +113,7 @@ jobs:
 
       - name: Install Playwright and fonts
         run: |
-          python -m pip install playwright==1.65.2
+          python -m pip install playwright==1.65.2 Pillow==13.0.0
           python -m playwright install --with-deps --only-shell chromium
           sudo apt-get install -y fonts-noto-cjk
 
@@ -123,13 +123,13 @@ jobs:
         run: |
           python .github/scripts/render_readme_status.py \
             --stats build/statistic/statistic.json \
-            --output build/readme-status/repository-status.png
+            --output build/readme-status/repository-status.webp
 
       - name: Upload the status card
         uses: actions/upload-artifact@v7
         with:
           name: readme-status
-          path: build/readme-status/repository-status.png
+          path: build/readme-status/repository-status.webp
           if-no-files-found: error
           compression-level: 0
 
@@ -158,4 +158,4 @@ jobs:
           GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
-        run: bash .github/scripts/publish_readme_status.sh build/readme-status/repository-status.png "$GITHUB_SHA"
+        run: bash .github/scripts/publish_readme_status.sh build/readme-status/repository-status.webp "$GITHUB_SHA"

@@ -6,6 +6,7 @@ import base64
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from html import escape
+from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 
@@ -183,7 +185,7 @@ def language_fields(languages):
     )
     total = sum(lines for _, lines in entries)
     if not total:
-        return {"gradient": "#493e58 0% 100%", "leading_percent": "—", "leading_language": "No code", "legend": ""}
+        return {"gradient": "#493e58 0% 100%", "leading_percent": "—", "leading_language": "No data", "legend": ""}
     if len(entries) > len(LANGUAGE_COLORS):
         split = len(LANGUAGE_COLORS) - 1
         entries = entries[:split] + [("Other", sum(lines for _, lines in entries[split:]))]
@@ -319,7 +321,7 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
     catalog = tomllib.loads((ROOT / "libs.versions.toml").read_text(encoding="utf-8"))
     fields = {
         **repository_fields(repository),
-        **language_fields(stats["languages"]),
+        **language_fields(stats.get("programming_languages", [])),
         "banner": image_file(ROOT / "ylcs-docs/docs/assets/title.png", "image/png"),
         "platforms": image_file(ASSETS / "platforms.webp", "image/webp"),
         "platform_items": "".join(
@@ -348,7 +350,11 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
         browser.close()
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_bytes(png)
+    if output.suffix.lower() == ".webp":
+        with Image.open(BytesIO(png)) as image:
+            image.convert("RGB").save(output, format="WEBP", quality=92, method=6)
+    else:
+        output.write_bytes(png)
     if html_output:
         html_output.parent.mkdir(parents=True, exist_ok=True)
         html_output.write_text(html, encoding="utf-8")
@@ -358,7 +364,7 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stats", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True, help="Output image path (.webp or .png)")
     parser.add_argument("--repository", default=os.environ.get("GITHUB_REPOSITORY", REPOSITORY))
     parser.add_argument("--html", type=Path, help="Also save the rendered HTML for local preview")
     parser.add_argument("--browser", help="Optional path to a local Chromium-based browser")

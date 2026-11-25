@@ -1,4 +1,4 @@
-![Preview](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.png)
+![Preview](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.webp)
 
 ### 语言 (Language) :
 **中文** | [English](README_en.md)

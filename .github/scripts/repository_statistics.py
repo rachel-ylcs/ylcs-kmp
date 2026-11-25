@@ -24,6 +24,9 @@ TOOL_MODULES = {"build-tool", "lint", "dokka"}
 PLACEHOLDERS = {".gitkeep", ".keep", ".placeholder", "placeholder", ".empty"}
 LONG_FILE_THRESHOLD = 1000
 UNREPORTED_LANGUAGE_CATEGORIES = {"JSON", "Other text"}
+NON_PROGRAMMING_LANGUAGE_CATEGORIES = {"CMake", "Config", "Markdown"}
+# The existing JavaScript and C++ report categories also include these non-source formats.
+NON_PROGRAMMING_EXTENSIONS = {".css", ".def", ".htm", ".html", ".scss"}
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX|HACK)\b")
 SEMVER_RE = re.compile(r"^(?:v|m|release[-_]?|rel[-_]?)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix>[-+][0-9A-Za-z.-]+)?$", re.IGNORECASE)
 
@@ -250,6 +253,11 @@ def aggregate(items: list[dict]) -> dict:
         "lines": {key: line_counts[key] for key in ("code", "comment", "blank", "total")},
         "average_lines_per_file": round(line_counts["total"] / len(items), 1) if items else 0,
     }
+
+
+def language_statistics(groups: dict) -> list[dict]:
+    totals = [{"language": name, **aggregate(items)} for name, items in groups.items() if items]
+    return sorted(totals, key=lambda item: item["lines"]["code"], reverse=True)
 
 
 def classify_asset(path: Path) -> str:
@@ -585,7 +593,12 @@ def collect_statistics() -> dict:
         if digest:
             duplicate_groups[digest].append({"path": relative, "bytes": size})
 
-    languages = [{"language": name, **aggregate(items)} for name, items in sorted(language_rows.items(), key=lambda item: sum(row["lines"]["code"] for row in item[1]), reverse=True)]
+    languages = language_statistics(language_rows)
+    programming_languages = language_statistics({
+        name: [row for row in items if row["extension"] not in NON_PROGRAMMING_EXTENSIONS]
+        for name, items in language_rows.items()
+        if name not in NON_PROGRAMMING_LANGUAGE_CATEGORIES
+    })
     scopes = [{"scope": name, **aggregate(items)} for name, items in sorted(scope_rows.items())]
     modules = [{"module": name, **aggregate(items)} for name, items in sorted(module_rows.items(), key=lambda item: sum(row["lines"]["code"] for row in item[1]), reverse=True)]
     assets = []
@@ -656,7 +669,8 @@ def collect_statistics() -> dict:
             "gradle_modules": len(gradle_modules), "ylcs_module_modules": len(kmp_modules),
             "kmp_modules": kmp_count, "native_modules": native_count,
         },
-        "languages": languages, "scopes": scopes, "modules": modules, "assets": assets,
+        "languages": languages, "programming_languages": programming_languages,
+        "scopes": scopes, "modules": modules, "assets": assets,
         "quality": {
             "todo_counts": dict(Counter(item["marker"] for item in todo_entries)), "todo_total": len(todo_entries),
             "todo_entries": todo_entries, "empty_files": empty_files,

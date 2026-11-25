@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-png=${1:?Usage: publish_readme_status.sh PNG MAIN_SHA}
-source_sha=${2:?Usage: publish_readme_status.sh PNG MAIN_SHA}
+image=${1:?Usage: publish_readme_status.sh WEBP MAIN_SHA}
+source_sha=${2:?Usage: publish_readme_status.sh WEBP MAIN_SHA}
 branch=refs/heads/readme-assets
-filename=repository-status.png
+filename=repository-status.webp
 
-test -s "$png"
+test -s "$image"
 remote_main=$(git ls-remote --exit-code origin refs/heads/main)
 read -r main_tip _ <<< "$remote_main"
 if [[ "$source_sha" != "$main_tip" ]]; then
@@ -27,7 +27,7 @@ else
     fi
 fi
 
-blob=$(git hash-object -w -- "$png")
+blob=$(git hash-object -w -- "$image")
 if [[ -n "$base" && $(git rev-parse --verify "$base:$filename" 2>/dev/null || true) == "$blob" ]]; then
     echo "The published card already matches this render."
     exit 0
