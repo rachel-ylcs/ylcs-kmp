@@ -12,7 +12,7 @@ import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 @Stable
-internal class PcAudioPlayer(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
+internal class PCAudioPlayer(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     private val backend = AudioBackend()
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
     private val desiredPlaying = atomic(false)

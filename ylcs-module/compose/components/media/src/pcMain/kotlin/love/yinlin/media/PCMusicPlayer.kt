@@ -18,7 +18,7 @@ import love.yinlin.foundation.PlatformContext
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-internal abstract class PcMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher) {
+internal abstract class PCMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher) {
     protected val backend = AudioBackend(music = true)
     protected var shouldImmediatePlay = false
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
@@ -88,7 +88,7 @@ internal abstract class PcMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMus
             backend.seek(position)
             backend.play()
             val current = backend.query().position
-            this@PcMusicPlayer.position = current
+            this@PCMusicPlayer.position = current
             listener?.onPositionChanged(current)
         }
     }

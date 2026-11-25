@@ -19,7 +19,7 @@ import love.yinlin.extension.cleaning
 import org.jetbrains.skia.*
 
 @Stable
-internal class PcVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
+internal class PCVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     private val backend = AudioBackend(create = VideoNative::create)
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
     private val playback = MutableStateFlow(false)
@@ -190,7 +190,7 @@ internal class PcVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
             pendingSeek = target.takeIf { !backend.seek(it) }
             desiredPlaying = true
             backend.play()
-            this@PcVideoController.position = backend.query().position
+            this@PCVideoController.position = backend.query().position
         }
     }
 
