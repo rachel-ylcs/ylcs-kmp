@@ -21,7 +21,7 @@ ktlint = "2.0.0-ALPHA-5"
 
 # ----- [Common] ----- #
 
-skiko = "0.158.0-alpha01"
+skiko = "0.157.0"
 lifecycle = "2.12.0-alpha06"
 savedstate = "1.6.0-alpha06"
 material3-adaptive = "1.4.0-alpha01"

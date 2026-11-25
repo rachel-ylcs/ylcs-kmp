@@ -2,7 +2,6 @@ import groovy.json.JsonSlurper
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.skiko.build.configuration.configureNativeTarget
 import org.jetbrains.skiko.build.context.SkikoProjectContext
@@ -50,30 +49,18 @@ if (dokkaBuild) {
     }
 }
 
-// Keep the desktop KLIB identity used by Compose while compiling the split upstream sources.
-val upstreamSourceRoots = listOf("src", "skiko-ganesh/src", "skiko-platform/src").map(project::file)
+// Configure source roots after upstream has registered every platform task.
 extensions.configure<KotlinMultiplatformExtension> {
     sourceSets.configureEach {
-        // Cocoa forward declarations belong to the macOS leaf compilation.
+        // Cocoa forward declarations belong to the macOS platform fragment.
+        // macosArm64 is the only supported macOS target; use its leaf as the source root.
         if (name == "macosMain") kotlin.setSrcDirs(emptyList<String>())
         else {
-            val sourceSet = if (name == "macosArm64Main") "macosMain" else name
-            val roots = if (name == sourceSet) upstreamSourceRoots.drop(1) else upstreamSourceRoots
-            for (root in roots) {
-                val directory = root.resolve("$sourceSet/kotlin")
-                if (directory.isDirectory) kotlin.srcDir(directory)
-            }
-            if (name == "macosArm64Test") {
-                kotlin.srcDir(project.file("skiko-ganesh/src/darwinTest/kotlin"))
-            }
-            val directory = adaptationDirectory.resolve("src/$sourceSet/kotlin")
+            val directory = adaptationDirectory.resolve("src/${if (name == "macosArm64Main") "macosMain" else name}/kotlin")
+            if (name == "macosArm64Main") kotlin.srcDir(project.file("src/macosMain/kotlin"))
             if (directory.isDirectory) kotlin.srcDir(directory)
         }
     }
-}
-
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.skiko.InternalSkikoApi")
 }
 
 tasks.withType<CompileSkikoCppTask>().configureEach {
@@ -96,10 +83,6 @@ tasks.withType<AbstractArchiveTask>().configureEach {
         from(adaptationDirectory.resolve("src")) {
             include("**/*.cc", "**/*.cpp", "**/*.h", "**/*.hh")
             into("native-sources")
-        }
-        from(project.file("skiko-ganesh/src")) {
-            include("nativeJsMain/cpp/**", "commonMain/cpp/**")
-            into("native-sources/ganesh")
         }
     }
 }
