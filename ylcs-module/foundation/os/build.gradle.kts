@@ -20,6 +20,7 @@ rachel {
                 lib(
                     ExportLib,
                     projects.ylcsModule.foundation.context,
+                    projects.ylcsModule.foundation.filesystem,
                 )
             }
 

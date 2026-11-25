@@ -18,29 +18,20 @@ import platform.windows.OSVERSIONINFOW
 
 @OptIn(ExperimentalForeignApi::class)
 actual object SystemManager {
-    actual fun getSystemVersion(): String? = catchingNull {
-        memScoped {
-            val info = alloc<OSVERSIONINFOW>()
-            info.dwOSVersionInfoSize = sizeOf<OSVERSIONINFOW>().convert()
-            if (GetVersionExW(info.ptr) == FALSE) return@memScoped null
-
-            val major = info.dwMajorVersion.toInt()
-            val minor = info.dwMinorVersion.toInt()
-            val build = info.dwBuildNumber.toInt()
-            when {
-                major >= 10 && build >= 22000 -> "Windows 11"
-                major >= 10 -> "Windows 10"
-                major == 6 && minor == 3 -> "Windows 8.1"
-                major == 6 && minor == 2 -> "Windows 8"
-                major == 6 && minor == 1 -> "Windows 7"
-                major == 6 && minor == 0 -> "Windows Vista"
-                major == 5 && minor == 1 -> "Windows XP"
-                else -> "Windows " + major + "." + minor
+    actual suspend fun getSystemVersion(): String? {
+        val version = catchingNull {
+            memScoped {
+                val info = alloc<OSVERSIONINFOW>()
+                info.dwOSVersionInfoSize = sizeOf<OSVERSIONINFOW>().convert()
+                if (GetVersionExW(info.ptr) == FALSE) null
+                else Triple(info.dwMajorVersion.toInt(), info.dwMinorVersion.toInt(), info.dwBuildNumber.toInt())
             }
         }
+
+        return version?.let { WindowsSystemVersion.format(it.first, it.second, it.third) }
     }
 
-    actual fun getUserName(): String? = catchingNull {
+    actual suspend fun getUserName(): String? = catchingNull {
         memScoped {
             val variable = "USERNAME".wcstr.ptr
             val buffer = allocArray<UShortVar>(256)

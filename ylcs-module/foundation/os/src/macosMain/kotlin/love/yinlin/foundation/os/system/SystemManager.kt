@@ -10,13 +10,13 @@ import platform.posix.getpwuid
 
 @OptIn(ExperimentalForeignApi::class)
 actual object SystemManager {
-    actual fun getSystemVersion(): String? = catchingNull {
+    actual suspend fun getSystemVersion(): String? = catchingNull {
         val rawVersion = NSProcessInfo.processInfo.operatingSystemVersionString
         val version = rawVersion.substringAfter("Version ", "").substringBefore(' ')
-        version.takeIf { it.isNotBlank() }?.let { "macOS " + it }
+        version.takeIf { it.isNotBlank() }?.let { "macOS $it" }
     }
 
-    actual fun getUserName(): String? = catchingNull {
+    actual suspend fun getUserName(): String? = catchingNull {
         getpwuid(geteuid())?.pointed?.pw_name?.toKString()?.takeIf { it.isNotBlank() }
     }
 }

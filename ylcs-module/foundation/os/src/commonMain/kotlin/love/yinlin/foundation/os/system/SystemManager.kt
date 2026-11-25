@@ -1,6 +1,6 @@
 package love.yinlin.foundation.os.system
 
 expect object SystemManager {
-    fun getSystemVersion(): String?
-    fun getUserName(): String?
+    suspend fun getSystemVersion(): String?
+    suspend fun getUserName(): String?
 }

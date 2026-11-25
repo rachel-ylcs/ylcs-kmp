@@ -1,38 +1,37 @@
 package love.yinlin.foundation.os.battery
 
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readString
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
+import love.yinlin.fs.File
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 internal object LinuxBatteryReader {
-    private val suppliesPath = Path("/sys/class/power_supply")
+    private val suppliesPath = File("/sys/class/power_supply")
 
-    private fun read(path: Path, name: String): String? = catchingNull {
-        SystemFileSystem.source(Path(path, name)).buffered().use { it.readString().trim() }
+    private suspend fun read(path: File, name: String): String? = catchingNull {
+        File(path, name).readText()?.trim()?.takeIf { it.isNotEmpty() }
     }
 
-    private fun readProperties(path: Path): Map<String, String> = buildMap {
+    private suspend fun readProperties(path: File): Map<String, String> {
+        val properties = mutableMapOf<String, String>()
         read(path, "uevent")?.lineSequence()?.forEach { line ->
             val split = line.indexOf('=')
-            if (split > 0) put(line.substring(0, split).removePrefix("POWER_SUPPLY_"), line.substring(split + 1))
+            if (split > 0) properties[line.substring(0, split).removePrefix("POWER_SUPPLY_")] = line.substring(split + 1)
         }
+        return properties
     }
 
-    private fun isSystemBattery(path: Path, properties: Map<String, String>): Boolean = (properties["SCOPE"] ?: read(path, "scope")) != "Device" && (properties["PRESENT"] ?: read(path, "present")) != "0"
+    private suspend fun isSystemBattery(path: File, properties: Map<String, String>): Boolean = (properties["SCOPE"] ?: read(path, "scope")) != "Device" && (properties["PRESENT"] ?: read(path, "present")) != "0"
 
-    fun readInfo(): BatteryInfo = catchingDefault(BatteryInfo()) {
+    suspend fun readInfo(): BatteryInfo = catchingDefault(BatteryInfo()) {
         val levels: MutableList<Int?> = []
         val states: MutableList<BatteryChargingState?> = []
         val times: MutableList<Long?> = []
         val externalSources: MutableSet<PowerSource> = []
         var unknownSupply = false
 
-        for (supply in SystemFileSystem.list(suppliesPath)) {
+        for (supply in suppliesPath.list()) {
             val properties = readProperties(supply)
             when (val type = properties["TYPE"] ?: read(supply, "type")) {
                 null -> unknownSupply = true
