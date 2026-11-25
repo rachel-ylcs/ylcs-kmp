@@ -20,8 +20,6 @@ runs:
       env:
         IPA_NAME: ${{ inputs.ipa-name }}
       run: |
-        XCODEPROJ_PATH="$PWD/ylcs-app/iosApp/iosApp.xcodeproj" \
-          ./gradlew :ylcs-app:app:portal:integrateLinkagePackage
         xcodebuild archive \
           -project ./ylcs-app/iosApp/iosApp.xcodeproj \
           -scheme iosApp \

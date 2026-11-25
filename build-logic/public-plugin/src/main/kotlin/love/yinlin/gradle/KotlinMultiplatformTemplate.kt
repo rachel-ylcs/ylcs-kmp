@@ -388,9 +388,8 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 }
 
                 if (buildDefaults.platform == BuildPlatform.Mac) {
-                    extensions.findByType<SwiftPMImportExtension>()?.apply {
-                        iosMinimumDeploymentTarget.set(buildDefaults.ios.target)
-                        interopSettings.iosSettings.configure(this, iosLocalSPMDir)
+                    extensions.findByType<SwiftPMImportExtension>()?.let {
+                        interopSettings.iosSettings.configureSwiftPackages(it, iosLocalSPMDir, buildDefaults.ios.target)
                     }
                 }
             }

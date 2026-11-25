@@ -22,11 +22,6 @@ rachel {
             native {
                 cpp("kv")
             }
-            ios {
-                discoverClangModulesImplicitly = false
-                spm("https://github.com/Tencent/MMKV.git", libs.versions.mmkv.get(), "MMKV")
-                spm("Dummy")
-            }
         }
 
         sources {
@@ -38,10 +33,18 @@ rachel {
             }
 
             androidMain(commonMain) {
-                lib(libs.mmkv.android)
+                lib(
+                    ExportLib,
+                    libs.mmkv
+                )
             }
 
-            iosMain(commonMain)
+            iosMain(commonMain) {
+                lib(
+                    ExportLib,
+                    libs.mmkv
+                )
+            }
 
             iosMainList(iosMain)
 

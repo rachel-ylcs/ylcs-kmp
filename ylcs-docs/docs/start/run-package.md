@@ -121,14 +121,7 @@ Android 产物由 Android 插件与 Rachel 模板共同生成。打包前确认�
 
 ## iOS
 
-iOS 需要 macOS 与 Xcode。首次打开工程或修改 SwiftPM 依赖后，先为 `portal` 及其传递依赖生成链接包：
-
-```bash title="生成 SwiftPM 链接包"
-XCODEPROJ_PATH="$PWD/ylcs-app/iosApp/iosApp.xcodeproj" \
-  ./gradlew :ylcs-app:app:portal:integrateLinkagePackage
-```
-
-随后在 Xcode 中归档。工程会在 Swift 编译前构建对应架构的 framework。仅执行 Kotlin 链接任务不能验证 Swift 宿主编译与 Xcode 归档。
+iOS 需要 macOS 与 Xcode。打开 `ylcs-app/iosApp/iosApp.xcodeproj`，选择 `iosApp` scheme 后归档。Xcode 会在编译 Swift 宿主前调用 Gradle 构建并嵌入对应架构的 Kotlin framework。
 
 ## Web
 

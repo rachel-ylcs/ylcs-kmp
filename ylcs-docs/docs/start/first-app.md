@@ -179,7 +179,7 @@ class ScreenDetails(private val id: String) : Screen() {
 | --- | --- |
 | 启动即崩溃，提示引用未初始化 | 在平台入口调用 `run()` 前读取了应用委托 |
 | Android 编译通过但无法启动 | Manifest 未指向 `ComposeApplication` 与 `ComposeActivity` |
-| iOS 链接失败 | SwiftPM 链接包未生成，或 Xcode 架构与目标不匹配 |
+| iOS 链接失败 | 检查 Kotlin framework 构建阶段的日志，并确认 Xcode 架构与 Kotlin 目标匹配 |
 | 页面找不到 | 页面未在导航 builder 中注册，或根页面需要构造参数 |
 | Web 刷新后状态丢失 | 需要跨刷新保留的数据没有进入持久化服务 |
 

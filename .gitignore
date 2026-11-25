@@ -22,7 +22,6 @@ work/
 xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
 .swiftpm-locks/
-/ylcs-app/iosApp/KotlinMultiplatformLinkedPackage/
 **/Version.xcconfig
 
 # native

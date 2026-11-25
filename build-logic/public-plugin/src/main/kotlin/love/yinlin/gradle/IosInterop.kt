@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 class IosInterop internal constructor() {
-    var discoverClangModulesImplicitly: Boolean = true
     private val packages = mutableListOf<SwiftPMImportExtension.(Directory) -> Unit>()
     private val interops = NativeInterop()
     internal val sources = linkedSetOf<String>()
@@ -45,8 +44,9 @@ class IosInterop internal constructor() {
         }
     }
 
-    internal fun configure(extension: SwiftPMImportExtension, directory: Directory) {
-        extension.discoverClangModulesImplicitly.set(discoverClangModulesImplicitly)
+    internal fun configureSwiftPackages(extension: SwiftPMImportExtension, directory: Directory, deploymentTarget: String) {
+        if (packages.isEmpty()) return
+        extension.iosMinimumDeploymentTarget.set(deploymentTarget)
         for (pkg in packages) extension.pkg(directory)
     }
 }
