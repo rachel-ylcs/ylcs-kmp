@@ -1,6 +1,6 @@
 headers = rachel_audio.h
 headerFilter = rachel_audio.h
-package = love.yinlin.media.internal
+package = rachel.audio.interop
 staticLibraries = librachel_audio.a
 linkerOpts.mingw = -lruntimeobject -lshlwapi -lole32 -loleaut32 -luuid -lwindowsapp -ld3d11 -ldxgi
 linkerOpts.linux = -lstdc++ -lpthread -ldl -lm

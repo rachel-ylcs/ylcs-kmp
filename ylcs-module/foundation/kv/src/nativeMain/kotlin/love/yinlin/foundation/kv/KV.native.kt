@@ -4,7 +4,7 @@ package love.yinlin.foundation.kv
 import kotlinx.cinterop.*
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
-import love.yinlin.foundation.kv.internal.*
+import mmkv.interop.*
 
 actual class KV actual constructor(context: PlatformContext, initPath: File) : AutoCloseable {
     private var handle: COpaquePointer? = run {

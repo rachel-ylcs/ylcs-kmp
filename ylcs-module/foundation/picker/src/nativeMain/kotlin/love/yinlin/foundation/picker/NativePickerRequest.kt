@@ -5,8 +5,8 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.CancellableContinuation
 import love.yinlin.concurrent.Lock
 import love.yinlin.extension.cleaning
-import love.yinlin.foundation.picker.internal.SDL_DialogFileFilter
-import love.yinlin.foundation.picker.internal.SDL_GetError
+import sdl3.interop.SDL_DialogFileFilter
+import sdl3.interop.SDL_GetError
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 

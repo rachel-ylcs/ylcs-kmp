@@ -2,7 +2,7 @@
 package love.yinlin.media
 
 import kotlinx.cinterop.*
-import love.yinlin.media.internal.*
+import rachel.audio.interop.*
 
 internal actual object AudioNative {
     actual fun create(music: Boolean, callback: (Long, Int, Long, String?) -> Unit): Long = createPlayer(music, false, callback)

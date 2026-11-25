@@ -1,5 +1,5 @@
 headers = rachel_webview.h
 headerFilter = rachel_webview.h
-package = love.yinlin.webview.internal
+package = com.microsoft.webview2.interop
 staticLibraries = librachel_webview.a
 linkerOpts.mingw = -lole32 -lshell32 -lshlwapi -ladvapi32 -luuid -lcomctl32 -luser32 -lversion

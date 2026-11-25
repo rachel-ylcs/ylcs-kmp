@@ -13,6 +13,7 @@ import love.yinlin.extension.uint1
 import love.yinlin.extension.uint2
 import platform.posix.wmemcpy
 import platform.windows.*
+import platform.windows.interop.LINKFILE_HEADER
 
 /**
  * 标准目录

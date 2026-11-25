@@ -1,5 +1,5 @@
 headers = macos_webview.h
 headerFilter = macos_webview.h
-package = love.yinlin.webview.internal
+package = platform.WebKit.interop
 staticLibraries = librachel_webview.a
 linkerOpts.osx = -framework Foundation -framework WebKit

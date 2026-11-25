@@ -5,7 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.cinterop.*
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.webview.internal.*
+import com.microsoft.webview2.interop.*
 
 @Stable
 actual class WebViewState actual constructor(initUrl: String) : PlatformViewState<COpaquePointer, WebViewParameters>() {

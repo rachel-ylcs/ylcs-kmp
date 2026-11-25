@@ -2,7 +2,7 @@
 package love.yinlin.media
 
 import kotlinx.cinterop.*
-import love.yinlin.media.internal.*
+import rachel.audio.interop.*
 
 internal actual object SoundNative {
     actual fun create(): Long = rachel_sound_create()?.rawValue?.toLong() ?: 0L

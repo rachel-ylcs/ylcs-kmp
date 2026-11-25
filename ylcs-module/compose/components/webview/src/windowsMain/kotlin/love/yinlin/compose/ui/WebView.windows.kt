@@ -8,7 +8,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.ui.tool.NavigationBack
 import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.webview.internal.rachel_webview_available
+import com.microsoft.webview2.interop.rachel_webview_available
 
 @Composable
 actual fun WebView(state: WebViewState, modifier: Modifier, config: WebViewConfig) {

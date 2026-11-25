@@ -2,9 +2,9 @@
 package love.yinlin.compose.ui
 
 import kotlinx.cinterop.*
-import love.yinlin.webview.internal.rachel_webview_observe
-import love.yinlin.webview.internal.rachel_webview_unobserve
 import platform.WebKit.WKWebView
+import platform.WebKit.interop.rachel_webview_observe
+import platform.WebKit.interop.rachel_webview_unobserve
 
 internal class MacosWebViewObserver(view: WKWebView, update: (WKWebView) -> Unit) {
     private var observation: COpaquePointer?

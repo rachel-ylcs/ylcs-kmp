@@ -2,7 +2,7 @@
 package love.yinlin.media
 
 import kotlinx.cinterop.*
-import love.yinlin.media.internal.*
+import rachel.audio.interop.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Platform
 import love.yinlin.platform.platform

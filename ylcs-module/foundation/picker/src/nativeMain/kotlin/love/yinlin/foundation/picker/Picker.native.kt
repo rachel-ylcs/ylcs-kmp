@@ -18,8 +18,8 @@ import love.yinlin.fs.safeSources
 import love.yinlin.io.Sources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
-import love.yinlin.foundation.picker.internal.*
-import love.yinlin.foundation.picker.internal.SDL_FileDialogType.*
+import sdl3.interop.*
+import sdl3.interop.SDL_FileDialogType.*
 
 actual class Picker actual constructor(private val context: PlatformContextProvider) : AutoCloseable {
     companion object {

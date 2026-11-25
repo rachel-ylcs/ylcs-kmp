@@ -1,4 +1,4 @@
-package = platform.windows
+package = platform.windows.interop
 language = C
 
 ---
