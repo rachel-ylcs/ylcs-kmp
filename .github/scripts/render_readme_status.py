@@ -48,7 +48,6 @@ ICONS = {
     "gallery": '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     "nav": '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h8a3 3 0 1 0 0-6H9a3 3 0 1 1 0-6h8"/>',
     "folder": '<path d="M3 19h18V7h-9l-2-3H3v15Z"/>',
-    "arrow": '<path d="M7 17 17 7M8 7h9v9"/>',
     "success": '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.7 2.7 5.3-5.4"/>',
     "failure": '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/>',
     "neutral": '<circle cx="12" cy="12" r="9"/><path d="M8.5 12h7"/>',
@@ -270,7 +269,7 @@ def links():
             visual = f'<span class="link-glyph" style="--glyph-color:{color}" aria-hidden="true">{icon(glyph)}</span>'
         cards.append(
             f'<a class="link-card" href="{url}">{visual}<span class="link-title">{title}</span>'
-            f'<span class="link-url">{url}</span><span class="link-arrow">{icon("arrow")}</span></a>'
+            f'<span class="link-url">{url}</span></a>'
         )
     return "".join(cards)
 
@@ -340,7 +339,7 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
     html = Template((ASSETS / "card.html").read_text(encoding="utf-8")).substitute(fields)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=browser_path)
-        page = browser.new_page(viewport={"width": 960, "height": 1200}, device_scale_factor=2)
+        page = browser.new_page(viewport={"width": 960, "height": 1200}, device_scale_factor=1.5)
         page.set_content(html, wait_until="load")
         page.evaluate("document.fonts.ready")
         page.evaluate("(src) => { const img = new Image(); img.src = src; return img.decode(); }", fields["platforms"])

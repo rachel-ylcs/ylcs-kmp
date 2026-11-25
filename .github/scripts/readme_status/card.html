@@ -69,16 +69,14 @@
 
     .link-panel { background: radial-gradient(ellipse at 0% 0%, #75609625, transparent 60%), #d5c4ff08; }
     .link-grid { display: grid; gap: 5px; margin-top: 12px; }
-    .link-card { display: grid; grid-template-columns: 20px 128px minmax(0, 1fr) 15px; gap: 8px; align-items: center; min-height: 28px; padding: 3px 9px 3px 6px; border: 1px solid #58486588; border-radius: 9px; background: linear-gradient(100deg, #d5c4ff08, #17132355); color: inherit; text-decoration: none; }
+    .link-card { display: grid; grid-template-columns: 20px max-content minmax(0, 1fr); gap: 8px; align-items: center; min-height: 28px; padding: 3px 9px 3px 6px; border: 1px solid #58486588; border-radius: 9px; background: linear-gradient(100deg, #d5c4ff08, #17132355); color: inherit; text-decoration: none; }
     .link-card:focus-visible { outline: 1px solid #c3aff4; outline-offset: 1px; }
     .link-glyph { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: color-mix(in srgb, var(--glyph-color, transparent) 15%, transparent); color: var(--glyph-color); }
     .link-glyph svg { width: 13px; height: 13px; }
     .link-glyph img { display: block; width: 18px; height: 18px; object-fit: contain; }
     .link-glyph.yinlin img { width: 19px; height: 19px; }
     .link-title { color: #f5eefb; font-size: 12px; font-weight: 620; }
-    .link-url { color: #fff; font-size: 12px; overflow-wrap: anywhere; }
-    .link-arrow { justify-self: end; color: #bba7d4; }
-    .link-arrow svg { display: block; width: 14px; height: 14px; }
+    .link-url { color: #fff; font-size: 12px; overflow-wrap: anywhere; text-align: right; }
     .topic-panel { background: radial-gradient(ellipse at 100% 0%, #75609625, transparent 72%), #d5c4ff08; }
     .topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
     .topic { display: block; padding: 6px 11px; border: 1px solid #6d548c; border-radius: 999px; background: #9b79ca20; color: #ead9fe; font-size: 12px; font-weight: 550; line-height: 1.25; overflow-wrap: anywhere; text-decoration: none; }
