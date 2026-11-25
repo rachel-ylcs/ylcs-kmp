@@ -9,7 +9,6 @@ from html import escape
 import json
 import os
 from pathlib import Path
-import re
 from string import Template
 from time import sleep
 import tomllib
@@ -229,16 +228,11 @@ def tree_children(tree):
     return f'<div class="tree-children">{leaf_list}{"".join(groups)}</div>'
 
 
-def module_rows(readme):
-    _, found, tail = readme.partition("# 全平台模块支持")
-    paths = re.findall(r"\[[^\]]+\]\(ylcs-module/([a-z0-9/_-]+)\)", tail.split("\n# ", 1)[0])
-    if not found or not paths:
-        raise ValueError("README.md has no module list under 全平台模块支持")
-
+def module_rows(modules):
     tree = {}
-    for path in paths:
+    for module in modules:
         node = tree
-        for part in path.split("/"):
+        for part in module["path"].removeprefix("ylcs-module/").split("/"):
             node = node.setdefault(part, {})
     order = dict.fromkeys((*MODULE_GROUPS, *tree))
     rows = []
@@ -339,7 +333,7 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
         "size": format_size(summary["bytes"]),
         "links": links(),
         "folder_icon": icon("folder"),
-        "module_tree": module_rows((ROOT / "README.md").read_text(encoding="utf-8")),
+        "module_tree": module_rows(stats["kmp"]["modules"]),
     }
     html = Template((ASSETS / "card.html").read_text(encoding="utf-8")).substitute(fields)
     with sync_playwright() as playwright:
