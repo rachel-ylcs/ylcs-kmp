@@ -14,6 +14,3 @@ private val ConvertMap = [
 fun String.convert(encoding: Encoding = Encoding.Default): ByteArray = ConvertMap[encoding.ordinal].first(this)
 
 fun ByteArray.convert(encoding: Encoding = Encoding.Default): String = ConvertMap[encoding.ordinal].second(this)
-
-internal expect fun convertStringToUTF8(data: String): ByteArray
-internal expect fun convertUTF8ToString(data: ByteArray): String
