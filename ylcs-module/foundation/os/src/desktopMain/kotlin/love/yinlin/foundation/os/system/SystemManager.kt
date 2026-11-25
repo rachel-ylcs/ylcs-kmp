@@ -4,24 +4,20 @@ import java.lang.foreign.ValueLayout
 import love.yinlin.extension.catchingNull
 import love.yinlin.fs.File
 import love.yinlin.platform.Platform
-import love.yinlin.platform.ffi.NativeLibrary
-import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.FFI
+import love.yinlin.platform.ffi.ntdll
 import love.yinlin.platform.ffi.useMemory
 import love.yinlin.platform.platform
 
 actual object SystemManager {
     private object Windows {
-        private object Ntdll : NativeLibrary("ntdll") {
-            val RtlGetVersion by func { declare(NativeType.Pointer, retType = NativeType.Int) }
-        }
-
         suspend fun getSystemVersion(): String? {
             val version = catchingNull {
                 useMemory { arena ->
                     // RTL_OSVERSIONINFOW: five DWORD fields followed by WCHAR[128].
                     val info = arena.allocate(276, 4)
                     info.set(ValueLayout.JAVA_INT, 0, 276)
-                    if ((Ntdll.RtlGetVersion(info) as Int) != 0) null
+                    if ((FFI.ntdll.RtlGetVersion(info) as Int) != 0) null
                     else Triple(
                         info.get(ValueLayout.JAVA_INT, 4),
                         info.get(ValueLayout.JAVA_INT, 8),
