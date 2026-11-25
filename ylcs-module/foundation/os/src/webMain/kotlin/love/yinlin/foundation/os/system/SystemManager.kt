@@ -3,50 +3,49 @@ package love.yinlin.foundation.os.system
 
 import kotlinx.coroutines.await
 import love.yinlin.extension.catchingNull
-import love.yinlin.foundation.os.system.SystemManager
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.js
 
-actual object SystemManager {
-    private suspend fun browserPlatform(): String? = js("""
-        (function() {
-            if (typeof navigator === 'undefined') return null;
-            const userAgent = navigator.userAgent || '';
-            const clientPlatform = navigator.userAgentData?.platform;
-            if (clientPlatform) return clientPlatform;
-            if (/Android/i.test(userAgent)) return 'Android';
-            if (/(iPhone|iPad|iPod)/i.test(userAgent)) return 'iOS';
-            if (/CrOS/i.test(userAgent)) return 'Chrome OS';
-            const platform = navigator.platform || '';
-            if (/Win/i.test(platform)) return 'Windows';
-            if (/Mac/i.test(platform)) return 'macOS';
-            if (/Linux/i.test(platform)) return 'Linux';
-            return null;
-        })()
-    """)
+private suspend fun browserPlatform(): String? = js("""
+    (function() {
+        if (typeof navigator === 'undefined') return null;
+        const userAgent = navigator.userAgent || '';
+        const clientPlatform = navigator.userAgentData?.platform;
+        if (clientPlatform) return clientPlatform;
+        if (/Android/i.test(userAgent)) return 'Android';
+        if (/(iPhone|iPad|iPod)/i.test(userAgent)) return 'iOS';
+        if (/CrOS/i.test(userAgent)) return 'Chrome OS';
+        const platform = navigator.platform || '';
+        if (/Win/i.test(platform)) return 'Windows';
+        if (/Mac/i.test(platform)) return 'macOS';
+        if (/Linux/i.test(platform)) return 'Linux';
+        return null;
+    })()
+""")
 
-    private suspend fun browserUserAgent(): String = js("typeof navigator !== 'undefined' ? navigator.userAgent || '' : ''")
+private suspend fun browserUserAgent(): String = js("typeof navigator !== 'undefined' ? navigator.userAgent || '' : ''")
 
-    private suspend fun requestPlatformVersion(): Promise<JsAny>? = js("""
-        typeof navigator !== 'undefined' &&
-        navigator.userAgentData &&
-        typeof navigator.userAgentData.getHighEntropyValues === 'function'
-            ? navigator.userAgentData.getHighEntropyValues(['platformVersion'])
-            : null
-    """)
+private suspend fun requestPlatformVersion(): Promise<JsAny>? = js("""
+    typeof navigator !== 'undefined' &&
+    navigator.userAgentData &&
+    typeof navigator.userAgentData.getHighEntropyValues === 'function'
+        ? navigator.userAgentData.getHighEntropyValues(['platformVersion'])
+        : null
+""")
 
-    private suspend fun browserPlatformVersion(): String? {
-        val request = requestPlatformVersion() ?: return null
-        return catchingNull {
-            val values = request.await()
-            readPlatformVersion(values)
-        }
+private suspend fun browserPlatformVersion(): String? {
+    val request = requestPlatformVersion() ?: return null
+    return catchingNull {
+        val values = request.await()
+        readPlatformVersion(values)
     }
+}
 
-    private suspend fun readPlatformVersion(values: JsAny): String? = js("values.platformVersion || null")
+private suspend fun readPlatformVersion(values: JsAny): String? = js("values.platformVersion || null")
 
+actual object SystemManager {
     private suspend fun formatSystemVersion(platform: String, version: String?, userAgent: String): String? = when (platform) {
         "Windows" -> {
             val major = version?.substringBefore('.')?.toIntOrNull()
