@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rachel repository status</title>
+<style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0e0d18; color: #f4f1fc; font-family: "Segoe UI", system-ui, "Noto Sans CJK SC", sans-serif; }
+    .card { width: 960px; margin: auto; overflow: hidden; border: 1px solid #403a56; border-radius: 24px; background: radial-gradient(ellipse at 91% 4%, #292343 0%, transparent 55%), linear-gradient(147deg, #1d1a2c, #151422 75%); }
+    .banner { display: block; width: 100%; height: auto; border-bottom: 1px solid #62577f; }
+    .panel { padding: 19px 23px 23px; }
+    .row { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 2fr); gap: 12px; margin-top: 12px; }
+    .link-topic-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+    .tile { min-width: 0; padding: 15px 16px; border: 1px solid #403850; border-radius: 13px; background: #d5c4ff08; }
+    .section-title { margin: 0; color: #ebe4f7; font-size: 15px; font-weight: 650; line-height: 1.35; }
+    .section-title small { margin-left: 7px; color: #c8badd; font-size: 12px; font-weight: 500; }
+    .line-icon { width: 15px; height: 15px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+
+    .pipelines { display: grid; grid-template-columns: 1.14fr repeat(5, minmax(0, 1fr)); overflow: hidden; border: 1px solid #403850; border-radius: 13px; background: #11101b55; }
+    .pipeline { min-width: 0; padding: 12px 15px 13px; }
+    .pipeline + .pipeline { border-left: 1px solid #383149; }
+    .pipeline:first-child { background: linear-gradient(118deg, #aa89fa20, #aa89fa07); }
+    .field { display: block; margin-bottom: 5px; color: #bdb7d1; font-size: 13px; font-weight: 550; }
+    .version { display: block; color: #efe3ff; font-size: 29px; font-weight: 650; line-height: 24px; letter-spacing: -.035em; }
+    .state { display: flex; gap: 6px; align-items: center; min-height: 24px; font-size: 15px; font-weight: 620; }
+    .success { color: #8de6b9; }
+    .failure { color: #ffaba9; }
+    .neutral { color: #d8c3a5; }
+
+    .activity { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(44px, 1fr); gap: 0 12px; padding: 7px 13px; }
+    .activity > div { display: flex; align-items: center; gap: 8px; min-width: 0; padding-block: 5px; }
+    .activity > div:nth-child(n+3) { border-top: 1px solid #403650; }
+    .icon { flex: 0 0 auto; display: grid; place-items: center; width: 33px; height: 33px; border-radius: 8px; background: color-mix(in srgb, currentColor 13%, transparent); }
+    .icon .line-icon { width: 18px; height: 18px; }
+    .watch { color: #a6b8ff; }
+    .fork { color: #c9b0ff; }
+    .star { color: #ffc88e; }
+    .metric-name { display: block; color: #d5cce5; font-size: 12px; font-weight: 500; }
+    .number { display: block; color: #faf8ff; font-size: 20px; font-weight: 650; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .activity .date { display: grid; grid-column: 1 / -1; grid-template-columns: 33px minmax(0, 1fr); }
+    .date-text { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+    .date .metric-name { font-size: 13px; font-weight: 600; }
+    .date .number { font-size: 16px; white-space: nowrap; }
+    .people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(31px, auto); gap: 10px 9px; margin-top: 13px; }
+    .person { min-width: 0; display: flex; align-items: center; gap: 7px; }
+    .avatar { flex: 0 0 auto; display: grid; place-items: center; width: 31px; height: 31px; padding: 2px; border: 1px solid #807193; border-radius: 50%; background: #322841; object-fit: cover; font-size: 12px; }
+    .person-details { min-width: 0; line-height: 1.18; }
+    .person-name { display: block; overflow: hidden; color: #f3edf9; font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .person-count { display: block; margin-top: 3px; color: #beb4d2; font-size: 10px; }
+
+    .platform-list { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); justify-items: center; gap: 12px 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+    .platform-logo { width: 36px; height: 37px; background: url($platforms) calc(var(--platform) * -36px) center / 396px 36px no-repeat; }
+    .statistics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); padding: 0; }
+    .stats-data { align-self: center; padding: 14px 0 14px 15px; }
+    .totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 5px; margin: 12px 0 0; }
+    .totals dt { color: #beb4d2; font-size: 10px; font-weight: 500; }
+    .totals dd { margin: 3px 0 0; color: #f5edff; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .stats-chart { display: grid; grid-template-columns: 111px minmax(0, 1fr); align-items: center; gap: 8px; padding-right: 12px; }
+    .ring { display: grid; place-items: center; justify-self: center; width: 100px; height: 100px; border-radius: 50%; background: conic-gradient($gradient); }
+    .ring-center { display: grid; place-content: center; width: 77px; height: 77px; border-radius: 50%; background: #211c31; text-align: center; }
+    .ring-center strong { font-size: 18px; line-height: 1.15; }
+    .ring-center span { color: #c8badd; font-size: 10px; }
+    .legend { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+    .legend li { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto auto; gap: 4px; align-items: center; color: #e2d9ed; font-size: 10px; line-height: 1.16; }
+    .legend strong { min-width: 29px; color: #f0e7fa; font-weight: 580; text-align: right; }
+    .language-count { min-width: 37px; color: #c1b4d1; text-align: right; }
+    .swatch { width: 8px; height: 8px; border-radius: 50%; background: var(--swatch); }
+
+    .link-panel { background: radial-gradient(ellipse at 0% 0%, #75609625, transparent 60%), #d5c4ff08; }
+    .link-grid { display: grid; gap: 5px; margin-top: 12px; }
+    .link-card { display: grid; grid-template-columns: 20px 128px minmax(0, 1fr) 15px; gap: 8px; align-items: center; min-height: 28px; padding: 3px 9px 3px 6px; border: 1px solid #58486588; border-radius: 9px; background: linear-gradient(100deg, #d5c4ff08, #17132355); color: inherit; text-decoration: none; }
+    .link-card:focus-visible { outline: 1px solid #c3aff4; outline-offset: 1px; }
+    .link-glyph { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: color-mix(in srgb, var(--glyph-color, transparent) 15%, transparent); color: var(--glyph-color); }
+    .link-glyph svg { width: 13px; height: 13px; }
+    .link-glyph img { display: block; width: 18px; height: 18px; object-fit: contain; }
+    .link-glyph.yinlin img { width: 19px; height: 19px; }
+    .link-title { color: #f5eefb; font-size: 12px; font-weight: 620; }
+    .link-url { color: #fff; font-size: 12px; overflow-wrap: anywhere; }
+    .link-arrow { justify-self: end; color: #bba7d4; }
+    .link-arrow svg { display: block; width: 14px; height: 14px; }
+    .topic-panel { background: radial-gradient(ellipse at 100% 0%, #75609625, transparent 72%), #d5c4ff08; }
+    .topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+    .topic { display: block; padding: 6px 11px; border: 1px solid #6d548c; border-radius: 999px; background: #9b79ca20; color: #ead9fe; font-size: 12px; font-weight: 550; line-height: 1.25; overflow-wrap: anywhere; text-decoration: none; }
+
+    .h-tree { margin-top: 12px; padding: 14px 16px 13px; }
+    .tree-root { display: flex; align-items: center; gap: 7px; width: max-content; padding: 7px 12px; border: 1px solid #735b97; border-radius: 8px; background: #34274c; color: #eee5ff; font: 13px Consolas, "DejaVu Sans Mono", monospace; }
+    .tree-root .line-icon, .tree-row-label .line-icon { color: #c3aff4; }
+    .tree-rows { margin: 0 0 0 14px; padding: 0; list-style: none; }
+    .tree-row { position: relative; display: grid; grid-template-columns: 121px minmax(0, 1fr); align-items: start; margin-left: 1px; padding: 7px 0 0 15px; border-left: 1px solid #66547f; }
+    .tree-row:last-child { border-left-color: transparent; }
+    .tree-row::before { position: absolute; top: 0; left: -1px; width: 15px; height: 20px; border-left: 1px solid #66547f; border-bottom: 1px solid #66547f; border-bottom-left-radius: 4px; content: ""; }
+    .tree-row-label { position: relative; display: flex; align-items: center; gap: 6px; width: fit-content; height: 26px; padding: 5px 9px; border: 1px solid #544565; border-radius: 7px; background: #2b223c; color: #e4d4ff; font: 600 12px/1 Consolas, "DejaVu Sans Mono", monospace; }
+    .tree-row-label .line-icon { width: 13px; height: 13px; }
+    .tree-row:not(:first-child) .tree-row-label { width: 107px; }
+    .tree-row:not(:first-child) .tree-row-label::after { position: absolute; left: 100%; top: 50%; width: 14px; border-top: 1px solid #66547f; content: ""; }
+    .tree-row > .tree-children, .module-group > .tree-children { border-left: 1px solid #66547f; }
+    .tree-children { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px 6px; min-width: 0; padding: 4px 0 4px 7px; }
+    .tree-leaves { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+    .tree-leaves > li { padding: 3px 6px; border: 1px solid #463a55; border-radius: 5px; background: #181425; color: #e8ddf3; font: 11px/1.05 Consolas, "DejaVu Sans Mono", monospace; }
+    .tree-row > .tree-children > .tree-leaves { flex-basis: 100%; }
+    .module-group { display: flex; align-items: flex-start; min-width: 0; }
+    .module-group-label { padding: 4px 6px; color: #d1b7fa; font: 600 11px/1.15 Consolas, "DejaVu Sans Mono", monospace; }
+</style>
+</head>
+<body>
+<main class="card" aria-label="Rachel repository status">
+    <img class="banner" src="$banner" alt="Rachel, modern cross-platform development framework">
+    <div class="panel">
+        <section class="pipelines" aria-label="Version and latest completed workflows">
+            <div class="pipeline"><span class="field">Version</span><strong class="version">$version</strong></div>
+            $workflows
+        </section>
+        <div class="row">
+            <section class="tile activity" aria-label="Repository activity">$activity</section>
+            <section class="tile">
+                <h2 class="section-title">Contributors <small>$contributor_count</small></h2>
+                <div class="people">$contributors</div>
+            </section>
+        </div>
+        <div class="row">
+            <section class="tile">
+                <h2 class="section-title">Platform</h2>
+                <ul class="platform-list">$platform_items</ul>
+            </section>
+            <section class="tile statistics" aria-label="Repository source statistics">
+                <div class="stats-data">
+                    <h2 class="section-title">Repository statistics</h2>
+                    <dl class="totals">
+                        <div><dt>Total files</dt><dd>$files</dd></div>
+                        <div><dt>Code lines</dt><dd>$code_lines</dd></div>
+                        <div><dt>Gradle modules</dt><dd>$modules</dd></div>
+                        <div><dt>Repository size</dt><dd>$size</dd></div>
+                    </dl>
+                </div>
+                <div class="stats-chart" aria-label="Languages by classified code lines">
+                    <div class="ring" aria-hidden="true"><div class="ring-center"><strong>$leading_percent</strong><span>$leading_language</span></div></div>
+                    <ul class="legend">$legend</ul>
+                </div>
+            </section>
+        </div>
+        <div class="row link-topic-row">
+            <section class="tile link-panel">
+                <h2 class="section-title">Link</h2>
+                <div class="link-grid">$links</div>
+            </section>
+            <section class="tile topic-panel">
+                <h2 class="section-title">Topics</h2>
+                <ul class="topics">$topics</ul>
+            </section>
+        </div>
+        <section class="tile h-tree" aria-label="全平台模块支持">
+            <div class="tree-root">$folder_icon&#32;ylcs-module</div>
+            <ul class="tree-rows">$module_tree</ul>
+        </section>
+    </div>
+</main>
+</body>
+</html>
