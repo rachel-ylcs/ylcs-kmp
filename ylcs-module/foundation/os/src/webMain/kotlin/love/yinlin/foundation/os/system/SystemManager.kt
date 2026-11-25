@@ -8,7 +8,7 @@ import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.js
 
-private suspend fun browserPlatform(): String? = js("""
+private fun browserPlatform(): String? = js("""
     (function() {
         if (typeof navigator === 'undefined') return null;
         const userAgent = navigator.userAgent || '';
@@ -26,9 +26,9 @@ private suspend fun browserPlatform(): String? = js("""
     })()
 """)
 
-private suspend fun browserUserAgent(): String = js("typeof navigator !== 'undefined' ? navigator.userAgent || '' : ''")
+private fun browserUserAgent(): String = js("typeof navigator !== 'undefined' ? navigator.userAgent || '' : ''")
 
-private suspend fun requestPlatformVersion(): Promise<JsAny>? = js("""
+private fun requestPlatformVersion(): Promise<JsAny>? = js("""
     typeof navigator !== 'undefined' &&
     navigator.userAgentData &&
     typeof navigator.userAgentData.getHighEntropyValues === 'function'
@@ -44,7 +44,7 @@ private suspend fun browserPlatformVersion(): String? {
     }
 }
 
-private suspend fun readPlatformVersion(values: JsAny): String? = js("values.platformVersion || null")
+private fun readPlatformVersion(values: JsAny): String? = js("values.platformVersion || null")
 
 actual object SystemManager {
     private suspend fun formatSystemVersion(platform: String, version: String?, userAgent: String): String? = when (platform) {
