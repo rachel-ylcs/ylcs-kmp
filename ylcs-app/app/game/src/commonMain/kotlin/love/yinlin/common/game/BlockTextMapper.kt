@@ -134,7 +134,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
                         val textChanged = remember(blockSize, data, writeMode) {
                             suspend { hide: Boolean, index: Int, ch: Char ->
                                 if (inputMode == CharacterBlockInputMode.DISABLED) {
-                                    val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
+                                    val oldCharacter: Char? = ch.takeIf { it != BTConfig.CHAR_EMPTY && it != BTConfig.CHAR_BLOCK && it != BTConfig.CHAR_BLANK }
                                     onCharacterSelectedUpdate(oldCharacter)?.then { newCharacter ->
                                         if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
                                             onCharacterChangedUpdate(index, BlockCharacter(newCharacter, hide))

@@ -296,7 +296,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                 controller.stop()
                 DataSourceMusic.updatePlaylist(newPlaylist)
                 val index = if (startId != null) actualMusicList.indexOf(startId) else -1
-                controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
+                controller.prepareMedias(actualMusicList, index.takeIf { it != -1 }, playing)
             }
         }
     }

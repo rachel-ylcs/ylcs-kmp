@@ -253,7 +253,7 @@ class ScreenRhyme : BasicScreen() {
             Coroutines.io {
                 val modPath = app.modPath
                 rawLibrary.mapNotNullTo(library) { info ->
-                    if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
+                    info.takeIf { it.path(modPath, ModResourceType.Rhyme).exists() }
                 }
             }
             // 初始化仓库

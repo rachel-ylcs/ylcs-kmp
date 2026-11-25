@@ -26,7 +26,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         return if (indexInShuffled != -1 && indices.size == musicList.size) {
             val actualIndex = indices[(indexInShuffled + indices.size - 1) % indices.size]
             // 播放一轮结束, 重新洗牌
-            if (actualIndex == shuffledList.begin) null else actualIndex
+            actualIndex.takeIf { it != shuffledList.begin }
         }
         else -1
     }
@@ -37,7 +37,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         return if (indexInShuffled != -1 && indices.size == musicList.size) {
             val actualIndex = indices[(indexInShuffled + 1) % indices.size]
             // 播放一轮结束, 重新洗牌
-            if (actualIndex == shuffledList.begin) null else actualIndex
+            actualIndex.takeIf { it != shuffledList.begin }
         } else -1
     }
 
@@ -175,7 +175,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
                 newIndices[fromRandomIndex] = newIndices[toRandomIndex]
                 newIndices[toRandomIndex] = tmp
                 // 检查当前移走的媒体是否是随机播放的起点并更新
-                val start = if (shuffledList.begin == fromIndex) toIndex else null
+                val start = toIndex.takeIf { shuffledList.begin == fromIndex }
                 shuffledList.internalSet(newIndices, start)
             }
         }

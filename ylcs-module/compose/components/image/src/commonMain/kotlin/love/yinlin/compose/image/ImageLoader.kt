@@ -104,7 +104,7 @@ internal class ImageLoader(
             }.also { it.users++ }
         }
 
-        return consumeFlight(flightKey, flight, outputs, if (reportsProgress) onProgress else null)
+        return consumeFlight(flightKey, flight, outputs, onProgress.takeIf { reportsProgress })
     }
 
     private suspend fun decode(request: ImageRequest, sourceKey: String, resultKey: String, epoch: Long, onProgress: ((ImageProgress) -> Unit)?): ImageResult {

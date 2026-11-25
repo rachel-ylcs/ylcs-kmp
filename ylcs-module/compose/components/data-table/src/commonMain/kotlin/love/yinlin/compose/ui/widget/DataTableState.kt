@@ -236,7 +236,7 @@ class DataTableState<T : DataTableItem>(columns: List<DataTableColumn>, items: L
                 sortDirection == DataTableSortDirection.Descending -> DataTableSortDirection.None
                 else -> DataTableSortDirection.Ascending
             }
-            sortColumnKey = if (sortDirection == DataTableSortDirection.None) null else columnKey
+            sortColumnKey = columnKey.takeIf { sortDirection != DataTableSortDirection.None }
             applySort()
             sortVersion++
         }

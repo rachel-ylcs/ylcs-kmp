@@ -49,7 +49,7 @@ private fun parseWeiboHtml(html: String): List<Node>? {
                 val tagName = html.substring(pos, closeEnd).trim().lowercase()
                 pos = closeEnd + 1
 
-                return if (tagName == endTagName) nodes else null
+                return nodes.takeIf { tagName == endTagName }
             }
             else {
                 val tagNameStart = pos
@@ -115,7 +115,7 @@ private fun parseWeiboHtml(html: String): List<Node>? {
             }
         }
 
-        return if (endTagName != null) null else nodes
+        return nodes.takeIf { endTagName == null }
     }
 
     return parseNodes(null)

@@ -8,7 +8,7 @@ internal class IndexedTerm(
     val variants: Map<String, PostingList>?,
 ) {
     fun exact(word: String): PostingList? = if (variants == null) {
-        if (original == word) postings else null
+        postings.takeIf { original == word }
     }
     else variants[word]
 }

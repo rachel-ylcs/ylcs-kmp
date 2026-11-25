@@ -198,9 +198,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
 
     private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Bundle? = withMainPlayer {
         it.sendCustomCommand(command, args).get()
-    }?.let {
-        if (it.resultCode == SessionResult.RESULT_SUCCESS) it.extras else null
-    }
+    }?.takeIf { it.resultCode == SessionResult.RESULT_SUCCESS }?.extras
 
     override suspend fun updatePlayMode(mode: MediaPlayMode) {
         send(

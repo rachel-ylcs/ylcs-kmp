@@ -37,7 +37,7 @@ object BilibiliAPI {
                 vipTitle = data.obj("vip").let { vip ->
                     val status = vip["status"].Int
                     val label = vip.obj("label")["text"].String
-                    if (status != 0 && label.isNotEmpty()) label else null
+                    label.takeIf { status != 0 && it.isNotEmpty() }
                 },
                 background = "https://i0.hdslb.com/${data["top_photo"].String}",
                 liveRoom = data["live_room"].ObjectNull?.let { liveRoom ->
@@ -217,7 +217,7 @@ object BilibiliAPI {
             for (item in arr) {
                 catchingNull { extractDynamic(item.Object) }?.let { items += it }
             }
-            val actualOffset = if (hasMore && offset.isNotEmpty()) offset else null
+            val actualOffset = offset.takeIf { hasMore && it.isNotEmpty() }
             return items to actualOffset
         }
     }

@@ -293,7 +293,7 @@ class ReorderingState internal constructor(
         val info = layout.info
         val position = constrain(info, item, gesture.origin + gesture.delta)
         val base = positions[gesture.key]?.position() ?: info.position(item)
-        val drop = Drop(gesture.key, position - base, if (settleAfterAnimation) callback else null, gesture.pin)
+        val drop = Drop(gesture.key, position - base, callback.takeIf { settleAfterAnimation }, gesture.pin)
         drops = drops + drop
         if (!settleAfterAnimation) callback?.invoke()
         if (drop !in drops) return

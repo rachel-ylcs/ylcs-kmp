@@ -187,7 +187,7 @@ internal class PcVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
         scope.launch {
             if (url == null) return@launch
             val target = position.coerceAtLeast(0L)
-            pendingSeek = if (backend.seek(target)) null else target
+            pendingSeek = target.takeIf { !backend.seek(it) }
             desiredPlaying = true
             backend.play()
             this@PcVideoController.position = backend.query().position

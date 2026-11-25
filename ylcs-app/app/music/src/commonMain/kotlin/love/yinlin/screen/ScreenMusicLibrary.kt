@@ -299,7 +299,7 @@ class ScreenMusicLibrary : Screen() {
                     }.shadow(Theme.shape.v5, Theme.shadow.v7)
                     .clip(Theme.shape.v5)
                     .background(Theme.color.surface)
-                    .combinedClickable(onClick = onClick, onLongClick = if (enableLongClick) onLongClick else null)
+                    .combinedClickable(onClick = onClick, onLongClick = onLongClick.takeIf { enableLongClick })
             ) {
                 LocalFileImage(
                     source = musicInfo.path(ModResourceType.Record),

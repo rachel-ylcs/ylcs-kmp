@@ -134,7 +134,7 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
 
     override fun load(path: String) = command {
         val current = ensurePlayer()
-        url = if (current.load(path, playing = true)) path else null
+        url = path.takeIf { current.load(it, playing = true) }
         synchronize()
     }
 

@@ -686,7 +686,7 @@ fun BasicImage(
     val drawing = ImageElement(layout, alpha, options.colorFilter, ImageQualityPolicy.from(options.quality).filterQuality,
         !separateContent, options.fadeIn, if (options.fadeIn) Theme.animation.duration.default else 0)
 
-    val overlayClick = if (options.zoom) null else onClick
+    val overlayClick = onClick.takeIf { !options.zoom }
     val overlays: @Composable BoxScope.() -> Unit = remember(state, geometry, placeholder, overlayClick) {
         {
             if (overlayClick != null) ImageClickOverlay(state, geometry, overlayClick)
