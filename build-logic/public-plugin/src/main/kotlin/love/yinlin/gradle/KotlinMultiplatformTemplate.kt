@@ -39,7 +39,7 @@ class KotlinMultiplatformSourceSetsScope(
     val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
     val nativeTest: KotlinSourceSet by lazy { with(extension) { set.nativeTest.get() } }
     val androidMain: KotlinSourceSet by lazy { with(extension) { set.androidMain.get() } }
-    val androidTest: KotlinSourceSet by lazy { with(extension) { set.androidUnitTest.get() } }
+    val androidTest: KotlinSourceSet by lazy { set.getByName("androidHostTest") }
     val appleMain: KotlinSourceSet by lazy { with(extension) { set.appleMain.get() } }
     val appleTest: KotlinSourceSet by lazy { with(extension) { set.appleTest.get() } }
     val iosMain: KotlinSourceSet by lazy { with(extension) { set.iosMain.get() } }
@@ -333,9 +333,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                     }
                 }
 
-                withHostTest {
-
-                }
+                withHostTest {}
 
                 @Suppress("UnstableApiUsage")
                 optimization {
