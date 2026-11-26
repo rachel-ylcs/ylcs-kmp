@@ -1,28 +1,31 @@
-![Preview](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.webp)
+![Github仓库状态看板图加载中...](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.webp)
 
-### 语言 (Language) :
-**中文** | [English](README_en.md)
+## 语言 (Language) :
+### **中文** | [English](README_en.md)
 
-# Rachel快速开发框架
+# Rachel 快速开发框架
 
-`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，由银临茶舍项目组完成开发。
+> [!NOTE]
+> `Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架。
+>
+> 由银临茶舍项目组完成开发。
 
-## 特性
+# 特性
 
-- **跨平台**：基于`KMP` / `CMP`，支持全平台客户端与服务端，具有多端一致性。
-- **原生性能**：生成平台原生二进制文件，无桥接或附加库。
-- **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
-- **快速**：三分钟便能上手构建自己的跨平台应用程序。
-- **简洁**：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
-- **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
-- **高协作**：框架支持前后端协作开发，共享数据组织结构。
+> [!Tip]
+> - **跨平台**：基于`KMP` / `CMP`，支持全平台客户端与服务端，具有多端一致性。
+> - **原生性能**：生成平台原生二进制文件，无桥接或附加库。
+> - **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
+> - **快速**：三分钟便能上手构建自己的跨平台应用程序。
+> - **简洁**：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
+> - **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
+> - **高协作**：框架支持前后端协作开发，共享数据组织结构。
 
 # 文档
 
-|文档|链接|
-|:---:|:---:|
-| 入门指引 |  [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)  |
-|API|  [模块API合集](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)  |
+> [!IMPORTANT]
+> ### 1. [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+> ### 2. [Rachel模块API合集](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
 
 # Rachel Compose UI 界面库
 
@@ -30,10 +33,9 @@
 
 ![rachel](ylcs-docs/docs/assets/ui.png)
 
-|预览|链接|
-|:---:|:---:|
-|  UI 画廊  |  [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)  |
-|导航|  [Modern Navigation](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)  |
+> [!IMPORTANT]
+> ### 1. [UI在线画廊](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)
+> ### 2. [现代导航预览](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)
 
 # 案例：银临茶舍跨平台 App
 

@@ -67,8 +67,9 @@
     .language-count { min-width: 37px; color: #c1b4d1; text-align: right; }
     .swatch { width: 8px; height: 8px; border-radius: 50%; background: var(--swatch); }
 
-    .credits-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); align-items: start; gap: 14px; margin-top: 12px; padding-block: 13px; }
-    .license { border-right: 1px solid #403850; }
+    .credits-row { display: grid; grid-template-columns: 94px minmax(0, 1fr); align-items: center; column-gap: 24px; margin-top: 12px; padding-block: 13px; }
+    .credits-row .section-title { text-align: center; }
+    .license { display: grid; justify-items: center; padding-right: 14px; border-right: 1px solid #403850; }
     .license .section-title { font-size: 13px; }
     .license-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 5px 7px; border: 1px solid #89714c; border-radius: 7px; background: #ffc88e15; color: #ffdaac; font-size: 12px; font-weight: 700; text-decoration: none; }
     .license-badge .line-icon { width: 14px; height: 14px; }
@@ -76,6 +77,7 @@
     .credits-list > li { flex: 1 1 auto; min-width: 0; }
     .credit { display: grid; justify-items: center; gap: 4px; min-width: 0; color: #f3edf9; font-size: 11px; font-weight: 600; text-align: center; text-decoration: none; }
     .credit img.avatar { object-fit: contain; }
+    .credit[href="https://github.com/JetBrains/kotlin"] img.avatar { padding: 5px; }
     .credit span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .link-panel { background: radial-gradient(ellipse at 0% 0%, #75609625, transparent 60%), #d5c4ff08; }

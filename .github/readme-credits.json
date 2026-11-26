@@ -1,8 +1,7 @@
 [
     {
         "name": "media3",
-        "repository": "androidx/media",
-        "icon": "https://raw.githubusercontent.com/androidx/media/release/.idea/icon.svg"
+        "repository": "androidx/media"
     },
     {
         "name": "kotlin",
@@ -21,8 +20,7 @@
     },
     {
         "name": "miniaudio",
-        "repository": "mackron/miniaudio",
-        "icon": "https://raw.githubusercontent.com/mackron/miniaudio/master/resources/branding/icon-128x128.png"
+        "repository": "mackron/miniaudio"
     },
     {
         "name": "sqlx4k",

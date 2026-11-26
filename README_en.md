@@ -1,28 +1,31 @@
-![Preview](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.webp)
+![Loading Github repository status dashboard...](https://raw.githubusercontent.com/rachel-ylcs/ylcs-kmp/readme-assets/repository-status.webp)
 
-### 语言 (Language) :
-[中文](README.md) | **English**
+## 语言 (Language) :
+### [中文](README.md) | **English**
 
 # Rachel Rapid Development Framework
 
-`Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`, and was developed by the 银临茶舍 project team.
+> [!NOTE]
+>  `Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`.
+>
+> Developed by the 银临茶舍 project team.
 
-## Feature
+# Feature
 
-- **Cross-platform**: Based on `KMP` / `CMP`, it supports all platform clients and servers, with multi terminal consistency.
-- **Native performance**: Generate platform native binary files without bridging or additional libraries.
-- **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
-- **Quick**: You can start building your own cross-platform application in just three minutes.
-- **Simple**: A large number of type safe and structured framework DSL, without the need to write too much template code.
-- **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
-- **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
+> [!Tip]
+> - **Cross-platform**: Based on `KMP` / `CMP`, it supports all platform clients and servers, with multi terminal consistency.
+> - **Native performance**: Generate platform native binary files without bridging or additional libraries.
+> - **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
+> - **Quick**: You can start building your own cross-platform application in just three minutes.
+> - **Simple**: A large number of type safe and structured framework DSL, without the need to write too much template code.
+> - **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
+> - **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
 
 # Document
 
-|Documentation|Link|
-|:---:|:---:|
-| Getting Started |  [Rachel Framework Development Wizard](https://rachel-ylcs.github.io/ylcs-kmp)  |
-|API|  [Module API](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)  |
+> [!IMPORTANT]
+> ### 1. [Rachel Framework Development Wizard](https://rachel-ylcs.github.io/ylcs-kmp)
+> ### 2. [Rachel Module API](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
 
 # Rachel Compose UI Library
 
@@ -30,10 +33,9 @@ The UI library covers a large number of UI components, supports dark mode, is in
 
 ![rachel](ylcs-docs/docs/assets/ui.png)
 
-|Preview|Link|
-|:---:|:---:|
-|  UI Gallery  |  [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)  |
-|Navigation|  [Modern Navigation](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)  |
+> [!IMPORTANT]
+> ### 1. [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)
+> ### 2. [Modern Navigation](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)
 
 # Sample: 银临茶舍 Cross-Platform App
 
