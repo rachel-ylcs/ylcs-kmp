@@ -52,6 +52,21 @@ object MacOSDef {
         "size" with CGSize
     }
 
+    val CGAffineTransform: Layout = NamedStructLayout("CGAffineTransform") {
+        "a" with NativeType.Double
+        "b" with NativeType.Double
+        "c" with NativeType.Double
+        "d" with NativeType.Double
+        "tx" with NativeType.Double
+        "ty" with NativeType.Double
+    }
+
+    val AudioObjectPropertyAddress: Layout = NamedStructLayout("AudioObjectPropertyAddress") {
+        "mSelector" with NativeType.Int
+        "mScope" with NativeType.Int
+        "mElement" with NativeType.Int
+    }
+
     val NSEdgeInsets: Layout = NamedStructLayout("NSEdgeInsets") {
         "top" with NativeType.Double
         "left" with NativeType.Double
