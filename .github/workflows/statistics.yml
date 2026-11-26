@@ -12,6 +12,7 @@ on:
       - 'ylcs-docs/**'
       - 'native-compose/adaptation/**'
       - '.github/scripts/**'
+      - '.github/readme-credits.json'
       - '.github/workflows/**'
       - '.github/actions/**'
       - 'gradle/**'
@@ -33,6 +34,7 @@ on:
       - 'ylcs-docs/**'
       - 'native-compose/adaptation/**'
       - '.github/scripts/**'
+      - '.github/readme-credits.json'
       - '.github/workflows/**'
       - '.github/actions/**'
       - 'gradle/**'
@@ -123,6 +125,7 @@ jobs:
         run: |
           python .github/scripts/render_readme_status.py \
             --stats build/statistic/statistic.json \
+            --credits .github/readme-credits.json \
             --output build/readme-status/repository-status.webp
 
       - name: Upload the status card

@@ -58,20 +58,3 @@
 ### 宣发视频
 
 https://private-user-images.githubusercontent.com/76944654/719117260-84a79114-6540-4cd4-a0b5-892960823d88.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTU2MzE1OTYsIm5iZiI6MTc5NTYzMTI5NiwicGF0aCI6Ii83Njk0NDY1NC83MTkxMTcyNjAtODRhNzkxMTQtNjU0MC00Y2Q0LWEwYjUtODkyOTYwODIzZDg4Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjExMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMTI1VDE4MjgxNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWI4NDVhOWI3MTA4ZDAxNGE1YzZkNGM5NDMwMjk5NjVjMWE1YTBiMGNjMTkwNTM1OTg5ZDkxOGFmYjFiYTBlZjYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.i2kaEaj12Wt5qKM56Mm9YY3HcQVD7ZReQJhN8xOI260
-
-## 许可
-
-`银临茶舍` 是在 MIT 许可下许可的开源软件，查看[LICENSE](LICENSE)获取更多信息。
-
-## 致谢
-
-按首字母排序。
-
-|   Type   |     Author      |                                                                                Name                                                                                |
-|:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
-| Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
-| Library  |mackron|[miniaudio](https://github.com/mackron/miniaudio)|
-| Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
-| Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
-| Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |

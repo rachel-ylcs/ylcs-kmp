@@ -67,6 +67,17 @@
     .language-count { min-width: 37px; color: #c1b4d1; text-align: right; }
     .swatch { width: 8px; height: 8px; border-radius: 50%; background: var(--swatch); }
 
+    .credits-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); align-items: start; gap: 14px; margin-top: 12px; padding-block: 13px; }
+    .license { border-right: 1px solid #403850; }
+    .license .section-title { font-size: 13px; }
+    .license-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 5px 7px; border: 1px solid #89714c; border-radius: 7px; background: #ffc88e15; color: #ffdaac; font-size: 12px; font-weight: 700; text-decoration: none; }
+    .license-badge .line-icon { width: 14px; height: 14px; }
+    .credits-list { display: flex; gap: 7px; align-items: start; margin: 7px 0 0; padding: 0; list-style: none; }
+    .credits-list > li { flex: 1 1 auto; min-width: 0; }
+    .credit { display: grid; justify-items: center; gap: 4px; min-width: 0; color: #f3edf9; font-size: 11px; font-weight: 600; text-align: center; text-decoration: none; }
+    .credit img.avatar { object-fit: contain; }
+    .credit span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
     .link-panel { background: radial-gradient(ellipse at 0% 0%, #75609625, transparent 60%), #d5c4ff08; }
     .link-grid { display: grid; gap: 5px; margin-top: 12px; }
     .link-card { display: grid; grid-template-columns: 20px max-content minmax(0, 1fr); gap: 8px; align-items: center; min-height: 28px; padding: 3px 9px 3px 6px; border: 1px solid #58486588; border-radius: 9px; background: linear-gradient(100deg, #d5c4ff08, #17132355); color: inherit; text-decoration: none; }
@@ -137,6 +148,19 @@
                 </div>
             </section>
         </div>
+        <section class="tile credits-row" aria-label="License and credits">
+            <div class="license">
+                <h2 class="section-title">LICENSE</h2>
+                <a class="license-badge" href="$license_url" aria-label="MIT License">
+                    <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                    MIT
+                </a>
+            </div>
+            <div>
+                <h2 class="section-title">Credits</h2>
+                <ul class="credits-list">$credits</ul>
+            </div>
+        </section>
         <div class="row link-topic-row">
             <section class="tile link-panel">
                 <h2 class="section-title">Link</h2>

@@ -23,6 +23,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = Path(__file__).with_name("readme_status")
+CREDITS = ROOT / ".github/readme-credits.json"
 REPOSITORY = "rachel-ylcs/ylcs-kmp"
 DOCS = "https://rachel-ylcs.github.io/ylcs-kmp"
 CHINA_TIME = timezone(timedelta(hours=8))
@@ -148,31 +149,61 @@ def date_metric(title, glyph, timestamp):
     )
 
 
-def avatar(person):
-    parts = urlsplit(person["avatar_url"])
-    if parts.scheme != "https" or parts.netloc != "avatars.githubusercontent.com":
+def remote_image(url, *, allow_svg=False):
+    if urlsplit(url).scheme != "https":
         return None
-    url = parts._replace(query="s=96").geturl()
+    formats = {"image/png", "image/jpeg", "image/webp", "image/gif"}
+    if allow_svg:
+        formats.add("image/svg+xml")
     try:
         with urlopen(url, timeout=8) as response:
             mime = response.headers.get_content_type()
-            if mime in ("image/png", "image/jpeg", "image/webp", "image/gif"):
+            if mime in formats:
                 return image_url(response.read(), mime)
     except (URLError, TimeoutError):
         pass
     return None
 
 
+def avatar(person):
+    parts = urlsplit(person["avatar_url"])
+    if parts.netloc != "avatars.githubusercontent.com":
+        return None
+    return remote_image(parts._replace(query="s=96").geturl())
+
+
+def profile_icon(name, source):
+    if source:
+        return f'<img class="avatar" src="{source}" alt="">'
+    return f'<span class="avatar" aria-hidden="true">{escape(name[:1].upper())}</span>'
+
+
 def contributor(person):
     name = escape(person["login"])
     commits = person["contributions"]
     unit = "commit" if commits == 1 else "commits"
-    source = avatar(person)
-    head = f'<img class="avatar" src="{source}" alt="">' if source else f'<span class="avatar">{escape(person["login"][:1].upper())}</span>'
+    head = profile_icon(person["login"], avatar(person))
     return (
         f'<div class="person">{head}<div class="person-details">'
         f'<span class="person-name" title="{name}">{name}</span>'
         f'<span class="person-count">{commits:,} {unit}</span></div></div>'
+    )
+
+
+def credit(entry):
+    name = entry["name"]
+    repository = quote(entry["repository"], safe="/")
+    icon_url = entry.get("icon")
+    source = remote_image(icon_url, allow_svg=True) if icon_url else None
+    if not source:
+        try:
+            owner = github(f"/repos/{repository}")["owner"]
+            source = avatar(owner)
+        except (URLError, TimeoutError):
+            pass
+    return (
+        f'<li><a class="credit" href="https://github.com/{repository}">'
+        f'{profile_icon(name, source)}<span>{escape(name)}</span></a></li>'
     )
 
 
@@ -315,9 +346,12 @@ def repository_fields(repository):
     }
 
 
-def render_card(stats, repository, output, html_output=None, browser_path=None):
+def render_card(stats, repository, output, html_output=None, browser_path=None, credits_path=CREDITS):
     summary = stats["summary"]
     catalog = tomllib.loads((ROOT / "libs.versions.toml").read_text(encoding="utf-8"))
+    entries = json.loads(credits_path.read_text(encoding="utf-8"))
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        credits = "".join(executor.map(credit, entries))
     fields = {
         **repository_fields(repository),
         **language_fields(stats.get("programming_languages", [])),
@@ -332,6 +366,8 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
         "code_lines": f"{summary['code_lines']:,}",
         "modules": f"{summary['gradle_modules']:,}",
         "size": format_size(summary["bytes"]),
+        "license_url": f"https://github.com/{quote(repository, safe='/')}/blob/main/LICENSE",
+        "credits": credits,
         "links": links(),
         "folder_icon": icon("folder"),
         "module_tree": module_rows(stats["kmp"]["modules"]),
@@ -339,7 +375,8 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
     html = Template((ASSETS / "card.html").read_text(encoding="utf-8")).substitute(fields)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=browser_path)
-        page = browser.new_page(viewport={"width": 960, "height": 1200}, device_scale_factor=1.5)
+        viewport_width = 960
+        page = browser.new_page(viewport={"width": viewport_width, "height": 1200}, device_scale_factor=1080 / viewport_width)
         page.set_content(html, wait_until="load")
         page.evaluate("document.fonts.ready")
         page.evaluate("(src) => { const img = new Image(); img.src = src; return img.decode(); }", fields["platforms"])
@@ -351,7 +388,7 @@ def render_card(stats, repository, output, html_output=None, browser_path=None):
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.suffix.lower() == ".webp":
         with Image.open(BytesIO(png)) as image:
-            image.convert("RGB").save(output, format="WEBP", quality=92, method=6)
+            image.convert("RGB").save(output, format="WEBP", quality=90, method=6)
     else:
         output.write_bytes(png)
     if html_output:
@@ -365,11 +402,12 @@ def main():
     parser.add_argument("--stats", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True, help="Output image path (.webp or .png)")
     parser.add_argument("--repository", default=os.environ.get("GITHUB_REPOSITORY", REPOSITORY))
+    parser.add_argument("--credits", type=Path, default=CREDITS, help="Credits JSON with name, repository (owner/name), and optional HTTPS icon")
     parser.add_argument("--html", type=Path, help="Also save the rendered HTML for local preview")
     parser.add_argument("--browser", help="Optional path to a local Chromium-based browser")
     args = parser.parse_args()
     stats = json.loads(args.stats.read_text(encoding="utf-8"))
-    render_card(stats, args.repository, args.output, args.html, args.browser)
+    render_card(stats, args.repository, args.output, args.html, args.browser, args.credits)
 
 
 if __name__ == "__main__":

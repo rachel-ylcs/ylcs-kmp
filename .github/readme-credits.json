@@ -1,0 +1,45 @@
+[
+    {
+        "name": "media3",
+        "repository": "androidx/media",
+        "icon": "https://raw.githubusercontent.com/androidx/media/release/.idea/icon.svg"
+    },
+    {
+        "name": "kotlin",
+        "repository": "JetBrains/kotlin",
+        "icon": "https://kotlinlang.org/assets/images/favicon.svg"
+    },
+    {
+        "name": "compose",
+        "repository": "JetBrains/compose-multiplatform",
+        "icon": "https://raw.githubusercontent.com/JetBrains/compose-multiplatform/master/artwork/compose-logo.svg"
+    },
+    {
+        "name": "ktor",
+        "repository": "ktorio/ktor",
+        "icon": "https://raw.githubusercontent.com/ktorio/ktor/main/ktor-dokka/assets/logo-icon.svg"
+    },
+    {
+        "name": "miniaudio",
+        "repository": "mackron/miniaudio",
+        "icon": "https://raw.githubusercontent.com/mackron/miniaudio/master/resources/branding/icon-128x128.png"
+    },
+    {
+        "name": "sqlx4k",
+        "repository": "smyrgeorge/sqlx4k"
+    },
+    {
+        "name": "MMKV",
+        "repository": "Tencent/MMKV"
+    },
+    {
+        "name": "libpag",
+        "repository": "Tencent/libpag",
+        "icon": "https://media.githubusercontent.com/media/Tencent/libpag/main/playground/pagx-playground/static/favicon.png"
+    },
+    {
+        "name": "re.this",
+        "repository": "vendelieu/re.this",
+        "icon": "https://raw.githubusercontent.com/vendelieu/re.this/master/assets/logo-icon.svg"
+    }
+]
