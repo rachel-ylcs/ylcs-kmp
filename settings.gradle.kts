@@ -117,7 +117,10 @@ repository {
 
             module("compose") {
                 module("core")
-                module("theme", "ui", "icons", "platform-view", "screen", "cache", "app", "config")
+                module("platform-view", "shader")
+                module("theme", "icons", "ui")
+                module("cache", "config")
+                module("screen", "app")
                 module("game") {
                     module("core")
                 }
