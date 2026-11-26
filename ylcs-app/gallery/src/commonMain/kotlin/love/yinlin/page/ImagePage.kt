@@ -52,7 +52,7 @@ object ImagePage : Page(
     english = "Image",
     description = "加载资源、本地或网络图片，也可播放、缩放和裁剪。",
     keywords = "图片 ImageSource ImageState",
-    group = PageGroup.Layout,
+    group = PageGroup.Foundation,
 ) {
     private val demoResourceImage = component("Resource", "从应用资源读取图片，可离线查看。", "JPEG PNG BMP GIF WebP EXIF")
     private val demoWebImage = component("Web", "按网址加载图片，支持进度和重试。", "URL HTTP 缓存")

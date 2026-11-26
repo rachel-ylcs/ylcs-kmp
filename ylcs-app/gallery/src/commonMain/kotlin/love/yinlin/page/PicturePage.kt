@@ -44,7 +44,7 @@ object PicturePage : Page(
     english = "Picture",
     description = "图片处理或布局",
     keywords = "图标 配图 九宫格 调色板",
-    group = PageGroup.Layout,
+    group = PageGroup.Foundation,
 ) {
     private val demoIcon = component("Icon", "用图标表示操作或状态，支持提示和自定义颜色。", "LoadingIcon ColorIcon")
     private val demoNineGrid = component("NineGrid", "把照片和视频封面排成九宫格。", "配图 视频")

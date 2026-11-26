@@ -43,35 +43,41 @@ internal object OverviewPage : Page(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 maxItemsInEachRow = if (LocalGalleryCompact.current) 1 else 3,
             ) {
-                GalleryMetric("组件分类", GalleryCatalog.entries.size.toString(), Modifier.weight(1f))
+                GalleryMetric("展示页面", GalleryCatalog.entries.size.toString(), Modifier.weight(1f))
                 GalleryMetric("组件示例", GalleryCatalog.componentCount.toString(), Modifier.weight(1f))
                 GalleryMetric("当前外观", if (darkMode) "深色" else "浅色", Modifier.weight(1f))
             }
+            PageCards(GalleryCatalog.entries.filter { it.group == null })
             PageGroup.entries.forEach { group ->
                 GallerySectionHeading(group.title, group.description)
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    maxItemsInEachRow = if (LocalGalleryCompact.current) 1 else 2,
-                ) {
-                    GalleryCatalog.entries.filter { it.group == group }.forEach { item ->
-                        GalleryCard(modifier = Modifier.weight(1f).heightIn(min = 238.dp), onClick = { currentPage = item }) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(13.dp)) {
-                                GalleryIconTile(item.icon)
-                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                    Text(item.title, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
-                                    GalleryCaption(item.english)
-                                }
-                                GalleryBadge("${item.components.size} 组")
-                            }
-                            GalleryParagraph(item.description)
-                            GalleryCaption(item.components.joinToString(" · ") { it.title })
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("打开示例", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Theme.color.primary)
-                                Icon(Icons.KeyboardArrowRight, color = Theme.color.primary, modifier = Modifier.size(16.dp))
-                            }
+                PageCards(GalleryCatalog.entries.filter { it.group == group })
+            }
+        }
+    }
+
+    @Composable
+    private fun PageCards(pages: List<Page>) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            maxItemsInEachRow = if (LocalGalleryCompact.current) 1 else 2,
+        ) {
+            pages.forEach { item ->
+                GalleryCard(modifier = Modifier.weight(1f).heightIn(min = 238.dp), onClick = { currentPage = item }) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(13.dp)) {
+                        GalleryIconTile(item.icon)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(item.title, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
+                            GalleryCaption(item.english)
                         }
+                        GalleryBadge("${item.components.size} 组")
+                    }
+                    GalleryParagraph(item.description)
+                    GalleryCaption(item.components.joinToString(" · ") { it.title })
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("打开示例", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Theme.color.primary)
+                        Icon(Icons.KeyboardArrowRight, color = Theme.color.primary, modifier = Modifier.size(16.dp))
                     }
                 }
             }

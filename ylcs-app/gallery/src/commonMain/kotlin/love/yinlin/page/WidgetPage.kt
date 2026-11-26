@@ -37,7 +37,7 @@ object WidgetPage : Page(
     english = "Widgets",
     description = "用于日历、日志和数据查看的专用组件。",
     keywords = "日历 日志 表格",
-    group = PageGroup.Layout,
+    group = PageGroup.Standalone,
 ) {
     private val demoCalendar = component("Calendar", "浏览月历，也可查看农历、节日和节气。", "日历 月历")
     private val demoLogOutput = component("LogOutput", "查看不断更新的日志，支持 ANSI 颜色和暂停跟随。", "LogOutputState ANSI")

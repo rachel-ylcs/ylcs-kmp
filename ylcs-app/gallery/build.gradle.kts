@@ -20,10 +20,12 @@ rachel {
         sources {
             commonMain {
                 lib(
+                    libs.jetbrains.annotation,
                     libs.compose.resources,
                     projects.ylcsModule.foundation.fts,
                     projects.ylcsModule.compose.app,
                     projects.ylcsModule.compose.platformView,
+                    projects.ylcsModule.compose.shader,
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.blur,
                     projects.ylcsModule.compose.components.palette,

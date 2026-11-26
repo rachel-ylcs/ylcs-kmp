@@ -28,7 +28,7 @@ object PlatformViewPage : Page(
     english = "Interop",
     description = "在 Compose 界面中嵌入平台原生组件。",
     keywords = "Platform View 原生控件",
-    group = PageGroup.Layout,
+    group = PageGroup.Standalone,
 ) {
     private val demoPlatformView = component("Interop", "可直接编辑原生文本，也可在上方叠放 Compose 控件。", "PlatformViewState PlatformViewHost", previewAlias = "原生组件嵌入")
 

@@ -28,7 +28,6 @@ object ThemePage : Page(
     english = "Theme",
     description = "用主题色统一界面的背景、内容和反馈。",
     keywords = "配色 明暗 ColorSystem",
-    group = PageGroup.Foundation,
 ) {
     private val demoAccent = component("Accent", "用强调色区分操作的优先级。", "primary secondary tertiary")
     private val demoContainer = component("Container", "搭配容器底色与前景色，让文字清晰可读。", "primaryContainer onContainer")

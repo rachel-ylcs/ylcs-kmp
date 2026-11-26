@@ -102,8 +102,8 @@ private fun GallerySidebar(selected: Page, filtered: List<Page>, search: InputSt
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            if (OverviewPage in filtered) {
-                itemKey(OverviewPage.id) { GalleryNavItem(OverviewPage, selected) }
+            items(filtered.filter { it.group == null }, key = { it.id }) {
+                GalleryNavItem(it, selected)
             }
 
             PageGroup.entries.forEach { group ->
@@ -136,7 +136,7 @@ private fun GallerySidebar(selected: Page, filtered: List<Page>, search: InputSt
 
             GalleryBadge(galleryPalette.title)
 
-            GalleryCaption("${GalleryCatalog.entries.size} 个分类  /  ${GalleryCatalog.componentCount} 组展示")
+            GalleryCaption("${GalleryCatalog.entries.size} 个展示页面  /  ${GalleryCatalog.componentCount} 组展示")
 
             GalleryActions {
                 GalleryBadge("Desktop")

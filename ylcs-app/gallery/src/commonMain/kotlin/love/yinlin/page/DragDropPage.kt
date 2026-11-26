@@ -35,7 +35,7 @@ object DragDropPage : Page(
     english = "DragDrop",
     description = "把系统文件或其他应用中的文本拖进界面。",
     keywords = "Drag & Drop DragFlag",
-    group = PageGroup.Interaction,
+    group = PageGroup.AdvancedInteraction,
 ) {
     private val demoFileDrop = component("文件", "从文件管理器拖入一个或多个文件。", "DragFlag.File DropResult.File", previewAlias = "文件拖放")
     private val demoTextDrop = component("文本", "把其他应用中选中的文字拖进接收区。", "DragFlag.Text DropResult.Text", previewAlias = "文本拖放")

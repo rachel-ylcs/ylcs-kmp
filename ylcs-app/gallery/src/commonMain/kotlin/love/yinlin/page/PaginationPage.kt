@@ -53,7 +53,7 @@ object PaginationPage : Page(
     english = "Pagination",
     description = "管理分页数据，并在列表、网格和瀑布流中完成下拉刷新与继续加载。",
     keywords = "分页 Pagination PaginationArgs PaginationColumn PaginationGrid PaginationStaggeredGrid 下拉刷新 加载更多",
-    group = PageGroup.Pagination,
+    group = PageGroup.Standalone,
 ) {
     private val demoPagination = component(
         title = "Pagination",

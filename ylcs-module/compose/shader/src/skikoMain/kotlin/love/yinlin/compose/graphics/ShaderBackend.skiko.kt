@@ -1,13 +1,12 @@
 package love.yinlin.compose.graphics
 
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.asComposeShader
+import org.intellij.lang.annotations.Language
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 import org.jetbrains.skia.impl.use
 
-internal actual fun createShaderBackend(source: String): (List<ShaderUniform>) -> (Size) -> Shader {
+internal actual fun createShaderBackend(@Language("AGSL") source: String): ShaderBackend {
     val effect = RuntimeEffect.makeForShader(source)
     return { uniforms ->
         { size ->
@@ -23,6 +22,7 @@ internal actual fun createShaderBackend(source: String): (List<ShaderUniform>) -
                         else -> error("Invalid float uniform size.")
                     }
                 }
+
                 builder.makeShader().asComposeShader()
             }
         }

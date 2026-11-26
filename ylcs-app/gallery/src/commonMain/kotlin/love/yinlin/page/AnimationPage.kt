@@ -34,7 +34,7 @@ object AnimationPage : Page(
     english = "Animation",
     description = "用动画表现加载、进度和内容展开。",
     keywords = "加载 进度 过渡",
-    group = PageGroup.Interaction,
+    group = PageGroup.Effects,
 ) {
     private val demoLoading = component("Loading", "用环形或波浪动画提示正在加载。", "CircleLoading WaveLoading")
     private val demoProgress = component("Progress", "用线条或圆环显示任务进度。", "LinearProgress CircleProgress")

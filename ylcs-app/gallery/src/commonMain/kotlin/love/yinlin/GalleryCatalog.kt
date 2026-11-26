@@ -4,32 +4,35 @@ import love.yinlin.foundation.fts.FullTextSearch
 import love.yinlin.page.*
 
 internal enum class PageGroup(val title: String, val description: String) {
-    Foundation("设计基础", "界面配色、排版和文字样式。"),
-    Interaction("操作与反馈", "输入控件、选择器、导航和操作反馈。"),
-    Layout("内容与布局", "布局容器、图片和数据展示。"),
-    Pagination("Pagination", "分页数据管理、下拉刷新与加载布局。"),
+    Foundation("基础组件", "文本排版、图片展示和图像处理。"),
+    Interaction("操作反馈", "输入控件、选择器和导航。"),
+    Layout("内容布局", "布局、容器、集合与浮窗。"),
+    Effects("视觉效果", "动画、模糊和可实时预览的着色器。"),
+    AdvancedInteraction("高级交互", "拖放操作和拖动排序。"),
+    Standalone("独立组件", "原生视图、分页和专用组件。"),
 }
 
 internal object GalleryCatalog {
     val entries: List<Page> = [
         ThemePage,
         TextPage,
+        PicturePage,
+        ImagePage,
         InputPage,
         PickerPage,
         NavigationPage,
-        AnimationPage,
-        FloatingPage,
-        DragDropPage,
-        PicturePage,
-        ImagePage,
-        ContainerPage,
         LayoutPage,
+        ContainerPage,
         CollectionPage,
+        FloatingPage,
+        AnimationPage,
         BlurPage,
+        ShaderPage,
+        DragDropPage,
         ReorderingPage,
         PlatformViewPage,
-        WidgetPage,
         PaginationPage,
+        WidgetPage,
     ]
 
     private val allEntries: List<Page> = [OverviewPage] + entries

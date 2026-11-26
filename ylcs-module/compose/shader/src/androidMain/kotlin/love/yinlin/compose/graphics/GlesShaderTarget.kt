@@ -26,6 +26,7 @@ internal class GlesShaderTarget(val width: Int, val height: Int) {
         GLES20.glFramebufferTexture2D(
             GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture, 0,
         )
+
         val status = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)
         if (framebuffer == 0 || texture == 0 || status != GLES20.GL_FRAMEBUFFER_COMPLETE) {
             close()
@@ -39,6 +40,7 @@ internal class GlesShaderTarget(val width: Int, val height: Int) {
         else {
             val paddedPixels = ByteBuffer.allocateDirect(bitmap.byteCount)
             val row = pixels.duplicate()
+
             for (y in 0 ..< height) {
                 val start = y * packedRowBytes
                 row.limit(start + packedRowBytes)
@@ -46,6 +48,7 @@ internal class GlesShaderTarget(val width: Int, val height: Int) {
                 paddedPixels.position(y * bitmap.rowBytes)
                 paddedPixels.put(row)
             }
+
             paddedPixels.rewind()
             bitmap.copyPixelsFromBuffer(paddedPixels)
         }

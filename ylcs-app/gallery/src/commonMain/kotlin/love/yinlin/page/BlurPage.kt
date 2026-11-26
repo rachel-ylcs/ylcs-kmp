@@ -46,7 +46,7 @@ object BlurPage : Page(
     english = "Blur",
     description = "让面板背后的内容呈现磨砂效果。",
     keywords = "磨砂 BlurState",
-    group = PageGroup.Layout,
+    group = PageGroup.Effects,
 ) {
     private val demoBlurEffect = component("效果", "把背景接到模糊面板上，调整模糊程度和色调。", "BlurParameters blurSource blurTarget", previewAlias = "Source / Target")
     private val demoPanels = component("面板", "多个面板共用一个背景，各自设置模糊效果。", "blurTarget", previewAlias = "多个 Target")

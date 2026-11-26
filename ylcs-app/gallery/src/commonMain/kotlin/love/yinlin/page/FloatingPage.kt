@@ -34,7 +34,7 @@ object FloatingPage : Page(
     english = "Floating",
     description = "在当前页面上打开对话框、抽屉和菜单。",
     keywords = "弹窗 抽屉 提示",
-    group = PageGroup.Interaction,
+    group = PageGroup.Layout,
 ) {
     private val demoDialog = component("Dialog", "需要确认、输入或选择时，在当前内容上弹出对话框。", "DialogInfo DialogConfirm DialogInput DialogChoice DialogLoading DialogProgress")
     private val demoSheet = component("Sheet", "用抽屉承载补充内容或可滚动的选项列表。", "SheetContent")

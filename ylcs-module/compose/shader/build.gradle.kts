@@ -20,13 +20,10 @@ rachel {
         sources {
             commonMain {
                 lib(
+                    libs.jetbrains.annotation,
                     ExportLib,
                     projects.ylcsModule.compose.core
                 )
-            }
-
-            commonTest {
-                lib(libs.test)
             }
 
             skikoMain(commonMain)
@@ -36,11 +33,6 @@ rachel {
             iosMainList(iosMain)
 
             desktopMain(skikoMain)
-            desktopTest {
-                dependencies {
-                    runtimeOnly("org.jetbrains.skiko:skiko-awt-runtime-all:${libs.versions.skiko.get()}")
-                }
-            }
 
             nativeMain(skikoMain)
 

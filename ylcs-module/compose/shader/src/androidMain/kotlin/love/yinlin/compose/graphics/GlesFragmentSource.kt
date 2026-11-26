@@ -13,13 +13,11 @@ internal fun toGlesFragmentSource(source: String): String {
             token.startsWith("rachelShader") -> error("The rachelShader prefix is reserved in shader source.")
             token == "main" -> "rachelShaderMain"
             token == "half" -> "float"
-            token in unsupportedTokens ->
-                error("'$token' is unsupported by the Android 9–12 shader backend.")
-            else -> vectorType.matchEntire(token)?.let { "vec${it.groupValues[1]}" }
-                ?: matrixType.matchEntire(token)?.let { "mat${it.groupValues[1]}" }
-                ?: token
+            token in unsupportedTokens -> error("'$token' is unsupported by the Android 9–12 shader backend.")
+            else -> vectorType.matchEntire(token)?.let { "vec${it.groupValues[1]}" } ?: matrixType.matchEntire(token)?.let { "mat${it.groupValues[1]}" } ?: token
         }
     }
+
     return """
         #ifdef GL_FRAGMENT_PRECISION_HIGH
         precision highp float;

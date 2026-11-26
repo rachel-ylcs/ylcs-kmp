@@ -38,7 +38,7 @@ object ReorderingPage : Page(
     english = "Reordering",
     description = "在列表、网格和瀑布流里拖动条目调整顺序。",
     keywords = "拖柄 ReorderingItem onSettle",
-    group = PageGroup.Layout,
+    group = PageGroup.AdvancedInteraction,
 ) {
     private val demoLazyList = component("列表", "在横向或纵向列表中拖动排序，靠近边缘可继续滚动。", "LazyColumn LazyRow", previewAlias = "LazyColumn / LazyRow")
     private val demoLazyGrid = component("网格", "在网格中拖动排序，支持跨行或跨列的条目。", "LazyVerticalGrid LazyHorizontalGrid", previewAlias = "LazyVerticalGrid / LazyHorizontalGrid")
