@@ -66,8 +66,25 @@ class ScreenAdmin : Screen() {
         }
     }
 
+    @Composable
+    private fun WorldPanel(modifier: Modifier) {
+        SettingsLayout(
+            modifier = modifier,
+            title = "世界",
+            icon = Icons.Public,
+            color = Theme.color.secondaryContainer
+        ) {
+            ItemExpander(
+                title = "演出记忆数据库",
+                icon = Icons.LibraryMusic,
+                onClick = { navigate(::ScreenConcertEditor) }
+            )
+        }
+    }
+
     private val adminPanel = movableComposable { profile: UserProfile, modifier: Modifier ->
         ActivityPanel(profile, modifier)
+        WorldPanel(modifier)
     }
 
     @Composable

@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.account.SigninData
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.concert.Concert
+import love.yinlin.data.rachel.concert.ConcertSaveRequest
 import love.yinlin.data.rachel.concert.ConcertSong
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -151,16 +152,28 @@ val ApiBackupDownloadPlaylist by API.post.i<String>().o<JsonObject>()
 // Concert
 
 @APIParam("token")
-@APIReturn("concerts", description = "全部演出，按 cid 升序")
-@APIReturn("songs", description = "全部演出歌曲，按 sid 升序")
-@APIReturn("attendedConcerts", description = "当前用户点亮的演出 cid 列表")
+@APIReturn("concerts")
+@APIReturn("songs")
+@APIReturn("attendedConcerts")
 val ApiConcertGetConcerts by API.post.i<String>().o<List<Concert>, List<ConcertSong>, List<Int>>()
 
 @APIParam("token")
 @APIParam("cid")
-@APIParam("attended", description = "true 点亮，false 取消点亮")
-@APIReturn("attendedConcerts", description = "更新后的完整点亮演出 cid 列表")
+@APIParam("attended")
+@APIReturn("attendedConcerts")
 val ApiConcertSetAttended by API.post.i<String, Int, Boolean>().o<List<Int>>()
+
+@APIParam("token")
+@APIReturn("concerts")
+@APIReturn("songs")
+@APIReturn("albums")
+val ApiConcertGetEditorData by API.post.i<String>().o<List<Concert>, List<ConcertSong>, PhotoAlbumList>()
+
+@APIParam("token")
+@APIParam("concert", description = "cid 为空时新增，否则修改指定演出")
+@APIReturn("concert")
+@APIReturn("songs")
+val ApiConcertSaveConcert by API.post.i<String, ConcertSaveRequest>().o<Concert, List<ConcertSong>>()
 
 // Follows
 

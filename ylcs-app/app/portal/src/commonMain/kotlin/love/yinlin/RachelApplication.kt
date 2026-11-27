@@ -74,6 +74,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             // world
             screen(::ScreenWorld)
             screen(::ScreenConcert)
+            screen(::ScreenConcertEditor)
 
             // game
             screen(::ScreenGame)

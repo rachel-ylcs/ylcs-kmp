@@ -119,6 +119,33 @@ object Icons {
         close()
     }
 
+    val Save by icon {
+        moveTo(17f, 3f)
+        horizontalLineTo(5f)
+        curveTo(3.9f, 3f, 3f, 3.9f, 3f, 5f)
+        verticalLineTo(19f)
+        curveTo(3f, 20.1f, 3.9f, 21f, 5f, 21f)
+        horizontalLineTo(19f)
+        curveTo(20.1f, 21f, 21f, 20.1f, 21f, 19f)
+        verticalLineTo(7f)
+        lineTo(17f, 3f)
+        close()
+
+        moveTo(12f, 19f)
+        curveToRelative(-1.66f, 0f, -3f, -1.34f, -3f, -3f)
+        reflectiveCurveToRelative(1.34f, -3f, 3f, -3f)
+        reflectiveCurveToRelative(3f, 1.34f, 3f, 3f)
+        reflectiveCurveToRelative(-1.34f, 3f, -3f, 3f)
+        close()
+
+        moveTo(15f, 10f)
+        horizontalLineTo(5f)
+        verticalLineTo(5f)
+        horizontalLineTo(15f)
+        verticalLineTo(10f)
+        close()
+    }
+
     val Search by icon {
         moveTo(15.5f, 14.0f)
         horizontalLineToRelative(-0.79f)

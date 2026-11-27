@@ -161,7 +161,7 @@ class ScreenConcert : BasicScreen() {
         provider.withLoading {
             val [concerts, songs, attended] = ApiConcertGetConcerts.requestNull(token)!!
             memory = ConcertMemoryState.create(concerts, songs, attended)
-            concerts.isNotEmpty() && songs.isNotEmpty()
+            concerts.isNotEmpty()
         }
     }
 
