@@ -3,17 +3,14 @@ package love.yinlin.compose.ui.floating
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -23,9 +20,9 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.animation.AnimationContent
+import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catching
@@ -103,44 +100,44 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
                 Type.Warning -> Theme.color.warning
                 Type.Error -> Theme.color.error
             }
-            val surface = Theme.color.surface
-            val brush = remember(accent, surface) {
-                Brush.horizontalGradient([
-                    accent.copy(alpha = 0.32f).compositeOver(surface),
-                    accent.copy(alpha = 0.24f).compositeOver(surface),
-                    surface
-                ])
-            }
 
             val shape = Theme.shape.v5
             val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h9, vertical = Theme.padding.v4)
             val duration = Theme.animation.duration.v7
 
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .defaultMinSize(minWidth = Theme.size.cell1)
-                    .widthIn(max = Theme.size.cell1 * 1.5f)
-                    .shadow(shape, radius = Theme.shadow.v7)
-                    .clip(shape)
-                    .background(brush)
-                    .border(Theme.border.v7, accent.copy(alpha = 0.48f), shape)
-            ) {
-                AnimationContent(
-                    state = data,
-                    enter = {
-                        fadeIn(tween(duration, easing = FastOutSlowInEasing)) + slideInVertically(initialOffsetY = { -it / 4 }, animationSpec = tween(duration, easing = FastOutSlowInEasing))
-                    },
-                    exit = {
-                        fadeOut(tween(duration / 2)) + slideOutVertically(targetOffsetY = { -it / 5 }, animationSpec = tween(duration / 2))
-                    }
-                ) { (val type, val text) ->
+            AnimationContent(
+                state = data,
+                enter = {
+                    fadeIn(
+                        animationSpec = tween(duration, easing = FastOutSlowInEasing)
+                    ) + slideInVertically(
+                        initialOffsetY = { -it / 4 },
+                        animationSpec = tween(duration, easing = FastOutSlowInEasing)
+                    )
+                },
+                exit = {
+                    fadeOut(
+                        animationSpec = tween(duration / 2)
+                    ) + slideOutVertically(
+                        targetOffsetY = { -it / 5 },
+                        animationSpec = tween(duration / 2)
+                    )
+                }
+            ) { (val type, val text) ->
+                Surface(
+                    modifier = Modifier.padding(padding).widthIn(max = Theme.size.cell1 * 1.5f),
+                    contentAlignment = Alignment.CenterStart,
+                    shadowElevation = Theme.shadow.v5,
+                    tonalLevel = 3,
+                    shape = shape,
+                    border = BorderStroke(Theme.border.v5, accent.copy(alpha = 0.8f))
+                ) {
                     Row(
-                        modifier = Modifier.padding(Theme.padding.value9),
+                        modifier = Modifier.defaultMinSize(minWidth = Theme.size.cell1).background(accent.copy(alpha = 0.12f)).padding(Theme.padding.value9),
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(modifier = Modifier.width(Theme.size.box4).height(Theme.size.icon).clip(Theme.shape.circle).background(accent))
+                        Box(modifier = Modifier.size(Theme.size.box4, Theme.size.icon).clip(Theme.shape.circle).background(accent))
 
                         Box(
                             modifier = Modifier.size(Theme.size.icon).clip(Theme.shape.circle).background(accent.copy(alpha = 0.34f)),
