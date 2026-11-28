@@ -4,5 +4,5 @@ import androidx.compose.runtime.Stable
 
 @Stable
 object RedBookUrl {
-    fun userProfile(id: String): String = "https://www.xiaohongshu.com/user/profile/$id"
+    fun userProfile(id: String): String = "https://www.rednote.com/user/profile/$id"
 }

@@ -26,15 +26,12 @@ object RedBookAPI {
                 val start = i
                 val first = src[i]
 
-                // 标量值：读到分隔符为止
                 if (first != '{' && first != '[') {
                     var j = i
                     while (j < src.length && src[j] !in ",}]") j++
-                    return start until j
+                    return start ..< j
                 }
 
-                // 对象 / 数组：括号配对，跳过字符串内部
-                val open = first
                 val close = if (first == '{') '}' else ']'
                 var depth = 0
                 var inStr: Char? = null
@@ -50,7 +47,7 @@ object RedBookAPI {
                     } else {
                         when (ch) {
                             '"', '\'', '`' -> inStr = ch
-                            open -> depth++
+                            first -> depth++
                             close -> if (--depth == 0) return start .. i
                         }
                     }
@@ -71,15 +68,9 @@ object RedBookAPI {
             val noteCard = note["noteCard"].Object
             val user = noteCard["user"].Object
             val interactInfo = noteCard["interactInfo"].Object
-            val type = noteCard["type"].String
             val cover = noteCard["cover"].Object
             val defaultUrl = cover["urlDefault"].String
-            val picture = if (type == "video") {
-                RedBookMedia.Video(image = defaultUrl)
-            }
-            else {
-                RedBookMedia.Image(image = defaultUrl)
-            }
+            val picture = RedBookMedia.Image(image = defaultUrl)
 
             return RedBook(
                 id = note["index"].String,
@@ -91,7 +82,7 @@ object RedBookAPI {
                 time = noteCard["time"].Long.toLocalDateTime!!,
                 title = noteCard["displayTitle"].String,
                 data = RedBookData(
-                    likeNum = interactInfo["likedCount"].String.toInt()
+                    likeNum = interactInfo["likedCount"].String.filter { it.isDigit() }.toInt()
                 ),
                 medias = [picture],
                 xsecToken = note["xsecToken"].String
@@ -111,7 +102,11 @@ object RedBookAPI {
         buildList {
             for (note in notes) {
                 if (note is JsonArray && note.isNotEmpty()) {
-                    for (subNote in note) add(Fetcher.extractRedBook(subNote.Object))
+                    for (subNote in note) {
+                        catching {
+                            add(Fetcher.extractRedBook(subNote.Object))
+                        }
+                    }
                 }
             }
         }

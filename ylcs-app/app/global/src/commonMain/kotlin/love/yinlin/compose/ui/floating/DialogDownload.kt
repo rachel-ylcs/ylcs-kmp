@@ -28,7 +28,8 @@ suspend fun DialogDownload.download(url: String, sink: Sink, onSave: suspend (Bo
 
 suspend fun DialogDownload.downloadPhoto(url: String) {
     val picker = app.picker
-    val filename = url.filenameOrRandom(".webp")
+    val fn = url.filenameOrRandom(".webp")
+    val filename = if (fn.endsWith(".webp")) fn else "$fn.webp"
     picker.prepareSavePicture(filename)?.then { [origin, sink] ->
         val result = download(url, sink) {
             if (it) picker.actualSave(filename, origin, sink)
@@ -39,7 +40,8 @@ suspend fun DialogDownload.downloadPhoto(url: String) {
 
 suspend fun DialogDownload.downloadVideo(url: String) {
     val picker = app.picker
-    val filename = url.filenameOrRandom(".mp4")
+    val fn = url.filenameOrRandom(".mp4")
+    val filename = if (fn.endsWith(".mp4")) fn else "$fn.mp4"
     picker.prepareSaveVideo(filename)?.then { [origin, sink] ->
         val result = download(url, sink) {
             if (it) picker.actualSave(filename, origin, sink)
@@ -55,7 +57,8 @@ suspend fun DialogDownload.downloadPhotos(pics: List<String>) {
         this.total = pics.size.toString()
         for (index in pics.indices) {
             val pic = pics[index]
-            val filename = pic.filenameOrRandom(".webp")
+            val fn = pic.filenameOrRandom(".webp")
+            val filename = if (fn.endsWith(".webp")) fn else "$fn.webp"
             picker.prepareSavePicture(filename)?.then { [origin, sink] ->
                 sink.use {
                     NetClient.File.download(
