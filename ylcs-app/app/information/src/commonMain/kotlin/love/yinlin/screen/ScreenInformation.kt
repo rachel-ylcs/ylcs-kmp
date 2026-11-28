@@ -33,7 +33,18 @@ import love.yinlin.extension.cleaning
 
 @Stable
 class ScreenInformation : BasicScreen() {
-    private val provider = RachelStatefulProvider()
+    private val errorRequestText = "可能触发风控啦, 再试试呗~"
+    private val errorRequestHandlerText = "重试"
+
+    private val provider = RachelStatefulProvider(
+        emptyText = errorRequestText,
+        emptyHandler = ::requestNewData,
+        emptyHandlerText = errorRequestHandlerText,
+        networkErrorText = errorRequestText,
+        networkErrorHandler = ::requestNewData,
+        networkErrorHandlerText = errorRequestHandlerText
+    )
+
     private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.manager(MessageType.Default))
     private var isNavigating by mutableStateOf(false)
 
@@ -51,31 +62,39 @@ class ScreenInformation : BasicScreen() {
         if (currentManager != manager && !isNavigating) {
             currentManager = manager
             // 检查是否有数据需要更新
-            if (manager.items.isEmpty()) {
-                launch { requestNewData(manager) }
-            }
+            if (manager.items.isEmpty()) requestNewData(manager)
             else provider.status = StatefulStatus.Content
         }
     }
 
-    private suspend fun requestNewData(manager: MessageManager<*>) {
-        isNavigating = true
-        cleaning({
-            provider.withLoading { manager.requestNewData(::flushContent) }
-        }) { isNavigating = false }
+    private fun requestNewData(manager: MessageManager<*> = currentManager) {
+        if (!isNavigating) {
+            launch {
+                if (!isNavigating) {
+                    isNavigating = true
+                    cleaning({
+                        provider.withLoading { manager.requestNewData(::flushContent) }
+                    }) { isNavigating = false }
+                }
+            }
+        }
     }
 
-    private suspend fun requestMoreData(manager: MessageManager<*>) {
-        isNavigating = true
-        cleaning({
-            manager.requestMoreData()
-        }) { isNavigating = false }
+    private fun requestMoreData(manager: MessageManager<*> = currentManager) {
+        if (!isNavigating) {
+            launch {
+                if (!isNavigating) {
+                    isNavigating = true
+                    cleaning({
+                        manager.requestMoreData()
+                    }) { isNavigating = false }
+                }
+            }
+        }
     }
 
     override fun initialize() {
-        launch {
-            requestNewData(currentManager)
-        }
+        requestNewData()
     }
 
     @Composable
@@ -157,13 +176,8 @@ class ScreenInformation : BasicScreen() {
                     state = currentManager.gridState,
                     canRefresh = true,
                     canLoading = currentManager.canLoading,
-                    onRefresh = {
-                        // 防止正在切换
-                        if (!isNavigating) requestNewData(currentManager)
-                    },
-                    onLoading = {
-                        if (!isNavigating) requestMoreData(currentManager)
-                    },
+                    onRefresh = { requestNewData() },
+                    onLoading = { requestMoreData() },
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = Theme.padding.eValue,
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
