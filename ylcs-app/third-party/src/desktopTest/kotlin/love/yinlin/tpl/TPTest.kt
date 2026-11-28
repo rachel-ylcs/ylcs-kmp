@@ -60,7 +60,7 @@ class TPTest private constructor() {
                 println("[TP / $name] failed")
                 throw error
             }
-            println("[TP / $name: $type]\n$json")
+            println("###### [TP / $name: $type]\n$json")
             return ReadOnlyProperty { _, _ -> value }
         }
     }
@@ -68,6 +68,7 @@ class TPTest private constructor() {
     companion object {
         operator fun invoke(block: suspend TPTest.() -> Unit) = runTest {
             catchingError { TPTest().block() }?.printStackTrace(System.err)
+            println()
         }
     }
 }

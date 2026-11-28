@@ -1,6 +1,7 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,10 +16,8 @@ import love.yinlin.common.APILevel
 import love.yinlin.common.MessageManager
 import love.yinlin.common.MessageType
 import love.yinlin.compose.Colors
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.layout.HorizontalScrollContainer
@@ -29,8 +28,7 @@ import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
-import love.yinlin.compose.ui.node.squareByContentSize
-import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.extension.cleaning
 
 @Stable
@@ -94,21 +92,10 @@ class ScreenInformation : BasicScreen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
-                    ) {
-                        Icon(
-                            icon = Icons.ArrowBack,
-                            onClick = ::onBack
-                        )
-
-                        Icon(
-                            icon = Icons.Settings,
-                            onClick = {
-                                with(currentManager) { openSettings() }
-                            }
-                        )
-                    }
+                    Icon(
+                        icon = Icons.ArrowBack,
+                        onClick = ::onBack
+                    )
 
                     HorizontalScrollContainer(state = state, modifier = Modifier.weight(1f)) {
                         LazyRow(
@@ -120,39 +107,42 @@ class ScreenInformation : BasicScreen() {
                             items(items = MessageType.entries, key = { it }) { type ->
                                 val manager: MessageManager<*> = DataSourceInformation.manager(type)
                                 val isSelected = currentManager == manager
-                                val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
-                                val levelName = manager.level.name
 
+                                val accentColor = when (manager.level) {
+                                    APILevel.TODO -> Theme.color.disabledContainer
+                                    APILevel.ALPHA -> Colors.Pink4
+                                    APILevel.BETA -> Colors.Red4
+                                    APILevel.RC -> Colors.Orange4
+                                    APILevel.STABLE -> Colors.Green4
+                                }
+                                val borderColor = if (isSelected) Theme.color.onSurface.copy(alpha = 0.8f) else accentColor.copy(alpha = 0.8f)
+                                val shape = Theme.shape.v7
 
-                                Column(
+                                Box(
                                     modifier = Modifier
-                                        .clip(Theme.shape.v7)
-                                        .background(background)
+                                        .clip(shape)
+                                        .condition(isSelected) { background(accentColor.copy(alpha = 0.35f)) }
+                                        .border(Theme.border.v6, borderColor, shape)
                                         .clickable(enabled = !isNavigating) { onNavigate(manager) }
-                                        .squareByContentSize()
-                                        .padding(Theme.padding.g2),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(Theme.padding.g2, Alignment.CenterVertically)
+                                        .padding(Theme.padding.e),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         icon = manager.icon,
                                         color = Colors.Unspecified,
-                                        tip = levelName
-                                    )
-                                    SimpleClipText(
-                                        text = levelName,
-                                        color = when (manager.level) {
-                                            APILevel.UNUSED -> LocalColor.current
-                                            APILevel.ALPHA -> Theme.color.tertiary
-                                            APILevel.BETA -> Theme.color.secondary
-                                            APILevel.RC, APILevel.STABLE -> Theme.color.primary
-                                        },
-                                        style = Theme.typography.v8.bold
+                                        tip = manager.name
                                     )
                                 }
                             }
                         }
                     }
+
+                    Icon(
+                        icon = Icons.Settings,
+                        onClick = {
+                            with(currentManager) { openSettings() }
+                        }
+                    )
                 }
             }
 
